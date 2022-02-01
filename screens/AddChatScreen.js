@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React, { useLayoutEffect, useState } from 'react';
 import { Input, Button } from 'react-native-elements';
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { db } from '../firebase';
 
 const AddChatScreen = ({ navigation }) => {
@@ -10,7 +10,7 @@ const AddChatScreen = ({ navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
         title: 'Add a new chat',
-        headerBackTitle: "Chats",
+        headerBackTitle: 'Chats',
     });
   }, [navigation])
 
@@ -23,17 +23,17 @@ const AddChatScreen = ({ navigation }) => {
   }
     
   return (
-    <View style={styles.container}>
+    <View style={ styles.container }>
         <Input 
             placeholder='Enter a chat name'
-            value={input}
-            onChangeText={(text) => setInput(text)}
-            onSubmitEditing={createChat}
+            value={ input }
+            onChangeText={ (text) => setInput(text) }
+            onSubmitEditing={ createChat }
             leftIcon={
-                <Icon name="wechat" type="antdesign" size={24} color="black"/>
+                <Icon name='wechat' type='antdesign' size={ 24 } color='black' />
             }
         />
-        <Button disabled={!input} onPress={createChat} title='Create new Chat' /> 
+        <Button disabled={ !input } onPress={ createChat } title='Create new Chat' /> 
     </View>
   );
 };
@@ -42,8 +42,8 @@ export default AddChatScreen;
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "white",
+        backgroundColor: 'white',
         padding: 30,
-        height: "100%",
+        height: '100%',
     },
 });

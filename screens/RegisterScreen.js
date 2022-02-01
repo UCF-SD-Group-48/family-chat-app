@@ -13,8 +13,7 @@ const RegisterScreen = ({ navigation }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerBackTitle:"Back to Login",
-    
+            headerBackTitle: 'Back to Login',
         })
     }, [navigation])
 
@@ -23,13 +22,13 @@ const RegisterScreen = ({ navigation }) => {
         .then((authUser) => {
             authUser.user.updateProfile({
                 displayName: name,
-                photoURL: imageUrl || "https://connectingcouples.us/wp-content/uploads/2019/07/avatar-placeholder.png"
+                photoURL: imageUrl || 'https://connectingcouples.us/wp-content/uploads/2019/07/avatar-placeholder.png'
             });
         }).catch(error => alert(error.message));
     };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.container}>
+    <KeyboardAvoidingView behavior='padding' style={ styles.container }>
         <StatusBar style='light'/>
 
         <Text h3 style={{ marginBottom: 50 }}>
@@ -58,21 +57,21 @@ const RegisterScreen = ({ navigation }) => {
                 onChangeText={(text) => setPassword(text)}
             />
             <Input 
-                placeholder='Profile Picture URL (optional)' 
+                placeholder='Profile Picture URL (Optional)' 
                 type = 'text'
                 value={imageUrl}
                 onChangeText={(text) => setImageUrl(text)}
-                onSubmitEditing={register}
+                onSubmitEditing={ register }
             />
 
         </View>
-            <Button 
-                style={styles.button}
-                raised
-                onPress={register}
-                title='Register'
-            />
-            <View style={{ height: 100 }} />
+        <Button 
+            style={styles.button}
+            raised
+            onPress={ register }
+            title='Register'
+        />
+        <View style={{ height: 100 }} />
     </KeyboardAvoidingView>
   );
 };
@@ -82,10 +81,10 @@ export default RegisterScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: 'center',
+        justifyContent: 'center',
         padding: 10,
-        backgroundColor: "white"
+        backgroundColor: 'white'
     },
     button: {
         width: 200,
