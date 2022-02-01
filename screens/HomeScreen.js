@@ -78,7 +78,6 @@ const HomeScreen = ({ navigation }) => {
                 enterChat={enterChat}
                 />
           ))}
-        <CustomListItem />
       </ScrollView>
     </SafeAreaView>
   );
