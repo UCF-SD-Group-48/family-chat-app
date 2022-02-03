@@ -13,6 +13,8 @@ import LandingPage from './screens/LandingPage';
 import RegisterPage from './screens/RegisterPage';
 import VerifyPage from './screens/VerifyPage';
 
+import FrontEndTestSpace from './screens/FrontEndTestSpace';
+
 const Stack = createStackNavigator();
 
 const globalScreenOptions = {
@@ -34,6 +36,8 @@ export default function App() {
         <Stack.Screen name='Home' component={ HomeScreen } />    
         <Stack.Screen name='AddChat' component={ AddChatScreen } /> 
         <Stack.Screen name='Chat' component={ ChatScreen } />    
+
+        <Stack.Screen name='FrontEndTestSpace' component={ FrontEndTestSpace } />
       </Stack.Navigator>
     </NavigationContainer>
   );

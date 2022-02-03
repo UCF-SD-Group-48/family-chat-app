@@ -11,7 +11,7 @@ const CustomListItem = ({id, chatName, enterChat }) => {
         .collection('chats')
         .doc(id)
         .collection('messages')
-        .orderBy("timestamp", "desc")
+        .orderBy('timestamp', "desc")
         .onSnapshot((snapshot) => 
             setChatMessages(snapshot.docs.map((doc) => doc.data()))
         );
@@ -21,16 +21,16 @@ const CustomListItem = ({id, chatName, enterChat }) => {
 
   return (
     <ListItem 
-        key={id} 
+        key={ id } 
         onPress={() => enterChat(id, chatName)} 
-        key={id} 
+        key={ id } 
         buttomDivider>
       <Avatar
         rounded
         source={{
             uri: 
                 chatMessages?.[0]?.photoURL ||
-						    "http://www.cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
+						    'http://www.cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png',
         }}
       />
       <ListItem.Content>

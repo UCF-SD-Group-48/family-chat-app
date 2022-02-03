@@ -6,17 +6,19 @@ import { Avatar, Icon } from 'react-native-elements';
 import { auth, db } from '../firebase';
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
 
-const HomeScreen = ({ navigation }) => {
+// Landing Page - Avatar
+import AppLogo from '../assets/appLogo.svg'
+
+
+
+
+const FrontEndTestSpace = ({ navigation }) => {
     const [chats, setChats] = useState([]);
 
     const signOutUser = () => {
         auth.signOut().then(() => {
             navigation.replace('Login');
         });
-    };
-
-    const goToTestingGround = () => {
-        navigation.replace('FrontEndTestSpace');
     };
 
     useEffect(() => {
@@ -33,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: 'HOME',
+            title: 'FE TEST GROUND',
             headerStyle: { backgroundColor: '#fff' },
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
@@ -53,12 +55,15 @@ const HomeScreen = ({ navigation }) => {
                         marginRight: 20,
                     }}
                 >
-                    <TouchableOpacity activeOpacity={ 0.5 } onPress={ goToTestingGround }>
+                    <TouchableOpacity activeOpacity={ 0.5 }
+                        onPress={ () => navigation.navigate('Home') }
+                    >
                         <Icon
-                            name='alert-triangle'
-                            type='feather'
+                            name='back'
+                            type='antdesign'
                             color='#517fa4'
                         />
+                        
                     </TouchableOpacity>
                     <TouchableOpacity 
                         onPress={ () => navigation.navigate('AddChat') }
@@ -74,6 +79,7 @@ const HomeScreen = ({ navigation }) => {
 		navigation.navigate('Chat', { id, chatName });
 	};
 
+
   return (
     <SafeAreaView>
       <ScrollView style={ styles.container }>
@@ -85,12 +91,14 @@ const HomeScreen = ({ navigation }) => {
                     enterChat={ enterChat }
                 />
           ))}
+            <AppLogo />
+
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default HomeScreen;
+export default FrontEndTestSpace;
 
 const styles = StyleSheet.create({
     container: {
