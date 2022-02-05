@@ -11,12 +11,14 @@ import loginStyles from '../styles/loginStyles.js';
 // Landing Page - Avatar
 import AppLogo from '../assets/appLogo.svg'
 import LargeTitle from '../components/LargeTitle';
+import LoginInput from '../components/LoginInput';
 
 
 
 
 const FrontEndTestSpace = ({ navigation }) => {
     const [chats, setChats] = useState([]);
+    const [inputText, onChangeText] = useState("");
 
     const signOutUser = () => {
         auth.signOut().then(() => {
@@ -103,8 +105,7 @@ const FrontEndTestSpace = ({ navigation }) => {
         <View style={ loginStyles.top_centerAligned_view }>
             {/* <AppLogo /> */}
             <LargeTitle title="Family Chat" />
-            <LargeTitle title="Welcome,"/>
-            <LargeButton title="Get Started" type="Primary"/>
+            <LoginInput title="Enter Phone #:" value={inputText} placeholder={"1 (XXX) XXX - XXXX"}/>
         </View>
 
         <View style={ loginStyles.middle_centerAligned_view }>
