@@ -12,8 +12,9 @@ import ChatScreen from './screens/ChatScreen';
 import LandingPage from './screens/LandingPage';
 import RegisterPage from './screens/RegisterPage';
 import VerifyPage from './screens/VerifyPage';
-
+import PhoneVerification from './screens/PhoneVerification'; 
 import FrontEndTestSpace from './screens/FrontEndTestSpace';
+
 
 const Stack = createStackNavigator();
 
@@ -30,6 +31,7 @@ export default function App() {
       <Stack.Navigator screenOptions={ globalScreenOptions }>
         <Stack.Screen name='Landing Page' component={ LandingPage }/>
         <Stack.Screen name="Register Page" component={ RegisterPage }/>
+        <Stack.Screen name="PhoneVerification" component={ PhoneVerification }/>
         <Stack.Screen name="Verify Page" component={ VerifyPage }/>
         <Stack.Screen name='Login' component={ LoginScreen } />
         <Stack.Screen name='Register' component={ RegisterScreen } />    

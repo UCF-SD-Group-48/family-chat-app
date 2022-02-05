@@ -47,7 +47,7 @@ const LandingPage = ({ navigation }) => {
             </View>
 
             <Button 
-                onPress={ () => navigation.navigate('Register Page') } 
+                onPress={ () => navigation.navigate('PhoneVerification') } 
                 style={ styles.button } 
                 type='outline' 
                 title='Get Started'
