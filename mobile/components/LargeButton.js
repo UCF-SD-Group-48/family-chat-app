@@ -5,14 +5,13 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 const LargeButton = (props) => {
   return (
-    <TouchableOpacity onPress={props.onPress}>
-      <View style={ props.style=="Secondary" ? styles.viewSecondary :
-                    props.style=="Tertiary" ? styles.viewTertiary : styles.viewPrimary }>
-        <Text style={ props.style=="Secondary" ? styles.textSecondary :
-                      props.style=="Tertiary" ? styles.textTertiary : styles.textPrimary }>
+    <TouchableOpacity onPress={props.onPress} style={
+                      props.type=="Secondary" ? styles.viewSecondary :
+                      props.type=="Tertiary" ? styles.viewTertiary : styles.viewPrimary }>
+        <Text style={ props.type=="Secondary" ? styles.textSecondary :
+                      props.type=="Tertiary" ? styles.textTertiary : styles.textPrimary }>
           {props.title || ""}
         </Text>
-      </View>
     </TouchableOpacity>
   );
 };
@@ -30,14 +29,15 @@ const styles = StyleSheet.create({
     marginTop: 15,
 
     height: 65,
+    width: '85%',
 
     justifyContent: 'center',
-    alignItems: 'center',
   },
   textPrimary: {
     color: "white",
     fontSize: 20,
-    fontWeight: '600'
+    fontWeight: '600',
+    textAlign: "center",
   },
 
   viewSecondary: {
@@ -52,38 +52,38 @@ const styles = StyleSheet.create({
     marginTop: 15,
 
     height: 65,
+    width: '85%',
 
     justifyContent: 'center',
-    alignItems: 'center',
-
   },
   textSecondary: {
     color: "black",
     fontSize: 20,
-    fontWeight: '600'
+    fontWeight: '600',
+    textAlign: "center",
   },
 
   viewTertiary: {
     backgroundColor: "#0000",
     borderRadius: 20,
-    borderWidth: 0,
+    borderWidth: 1,
     borderColor: "#0000",
 
     paddingVertical: 10,
     paddingHorizontal: 10,
     marginHorizontal: 40,
-    marginTop: 15,
+    marginTop: 5,
 
-    height: 40,
+    height: 45,
+    width: '85%',
 
     justifyContent: 'center',
-    alignItems: 'center',
-
   },
   textTertiary: {
     color: "black",
     fontSize: 20,
-    fontWeight: '600'
+    fontWeight: '600',
+    textAlign: "center",
   },
 });
 
