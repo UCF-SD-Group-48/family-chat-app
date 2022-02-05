@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import CustomListItem from '../components/CustomListItem';
+import LargeButton from '../components/LargeButton';
 import { NavigationContainer } from '@react-navigation/native';
 import { Avatar, Icon } from 'react-native-elements';
 import { auth, db } from '../firebase';
@@ -91,7 +92,13 @@ const FrontEndTestSpace = ({ navigation }) => {
                     enterChat={ enterChat }
                 />
           ))}
-            <AppLogo />
+
+          {/* <AppLogo /> */}
+          <LargeButton title="Get Started" style="Primary"/>
+          <LargeButton title="Log In" style="Secondary"/>
+          <LargeButton title="Go to Home Screen" style="Tertiary"/>
+          <LargeButton title="Log In" style="Create Account"/>
+
 
       </ScrollView>
     </SafeAreaView>
