@@ -16,8 +16,5 @@ web-build/
 # firebase configs
 /firebase.js
 
-# ignore 
-/ignoreMe.txt
-
 # yarn
 /yarn.lock
