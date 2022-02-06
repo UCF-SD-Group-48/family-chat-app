@@ -1,66 +1,82 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useLayoutEffect} from 'react';
+import React, {useState, useLayoutEffect, useRef} from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Input, Text } from 'react-native-elements';
-import { KeyboardAvoidingView } from 'react-native';
-import { auth } from '../firebase';
+import { Button, Input, Text, TextInput, TouchableOpacity, Platform, Alert } from 'react-native-elements';
+import { KeyboardAvoidingView  } from 'react-native';
+import { auth, firebaseConfig } from '../firebase';
+import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import firebase from 'firebase/compat/app';
+
 
 const RegisterPage = ({ navigation }) => {
-    const[phoneNumber, setPhoneNumber] = useState('');
+    const[phoneNumber, setPhoneNumber] = useState();
     const[confirm, setConfirm] = useState(null);
+    const recaptchaVerifier = useRef(null);
+    const [verificationId, setVerificationId] = useState();
+    // const [message, showMessage] = useState((!firebaseConfig || Platform.OS === 'web'));
+    // //   ? { text: "To get started, provide a valid firebase config in App.js and open this snack on an iOS or Android device."}
+    // //   : undefined);
 
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerBackTitle: 'Back to Login',
-        })
-    }, [navigation])
-
-    // const register = () => {
-    //     auth.createUserWithEmailAndPassword(email, password)
-
-    //     .then((authUser) => {
-    //         authUser.user.updateProfile({
-    //             displayName: name,
-    //             photoURL: imageUrl || 'https://connectingcouples.us/wp-content/uploads/2019/07/avatar-placeholder.png'
-    //         });
-    //     }).catch(error => alert(error.message));
-    // };
-    const register = async () => {
-        try {
-            const confirmation = await auth.signInWithPhoneNumber(phoneNumber);
-            setConfirm(confirmation)
-            if(confirm) {
-                navigation.navigate('Verify Page');
-            }
-        } catch (error) {
-            alert(error);
-        }
+    const phoneSubmit = async () => {
+         try {
+             console.log("hey hey hey")
+             console.log(phoneNumber)
+            const phoneProvider = new firebase.auth.PhoneAuthProvider();
+            const verificationId = await phoneProvider.verifyPhoneNumber(
+              phoneNumber,
+              recaptchaVerifier.current
+            );
+            setVerificationId(verificationId);
+            navigation.navigate('PhoneVerification', { verificationId });
+            // showMessage({
+            //   text: "Verification code has been sent to your phone.",
+            // });
+          } catch (err) {
+            // showMessage({ text: `Error: ${err.message}`, color: "red" });
+            console.log(err)
+          }
     };
+    
 
   return (
     <KeyboardAvoidingView behavior='padding' style={ styles.container }>
         <StatusBar style='light'/>
+        <FirebaseRecaptchaVerifierModal
+            ref={recaptchaVerifier}
+            firebaseConfig={firebaseConfig}
+        />
 
         <Text h3 style={{ marginBottom: 50 }}>
             ENTER PHONE #
         </Text>
 
         <View style={styles.inputContainer}>
-            <Input 
-                placeholder='1 (XXX) XXX-XXXX'
-                autofocus 
-                type = 'text'
-                value={phoneNumber}
-                onChangeText={(text) => setPhoneNumber(text)}
+            <Input
+                placeholder="+1 999 999 9999"
+                autoFocus
+                // autoCompleteType="tel"
+                // keyboardType="phone-pad"
+                // textContentType="telephoneNumber"
+                onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
             />
 
         </View>
         <Button 
             style={styles.button}
             raised
-            onPress={ register }
+            onPress={ phoneSubmit }
             title='Submit'
+            
         />
+        {/* {message ? (
+        <TouchableOpacity
+          style={[StyleSheet.absoluteFill, { backgroundColor: 0xffffffee, justifyContent: "center" }]}
+          onPress={() => showMessage(undefined)}>
+          <Text style={{color: message.color || "blue", fontSize: 17, textAlign: "center", margin: 20, }}>
+            {message.text}
+          </Text>
+        </TouchableOpacity>
+      ) : undefined} */}
         <View style={{ height: 100 }} />
     </KeyboardAvoidingView>
   );
