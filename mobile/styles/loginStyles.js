@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+
   
  export default StyleSheet.create({
     container: {
@@ -22,8 +23,9 @@ import { StyleSheet } from 'react-native'
     middle_centerAligned_view: {
         flex: 1,
         flexGrow: 1
-    },
-    bottom_centerAligned_view: {
-        height: Platform.OS === 'ios' ? 22 : 0
     }
+    // ,
+    // bottom_centerAligned_view: {
+    //     height: Platform.OS === 'ios' ? 22 : 0
+    // }
  });
