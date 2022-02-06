@@ -5331,6 +5331,11 @@ pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
+platform@^1.3.6:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/platform/-/platform-1.3.6.tgz#48b4ce983164b209c2d45a107adb31f473a6e7a7"
+  integrity sha512-fnWVljUchTro6RiCFvCXBbNhJc2NijN7oIQxbwsyL0buWJPG85v81ehlHI9fXrJsMNgTofEoWIQeClKpgxFLrg==
+
 plist@^3.0.1, plist@^3.0.4:
   version "3.0.4"
   resolved "https://registry.npmjs.org/plist/-/plist-3.0.4.tgz"
@@ -5501,6 +5506,11 @@ react-native-elements@^3.4.2:
     opencollective-postinstall "^2.0.3"
     react-native-ratings "8.0.4"
     react-native-size-matters "^0.3.1"
+
+react-native-emojicon@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-emojicon/-/react-native-emojicon-1.0.0.tgz#3d44b543bae32c8a14a4c339c184e0c9a01f23c0"
+  integrity sha1-PUS1Q7rjLIoUpMM5wYTgyaAfI8A=
 
 react-native-gesture-handler@^2.2.0:
   version "2.2.0"

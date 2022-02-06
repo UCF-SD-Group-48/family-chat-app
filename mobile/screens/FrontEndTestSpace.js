@@ -38,16 +38,24 @@ const FrontEndTestSpace = ({ navigation }) => {
         return unsubscribe;
     }, [])
 
+    const goBackToPreviousScreen = () => {
+        navigation.replace('Home');
+    };
+
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: 'FE TEST GROUND',
+            title: 'FE TEST SPACE',
             headerStyle: { backgroundColor: '#fff' },
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 20 }}>
-                    <TouchableOpacity activeOpacity={ 0.5 } onPress={ signOutUser }>
-                        <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/>
+                    <TouchableOpacity activeOpacity={ 0.5 } onPress={ goBackToPreviousScreen }>
+                        <Icon
+                            name='back'
+                            type='antdesign'
+                            color='black'
+                        />
                     </TouchableOpacity>
                 </View>
             ),
@@ -56,24 +64,19 @@ const FrontEndTestSpace = ({ navigation }) => {
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
-                        width: 80,
                         marginRight: 20,
                     }}
                 >
-                    <TouchableOpacity activeOpacity={ 0.5 }
-                        onPress={ () => navigation.navigate('Home') }
+                    <TouchableOpacity 
+                        onPress={ () => navigation.navigate('UserAuth') }
+                        activeOpacity={ 0.5 }
                     >
                         <Icon
-                            name='back'
-                            type='antdesign'
-                            color='#517fa4'
+                            name='resistor-nodes'
+                            type='material-community'
+                            color='red'
+                            size='30'
                         />
-                        
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        onPress={ () => navigation.navigate('AddChat') }
-                        activeOpacity={ 0.5 }>
-                        <SimpleLineIcons name='pencil' size={24} color='black' />
                     </TouchableOpacity>
                 </View>
             )
