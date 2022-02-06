@@ -27,7 +27,7 @@ const RegisterPage = ({ navigation }) => {
               recaptchaVerifier.current
             );
             setVerificationId(verificationId);
-            navigation.navigate('PhoneVerification', { verificationId });
+            navigation.navigate('PhoneVerification', { verificationId, phoneNumber });
             // showMessage({
             //   text: "Verification code has been sent to your phone.",
             // });

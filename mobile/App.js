@@ -11,9 +11,8 @@ import AddChatScreen from './screens/AddChatScreen';
 import ChatScreen from './screens/ChatScreen';
 import LandingPage from './screens/LandingPage';
 import RegisterPage from './screens/RegisterPage';
-import VerifyPage from './screens/VerifyPage';
 import PhoneVerification from './screens/PhoneVerification'; 
-
+import Success from './screens/SuccessPage';
 
 import FrontEndTestSpace from './screens/FrontEndTestSpace';
 import UserAuth from './screens/0_Registration/UserAuth';
@@ -38,7 +37,7 @@ export default function App() {
         <Stack.Screen name='Landing Page' component={ LandingPage }/>
         <Stack.Screen name="Register Page" component={ RegisterPage }/>
         <Stack.Screen name="PhoneVerification" component={ PhoneVerification }/>
-        <Stack.Screen name="Verify Page" component={ VerifyPage }/>
+        <Stack.Screen name="Success" component={ Success }/>
         <Stack.Screen name='Login' component={ LoginScreen } />
         <Stack.Screen name='Register' component={ RegisterScreen } />    
         <Stack.Screen name='Home' component={ HomeScreen } />    

@@ -9,6 +9,7 @@ import {useRef, useState} from 'react'
 const PhoneVerification = ({ navigation, route }) => {
     const verificationId = route.params.verificationId;
     const [verificationCode, setVerificationCode] = useState();
+    const phoneNumber = route.params.phoneNumber;
 
 
   return (
@@ -31,6 +32,7 @@ const PhoneVerification = ({ navigation, route }) => {
               verificationCode
             );
             await auth.signInWithCredential(credential);
+            navigation.navigate('Success', {phoneNumber})
             console.log("Phone authentication successful")
           } catch (err) {
             console.log(err)
