@@ -28,7 +28,7 @@ const LandingPage = ({ navigation }) => {
             <KeyboardAvoidingView behavior='padding'>
                 <View style={ loginStyles.top_centerAligned_view }>
                     <StatusBar style='light'/>
-                    <View style={ {height: 175} } />
+                    <View style={ {height: 75} } />
                     <Image source={{
                             uri: 'https://logowik.com/content/uploads/images/signal-messenger-icon9117.jpg'
                         }}
@@ -60,20 +60,19 @@ const LandingPage = ({ navigation }) => {
                     onPress={ () => navigation.navigate('Register Page') }
                     style={ styles.button }
                     type='outline'
-                    title='Get Started'
+                    title='Register Page'
+                />
+                <Button 
+                    onPress={ () => navigation.navigate('PhoneVerification') }
+                    style={ styles.button }
+                    type='outline'
+                    title='PhoneVerification'
                 />
                 <Button style={ styles.button } onPress={ signIn } title='Login' />
             </View>
 
-            <Button 
-                onPress={ () => navigation.navigate('PhoneVerification') }
-                style={ styles.button }
-                type='outline'
-                title='Get Started'
-            />
-            <Button style={ styles.button } onPress={ signIn } title='Login' />
-            <View style={{ height: 100 }} />
-        </KeyboardAvoidingView>
+            <View style={ loginStyles.bottom_centerAligned_view } />
+        </View>
     );
 };
 
