@@ -57,7 +57,7 @@ const HomeScreen = ({ navigation }) => {
                         <Icon
                             name='alert-triangle'
                             type='feather'
-                            color='#517fa4'
+                            color='orange'
                         />
                     </TouchableOpacity>
                     <TouchableOpacity 

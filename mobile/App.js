@@ -13,7 +13,13 @@ import LandingPage from './screens/LandingPage';
 import RegisterPage from './screens/RegisterPage';
 import VerifyPage from './screens/VerifyPage';
 import PhoneVerification from './screens/PhoneVerification'; 
+
+
 import FrontEndTestSpace from './screens/FrontEndTestSpace';
+import UserAuth from './screens/0_Registration/UserAuth';
+import RegisterPhone from './screens/0_Registration/RegisterPhone';
+import VerifyPhone from './screens/0_Registration/VerifyPhone';
+
 
 
 const Stack = createStackNavigator();
@@ -39,7 +45,13 @@ export default function App() {
         <Stack.Screen name='AddChat' component={ AddChatScreen } /> 
         <Stack.Screen name='Chat' component={ ChatScreen } />    
 
+        {/* Front-End Test Screens */}
         <Stack.Screen name='FrontEndTestSpace' component={ FrontEndTestSpace } />
+        <Stack.Screen name='UserAuth' component={ UserAuth } />
+        <Stack.Screen name='RegisterPhone' component={ RegisterPhone } />
+        <Stack.Screen name='VerifyPhone' component={ VerifyPhone } />
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

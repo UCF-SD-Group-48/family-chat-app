@@ -4,6 +4,14 @@ import { Input, Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { db } from '../firebase';
 
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'white',
+        padding: 30,
+        height: '100%',
+    },
+});
+
 const AddChatScreen = ({ navigation }) => {
     const [input, setInput] = useState('');
 
@@ -39,11 +47,3 @@ const AddChatScreen = ({ navigation }) => {
 };
 
 export default AddChatScreen;
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: 'white',
-        padding: 30,
-        height: '100%',
-    },
-});

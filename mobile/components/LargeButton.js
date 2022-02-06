@@ -23,15 +23,17 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#0000",
 
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    marginHorizontal: 40,
-    marginTop: 15,
+    // paddingVertical: 10,
+    // paddingHorizontal: 10,
+    // margin: 30,
+    marginBottom: 20,
+
+    textAlign: 'center',
+    justifyContent: 'center',
+
 
     height: 65,
     width: '85%',
-
-    justifyContent: 'center',
   },
   textPrimary: {
     color: "white",
@@ -46,10 +48,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#888",
 
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    marginHorizontal: 40,
-    marginTop: 15,
+    // paddingVertical: 10,
+    // paddingHorizontal: 10,
+    // marginHorizontal: 30,
+    // marginBottom: 20,
 
     height: 65,
     width: '85%',
@@ -72,7 +74,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 10,
     marginHorizontal: 40,
-    marginTop: 5,
+    marginTop: 20,
 
     height: 45,
     width: '85%',
