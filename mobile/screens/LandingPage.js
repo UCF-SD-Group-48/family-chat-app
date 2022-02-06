@@ -64,7 +64,7 @@ const LandingPage = ({ navigation }) => {
                 />
                 <Button style={ styles.button } onPress={ signIn } title='Login' />
             </View>
-
+                        
             <Button 
                 onPress={ () => navigation.navigate('PhoneVerification') }
                 style={ styles.button }
@@ -73,7 +73,8 @@ const LandingPage = ({ navigation }) => {
             />
             <Button style={ styles.button } onPress={ signIn } title='Login' />
             <View style={{ height: 100 }} />
-        </KeyboardAvoidingView>
+            </View>
+ 
     );
 };
 
