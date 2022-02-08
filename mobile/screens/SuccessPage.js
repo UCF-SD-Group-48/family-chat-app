@@ -14,12 +14,11 @@ const RegisterScreen = ({ navigation, route }) => {
     const phoneNumber = route.params.phoneNumber;
 
 	const getPermissions = async () => {
-		
-			const status = await ImagePicker.requestMediaLibraryPermissionsAsync();
-			if (status !== "granted") {
-				alert("We need permission to access your camera ");
-			
-		}
+        const status = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        console.log("status: " + status);
+        if (status !== "granted") {
+            alert("We need permission to access your camera ");
+        }
 		pickImage();
 	};
 
@@ -83,16 +82,14 @@ const RegisterScreen = ({ navigation, route }) => {
 							name="plus"
 							size={24}
 							color="#FFFF"
-							// onPress={getPermissions}
-                            onPress={pickImage}
+							onPress={getPermissions}
 
 						/>
 					) : (
 						<Image
 							source={{ uri: profilePic }}
 							style={{ width: 100, height: 100 }}
-							// onPress={getPermissions}
-                            onPress={pickImage}
+							onPress={getPermissions}
 						/>
 					)}
 				</View>
