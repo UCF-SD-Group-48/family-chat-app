@@ -5,11 +5,12 @@ import { StyleSheet, View } from 'react-native';
 import { Button, Input, Text } from 'react-native-elements';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import ImagePicker from 'expo-image-picker';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 
-const RegisterScreen = ({ navigation, route }) => {
+const SuccessPage = ({ navigation, route }) => {
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
+	const [email, setEmail] = useState('');
 	const [profilePic, setProfilePic] = useState();
 	const phoneNumber = route.params.phoneNumber;
 
@@ -48,24 +49,51 @@ const RegisterScreen = ({ navigation, route }) => {
 		});
 	}, [navigation]);
 
+	// const register = async () => {
+	// 	const currentUser = auth.currentUser;
+	// 	console.log('Current User:' + JSON.stringify(currentUser));
+	// 	await auth
+	// 		.updateCurrentUser(auth.currentUser,
+	// 			{
+	// 				firstName: firstName,
+	// 				lastName: lastName,
+	// 				phoneNumber: phoneNumber,
+	// 				photoURL:
+	// 					profilePic ||
+	// 					'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+
+	// 			}
+	// 		)
+	// 		.then(() => {
+	// 			console.log('Profile Updated!')
+	// 			console.log("current user is now:  " + JSON.stringify(auth.currentUser))
+	// 			navigation.replace('Home');
+	// 		})
+	// 		.catch((error) => alert(error.message));
+	// };
+
 	const register = async () => {
 		const currentUser = auth.currentUser;
 		console.log('Current User:' + JSON.stringify(currentUser));
-		await auth
-			.updateCurrentUser(auth.currentUser,
-				{
-					firstName: firstName,
-					lastName: lastName,
-					phoneNumber: phoneNumber,
-					photoURL:
-						profilePic ||
-						'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+		await db
+			.collection('users_family').doc('/' + currentUser.phoneNumber + '/').set({
+				firstName: firstName,
+				lastName: lastName,
+				pfp: "",
+				color: "Blue",
+				status: "Active",
+				statusEmoji: "Happy",
+				email: email,
+				phoneNumber: currentUser.phoneNumber,
+				pushNotificationEnabled: true,
+				locationServicesEnabled: true,
+				importContactsEnabled: true,
+				groups: []
 
-				}
-			)
+			})
 			.then(() => {
 				console.log('Profile Updated!')
-				navigation.replace('Home');
+				navigation.replace('Login');
 			})
 			.catch((error) => alert(error.message));
 	};
@@ -110,6 +138,13 @@ const RegisterScreen = ({ navigation, route }) => {
 					value={lastName}
 					onChangeText={(text) => setLastName(text)}
 				/>
+				<Input
+					placeholder='Email'
+					autoFocus
+					type='email'
+					value={email}
+					onChangeText={(text) => setEmail(text)}
+				/>
 			</View>
 			<Button
 				containerStyle={styles.button}
@@ -121,7 +156,7 @@ const RegisterScreen = ({ navigation, route }) => {
 	);
 };
 
-export default RegisterScreen;
+export default SuccessPage;
 
 const styles = StyleSheet.create({
 	container: {
