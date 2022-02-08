@@ -13,7 +13,7 @@ const UserPrompt = (props) => {
 
 const styles = StyleSheet.create({
   viewPrimary: {
-    backgroundColor: "#7da",
+    backgroundColor: "#7dab",
     borderRadius: 12,
     borderWidth: 0,
     borderColor: "#0000",

@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-const LargeTitle = (props) => {
+const LoginText = (props) => {
   return (
-      <View style={ styles.view } height={props.height || 125} marginTop={ props.topSpacing || 15 } >
+      <View style={ styles.view } height={props.height || 100} marginTop={ props.topSpacing || 15 } >
         <Text style={ styles.text }>
           {props.title || ""}
         </Text>
@@ -28,10 +28,10 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "black",
-    fontSize: 50,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '500',
     textAlign: 'center',
   },
 });
 
-export default LargeTitle;
+export default LoginText;

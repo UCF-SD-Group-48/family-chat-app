@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     // paddingVertical: 10,
     // paddingHorizontal: 10,
     // margin: 30,
-    marginBottom: 20,
+    marginTop: 20,
 
     textAlign: 'center',
     justifyContent: 'center',
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#0000",
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#0000",
+    borderColor: "#8880",
 
     paddingVertical: 10,
     paddingHorizontal: 10,
     marginHorizontal: 40,
-    marginTop: 20,
+    marginTop: 10,
 
     height: 45,
     width: '85%',
