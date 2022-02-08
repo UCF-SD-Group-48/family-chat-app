@@ -9,7 +9,7 @@ import { StyleSheet, Platform } from 'react-native'
     },
     top_centerAligned_view: {
         borderWidth: 2,
-        borderColor: "#888",
+        borderColor: "#eee",
     
         paddingVertical: 10,
         paddingHorizontal: 10,

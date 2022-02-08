@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput } from 'react-native';
 
 const LoginInput = (props) => {
   return (
-      <View style={ styles.view }>
+      <View style={ styles.view } marginTop={ props.topSpacing } >
         <Text style={ styles.text }>
           {props.title || ""}
         </Text>
@@ -19,7 +19,7 @@ const LoginInput = (props) => {
 const styles = StyleSheet.create({
   view: {
     borderWidth: 2,
-    borderColor: "#888",
+    borderColor: "#eee",
 
     paddingVertical: 0,
     paddingHorizontal: 10,

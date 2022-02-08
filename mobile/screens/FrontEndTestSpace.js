@@ -12,6 +12,7 @@ import loginStyles from '../styles/loginStyles.js';
 import AppLogo from '../assets/appLogo.svg'
 import LargeTitle from '../components/LargeTitle';
 import LoginInput from '../components/LoginInput';
+import LineDivider from '../components/LineDivider';
 
 
 
@@ -107,7 +108,9 @@ const FrontEndTestSpace = ({ navigation }) => {
     <View style={ loginStyles.container }>
         <View style={ loginStyles.top_centerAligned_view }>
             {/* <AppLogo /> */}
-            <LargeTitle title="Family Chat" />
+            <LargeTitle title="Family Chat" height={100} topSpacing={40}/>
+            <LineDivider/>
+            <View height={25} />
             <LoginInput title="Enter Phone #:" value={inputText} placeholder={"1 (XXX) XXX - XXXX"}/>
         </View>
 

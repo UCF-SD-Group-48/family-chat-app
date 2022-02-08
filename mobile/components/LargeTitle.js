@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 const LargeTitle = (props) => {
   return (
-      <View style={ styles.view }>
+      <View style={ styles.view } height={props.height} marginTop={ props.topSpacing } >
         <Text style={ styles.text }>
           {props.title || ""}
         </Text>
@@ -14,7 +14,7 @@ const LargeTitle = (props) => {
 const styles = StyleSheet.create({
   view: {
     borderWidth: 2,
-    borderColor: "#888",
+    borderColor: "#eee",
 
     paddingVertical: 10,
     paddingHorizontal: 10,
