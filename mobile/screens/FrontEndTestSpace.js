@@ -12,6 +12,9 @@ import loginStyles from '../styles/loginStyles.js';
 import AppLogo from '../assets/appLogo.svg'
 import LargeTitle from '../components/LargeTitle';
 import LoginInput from '../components/LoginInput';
+import LineDivider from '../components/LineDivider';
+import UserPrompt from '../components/UserPrompt';
+import LoginText from '../components/LoginText';
 
 
 
@@ -107,18 +110,19 @@ const FrontEndTestSpace = ({ navigation }) => {
     <View style={ loginStyles.container }>
         <View style={ loginStyles.top_centerAligned_view }>
             {/* <AppLogo /> */}
-            <LargeTitle title="Family Chat" />
-            <LoginInput title="Enter Phone #:" value={inputText} placeholder={"1 (XXX) XXX - XXXX"}/>
+            <UserPrompt title={"Hi there! Let's get started!"} topSpacing={5} />
+            <LargeTitle title="Family Chat" height={100} topSpacing={-1}/>
+            <LineDivider topSpacing={-5}/>
+            <LoginText title={"Enter your phone number below\nto setup your account"} topSpacing={45} />
+            <LoginInput title="Enter Phone #:" value={inputText} placeholder={"1 (XXX) XXX - XXXX"} topSpacing={-1}/>
         </View>
 
         <View style={ loginStyles.middle_centerAligned_view }>
         </View>
 
         <View style={ loginStyles.top_centerAligned_view }>
-            <LargeButton title="Log In" type="Secondary"/>
+            <LargeButton title="Register" type="Primary"/>
             <LargeButton title="Go to Home Screen" type="Tertiary"/>
-            <LargeButton title="Log In" type="" style={{alignSelf: 'flex-end'}}/>
-            <Text>hello</Text>
         </View>
 
         <View style={ loginStyles.bottom_centerAligned_view } />

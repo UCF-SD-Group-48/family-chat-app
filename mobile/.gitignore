@@ -1,3 +1,4 @@
+# dependencies
 node_modules/
 .expo/
 dist/
@@ -13,7 +14,7 @@ web-build/
 # macOS
 .DS_Store
 
-# firebase configs
+# firebase configuration
 /firebase.js
 
 # yarn
