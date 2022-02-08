@@ -76,7 +76,7 @@ const SuccessPage = ({ navigation, route }) => {
 		const currentUser = auth.currentUser;
 		console.log('Current User:' + JSON.stringify(currentUser));
 		await db
-			.collection('users_family').doc('/' + currentUser.phoneNumber + '/').set({
+			.collection('users').add({
 				firstName: firstName,
 				lastName: lastName,
 				pfp: "",
