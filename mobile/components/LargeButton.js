@@ -3,14 +3,22 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-{/* EXAMPLE INPUT: <LargeButton title="Login" type="Secondary" /> */}
+{/* EXAMPLE INPUT: <LargeButton title='Login' type='Secondary' /> */ }
 const LargeButton = (props) => {
   return (
-    <TouchableOpacity onPress={props.onPress} style={
-                    props.type == 'Secondary' ? styles.viewSecondary :
-                    props.type == 'Tertiary' ? styles.viewTertiary : styles.viewPrimary}>
-      <Text style={ props.type == 'Secondary' ? styles.textSecondary :
-                    props.type == 'Tertiary' ? styles.textTertiary : styles.textPrimary}>
+    <TouchableOpacity
+      onPress={props.onPress}
+      style={
+        props.type == 'Secondary' ? styles.viewSecondary :
+          props.type == 'Tertiary' ? styles.viewTertiary : styles.viewPrimary
+      }
+    >
+      <Text
+        style={
+          props.type == 'Secondary' ? styles.textSecondary :
+            props.type == 'Tertiary' ? styles.textTertiary : styles.textPrimary
+        }
+      >
         {props.title || ''}
       </Text>
     </TouchableOpacity>
@@ -25,10 +33,10 @@ const styles = StyleSheet.create({
     width: '85%',
     textAlign: 'center',
     marginBottom: 20,
-    backgroundColor: '#888',
+    backgroundColor: 'black',
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#0000',
+    borderColor: 'black',
   },
   textPrimary: {
     textAlign: 'center',
@@ -42,9 +50,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 65,
     width: '85%',
-    backgroundColor: '#0000',
+    backgroundColor: 'white',
     borderWidth: 2,
-    borderColor: '#888',
+    borderColor: 'black',
     borderRadius: 20,
   },
   textSecondary: {

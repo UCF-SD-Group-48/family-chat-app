@@ -30,8 +30,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 0,
     paddingHorizontal: 10,
-    borderWidth: 2,
-    borderColor: '#eee',
   },
   secondaryView: {
     height: 50,

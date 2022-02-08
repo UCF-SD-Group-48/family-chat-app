@@ -3,7 +3,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-{/* EXAMPLE INPUT: <LargeTitle title="Family Chat" /> */ }
+{/* EXAMPLE INPUT: <LargeTitle title='Family Chat' /> */ }
 const LargeTitle = (props) => {
   return (
     <View
@@ -12,7 +12,7 @@ const LargeTitle = (props) => {
       marginTop={props.topSpacing || 15}
     >
       <Text style={styles.text}>
-        {props.title || ""}
+        {props.title || ''}
       </Text>
     </View>
   );
@@ -24,12 +24,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 10,
     paddingHorizontal: 10,
-    borderWidth: 2,
-    borderColor: "#eee",
   },
   text: {
     textAlign: 'center',
-    fontSize: 50,
+    fontSize: 40,
     fontWeight: '600',
     color: 'black',
   },

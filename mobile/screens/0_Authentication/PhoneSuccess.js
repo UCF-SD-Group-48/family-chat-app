@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, Input, Text } from 'react-native-elements';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import ImagePicker from 'expo-image-picker';
-import { auth, db } from '../firebase';
+import { auth, db } from '../../firebase';
 
 const SuccessPage = ({ navigation, route }) => {
 	const [firstName, setFirstName] = useState('');

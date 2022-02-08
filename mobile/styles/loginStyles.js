@@ -1,4 +1,4 @@
-// Stylesheet to be imported for the Authentication Screen
+// Stylesheet to be imported for the Authentication Screen.
 
 import { StyleSheet, Platform } from 'react-native';
 

@@ -5,7 +5,7 @@ import { TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import firebase from 'firebase/compat/app';
-import { auth, db } from '../firebase';
+import { auth, db } from '../../firebase';
 
 const ChatScreen = ({ navigation, route }) => {
     const [input, setInput] = useState('');

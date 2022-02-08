@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import React, { useLayoutEffect, useState } from 'react';
 import { Input, Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { db } from '../firebase';
+import { db } from '../../firebase';
 
 const styles = StyleSheet.create({
     container: {

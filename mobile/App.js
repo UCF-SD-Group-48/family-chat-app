@@ -1,24 +1,44 @@
-import React from 'react';
-import 'react-native-gesture-handler';
 
-import { StyleSheet, Text, View } from 'react-native';
+// File starting point for the application.
+
+import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
+import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './screens/LoginScreen';
-import RegisterScreen from './screens/RegisterScreen';
-import HomeScreen from './screens/HomeScreen';
-import AddChatScreen from './screens/AddChatScreen';
-import ChatScreen from './screens/ChatScreen';
-import LandingPage from './screens/LandingPage';
-import RegisterPage from './screens/RegisterPage';
-import PhoneVerification from './screens/PhoneVerification';
-import Success from './screens/SuccessPage';
 
-import FrontEndTestSpace from './screens/FrontEndTestSpace';
-import UserAuth from './screens/0_Registration/UserAuth';
-import RegisterPhone from './screens/0_Registration/RegisterPhone';
-import VerifyPhone from './screens/0_Registration/VerifyPhone';
+// Temporary visual space for Front-End component testing.
+import FrontEndTestSpace from './screens/deprecated/FrontEndTestSpace';
 
+// Screen imports.
+// ----------------- "AUTHENTICATION" Screens
+import UserAuth from './screens/0_Authentication/UserAuth';
+import RegisterPhone from './screens/0_Authentication/RegisterPhone';
+import Login from './screens/0_Authentication/Login';
+import VerifyPhone from './screens/0_Authentication/VerifyPhone';
+import PhoneVerification from './screens/0_Authentication/PhoneVerification';
+import PhoneSuccess from './screens/0_Authentication/PhoneSuccess';
+import UserCreated from './screens/0_Authentication/UserCreated';
+
+// ----------------- "HOME" Screens
+import HomeTab from './screens/1_Home/HomeTab';
+
+// ----------------- "GROUP CHATS" Screens
+import GroupChatsTab from './screens/2_GroupChats/GroupChatsTab';
+import AddChatScreen from './screens/2_GroupChats/AddChatScreen';
+import ChatScreen from './screens/2_GroupChats/ChatScreen';
+
+// ----------------- "DMs" Screens
+import DMsTab from './screens/3_DMs/DMsTab';
+
+// ----------------- "Profile" Screens
+import ProfileTab from './screens/4_Profile/ProfileTab';
+
+// Global settings.
 const Stack = createStackNavigator();
 
 const globalScreenOptions = {
@@ -28,25 +48,37 @@ const globalScreenOptions = {
   headerTintStyle: 'white'
 }
 
+// Screen definitions for the application.
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={globalScreenOptions} >
-        <Stack.Screen name='Landing Page' component={LandingPage} />
-        <Stack.Screen name="Register Page" component={RegisterPage} />
+
+        {/* 0 - Authentication */}
+        <Stack.Screen name='UserAuth' component={UserAuth} />
+        <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
+        <Stack.Screen name='Login' component={Login} />
+        <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
         <Stack.Screen name="PhoneVerification" component={PhoneVerification} />
-        <Stack.Screen name="Success" component={Success} />
-        <Stack.Screen name='Login' component={LoginScreen} />
-        <Stack.Screen name='Register' component={RegisterScreen} />
-        <Stack.Screen name='Home' component={HomeScreen} />
+        <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
+        <Stack.Screen name="UserCreated" component={UserCreated} />
+
+        {/* 1 - Home */}
+        <Stack.Screen name='HomeTab' component={HomeTab} />
+
+        {/* 2 - Group Chats */}
+        <Stack.Screen name='GroupChatsTab' component={GroupChatsTab} />
         <Stack.Screen name='AddChat' component={AddChatScreen} />
         <Stack.Screen name='Chat' component={ChatScreen} />
 
+        {/* 3 - DMs */}
+        <Stack.Screen name='DMsTab' component={DMsTab} />
+
+        {/* 4 - Profile */}
+        <Stack.Screen name='ProfileTab' component={ProfileTab} />
+
         {/* Front-End Test Screens */}
         <Stack.Screen name='FrontEndTestSpace' component={FrontEndTestSpace} />
-        <Stack.Screen name='UserAuth' component={UserAuth} />
-        <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
-        <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
 
       </Stack.Navigator>
     </NavigationContainer>

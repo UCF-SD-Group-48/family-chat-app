@@ -1,18 +1,18 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import CustomListItem from '../components/CustomListItem';
+import CustomListItem from '../../components/CustomListItem';
 import { NavigationContainer } from '@react-navigation/native';
 import { Avatar, Icon } from 'react-native-elements';
-import { auth, db } from '../firebase';
+import { auth, db } from '../../firebase';
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
 
-const HomeScreen = ({ navigation }) => {
+const GroupChatsTab = ({ navigation }) => {
     const [chats, setChats] = useState([]);
 
     const signOutUser = () => {
         auth.signOut().then(() => {
             // navigation.replace('Login');
-            navigation.replace('Landing Page');
+            navigation.replace('UserAuth');
 
         });
     };
@@ -35,14 +35,19 @@ const HomeScreen = ({ navigation }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: 'HOME',
+            title: 'Group Chats',
             headerStyle: { backgroundColor: '#fff' },
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 20 }}>
                     <TouchableOpacity activeOpacity={ 0.5 } onPress={ signOutUser }>
-                        <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/>
+                        {/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/> */}
+                        <Icon
+                            name='logout'
+                            type='simple-line-icon'
+                            color='black'
+                        />
                     </TouchableOpacity>
                 </View>
             ),
@@ -92,10 +97,10 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-export default HomeScreen;
-
 const styles = StyleSheet.create({
     container: {
         height:'100%'
     }
 });
+
+export default GroupChatsTab;

@@ -3,7 +3,7 @@ import React, {useState, useLayoutEffect} from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Input, Text } from 'react-native-elements';
 import { KeyboardAvoidingView } from 'react-native';
-import { auth } from '../firebase';
+import { auth } from '../../firebase';
 
 const RegisterScreen = ({ navigation }) => {
     const[name, setName] = useState('');

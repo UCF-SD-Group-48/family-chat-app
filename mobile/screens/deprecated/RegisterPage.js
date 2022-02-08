@@ -3,7 +3,7 @@ import React, {useState, useLayoutEffect, useRef} from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Input, Text, TextInput, TouchableOpacity, Platform, Alert } from 'react-native-elements';
 import { KeyboardAvoidingView  } from 'react-native';
-import { auth, firebaseConfig } from '../firebase';
+import { auth, firebaseConfig } from '../../firebase';
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import firebase from 'firebase/compat/app';
 

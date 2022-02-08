@@ -8,9 +8,9 @@ const LineDivider = (props) => {
   return (
     <Divider
       style={styles.view}
-      width={ 2.6 }
-      color={ '#333' }
-      marginTop={ props.topSpacing || 15 }
+      width={2.6}
+      color={'#333'}
+      marginTop={props.topSpacing || 15}
     />
   );
 };

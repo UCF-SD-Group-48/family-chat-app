@@ -1,19 +1,27 @@
-import React, { useLayoutEffect } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import { Icon, Tooltip } from 'react-native-elements';
+import React, {
+    useLayoutEffect,
+} from 'react';
+import {
+    Text,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    View,
+} from 'react-native';
+import {
+    Icon,
+    Tooltip,
+} from 'react-native-elements';
 
 import LargeTitle from '../../components/LargeTitle'
+
 import Logo from '../../assets/appLogo.svg'
 import LargeButton from '../../components/LargeButton'
 
 const UserAuth = ({ navigation }) => {
 
-    const goToTestingGround = () => {
-        navigation.replace('FrontEndTestSpace');
-    };
-
     const goToRegisterPhone = () => {
-        navigation.replace('RegisterPhone');
+        navigation.navigate('RegisterPhone');
     };
 
     const goToLogin = () => {
@@ -22,24 +30,10 @@ const UserAuth = ({ navigation }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-
             title: '',
             headerStyle: { backgroundColor: '#fff' },
             headerTitleStyle: { color: 'black' },
-            headerTintColor: 'black',
-
-            headerLeft: () => (
-                <View style={{ marginLeft: 20 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={ goToTestingGround }>
-                        <Icon
-                            name='alert-triangle'
-                            type='feather'
-                            color='orange'
-                        />
-                    </TouchableOpacity>
-                </View>
-            ),
-
+            headerLeft: '',
             headerRight: () => (
                 <View
                     style={{
@@ -91,23 +85,19 @@ const UserAuth = ({ navigation }) => {
     );
 };
 
-export default UserAuth;
-
 const styles = StyleSheet.create({
     container: {
         height: '100%',
-        backgroundColor: 'white'
+        backgroundColor: 'white',
     },
 
     elements: {
         alignItems: 'center',
         justifyContent: 'center',
-
-        borderWidth: 2,
-        borderColor: "#888",
-
         paddingVertical: 25,
         paddingHorizontal: 25,
         marginTop: 10,
     },
 });
+
+export default UserAuth;
