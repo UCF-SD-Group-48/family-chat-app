@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "signalClone",
-    "slug": "signalClone",
+    "name": "family-chat-app",
+    "slug": "family-chat-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

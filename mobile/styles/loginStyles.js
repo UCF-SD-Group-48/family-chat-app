@@ -1,30 +1,28 @@
-import { StyleSheet, Platform } from 'react-native'
+// Stylesheet to be imported for the Authentication Screen
 
-  
- export default StyleSheet.create({
+import { StyleSheet, Platform } from 'react-native';
+
+export default StyleSheet.create({
     container: {
-        height:'100%',
-        flexDirection: "column",
+        height: '100%',
+        flexDirection: 'column',
         backgroundColor: 'white',
     },
     top_centerAligned_view: {
-        borderWidth: 2,
-        borderColor: "#eee",
-    
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-    
         width: '100%',
-    
         flex: -1,
         justifyContent: 'flex-start',
-        alignItems: "center"
-      },
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderWidth: 2,
+        borderColor: '#eee',
+    },
     middle_centerAligned_view: {
         flex: 1,
-        flexGrow: 1
+        flexGrow: 1,
     },
     bottom_centerAligned_view: {
-        height: Platform.OS === 'ios' ? 22 : 0
+        height: Platform.OS === 'ios' ? 22 : 0,
     }
- });
+});

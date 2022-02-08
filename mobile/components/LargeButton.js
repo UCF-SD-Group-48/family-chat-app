@@ -1,91 +1,78 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-//import { Button } from 'react-native-elements';
-//import { db } from '../firebase';
+// Large (primary, secondary, tertiary) button, used amongst the Authentication screens.
 
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+
+{/* EXAMPLE INPUT: <LargeButton title="Login" type="Secondary" /> */}
 const LargeButton = (props) => {
   return (
     <TouchableOpacity onPress={props.onPress} style={
-                      props.type=="Secondary" ? styles.viewSecondary :
-                      props.type=="Tertiary" ? styles.viewTertiary : styles.viewPrimary }>
-        <Text style={ props.type=="Secondary" ? styles.textSecondary :
-                      props.type=="Tertiary" ? styles.textTertiary : styles.textPrimary }>
-          {props.title || ""}
-        </Text>
+                    props.type == 'Secondary' ? styles.viewSecondary :
+                    props.type == 'Tertiary' ? styles.viewTertiary : styles.viewPrimary}>
+      <Text style={ props.type == 'Secondary' ? styles.textSecondary :
+                    props.type == 'Tertiary' ? styles.textTertiary : styles.textPrimary}>
+        {props.title || ''}
+      </Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  // Primary Button
   viewPrimary: {
-    backgroundColor: "#888",
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: "#0000",
-
-    // paddingVertical: 10,
-    // paddingHorizontal: 10,
-    // margin: 30,
-    marginTop: 20,
-
-    textAlign: 'center',
     justifyContent: 'center',
-
-
     height: 65,
     width: '85%',
+    textAlign: 'center',
+    marginBottom: 20,
+    backgroundColor: '#888',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#0000',
   },
   textPrimary: {
-    color: "white",
+    textAlign: 'center',
     fontSize: 20,
     fontWeight: '600',
-    textAlign: "center",
+    color: 'white',
   },
 
+  // Secondary Button
   viewSecondary: {
-    backgroundColor: "#0000",
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: "#888",
-
-    // paddingVertical: 10,
-    // paddingHorizontal: 10,
-    // marginHorizontal: 30,
-    // marginBottom: 20,
-
+    justifyContent: 'center',
     height: 65,
     width: '85%',
-
-    justifyContent: 'center',
+    backgroundColor: '#0000',
+    borderWidth: 2,
+    borderColor: '#888',
+    borderRadius: 20,
   },
   textSecondary: {
-    color: "black",
+    textAlign: 'center',
     fontSize: 20,
     fontWeight: '600',
-    textAlign: "center",
+    color: 'black',
   },
 
+  // Tertiary Button
   viewTertiary: {
-    backgroundColor: "#0000",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#8880",
-
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    marginHorizontal: 40,
-    marginTop: 10,
-
+    justifyContent: 'center',
     height: 45,
     width: '85%',
-
-    justifyContent: 'center',
+    marginTop: 10,
+    marginHorizontal: 40,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    backgroundColor: '#0000',
+    borderWidth: 1,
+    borderColor: '#0000',
+    borderRadius: 20,
   },
   textTertiary: {
-    color: "black",
+    textAlign: 'center',
     fontSize: 20,
     fontWeight: '600',
-    textAlign: "center",
+    color: 'black',
   },
 });
 

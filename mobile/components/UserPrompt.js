@@ -1,33 +1,39 @@
-import React from 'react';
-import { StyleSheet, Text, View, Modal } from 'react-native';
+// Affirmational confirmation message to provide context for the user, used amongst the Authentication screens.
 
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+{/* EXAMPLE INPUT: <UserPrompt title={'Hi there! Let's get started!'} topSpacing={5} /> */ }
 const UserPrompt = (props) => {
   return (
-    <View onPress={props.onPress} style={ styles.viewPrimary } marginTop={ props.topSpacing || 15 } height={props.height || 40} width={props.width || "95%"} >
-        <Text style={ styles.textPrimary }>
-          {props.title || ""}
-        </Text>
+    <View 
+      onPress={props.onPress}
+      style={styles.viewPrimary}
+      marginTop={props.topSpacing || 15}
+      height={props.height || 40}
+      width={props.width || '95%'}
+    >
+      <Text style={styles.textPrimary}>
+        {props.title || ''}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   viewPrimary: {
-    backgroundColor: "#7dab",
-    borderRadius: 12,
-    borderWidth: 0,
-    borderColor: "#0000",
-
-    // marginTop: 15,
-
-    textAlign: 'center',
     justifyContent: 'center',
+    textAlign: 'center',
+    backgroundColor: '#7dab',
+    borderWidth: 0,
+    borderColor: '#0000',
+    borderRadius: 12,
   },
   textPrimary: {
-    color: "black",
+    textAlign: 'center',
     fontSize: 17,
     fontWeight: '500',
-    textAlign: "center",
+    color: 'black',
   },
 });
 

@@ -1,36 +1,37 @@
+// Sub-title text, used amongst the Authentication screens.
+
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const LoginText = (props) => {
   return (
-      <View style={ styles.view } height={props.height || 100} marginTop={ props.topSpacing || 15 } >
-        <Text style={ styles.text }>
-          {props.title || ""}
-        </Text>
-      </View>
+    <View
+      style={styles.view}
+      height={props.height || 100}
+      marginTop={props.topSpacing || 15}
+    >
+      <Text style={styles.text}>
+        {props.title || ''}
+      </Text>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   view: {
+    width: '100%',
+    justifyContent: 'center',
     borderWidth: 2,
-    borderColor: "#eee",
-
+    borderColor: '#eee',
     paddingVertical: 10,
     paddingHorizontal: 10,
-    // marginTop: 15,
-
-    // height: 125,
-    width: '100%',
-
-    justifyContent: 'center',
-    
   },
+
   text: {
-    color: "black",
+    textAlign: 'center',
     fontSize: 22,
     fontWeight: '500',
-    textAlign: 'center',
+    color: 'black',
   },
 });
 
