@@ -4,13 +4,13 @@ import { Divider } from 'react-native-elements';
 
 const LineDivider = (props) => {
   return (
-      <Divider style={styles.view} width={ 2.6 } color={ '#333' } marginTop={ props.topSpacing } />
+      <Divider style={styles.view} width={ 2.6 } color={ '#333' } marginTop={ props.topSpacing || 15 } />
   );
 };
 
 const styles = StyleSheet.create({
   view: {
-    marginTop: 15,
+    // marginTop: 15,
     
     width: '80%',
   },

@@ -13,6 +13,7 @@ import AppLogo from '../assets/appLogo.svg'
 import LargeTitle from '../components/LargeTitle';
 import LoginInput from '../components/LoginInput';
 import LineDivider from '../components/LineDivider';
+import UserPrompt from '../components/UserPrompt';
 
 
 
@@ -108,9 +109,11 @@ const FrontEndTestSpace = ({ navigation }) => {
     <View style={ loginStyles.container }>
         <View style={ loginStyles.top_centerAligned_view }>
             {/* <AppLogo /> */}
-            <LargeTitle title="Family Chat" height={100} topSpacing={40}/>
+            <UserPrompt title={"Hi there! Let's setup your account!"} topSpacing={5} />
+            <LargeTitle title="Family Chat" height={100} topSpacing={15}/>
             <LineDivider/>
             <View height={25} />
+            {/* Enter your phone number below\nto register your phone number */}
             <LoginInput title="Enter Phone #:" value={inputText} placeholder={"1 (XXX) XXX - XXXX"}/>
         </View>
 
