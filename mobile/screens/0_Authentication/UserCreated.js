@@ -54,20 +54,25 @@ import Logo from '../../assets/appLogo.svg'
 const UserCreated = ({ navigation, route }) => {
   const firstName = route.params.firstName;
   const lastName = route.params.lastName;
+  const profilePic = route.params.profilePic;
   return (
     <>
     <Text h3 style={{ marginBottom: 50 }}>
       Welcome {firstName} {lastName}
 			</Text>
+      <Image
+							source={{ uri: profilePic }}
+							style={{ width: 100, height: 100 }}
+						/>
       <LargeButton 
         style={styles.button}
         title= 'Guided Tour'
-      />
+        />
       <LargeButton 
         onPress={() => navigation.replace('HomeTab')}
         style={styles.button}
         title= 'Go to Home Screen'
-      />
+        />
     </>
   );
 };

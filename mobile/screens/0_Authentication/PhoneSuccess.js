@@ -31,7 +31,7 @@ import {
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
-import ImagePicker from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
 // Imports for: Firebase
@@ -81,10 +81,11 @@ const PhoneSuccess = ({ navigation, route }) => {
 			let result = await ImagePicker.launchImageLibraryAsync({
 				mediaTypes: ImagePicker.MediaTypeOptions.All,
 				allowsEditing: true,
-				aspect: [1, 1],
-				quality: 0.5,
+				aspect: [4, 3],
+				quality: 1,
 			});
 
+			console.log(result);
 			if (!result.cancelled) {
 				setProfilePic(result.uri);
 			}
@@ -93,29 +94,6 @@ const PhoneSuccess = ({ navigation, route }) => {
 			console.log('Error @pickImage:', error);
 		}
 	};
-
-	// const register = async () => {
-	// 	const currentUser = auth.currentUser;
-	// 	console.log('Current User:' + JSON.stringify(currentUser));
-	// 	await auth
-	// 		.updateCurrentUser(auth.currentUser,
-	// 			{
-	// 				firstName: firstName,
-	// 				lastName: lastName,
-	// 				phoneNumber: phoneNumber,
-	// 				photoURL:
-	// 					profilePic ||
-	// 					'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
-
-	// 			}
-	// 		)
-	// 		.then(() => {
-	// 			console.log('Profile Updated!')
-	// 			console.log('current user is now:  ' + JSON.stringify(auth.currentUser))
-	// 			navigation.replace('Home');
-	// 		})
-	// 		.catch((error) => alert(error.message));
-	// };
 
 	const register = async () => {
 		const currentUser = auth.currentUser;
@@ -133,12 +111,13 @@ const PhoneSuccess = ({ navigation, route }) => {
 				pushNotificationEnabled: true,
 				locationServicesEnabled: true,
 				importContactsEnabled: true,
+				profilePic: profilePic,
 				groups: [],
 			})
 			.then(() => {
 				console.log('Profile Updated!')
-				navigation.navigate('UserCreated', {firstName, lastName});
-			})
+				navigation.navigate('UserCreated', {firstName, lastName, profilePic});
+			}) 
 			.catch((error) => alert(error.message));
 	};
 
