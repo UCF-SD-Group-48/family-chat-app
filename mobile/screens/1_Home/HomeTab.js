@@ -63,7 +63,7 @@ const DirectMessagesTab = ({ navigation }) => {
 
   return (
     <View>
-      <Text></Text>
+      <Text>Home Screen</Text>
     </View>
   );
 };

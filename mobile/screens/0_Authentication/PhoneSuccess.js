@@ -137,7 +137,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 			})
 			.then(() => {
 				console.log('Profile Updated!')
-				navigation.replace('Login');
+				navigation.navigate('UserCreated', {firstName, lastName});
 			})
 			.catch((error) => alert(error.message));
 	};
