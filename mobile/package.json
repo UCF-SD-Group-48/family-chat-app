@@ -33,7 +33,10 @@
     "react-native-svg": "12.1.1",
     "react-native-svg-transformer": "^1.0.0",
     "react-native-web": "0.17.1",
-    "react-native-webview": "^11.17.1"
+    "react-native-webview": "^11.17.1",
+    "node-fetch": ">=2.6.7",
+    "ansi-regex": ">=5.0.1",
+    "nth-check": ">=2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
