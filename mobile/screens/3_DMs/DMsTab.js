@@ -54,7 +54,7 @@ import UserPrompt from '../../components/UserPrompt';
 
 // *************************************************************
 
-// Fourth tab of the application: PROFILE of currently logged in user.
+// Third tab of the application: DIRECT MESSAGES.
 const DirectMessagesTab = ({ navigation }) => {
   return (
     <View>

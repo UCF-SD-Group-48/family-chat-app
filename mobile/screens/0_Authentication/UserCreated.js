@@ -54,8 +54,8 @@ import Logo from '../../assets/appLogo.svg'
 const UserCreated = ({ navigation }) => {
 
   return (
-   <>
-   </>
+    <>
+    </>
   );
 };
 
