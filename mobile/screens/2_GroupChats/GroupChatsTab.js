@@ -1,24 +1,69 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import CustomListItem from '../../components/CustomListItem';
-import { NavigationContainer } from '@react-navigation/native';
-import { Avatar, Icon } from 'react-native-elements';
-import { auth, db } from '../../firebase';
-import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
+// *************************************************************
+// Imports for: React, React Native, & React Native Elements
+import React, {
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
+import {
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
+} from 'react-native';
+import {
+    Alert,
+    Avatar,
+    Button,
+    Icon,
+    Image,
+    Input,
+    Tooltip,
+} from 'react-native-elements';
 
+// Imports for: Expo
+import { StatusBar } from 'expo-status-bar';
+import ImagePicker from 'expo-image-picker';
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+
+// Imports for: Firebase
+import {
+    apps,
+    auth,
+    db,
+    firebaseConfig
+} from '../../firebase';
+import firebase from 'firebase/compat/app';
+
+// Imports for: Components
+import CustomListItem from '../../components/CustomListItem';
+import LargeButton from '../../components/LargeButton';
+import LargeTitle from '../../components/LargeTitle';
+import LineDivider from '../../components/LineDivider';
+
+// *************************************************************
+
+// Second tab of the application: GROUP CHATS.
 const GroupChatsTab = ({ navigation }) => {
     const [chats, setChats] = useState([]);
 
     const signOutUser = () => {
         auth.signOut().then(() => {
-            // navigation.replace('Login');
+            // This SHOULD be replace, instead of '.navigate()'.
             navigation.replace('UserAuth');
-
         });
     };
 
     const goToTestingGround = () => {
-        navigation.replace('FrontEndTestSpace');
+        navigation.navigate('FrontEndTestSpace');
     };
 
     useEffect(() => {
@@ -27,8 +72,8 @@ const GroupChatsTab = ({ navigation }) => {
                 snapshot.docs.map((doc) => ({
                     id: doc.id,
                     data: doc.data(),
-            }))
-         )
+                }))
+            )
         ));
         return unsubscribe;
     }, [])
@@ -41,7 +86,7 @@ const GroupChatsTab = ({ navigation }) => {
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 20 }}>
-                    <TouchableOpacity activeOpacity={ 0.5 } onPress={ signOutUser }>
+                    <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
                         {/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/> */}
                         <Icon
                             name='logout'
@@ -52,7 +97,7 @@ const GroupChatsTab = ({ navigation }) => {
                 </View>
             ),
             headerRight: () => (
-                <View 
+                <View
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'space-between',
@@ -60,17 +105,21 @@ const GroupChatsTab = ({ navigation }) => {
                         marginRight: 20,
                     }}
                 >
-                    <TouchableOpacity activeOpacity={ 0.5 } onPress={ goToTestingGround }>
+                    <TouchableOpacity activeOpacity={0.5} onPress={goToTestingGround}>
                         <Icon
                             name='alert-triangle'
                             type='feather'
                             color='orange'
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity 
-                        onPress={ () => navigation.navigate('AddChat') }
-                        activeOpacity={ 0.5 }>
-                        <SimpleLineIcons name='pencil' size={24} color='black' />
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('AddChat')}
+                        activeOpacity={0.5}>
+                        <Icon
+                            name='pencil'
+                            type='simple-line-icon'
+                            color='black'
+                        />
                     </TouchableOpacity>
                 </View>
             )
@@ -78,28 +127,28 @@ const GroupChatsTab = ({ navigation }) => {
     }, [navigation]);
 
     const enterChat = (id, chatName) => {
-		navigation.navigate('Chat', { id, chatName });
-	};
+        navigation.navigate('Chat', { id, chatName });
+    };
 
-  return (
-    <SafeAreaView>
-      <ScrollView style={ styles.container }>
-          {chats.map( ({ id, data: { chatName } }) => (
-                <CustomListItem 
-                    key={ id } 
-                    id={ id } 
-                    chatName={ chatName }
-                    enterChat={ enterChat }
-                />
-          ))}
-      </ScrollView>
-    </SafeAreaView>
-  );
+    return (
+        <SafeAreaView>
+            <ScrollView style={styles.container}>
+                {chats.map(({ id, data: { chatName } }) => (
+                    <CustomListItem
+                        key={id}
+                        id={id}
+                        chatName={chatName}
+                        enterChat={enterChat}
+                    />
+                ))}
+            </ScrollView>
+        </SafeAreaView>
+    );
 };
 
 const styles = StyleSheet.create({
     container: {
-        height:'100%'
+        height: '100%'
     }
 });
 

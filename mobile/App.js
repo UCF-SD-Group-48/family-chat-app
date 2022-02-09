@@ -2,14 +2,10 @@
 // File starting point for the application.
 
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-import 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import 'react-native-gesture-handler';
 
 // Temporary visual space for Front-End component testing.
 import FrontEndTestSpace from './screens/deprecated/FrontEndTestSpace';
@@ -41,6 +37,7 @@ import ProfileTab from './screens/4_Profile/ProfileTab';
 // Global settings.
 const Stack = createStackNavigator();
 
+// Default values for "navigation.setOptions".
 const globalScreenOptions = {
   headerStyle: { backgroundColor: '#2C6BED' },
   headerTitleStyle: { color: 'white' },

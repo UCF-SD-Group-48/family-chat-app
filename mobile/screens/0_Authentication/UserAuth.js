@@ -1,23 +1,56 @@
+// *************************************************************
+// Imports for: React, React Native, & React Native Elements
 import React, {
+    useEffect,
     useLayoutEffect,
+    useRef,
+    useState,
 } from 'react';
 import {
-    Text,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
 import {
+    Alert,
+    Avatar,
+    Button,
     Icon,
+    Image,
+    Input,
     Tooltip,
 } from 'react-native-elements';
 
-import LargeTitle from '../../components/LargeTitle'
+// Imports for: Expo
+import { StatusBar } from 'expo-status-bar';
+import ImagePicker from 'expo-image-picker';
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
-import Logo from '../../assets/appLogo.svg'
+// Imports for: Firebase
+import {
+    apps,
+    auth,
+    db,
+    firebaseConfig
+} from '../../firebase';
+import firebase from 'firebase/compat/app';
+
+// Imports for: Components
 import LargeButton from '../../components/LargeButton'
+import LargeTitle from '../../components/LargeTitle'
+import Logo from '../../assets/appLogo.svg'
 
+// *************************************************************
+
+// First page the user sees when they open the application.
 const UserAuth = ({ navigation }) => {
 
     const goToRegisterPhone = () => {
@@ -67,17 +100,17 @@ const UserAuth = ({ navigation }) => {
 
     return (
         <SafeAreaView>
-            <ScrollView style={ styles.container }>
+            <ScrollView style={styles.container}>
 
                 <LargeTitle title="Family Chat" />
 
-                <View style={ styles.elements }>
-                    <Logo width={ 150 } height={ 150 } />
+                <View style={styles.elements}>
+                    <Logo width={150} height={150} />
                 </View>
-                
-                <View style={ styles.elements }>
-                    <LargeButton title="Create an Account" type="" onPress={ goToRegisterPhone }/>
-                    <LargeButton title="Login" type="Secondary" onPress={ goToLogin }/>
+
+                <View style={styles.elements}>
+                    <LargeButton title="Create an Account" type="" onPress={goToRegisterPhone} />
+                    <LargeButton title="Login" type="Secondary" onPress={goToLogin} />
                 </View>
 
             </ScrollView>

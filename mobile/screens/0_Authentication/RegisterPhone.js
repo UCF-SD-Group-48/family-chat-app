@@ -1,3 +1,5 @@
+// *************************************************************
+// Imports for: React, React Native, & React Native Elements
 import React, {
     useEffect,
     useLayoutEffect,
@@ -5,34 +7,54 @@ import React, {
     useState,
 } from 'react';
 import {
+    Keyboard,
     KeyboardAvoidingView,
+    Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
 import {
     Alert,
+    Avatar,
     Button,
     Icon,
+    Image,
     Input,
-    Platform,
-    Text,
-    TouchableOpacity,
+    Tooltip,
 } from 'react-native-elements';
+
+// Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
-import { auth, firebaseConfig } from '../../firebase';
+import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+
+// Imports for: Firebase
+import {
+    apps,
+    auth,
+    db,
+    firebaseConfig
+} from '../../firebase';
 import firebase from 'firebase/compat/app';
 
+// Imports for: Components
+import LargeButton from '../../components/LargeButton';
 import LargeTitle from '../../components/LargeTitle';
 import LineDivider from '../../components/LineDivider';
-import LargeButton from '../../components/LargeButton';
 
+// *************************************************************
+
+// Take the provided phone number, from the user, and check it's validity + reCAPTCHA.
 const RegisterPhone = ({ navigation }) => {
 
-    const[phoneNumber, setPhoneNumber] = useState();
-    const[confirm, setConfirm] = useState(null);
+    const [phoneNumber, setPhoneNumber] = useState();
+    const [confirm, setConfirm] = useState(null);
     const recaptchaVerifier = useRef(null);
     const [verificationId, setVerificationId] = useState();
 
@@ -104,6 +126,7 @@ const RegisterPhone = ({ navigation }) => {
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Mauris malesuada lorem vel dui porta, in molestie justo interdum.
                     </Text>
+
                     <View style={{ width: '90%' }}>
                         <Input
                             placeholder='+1 123 456 7890'
@@ -114,6 +137,7 @@ const RegisterPhone = ({ navigation }) => {
                             onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
                         />
                     </View>
+                    
                     <View style={styles.button}>
                         <LargeButton
                             title='Submit'

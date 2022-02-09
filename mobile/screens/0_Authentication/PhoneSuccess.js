@@ -1,13 +1,67 @@
-import { AntDesign } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
-import React, { useState, useLayoutEffect, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, Input, Text } from 'react-native-elements';
-import { KeyboardAvoidingView, Platform } from 'react-native';
-import ImagePicker from 'expo-image-picker';
-import { auth, db } from '../../firebase';
+// *************************************************************
+// Imports for: React, React Native, & React Native Elements
+import React, {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from 'react';
+import {
+	Keyboard,
+	KeyboardAvoidingView,
+	Platform,
+	SafeAreaView,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
+import {
+	Alert,
+	Avatar,
+	Button,
+	Icon,
+	Image,
+	Input,
+	Tooltip,
+} from 'react-native-elements';
 
-const SuccessPage = ({ navigation, route }) => {
+// Imports for: Expo
+import { StatusBar } from 'expo-status-bar';
+import ImagePicker from 'expo-image-picker';
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+
+// Imports for: Firebase
+import {
+	apps,
+	auth,
+	db,
+	firebaseConfig
+ } from '../../firebase';
+ import firebase from 'firebase/compat/app';
+
+ // Imports for: Components
+ import CustomListItem from '../../components/CustomListItem';
+import LargeButton from '../../components/LargeButton';
+import LargeTitle from '../../components/LargeTitle';
+import LineDivider from '../../components/LineDivider';
+import LoginInput from '../../components/LoginInput';
+import LoginText from '../../components/LoginText';
+import UserPrompt from '../../components/UserPrompt';
+
+ // *************************************************************
+
+ // The provided phone was accepted, now take the user's input to create account.
+const PhoneSuccess = ({ navigation, route }) => {
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerBackTitle: 'Back to Login',
+		});
+	}, [navigation]);
+
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
 	const [email, setEmail] = useState('');
@@ -15,18 +69,15 @@ const SuccessPage = ({ navigation, route }) => {
 	const phoneNumber = route.params.phoneNumber;
 
 	const getPermissions = async () => {
-
 		const status = await ImagePicker.requestMediaLibraryPermissionsAsync();
 		if (status !== 'granted') {
 			alert('We need permission to access your camera.');
-
 		}
 		pickImage();
 	};
 
 	const pickImage = async () => {
 		try {
-
 			let result = await ImagePicker.launchImageLibraryAsync({
 				mediaTypes: ImagePicker.MediaTypeOptions.All,
 				allowsEditing: true,
@@ -42,12 +93,6 @@ const SuccessPage = ({ navigation, route }) => {
 			console.log('Error @pickImage:', error);
 		}
 	};
-
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			headerBackTitle: 'Back to Login',
-		});
-	}, [navigation]);
 
 	// const register = async () => {
 	// 	const currentUser = auth.currentUser;
@@ -66,7 +111,7 @@ const SuccessPage = ({ navigation, route }) => {
 	// 		)
 	// 		.then(() => {
 	// 			console.log('Profile Updated!')
-	// 			console.log("current user is now:  " + JSON.stringify(auth.currentUser))
+	// 			console.log('current user is now:  ' + JSON.stringify(auth.currentUser))
 	// 			navigation.replace('Home');
 	// 		})
 	// 		.catch((error) => alert(error.message));
@@ -79,17 +124,16 @@ const SuccessPage = ({ navigation, route }) => {
 			.collection('users').add({
 				firstName: firstName,
 				lastName: lastName,
-				pfp: "",
-				color: "Blue",
-				status: "Active",
-				statusEmoji: "Happy",
+				pfp: '',
+				color: 'Blue',
+				status: 'Active',
+				statusEmoji: 'Happy',
 				email: email,
 				phoneNumber: currentUser.phoneNumber,
 				pushNotificationEnabled: true,
 				locationServicesEnabled: true,
 				importContactsEnabled: true,
-				groups: []
-
+				groups: [],
 			})
 			.then(() => {
 				console.log('Profile Updated!')
@@ -99,7 +143,11 @@ const SuccessPage = ({ navigation, route }) => {
 	};
 
 	return (
-		<KeyboardAvoidingView behavior='padding' enabled style={styles.container}>
+		<KeyboardAvoidingView
+			enabled
+			behavior='padding'
+			style={styles.container}
+		>
 			<StatusBar style='light' />
 			<Text h3 style={{ marginBottom: 50 }}>
 				SUCCESS PAGE
@@ -107,13 +155,13 @@ const SuccessPage = ({ navigation, route }) => {
 			<View style={styles.inputContainer}>
 				<View style={styles.profileImage}>
 					{!profilePic ? (
-						<AntDesign
+						<Icon
 							name='plus'
+							type='antdesign'
+							color='white'
 							size={24}
-							color='#FFFF'
 							// onPress={getPermissions}
 							onPress={pickImage}
-
 						/>
 					) : (
 						<Image
@@ -156,8 +204,6 @@ const SuccessPage = ({ navigation, route }) => {
 	);
 };
 
-export default SuccessPage;
-
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -186,3 +232,5 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 });
+
+export default PhoneSuccess;

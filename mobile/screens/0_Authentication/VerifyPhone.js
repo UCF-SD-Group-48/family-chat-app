@@ -1,25 +1,69 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import { Icon, Divider } from 'react-native-elements';
+// *************************************************************
+// Imports for: React, React Native, & React Native Elements
+import React, {
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
+import {
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
+} from 'react-native';
+import {
+    Alert,
+    Avatar,
+    Button,
+    Icon,
+    Image,
+    Input,
+    Tooltip,
+} from 'react-native-elements';
 
-import LargeTitle from '../../components/LargeTitle'
+// Imports for: Expo
+import { StatusBar } from 'expo-status-bar';
+import ImagePicker from 'expo-image-picker';
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
+// Imports for: Firebase
+import {
+    apps,
+    auth,
+    db,
+    firebaseConfig
+} from '../../firebase';
+import firebase from 'firebase/compat/app';
+
+// Imports for: Components
+import LargeTitle from '../../components/LargeTitle';
+import LineDivider from '../../components/LineDivider';
+
+// *************************************************************
+
+// Verify that the provided phone number is correct - matching the sent code.
 const VerifyPhone = ({ navigation }) => {
     
     const goBackToPreviousScreen = () => {
-        navigation.replace('RegisterPhone');
+        navigation.navigate('RegisterPhone');
     };
 
-    const [inputText, onChangeText] = useState("");
+    const [inputText, onChangeText] = useState('');
 
     useLayoutEffect(() => {
         navigation.setOptions({
-
             title: '',
             headerStyle: { backgroundColor: '#fff' },
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
-
             headerLeft: () => (
                 <View style={{ marginLeft: 20 }}>
                     <TouchableOpacity activeOpacity={ 0.5 } onPress={ goBackToPreviousScreen }>
@@ -31,7 +75,6 @@ const VerifyPhone = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             ),
-
             headerRight: () => (
                 <View
                     style={{
@@ -52,9 +95,9 @@ const VerifyPhone = ({ navigation }) => {
         <SafeAreaView>
             <ScrollView style={ styles.container }>
                 
-                <LargeTitle title="Verify" />
+                <LargeTitle title='Verify' />
 
-                <Divider inset={true} insetType="middle" width={ 1 } color={ 'gray' } />
+                <LineDivider />
 
                 <View style={ styles.subtext }>
                     <Text style={{ fontSize: 18 }}>
@@ -68,32 +111,27 @@ const VerifyPhone = ({ navigation }) => {
     );
 };
 
-export default VerifyPhone;
-
 const styles = StyleSheet.create({
     container: {
         height: '100%',
-        backgroundColor: 'white'
+        backgroundColor: 'white',
     },
-
     subtext: {
         width: '85%',
         position: 'relative',
-
-        padding: 25,
         marginLeft: 'auto',
-        marginRight: 'auto'
+        marginRight: 'auto',
+        padding: 25,
     },
-
     elements: {
         alignItems: 'center',
         justifyContent: 'center',
-
-        borderWidth: 2,
-        borderColor: "#888",
-
+        marginTop: 10,
         paddingVertical: 25,
         paddingHorizontal: 25,
-        marginTop: 10,
+        borderWidth: 2,
+        borderColor: '#888',
     },
 });
+
+export default VerifyPhone;
