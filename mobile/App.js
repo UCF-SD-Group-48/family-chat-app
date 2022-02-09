@@ -1,5 +1,5 @@
 
-// File starting point for the application.
+// This is the starting point file for the mobile application.
 
 import React from 'react';
 import { StyleSheet } from 'react-native';
@@ -16,7 +16,6 @@ import UserAuth from './screens/0_Authentication/UserAuth';
 import RegisterPhone from './screens/0_Authentication/RegisterPhone';
 import Login from './screens/0_Authentication/Login';
 import VerifyPhone from './screens/0_Authentication/VerifyPhone';
-import PhoneVerification from './screens/0_Authentication/PhoneVerification';
 import PhoneSuccess from './screens/0_Authentication/PhoneSuccess';
 import UserCreated from './screens/0_Authentication/UserCreated';
 
@@ -27,6 +26,7 @@ import HomeTab from './screens/1_Home/HomeTab';
 import GroupChatsTab from './screens/2_GroupChats/GroupChatsTab';
 import AddChatScreen from './screens/2_GroupChats/AddChatScreen';
 import ChatScreen from './screens/2_GroupChats/ChatScreen';
+import FamilyChatScreen from './screens/2_GroupChats/FamilyChatScreen';
 
 // ----------------- "DMs" Screens
 import DMsTab from './screens/3_DMs/DMsTab';
@@ -56,7 +56,6 @@ export default function App() {
         <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
         <Stack.Screen name='Login' component={Login} />
         <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
-        <Stack.Screen name="PhoneVerification" component={PhoneVerification} />
         <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
         <Stack.Screen name="UserCreated" component={UserCreated} />
 
@@ -67,6 +66,7 @@ export default function App() {
         <Stack.Screen name='GroupChatsTab' component={GroupChatsTab} />
         <Stack.Screen name='AddChat' component={AddChatScreen} />
         <Stack.Screen name='Chat' component={ChatScreen} />
+        <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
 
         {/* 3 - DMs */}
         <Stack.Screen name='DMsTab' component={DMsTab} />
