@@ -81,6 +81,11 @@ const Login = ({ navigation }) => {
         });
     }, [navigation]);
 
+    const [phoneNumber, setPhoneNumber] = useState();
+    const [verificationId, setVerificationId] = useState();
+    const [confirm, setConfirm] = useState(null);
+    const recaptchaVerifier = useRef(null);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -97,10 +102,31 @@ const Login = ({ navigation }) => {
         auth.signInWithEmailAndPassword(email, password).catch(error => alert(error));
     };
 
+    const phoneSubmit = async () => {
+        try {
+            console.log(phoneNumber)
+            const phoneProvider = new firebase.auth.PhoneAuthProvider();
+            const verificationId = await phoneProvider.verifyPhoneNumber(
+                phoneNumber,
+                recaptchaVerifier.current
+            );
+            setVerificationId(verificationId);
+            navigation.navigate('VerifyPhone', { verificationId, phoneNumber });
+        } catch (err) {
+            console.log(err)
+        }
+    };
+
+
     return (
         <SafeAreaView>
             <ScrollView>
                 <View style={styles.container}>
+
+                    <FirebaseRecaptchaVerifierModal
+                        ref={recaptchaVerifier}
+                        firebaseConfig={firebaseConfig}
+                    />
 
                     <LargeTitle title='Welcome back!' />
 
@@ -110,7 +136,8 @@ const Login = ({ navigation }) => {
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                     </Text>
 
-                    <Input placeholder='Email'
+                    {/* Email + Password input fields */}
+                    {/* <Input placeholder='Email'
                         autoFocus
                         type='email'
                         value={email}
@@ -122,11 +149,23 @@ const Login = ({ navigation }) => {
                         value={password}
                         onChangeText={text => setPassword(text)}
                         onSubmitEditing={signIn}
+                    /> */}
+
+                    <Input
+                        placeholder='+1 123 456 7890'
+                        autoFocus
+                        // autoCompleteType="tel"
+                        // keyboardType="phone-pad"
+                        // textContentType="telephoneNumber"
+                        onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
                     />
 
-                    <View style={styles.button}>
-                        <LargeButton title='Submit' type='' onPress={signIn} />
-                    </View>
+                    <LargeButton
+                        title='Submit'
+                        type=''
+                        onPress={phoneSubmit}
+                        style={styles.button}
+                    />
 
                 </View>
             </ScrollView>

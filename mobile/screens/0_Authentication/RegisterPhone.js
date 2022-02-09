@@ -54,9 +54,9 @@ import LineDivider from '../../components/LineDivider';
 const RegisterPhone = ({ navigation }) => {
 
     const [phoneNumber, setPhoneNumber] = useState();
+    const [verificationId, setVerificationId] = useState();
     const [confirm, setConfirm] = useState(null);
     const recaptchaVerifier = useRef(null);
-    const [verificationId, setVerificationId] = useState();
 
     const goBackToPreviousScreen = () => {
         navigation.replace('UserAuth');
