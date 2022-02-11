@@ -111,7 +111,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 				pushNotificationEnabled: true,
 				locationServicesEnabled: true,
 				importContactsEnabled: true,
-				profilePic: profilePic,
+				// profilePic: profilePic,
 				groups: [],
 			})
 			.then(() => {
@@ -168,7 +168,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 				<Input
 					placeholder='Email'
 					autoFocus
-					type='email'
+					type='text'
 					value={email}
 					onChangeText={(text) => setEmail(text)}
 				/>
