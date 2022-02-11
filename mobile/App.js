@@ -27,6 +27,7 @@ import GroupChatsTab from './screens/2_GroupChats/GroupChatsTab';
 import AddChatScreen from './screens/2_GroupChats/AddChatScreen';
 import ChatScreen from './screens/2_GroupChats/ChatScreen';
 import FamilyChatScreen from './screens/2_GroupChats/FamilyChatScreen';
+import Topics from './screens/2_GroupChats/Topics';
 
 // ----------------- "DMs" Screens
 import DMsTab from './screens/3_DMs/DMsTab';
@@ -67,6 +68,8 @@ export default function App() {
         <Stack.Screen name='AddChat' component={AddChatScreen} />
         <Stack.Screen name='Chat' component={ChatScreen} />
         <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
+        <Stack.Screen name='Topics' component={Topics} />
+  
 
         {/* 3 - DMs */}
         <Stack.Screen name='DMsTab' component={DMsTab} />
