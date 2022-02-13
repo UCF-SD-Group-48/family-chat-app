@@ -57,8 +57,6 @@ import UserPrompt from '../../components/UserPrompt';
  // The provided phone was accepted, now take the user's input to create account.
 const PhoneSuccess = ({ navigation, route }) => {
 
-	const dispatch = useDispatch();
-
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerBackTitle: 'Back to Login',
@@ -99,7 +97,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 	};
 
 	const register = async () => {
-		console.log('Current User:' + JSON.stringify(currentUser));
+		console.log('Current User:' + JSON.stringify(auth.currentUser));
 		await db
 			.collection('users').add({
 				firstName: firstName,
@@ -109,7 +107,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 				status: 'Active',
 				statusEmoji: 'Happy',
 				email: email,
-				phoneNumber: currentUser.phoneNumber,
+				phoneNumber: auth.currentUser.phoneNumber,
 				pushNotificationEnabled: true,
 				locationServicesEnabled: true,
 				importContactsEnabled: true,

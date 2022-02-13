@@ -241,7 +241,7 @@ const RootStackScreen = () => (
 
       // User is NOT logged in; show the Auth Stack
       <RootStack.Screen
-        name="AuthenticationStack"
+        name="AuthStack"
         component={AuthStackScreen}
         options={{ animationEnabled: false }}
       />

@@ -67,6 +67,8 @@ const UserCreated = ({ navigation, route }) => {
 
   console.log(isLoggedIn() + '' + auth.currentUser.phoneNumber);
 
+  console.log(auth.currentUser != null)
+
   return (
     <>
     <Text h3 style={{ marginBottom: 50 }}>
@@ -81,7 +83,7 @@ const UserCreated = ({ navigation, route }) => {
         title= 'Guided Tour'
         />
       <LargeButton 
-        onPress={() => navigation.navigate('TabEntry')}
+        onPress={() => navigation.navigate('TabStack', { screen: 'Home'})}
         style={styles.button}
         title= 'Go to Home Screen'
         />

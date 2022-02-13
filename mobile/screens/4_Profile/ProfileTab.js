@@ -56,9 +56,34 @@ import UserPrompt from '../../components/UserPrompt';
 
 // Fourth tab of the application: PROFILE of currently logged in user.
 const ProfileTab = ({ navigation }) => {
+
+  const signOutUser = () => {
+    auth.signOut().then(() => {
+      // This SHOULD be replace, instead of '.navigate()'.
+
+      navigation.replace('UserAuth');
+      // navigation.navigate('AuthStackScreen', { screen: 'UserAuth' });
+      // navigation.popToTop();
+      // navigation.navigate('AuthenticationStack', {
+      //     screen: 'AuthStackScreen', params: {
+      //         screen: 'UserAuth'
+      //     }
+      // });
+
+
+    });
+  };
+
   return (
     <View>
-      <Text></Text>
+      <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
+        {/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/> */}
+        <Icon
+          name='logout'
+          type='simple-line-icon'
+          color='black'
+        />
+      </TouchableOpacity>
     </View>
   );
 };

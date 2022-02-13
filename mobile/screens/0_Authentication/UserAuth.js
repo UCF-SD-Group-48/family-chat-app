@@ -98,6 +98,8 @@ const UserAuth = ({ navigation }) => {
         });
     }, [navigation]);
 
+    console.log(auth.currenUser);
+
     return (
         <SafeAreaView>
             <ScrollView style={styles.container}>
