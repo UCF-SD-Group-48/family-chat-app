@@ -61,6 +61,10 @@ const UserAuth = ({ navigation }) => {
         navigation.replace('Login');
     };
 
+    const goToTabStack = () => {
+        navigation.navigate('TabStack');
+    };
+
     useLayoutEffect(() => {
         navigation.setOptions({
             title: '',
@@ -98,8 +102,6 @@ const UserAuth = ({ navigation }) => {
         });
     }, [navigation]);
 
-    console.log(auth.currenUser);
-
     return (
         <SafeAreaView>
             <ScrollView style={styles.container}>
@@ -114,7 +116,10 @@ const UserAuth = ({ navigation }) => {
                     <LargeButton title="Create an Account" type="" onPress={goToRegisterPhone} />
                     <LargeButton title="Login" type="Secondary" onPress={goToLogin} />
                 </View>
-
+                
+                <Text onPress={goToTabStack}>
+                    TabStack
+                </Text>
             </ScrollView>
         </SafeAreaView>
     );

@@ -109,6 +109,12 @@ const TabStackScreen = () => (
     screenOptions={({ route }) => ({
       initialRouteName: "Home",
       headerShown: false,
+      tabBarStyle: {height: 80},
+      backgroundColor: 'red' ,
+      tabBarLabelStyle: {
+        fontSize: 15,
+        paddingBottom: 8,
+      },
       tabBarIcon: ({ color, type, size }) => {
         let iconName;
 
@@ -116,11 +122,11 @@ const TabStackScreen = () => (
           iconName = 'home';
           type = 'material-community';
           size = 35;
-        } else if (route.name === 'Group Chats') {
+        } else if (route.name === 'Groups') {
           iconName = 'group';
           type = 'material';
           size = 35;
-        } else if (route.name === 'Direct Messages') {
+        } else if (route.name === 'Messages') {
           iconName = 'direction';
           type = 'entypo';
           size = 28;
@@ -136,6 +142,7 @@ const TabStackScreen = () => (
             type={type}
             size={size}
             color={color}
+            style={{paddingTop: 10}}
           />
         );
       },
@@ -148,11 +155,11 @@ const TabStackScreen = () => (
       component={HomeStackScreen}
     />
     <TabStack.Screen
-      name='Group Chats'
+      name='Groups'
       component={GroupChatsStackScreen}
     />
     <TabStack.Screen
-      name='Direct Messages'
+      name='Messages'
       component={DMsStackScreen}
     />
     <TabStack.Screen
@@ -230,7 +237,7 @@ const ProfileStackScreen = () => (
 
 // This is the first stack that is rendered by the App
 const RootStack = createStackNavigator();
-const RootStackScreen = () => (
+const RootStackLogic = () => (
   <RootStack.Navigator headerMode="none">
 
     {/*
@@ -262,7 +269,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <RootStackScreen />
+      <RootStackLogic />
     </NavigationContainer>
   );
 }

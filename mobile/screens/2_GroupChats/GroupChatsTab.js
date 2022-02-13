@@ -58,23 +58,6 @@ import UserPrompt from '../../components/UserPrompt';
 const GroupChatsTab = ({ navigation }) => {
     const [chats, setChats] = useState([]);
 
-    const signOutUser = () => {
-        auth.signOut().then(() => {
-            // This SHOULD be replace, instead of '.navigate()'.
-
-            navigation.replace('UserAuth');
-            // navigation.navigate('AuthStackScreen', { screen: 'UserAuth' });
-            // navigation.popToTop();
-            // navigation.navigate('AuthenticationStack', {
-            //     screen: 'AuthStackScreen', params: {
-            //         screen: 'UserAuth'
-            //     }
-            // });
-            
-
-        });
-    };
-
     const goToTestingGround = () => {
         navigation.navigate('FrontEndTestSpace');
     };
@@ -97,18 +80,7 @@ const GroupChatsTab = ({ navigation }) => {
             headerStyle: { backgroundColor: '#fff' },
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
-            headerLeft: () => (
-                <View style={{ marginLeft: 20 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
-                        {/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/> */}
-                        <Icon
-                            name='logout'
-                            type='simple-line-icon'
-                            color='black'
-                        />
-                    </TouchableOpacity>
-                </View>
-            ),
+            headerLeft: '',
             headerRight: () => (
                 <View
                     style={{

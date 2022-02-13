@@ -71,22 +71,35 @@ const UserCreated = ({ navigation, route }) => {
 
   return (
     <>
-    <Text h3 style={{ marginBottom: 50 }}>
-      Welcome {firstName} {lastName}
-			</Text>
+      <Text h3 style={{ marginBottom: 50 }}>
+        Welcome {firstName} {lastName}
+      </Text>
       <Image
-							source={{ uri: profilePic }}
-							style={{ width: 100, height: 100 }}
-						/>
-      <LargeButton 
+        source={{ uri: profilePic }}
+        style={{ width: 100, height: 100 }}
+      />
+      <LargeButton
         style={styles.button}
-        title= 'Guided Tour'
-        />
-      <LargeButton 
-        onPress={() => navigation.navigate('TabStack', { screen: 'Home'})}
+        title='Guided Tour'
+      />
+      <LargeButton
+        onPress={() => {
+          //navigation.popToTop();
+          // navigation.navigate('TabStack', { screen: 'Home' })
+          navigation.navigate('RootStack', {
+            screen: 'TabStack',
+            params: {
+              screen: 'Home',
+              params: {
+                screen: 'HomeTab',
+              },
+            },
+          });
+          // navigation.navigate('AuthStack', { screen: 'UserAuth'})
+        }}
         style={styles.button}
-        title= 'Go to Home Screen'
-        />
+        title='Go to Home Screen'
+      />
     </>
   );
 };
@@ -94,10 +107,10 @@ const UserCreated = ({ navigation, route }) => {
 export default UserCreated;
 
 const styles = StyleSheet.create({
-    button: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: 200,
-      margin: 25,
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 200,
+    margin: 25,
   },
 })

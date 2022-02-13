@@ -78,12 +78,25 @@ const ProfileTab = ({ navigation }) => {
     <View>
       <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
         {/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/> */}
-        <Icon
-          name='logout'
-          type='simple-line-icon'
-          color='black'
-        />
+        <View
+        style={{ backgroundColor: 'lightgray', width: 125, height: 50, borderRadius: 10, border: 'black', borderWidth: 2}}
+        >
+
+        <Text
+        style={{ alignContent: 'center', justifyContent: 'center', position: 'relative',}}
+        >
+          <Icon
+            name='logout'
+            type='simple-line-icon'
+            color='black'
+            style={{ marginRight: 10 }}
+          />
+          LOGOUT
+        </Text>
+        </View>
+
       </TouchableOpacity>
+
     </View>
   );
 };
