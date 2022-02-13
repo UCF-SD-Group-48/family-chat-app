@@ -117,6 +117,7 @@ const Login = ({ navigation }) => {
         }
     };
 
+    console.log(auth.currentUser)
 
     return (
         <SafeAreaView>

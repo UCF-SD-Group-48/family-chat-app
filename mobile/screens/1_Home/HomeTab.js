@@ -65,7 +65,11 @@ const DirectMessagesTab = ({ navigation }) => {
   return (
     <View>
       <Text>Home Tab Screen</Text>
-      <LargeButton onPress={() => {navigation.navigate('Topics')}}>Go to a Topic</LargeButton>
+      <LargeButton
+        onPress={() => { navigation.navigate('Topics') }}
+      >
+        Go to a Topic
+      </LargeButton>
     </View>
   );
 };

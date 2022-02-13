@@ -55,6 +55,18 @@ const UserCreated = ({ navigation, route }) => {
   const firstName = route.params.firstName;
   const lastName = route.params.lastName;
   const profilePic = route.params.profilePic;
+
+
+  const isLoggedIn = () => {
+    if (auth.currentUser === null) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  console.log(isLoggedIn() + '' + auth.currentUser.phoneNumber);
+
   return (
     <>
     <Text h3 style={{ marginBottom: 50 }}>
@@ -69,7 +81,7 @@ const UserCreated = ({ navigation, route }) => {
         title= 'Guided Tour'
         />
       <LargeButton 
-        onPress={() => navigation.replace('HomeTab')}
+        onPress={() => navigation.navigate('TabEntry')}
         style={styles.button}
         title= 'Go to Home Screen'
         />
