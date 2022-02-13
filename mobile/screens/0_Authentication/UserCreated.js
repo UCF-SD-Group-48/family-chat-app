@@ -51,12 +51,66 @@ import Logo from '../../assets/appLogo.svg'
 // *************************************************************
 
 // Confirm to the user that their account was created, and give them the option to view a Guided Tour OR go straight to the Home screen.
-const UserCreated = ({ navigation }) => {
+const UserCreated = ({ navigation, route }) => {
+  const firstName = route.params.firstName;
+  const lastName = route.params.lastName;
+  const profilePic = route.params.profilePic;
+
+
+  const isLoggedIn = () => {
+    if (auth.currentUser === null) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  console.log(isLoggedIn() + '' + auth.currentUser.phoneNumber);
+
+  console.log(auth.currentUser != null)
 
   return (
     <>
+      <Text h3 style={{ marginBottom: 50 }}>
+        Welcome {firstName} {lastName}
+      </Text>
+      <Image
+        source={{ uri: profilePic }}
+        style={{ width: 100, height: 100 }}
+      />
+      <LargeButton
+        style={styles.button}
+        title='Guided Tour'
+      />
+      <LargeButton
+        onPress={() => {
+          //navigation.popToTop();
+          // navigation.navigate('TabStack', { screen: 'Home' })
+          navigation.navigate('RootStack', {
+            screen: 'TabStack',
+            params: {
+              screen: 'Home',
+              params: {
+                screen: 'HomeTab',
+              },
+            },
+          });
+          // navigation.navigate('AuthStack', { screen: 'UserAuth'})
+        }}
+        style={styles.button}
+        title='Go to Home Screen'
+      />
     </>
   );
 };
 
 export default UserCreated;
+
+const styles = StyleSheet.create({
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 200,
+    margin: 25,
+  },
+})

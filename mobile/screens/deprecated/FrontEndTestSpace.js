@@ -30,16 +30,15 @@ import LineDivider from '../../components/LineDivider';
 import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
+import NavTab from '../../components/NavTab';
+
+import HomeTab from '../1_Home/HomeTab'
+
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const FrontEndTestSpace = ({ navigation }) => {
     const [chats, setChats] = useState([]);
     const [inputText, onChangeText] = useState("");
-
-    const signOutUser = () => {
-        auth.signOut().then(() => {
-            navigation.replace('Login');
-        });
-    };
 
     useEffect(() => {
         const unsubscribe = db.collection('chats').onSnapshot((snapshot) => (
@@ -48,7 +47,7 @@ const FrontEndTestSpace = ({ navigation }) => {
                     id: doc.id,
                     data: doc.data(),
                 }))
-            ) 
+            )
         ));
         return unsubscribe;
     }, [])
@@ -97,23 +96,7 @@ const FrontEndTestSpace = ({ navigation }) => {
         navigation.navigate('Chat', { id, chatName });
     };
 
-
     return (
-        // <SafeAreaView>
-        //   <ScrollView style={ styles.container }>
-        //       {/* {chats.map( ({ id, data: { chatName } }) => (
-        //             <CustomListItem 
-        //                 key={ id } 
-        //                 id={ id } 
-        //                 chatName={ chatName }
-        //                 enterChat={ enterChat }
-        //             />
-        //       ))} */}
-
-
-        //   </ScrollView>
-        // </SafeAreaView>
-
         <View style={loginStyles.container}>
             <View style={loginStyles.top_centerAligned_view}>
                 {/* <AppLogo /> */}
@@ -122,6 +105,7 @@ const FrontEndTestSpace = ({ navigation }) => {
                 <LineDivider topSpacing={-5} />
                 <LoginText title={"Enter your phone number below\nto setup your account"} topSpacing={45} />
                 <LoginInput title="Enter Phone #:" value={inputText} placeholder={"1 (XXX) XXX - XXXX"} topSpacing={-1} />
+                <NavTab />
             </View>
 
             <View style={loginStyles.middle_centerAligned_view}>
@@ -133,14 +117,17 @@ const FrontEndTestSpace = ({ navigation }) => {
             </View>
 
             <View style={loginStyles.bottom_centerAligned_view} />
+            <Tab.Navigator>
+                <Tab.Screen name="HomeTab" component={HomeTab} />
+            </Tab.Navigator>
         </View>
     );
 };
-
-export default FrontEndTestSpace;
 
 const styles = StyleSheet.create({
     container: {
         height: '100%',
     }
 });
+
+export default FrontEndTestSpace;

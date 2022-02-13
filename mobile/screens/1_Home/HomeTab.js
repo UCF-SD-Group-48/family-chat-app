@@ -58,12 +58,18 @@ import UserPrompt from '../../components/UserPrompt';
 const DirectMessagesTab = ({ navigation }) => {
 
   useEffect(() => {
-    navigation.replace('GroupChatsTab');
+    // navigation.replace('GroupChatsTab');
+    console.log(JSON.stringify(auth.currentUser));
   }, []);
 
   return (
     <View>
-      <Text></Text>
+      <Text>Home Tab Screen</Text>
+      <LargeButton
+        onPress={() => { navigation.navigate('Topics') }}
+      >
+        Go to a Topic
+      </LargeButton>
     </View>
   );
 };
