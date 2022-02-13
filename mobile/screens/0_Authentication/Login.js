@@ -86,9 +86,6 @@ const Login = ({ navigation }) => {
     const [confirm, setConfirm] = useState(null);
     const recaptchaVerifier = useRef(null);
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             if (authUser) {
@@ -98,9 +95,9 @@ const Login = ({ navigation }) => {
         return unsubscribe;
     }, []);
 
-    const signIn = () => {
-        auth.signInWithEmailAndPassword(email, password).catch(error => alert(error));
-    };
+    // const signIn = () => {
+    //     auth.signInWithEmailAndPassword(email, password).catch(error => alert(error));
+    // };
 
     const phoneSubmit = async () => {
         try {
@@ -116,7 +113,6 @@ const Login = ({ navigation }) => {
             console.log(err)
         }
     };
-
 
     return (
         <SafeAreaView>
@@ -135,21 +131,6 @@ const Login = ({ navigation }) => {
                     <Text style={styles.subtext}>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                     </Text>
-
-                    {/* Email + Password input fields */}
-                    {/* <Input placeholder='Email'
-                        autoFocus
-                        type='email'
-                        value={email}
-                        onChangeText={text => setEmail(text)}
-                    />
-                    <Input placeholder='Password'
-                        secureTextEntry
-                        type='password'
-                        value={password}
-                        onChangeText={text => setPassword(text)}
-                        onSubmitEditing={signIn}
-                    /> */}
 
                     <Input
                         placeholder='+1 123 456 7890'
