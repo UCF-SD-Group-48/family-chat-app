@@ -117,30 +117,62 @@ const VerifyPhone = ({ navigation, route }) => {
                     </Text>
                 </View>
                 <View style={styles.centered}>
-                <TextInput
-                    style={{ marginVertical: 10, fontSize: 17 }}
-                    editable={!!verificationId}
-                    placeholder='123456'
-                    onChangeText={setVerificationCode}
-                />
+                    <TextInput
+                        style={{ marginVertical: 10, fontSize: 17 }}
+                        editable={!!verificationId}
+                        placeholder='123456'
+                        onChangeText={setVerificationCode}
+                    />
 
-                <Button
-                    title='Confirm Verification Code'
-                    disabled={!verificationId}
-                    onPress={async () => {
-                        try {
-                            const credential = firebase.auth.PhoneAuthProvider.credential(
-                                verificationId,
-                                verificationCode,
-                            );
-                            await auth.signInWithCredential(credential);
-                            navigation.navigate('PhoneSuccess', { phoneNumber })
-                            console.log('Phone authentication successful')
-                        } catch (err) {
-                            console.log(err)
-                        }
-                    }}
-                />
+                    <Button
+                        title='Confirm Verification Code'
+                        disabled={!verificationId}
+                        onPress={async () => {
+                            try {
+
+                                // Verify Phone: Check the given code with the generated code
+                                const credential = firebase.auth.PhoneAuthProvider.credential(
+                                    verificationId,
+                                    verificationCode,
+                                );
+
+                                // Login
+                                await auth.signInWithCredential(credential);
+
+                                console.log('Phone Verified.');
+
+                                // Check the database, within the users collection, with the user's phone number
+                                const userDocs = db.collection('users');
+                                const snapshot = await userDocs.where('phoneNumber', '==', {phoneNumber}).get();
+
+                                // Is there an existing account with the provided phone number?
+                                if (snapshot.empty) {
+                                    console.log('No account found with given phone number.');
+                                    console.log('User forwarded to Registration (instead of HomeTab.)');
+
+                                    // No account found, phone is verified, navigate to Registration (UserCreated) screen.
+                                    navigation.navigate('PhoneSuccess', { phoneNumber });
+                                    return;
+                                } else {
+                                    console.log('Account found.');
+
+                                    // Print user account data for console.
+                                    snapshot.forEach(doc => {
+                                        console.log(doc.id, '=>', doc.data());
+                                    });
+                                    
+                                    console.log('Successful login attempt.');
+                                    console.log('User forwarded to HomeTab.');
+
+                                    // User exists, phone is verified, logged in, navigate to HomeTab.
+                                    navigation.navigate('HomeTab');
+                                    return;
+                                }
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        }}
+                    />
                 </View>
             </ScrollView>
         </SafeAreaView>
