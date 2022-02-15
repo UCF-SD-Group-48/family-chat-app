@@ -56,7 +56,7 @@ import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
 // Imports for: Firebase
 import {
-  apps,
+  app,
   auth,
   db,
   firebaseConfig
@@ -109,8 +109,8 @@ const TabStackScreen = () => (
     screenOptions={({ route }) => ({
       initialRouteName: "Home",
       headerShown: false,
-      tabBarStyle: {height: 80},
-      backgroundColor: 'red' ,
+      tabBarStyle: { height: 80 },
+      backgroundColor: 'red',
       tabBarLabelStyle: {
         fontSize: 15,
         paddingBottom: 8,
@@ -142,7 +142,7 @@ const TabStackScreen = () => (
             type={type}
             size={size}
             color={color}
-            style={{paddingTop: 10}}
+            style={{ paddingTop: 10 }}
           />
         );
       },
@@ -235,43 +235,37 @@ const ProfileStackScreen = () => (
   </ProfileStack.Navigator>
 );
 
-// This is the first stack that is rendered by the App
-const RootStack = createStackNavigator();
-const RootStackLogic = () => (
-  <RootStack.Navigator headerMode="none">
-
-    {/*
-      Firebase query to check if the user is logged in
-      Change what screens screen stack they see, accordingly.
-    */}
-    {(auth.currentUser === null) ? (
-
-      // User is NOT logged in; show the Auth Stack
-      <RootStack.Screen
-        name="AuthStack"
-        component={AuthStackScreen}
-        options={{ animationEnabled: false }}
-      />
-    ) : (
-
-      // User logged in; show the Tab Stack
-      <RootStack.Screen
-        name="TabStack"
-        component={TabStackScreen}
-        options={{ animationEnabled: false }}
-      />
-    )}
-  </RootStack.Navigator>
-);
-
 // Application initialized.
 export default function App() {
 
+  const RootStack = createStackNavigator();
+
+  // firebase.auth().onAuthStateChanged(function(user) {
+  //   if (user) {
+  //     console.log('userSignedIn');
+  //   }
+  // });
+
   return (
     <NavigationContainer>
-      <RootStackLogic />
+      <RootStack.Navigator headerMode="none">
+        {(auth.currentUser === null) ? (
+          <RootStack.Screen
+            name="AuthStack"
+            component={AuthStackScreen}
+            options={{ animationEnabled: false }}
+          />
+        ) : (
+          <RootStack.Screen
+            name="TabStack"
+            component={TabStackScreen}
+            options={{ animationEnabled: false }}
+          />
+        )}
+      </RootStack.Navigator>
     </NavigationContainer>
-  );
+
+  )
 }
 
 const styles = StyleSheet.create({
