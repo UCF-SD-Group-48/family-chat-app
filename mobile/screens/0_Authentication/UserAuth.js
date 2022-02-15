@@ -62,7 +62,8 @@ const UserAuth = ({ navigation }) => {
     };
 
     const goToTabStack = () => {
-        navigation.navigate('TabStack');
+        // THIS IS TO BE WORKED ON AFTER HELPING JJ
+        navigation.navigate('HomeTab');
     };
 
     useLayoutEffect(() => {
@@ -115,11 +116,9 @@ const UserAuth = ({ navigation }) => {
                 <View style={styles.elements}>
                     <LargeButton title="Create an Account" type="" onPress={goToRegisterPhone} />
                     <LargeButton title="Login" type="Secondary" onPress={goToLogin} />
+                    <LargeButton title="BackendClickHere" type="" onPress={goToTabStack} />
                 </View>
-                
-                <Text onPress={goToTabStack}>
-                    TabStack
-                </Text>
+        
             </ScrollView>
         </SafeAreaView>
     );

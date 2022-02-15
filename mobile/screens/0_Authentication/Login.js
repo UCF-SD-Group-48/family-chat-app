@@ -39,8 +39,10 @@ import {
     apps,
     auth,
     db,
-    firebaseConfig
+    firebaseConfig,
 } from '../../firebase';
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
 import firebase from 'firebase/compat/app';
 
 // Imports for: Components
@@ -95,43 +97,62 @@ const Login = ({ navigation }) => {
         return unsubscribe;
     }, []);
 
+
+    // const [email, setEmail] = useState('');
+    // const [password, setPassword] = useState('');
+
     // const signIn = () => {
-    //     auth.signInWithEmailAndPassword(email, password).catch(error => alert(error));
-    // };
+    //     auth
+    //         .signInWithEmailAndPassword(email, password)
+    //         .catch((error) => {
+    //             console.log(error);
+    //             console.log('No account found with given phone number.');
+    //             console.log('User forwarded to Registration (instead of HomeTab.)');
+    //             const credential = getAuth();
+    //             createUserWithEmailAndPassword(credential, email, password)
+    //             signInWithEmailAndPassword(credential, email, password)
 
-    const phoneSubmit = async () => {
-        try {
-            console.log(phoneNumber)
-            const phoneProvider = new firebase.auth.PhoneAuthProvider();
-            const verificationId = await phoneProvider.verifyPhoneNumber(
-                phoneNumber,
-                recaptchaVerifier.current
-            );
-            setVerificationId(verificationId);
-            navigation.navigate('VerifyPhone', { verificationId, phoneNumber });
-        } catch (err) {
-            console.log(err)
-        }
-    };
 
-    return (
-        <SafeAreaView>
-            <ScrollView>
-                <View style={styles.container}>
+    //             let firstName = 'Line111'
+    //             let lastName = 'fromLogin'
+    //             navigation.navigate('UserCreated', { firstName, lastName, profilePic });
+    //         })
+    // }
 
-                    <FirebaseRecaptchaVerifierModal
-                        ref={recaptchaVerifier}
-                        firebaseConfig={firebaseConfig}
-                    />
+const phoneSubmit = async () => {
+    try {
+        console.log(phoneNumber)
+        const phoneProvider = new firebase.auth.PhoneAuthProvider();
+        const verificationId = await phoneProvider.verifyPhoneNumber(
+            phoneNumber,
+            recaptchaVerifier.current
+        );
+        setVerificationId(verificationId);
+        navigation.navigate('VerifyPhone', { verificationId, phoneNumber });
+    } catch (err) {
+        console.log(err)
+    }
+};
 
-                    <LargeTitle title='Welcome back!' />
+return (
+    <SafeAreaView>
+        <ScrollView>
+            <View style={styles.container}>
 
-                    <LineDivider />
+                <FirebaseRecaptchaVerifierModal
+                    ref={recaptchaVerifier}
+                    firebaseConfig={firebaseConfig}
+                />
 
-                    <Text style={styles.subtext}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </Text>
+                <LargeTitle title='Welcome back!' />
 
+                <LineDivider />
+
+                <Text style={styles.subtext}>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elitcam.
+                    Quick use: '+1 650 555 1234'
+                </Text>
+                
                     <Input
                         placeholder='+1 123 456 7890'
                         autoFocus
@@ -148,10 +169,27 @@ const Login = ({ navigation }) => {
                         style={styles.button}
                     />
 
-                </View>
-            </ScrollView>
-        </SafeAreaView>
-    );
+                {/* <Input
+                    placeholder='john123@email.com'
+                    autoFocus
+                    onChangeText={(email) => setEmail(email)}
+                />
+                <Input
+                    placeholder='******'
+                    autoFocus
+                    onChangeText={(password) => setPassword(password)}
+                />
+                <LargeButton
+                    title='Submit'
+                    type=''
+                    onPress={signIn}
+                    style={styles.button}
+                /> */}
+
+            </View>
+        </ScrollView>
+    </SafeAreaView>
+);
 };
 
 const styles = StyleSheet.create({

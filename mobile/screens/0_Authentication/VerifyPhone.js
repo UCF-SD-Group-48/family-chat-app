@@ -129,7 +129,6 @@ const VerifyPhone = ({ navigation, route }) => {
                         disabled={!verificationId}
                         onPress={async () => {
                             try {
-
                                 // Verify Phone: Check the given code with the generated code
                                 const credential = firebase.auth.PhoneAuthProvider.credential(
                                     verificationId,
