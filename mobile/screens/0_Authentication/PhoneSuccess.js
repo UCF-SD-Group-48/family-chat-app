@@ -107,7 +107,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 				status: 'Active',
 				statusEmoji: 'Happy',
 				email: email,
-				phoneNumber: auth.currentUser.phoneNumber,
+				phoneNumber: phoneNumber,
 				pushNotificationEnabled: true,
 				locationServicesEnabled: true,
 				importContactsEnabled: true,

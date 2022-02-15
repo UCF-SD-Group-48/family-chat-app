@@ -84,17 +84,17 @@ const UserCreated = ({ navigation, route }) => {
       />
       <LargeButton
         onPress={() => {
-          //navigation.popToTop();
+          navigation.popToTop().popToTop();
           // navigation.navigate('TabStack', { screen: 'Home' })
-          navigation.navigate('RootStack', {
-            screen: 'TabStack',
-            params: {
-              screen: 'Home',
-              params: {
-                screen: 'HomeTab',
-              },
-            },
-          });
+          // navigation.navigate('RootStack', {
+          //   screen: 'TabStack',
+          //   params: {
+          //     screen: 'Home',
+          //     params: {
+          //       screen: 'HomeTab',
+          //     },
+          //   },
+          // });
           // navigation.navigate('AuthStack', { screen: 'UserAuth'})
         }}
         style={styles.button}

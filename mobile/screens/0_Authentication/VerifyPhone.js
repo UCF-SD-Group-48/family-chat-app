@@ -60,7 +60,7 @@ import UserPrompt from '../../components/UserPrompt';
 const VerifyPhone = ({ navigation, route }) => {
     const verificationId = route.params.verificationId;
     const [verificationCode, setVerificationCode] = useState();
-    const phoneNumber = route.params.phoneNumber;
+    let phoneNumber = route.params.phoneNumber;
     const [inputText, onChangeText] = useState('');
 
     const goBackToPreviousScreen = () => {
@@ -129,6 +129,16 @@ const VerifyPhone = ({ navigation, route }) => {
                         disabled={!verificationId}
                         onPress={async () => {
                             try {
+
+                                /*
+                                    The way the app should function, instead of what is shown below is:
+                                        The user enters a phone number,
+                                        We remove the spaces from that input,
+                                        We check the database for a user with that phone number (also assuming there's only one),
+                                        If there exists a user, then forward them to "VerifyPhone"
+                                            If there ISN'T an account, then show an error, and give them the option to Register.
+                                */
+
                                 // Verify Phone: Check the given code with the generated code
                                 const credential = firebase.auth.PhoneAuthProvider.credential(
                                     verificationId,
@@ -140,9 +150,14 @@ const VerifyPhone = ({ navigation, route }) => {
 
                                 console.log('Phone Verified.');
 
+                                // go from "route.params.phoneNumber" which has the spaces
+                                // and override with the value of the currentUser (AKA what's in the database)
+                                // that value in the database, doesn't have spaces
+                                phoneNumber = auth.currentUser.phoneNumber;
+
                                 // Check the database, within the users collection, with the user's phone number
                                 const userDocs = db.collection('users');
-                                const snapshot = await userDocs.where('phoneNumber', '==', {phoneNumber}).get();
+                                const snapshot = await userDocs.where('phoneNumber', '==', `${ phoneNumber }`).get();
 
                                 // Is there an existing account with the provided phone number?
                                 if (snapshot.empty) {
