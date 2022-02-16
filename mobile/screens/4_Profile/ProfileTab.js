@@ -60,7 +60,6 @@ const ProfileTab = ({ navigation }) => {
   const signOutUser = () => {
     auth.signOut().then(() => {
       // This SHOULD be replace, instead of '.navigate()'.
-
       navigation.replace('UserAuth');
       // navigation.navigate('AuthStackScreen', { screen: 'UserAuth' });
       // navigation.popToTop();
