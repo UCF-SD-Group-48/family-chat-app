@@ -79,54 +79,90 @@ const DirectMessagesTab = ({ navigation }) => {
     console.log('Current User: ', JSON.stringify(auth.currentUser));
   }, []);
 
+  console.log("CHCIEKN SDFSDFSDF", auth.currentUser.displayName)
+
   return (
-    
-    <View>
+
+    <View
+      style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <View
+        style={{ position: 'relative', width: 350, alignContent: 'center' }}
+      >
+        <Text
+          style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
+        >
+          Welcome back {auth.currentUser.displayName || "friend"},
+        </Text>
+        <Text
+          style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}
+        >
+          here's what you've missed:
+        </Text>
+
+      </View>
+
+      <LineDivider style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+      }} />
+
       <Text>Home Tab Screen</Text>
       <LargeButton
         onPress={() => { navigation.navigate('Topics') }}
       >
         Go to a Topic
       </LargeButton>
-{/* 
+
+      {/* 
       <LargeButton onPress={() => { navigation.navigate('HomeTab') }}>Home</LargeButton>
       <LargeButton onPress={() => { navigation.navigate('GroupChatsTab') }}>Group Chats</LargeButton>
       <LargeButton onPress={() => { navigation.navigate('DMsTab') }}>Direct Messages</LargeButton>
-      <LargeButton onPress={() => { navigation.navigate('ProfileTab') }}>Profile</LargeButton> */}
-      <View style={{ padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', width: 200}}>
-      <TouchableOpacity activeOpacity={0.5} onPress={goToHome} style={{flex: 1, flexDirection: 'row', position: 'absolute', bottom:0}}>
-        <Icon
-          name='home'
-          type='material-community'
-          color='black'
-        />
-      </TouchableOpacity>
-      <TouchableOpacity activeOpacity={0.5} onPress={goToGroupChats} style={{flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 30}}>
-        <Icon
-          name='group'
-          type='material'
-          color='black'
-        />
-      </TouchableOpacity>
-      <TouchableOpacity activeOpacity={0.5} onPress={goToDMs} style={{flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 60}}>
-        <Icon
-          name='direction'
-          type='entypo'
-          color='black'
-        />
-      </TouchableOpacity>
-      <TouchableOpacity activeOpacity={0.5} onPress={goToProfile} style={{flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 90}}>
-        <Icon
-          name='person-pin'
-          type='material'
-          color='black'
-        />
-      </TouchableOpacity>
+      <LargeButton onPress={() => { navigation.navigate('ProfileTab') }}>Profile</LargeButton>
+      */}
+
+      <View style={{ padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', width: 200 }}>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToHome} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0 }}>
+          <Icon
+            name='home'
+            type='material-community'
+            color='black'
+          />
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToGroupChats} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 30 }}>
+          <Icon
+            name='group'
+            type='material'
+            color='black'
+          />
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToDMs} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 60 }}>
+          <Icon
+            name='direction'
+            type='entypo'
+            color='black'
+          />
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToProfile} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 90 }}>
+          <Icon
+            name='person-pin'
+            type='material'
+            color='black'
+          />
+        </TouchableOpacity>
       </View>
-      </View>
-      );
+    </View>
+  );
 };
 
-      const styles = StyleSheet.create({ });
+const styles = StyleSheet.create({});
 
-      export default DirectMessagesTab;
+export default DirectMessagesTab;

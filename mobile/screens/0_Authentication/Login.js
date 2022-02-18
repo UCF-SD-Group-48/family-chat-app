@@ -91,7 +91,7 @@ const Login = ({ navigation }) => {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             if (authUser) {
-                navigation.replace('HomeTab');
+                navigation.push('HomeTab');
             }
         });
         return unsubscribe;

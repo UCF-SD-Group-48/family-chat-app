@@ -1,4 +1,3 @@
-
 // This is the starting point file for the mobile application.
 
 import React, {
@@ -12,11 +11,19 @@ import {
   Text,
   View,
 } from 'react-native';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Icon,
+  Image,
+  Input,
+  Tooltip,
+} from 'react-native-elements';
+import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-import 'react-native-gesture-handler';
 
 // Temporary visual space for Front-End component testing.
 import FrontEndTestSpace from './screens/deprecated/FrontEndTestSpace';
@@ -67,78 +74,12 @@ import {
   firebaseConfig
 } from './firebase';
 import firebase from 'firebase/compat/app';
-import { Icon } from 'react-native-elements/dist/icons/Icon';
+import { Tab } from 'react-native-elements/dist/tab/Tab';
 
 // Screen definitions for the application.
 export default function App() {
   const Stack = createStackNavigator();
-  const TabStack = createBottomTabNavigator();
-  
-  const TabStackScreen = () => (
-    <TabStack.Navigator
-      headerMode="none"
-      screenOptions={({ route }) => ({
-        initialRouteName: "Home",
-        headerShown: false,
-        tabBarStyle: { height: 80 },
-        backgroundColor: 'red',
-        tabBarLabelStyle: {
-          fontSize: 15,
-          paddingBottom: 8,
-        },
-        tabBarIcon: ({ color, type, size }) => {
-          let iconName;
-  
-          if (route.name === 'Home') {
-            iconName = 'home';
-            type = 'material-community';
-            size = 35;
-          } else if (route.name === 'Groups') {
-            iconName = 'group';
-            type = 'material';
-            size = 35;
-          } else if (route.name === 'Messages') {
-            iconName = 'direction';
-            type = 'entypo';
-            size = 28;
-          } else if (route.name === 'Profile') {
-            iconName = 'person-pin';
-            type = 'material';
-            size = 35;
-          }
-  
-          return (
-            <Icon
-              name={iconName}
-              type={type}
-              size={size}
-              color={color}
-              style={{ paddingTop: 10 }}
-            />
-          );
-        },
-        tabBarActiveTintColor: "#1982FC",
-        tabBarInactiveTintColor: 'gray',
-      })}
-    >
-      <TabStack.Screen
-        name='Home'
-        component={HomeStackScreen}
-      />
-      <TabStack.Screen
-        name='Groups'
-        component={GroupChatsStackScreen}
-      />
-      <TabStack.Screen
-        name='Messages'
-        component={DMsStackScreen}
-      />
-      <TabStack.Screen
-        name='Profile'
-        component={ProfileStackScreen}
-      />
-    </TabStack.Navigator>
-  );
+  // const TabStack = createBottomTabNavigator();
 
   return (
     <NavigationContainer>
@@ -151,7 +92,6 @@ export default function App() {
         <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
         <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
         <Stack.Screen name="UserCreated" component={UserCreated} />
-
         {/* 1 - Home */}
         <Stack.Screen name='HomeTab' component={HomeTab} />
 
@@ -161,7 +101,7 @@ export default function App() {
         <Stack.Screen name='Chat' component={ChatScreen} />
         <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
         <Stack.Screen name='Topics' component={Topics} />
-  
+
 
         {/* 3 - DMs */}
         <Stack.Screen name='DMsTab' component={DMsTab} />
@@ -173,6 +113,7 @@ export default function App() {
         <Stack.Screen name='FrontEndTestSpace' component={FrontEndTestSpace} />
 
       </Stack.Navigator>
+
     </NavigationContainer>
   );
 }
@@ -185,6 +126,73 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+
+// const TabStackScreen = () => (
+//   <TabStack.Navigator
+//     headerMode="none"
+//     screenOptions={({ route }) => ({
+//       initialRouteName: "Home",
+//       headerShown: false,
+//       tabBarStyle: { height: 80 },
+//       backgroundColor: 'red',
+//       tabBarLabelStyle: {
+//         fontSize: 15,
+//         paddingBottom: 8,
+//       },
+//       tabBarIcon: ({ color, type, size }) => {
+//         let iconName;
+
+//         if (route.name === 'Home') {
+//           iconName = 'home';
+//           type = 'material-community';
+//           size = 35;
+//         } else if (route.name === 'Groups') {
+//           iconName = 'group';
+//           type = 'material';
+//           size = 35;
+//         } else if (route.name === 'Messages') {
+//           iconName = 'direction';
+//           type = 'entypo';
+//           size = 28;
+//         } else if (route.name === 'Profile') {
+//           iconName = 'person-pin';
+//           type = 'material';
+//           size = 35;
+//         }
+
+//         return (
+//           <Icon
+//             name={iconName}
+//             type={type}
+//             size={size}
+//             color={color}
+//             style={{ paddingTop: 10 }}
+//           />
+//         );
+//       },
+//       tabBarActiveTintColor: "#1982FC",
+//       tabBarInactiveTintColor: 'gray',
+//     })}
+//   >
+//     <TabStack.Screen
+//       name='Home'
+//       component={HomeStackScreen}
+//     />
+//     <TabStack.Screen
+//       name='Groups'
+//       component={GroupChatsStackScreen}
+//     />
+//     <TabStack.Screen
+//       name='Messages'
+//       component={DMsStackScreen}
+//     />
+//     <TabStack.Screen
+//       name='Profile'
+//       component={ProfileStackScreen}
+//     />
+//   </TabStack.Navigator>
+// );
 
 // // Stack of defined screens for the 'HOME' Tab
 // const HomeStack = createStackNavigator();
