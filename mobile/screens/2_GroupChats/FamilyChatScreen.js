@@ -54,7 +54,6 @@ import UserPrompt from '../../components/UserPrompt';
 
 // *************************************************************
 
-// ---
 const FamilyChatScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -97,6 +96,7 @@ const FamilyChatScreen = ({ navigation }) => {
             </View>
 
             <Button style={styles.button} onPress={signIn} title='Login' />
+            
             <Button
                 onPress={() => navigation.navigate('Register')}
                 style={styles.button}

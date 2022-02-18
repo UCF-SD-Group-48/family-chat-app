@@ -56,7 +56,6 @@ const UserCreated = ({ navigation, route }) => {
   const lastName = route.params.lastName;
   const profilePic = route.params.profilePic;
 
-
   const isLoggedIn = () => {
     if (auth.currentUser === null) {
       return false;
@@ -84,18 +83,7 @@ const UserCreated = ({ navigation, route }) => {
       />
       <LargeButton
         onPress={() => {
-          navigation.popToTop().popToTop();
-          // navigation.navigate('TabStack', { screen: 'Home' })
-          // navigation.navigate('RootStack', {
-          //   screen: 'TabStack',
-          //   params: {
-          //     screen: 'Home',
-          //     params: {
-          //       screen: 'HomeTab',
-          //     },
-          //   },
-          // });
-          // navigation.navigate('AuthStack', { screen: 'UserAuth'})
+          navigation.replace('Home');
         }}
         style={styles.button}
         title='Go to Home Screen'
@@ -104,8 +92,6 @@ const UserCreated = ({ navigation, route }) => {
   );
 };
 
-export default UserCreated;
-
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
@@ -113,4 +99,6 @@ const styles = StyleSheet.create({
     width: 200,
     margin: 25,
   },
-})
+});
+
+export default UserCreated;

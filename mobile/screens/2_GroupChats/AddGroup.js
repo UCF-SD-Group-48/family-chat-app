@@ -5,7 +5,6 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { db } from '../../firebase';
 
 const AddGroup = ({navigation}) => {
-
     const [input, setInput] = useState("");
 
     useLayoutEffect(() => {
@@ -26,7 +25,6 @@ const AddGroup = ({navigation}) => {
 			})
 			.catch((error) => alert(error));
 	};
-    
 
     return (
         <View style={styles.container}>
@@ -44,8 +42,6 @@ const AddGroup = ({navigation}) => {
   )
 }
 
-export default AddGroup
-
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: "white",
@@ -54,4 +50,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-
+export default AddGroup;

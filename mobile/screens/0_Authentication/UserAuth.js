@@ -61,7 +61,6 @@ const UserAuth = ({ navigation }) => {
         navigation.replace('Login');
     };
 
-
     useLayoutEffect(() => {
         navigation.setOptions({
             title: '',
@@ -99,6 +98,14 @@ const UserAuth = ({ navigation }) => {
         });
     }, [navigation]);
 
+    // const isUserOnMobile = () => {
+    //     if (Platform.OS === 'web') {
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+    // }
+
     return (
         <SafeAreaView>
             <ScrollView style={styles.container}>
@@ -114,7 +121,7 @@ const UserAuth = ({ navigation }) => {
                     <LargeButton title="Create an Account" type="" onPress={goToRegisterPhone} />
                     <LargeButton title="Login" type="Secondary" onPress={goToLogin} />
                 </View>
-        
+
             </ScrollView>
         </SafeAreaView>
     );

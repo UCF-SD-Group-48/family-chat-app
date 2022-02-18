@@ -124,13 +124,11 @@ const Login = ({ navigation }) => {
             user = await auth.signInWithCredential(credential)
             if (user){
                 console.log("user is authenticated")
-                navigation.navigate('HomeTab');
+                navigation.replace('TabStack');
             } else {
                 navigation.navigate('Login')
             }
-            // if successful, navigate to Groups
-            // how to check if successful?
-            console.log("success!!!")
+
         } catch (err) {
             console.log("verification code " + verificationCode)
             console.log("verifcationId " + verificationId)

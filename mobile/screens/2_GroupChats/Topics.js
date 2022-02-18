@@ -4,7 +4,7 @@ import CustomListItem from '../../components/CustomListItem';
 import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { auth, db } from '../../firebase';
-import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
+import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
 
 const Topics = ({ navigation, route }) => {
 	const [topics, setTopics] = useState([]);
@@ -16,7 +16,7 @@ const Topics = ({ navigation, route }) => {
 	};
 
 	useEffect(() => {
-    console.log("Topics/groupid " + groupId)
+		console.log("Topics/groupid " + groupId)
 		const unsubscribe = db.collection("groups").doc(String(groupId)).collection("topics").onSnapshot((snapshot) =>
 			setTopics(
 				snapshot.docs.map((doc) => ({
@@ -38,7 +38,7 @@ const Topics = ({ navigation, route }) => {
 				<View style={{ marginLeft: 20 }}>
 					<TouchableOpacity activeOpacity={0.5} onPress={signOut}>
 						{/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} /> */}
-            <SimpleLineIcons name="arrow-left" size={24} color="black" onPress={() => {navigation.replace('Groups')}}/>
+						<SimpleLineIcons name="arrow-left" size={24} color="black" onPress={() => { navigation.replace('Groups') }} />
 					</TouchableOpacity>
 				</View>
 			),
@@ -71,26 +71,26 @@ const Topics = ({ navigation, route }) => {
 		navigation.navigate("Chat", { id, topicName });
 	};
 
-  return (
-	<SafeAreaView>
-		<ScrollView style={styles.container}>
-			{topics.map(({ id, data: { topicName } }) => (
-				<CustomListItem
-					key={id}
-					id={id}
-					topicName={topicName}
-					enterTopic={enterTopic}
-				/>
-			))}
-		</ScrollView>
-	</SafeAreaView>
-  )
+	return (
+		<SafeAreaView>
+			<ScrollView style={styles.container}>
+				{topics.map(({ id, data: { topicName } }) => (
+					<CustomListItem
+						key={id}
+						id={id}
+						topicName={topicName}
+						enterTopic={enterTopic}
+					/>
+				))}
+			</ScrollView>
+		</SafeAreaView>
+	)
 }
-
-export default Topics
 
 const styles = StyleSheet.create({
 	container: {
 		height: "100%",
 	},
 })
+
+export default Topics;

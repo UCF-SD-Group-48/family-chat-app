@@ -181,7 +181,7 @@ const VerifyPhone = ({ navigation, route }) => {
                                     console.log('User forwarded to HomeTab.');
 
                                     // User exists, phone is verified, logged in, navigate to HomeTab.
-                                    navigation.navigate('HomeTab', { userInformation });
+                                    navigation.navigate('TabStack', { userInformation });
                                     return;
                                 }
                             } catch (err) {

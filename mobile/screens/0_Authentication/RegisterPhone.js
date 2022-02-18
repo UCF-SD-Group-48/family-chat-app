@@ -137,7 +137,7 @@ const RegisterPhone = ({ navigation }) => {
                             onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
                         />
                     </View>
-                    
+
                     <View style={styles.button}>
                         <LargeButton
                             title='Submit'

@@ -79,20 +79,12 @@ const ProfileTab = ({ navigation }) => {
       snapshot.forEach(doc => {
         userInformation = doc.data();
         firstName = userInformation.firstName;
-        // console.log("INDO--------", userInformation)
-        return {userInformation};
+        return { userInformation };
       });
 
     } catch (err) {
       console.log(err);
     }
-  }
-
-  const consoleFunction = () => {
-    console.log("Hello")
-    console.log(phoneNumber)
-
-    return firstName
   }
 
   const [pushNotificationsChecked, setPushNotificationsChecked] = useState(false);

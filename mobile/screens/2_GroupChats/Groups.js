@@ -1,10 +1,24 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-// import CustomListItem from '../../components/CustomListItem';
-import GroupListItem from '../../components/GroupListItem';
-import { NavigationContainer } from '@react-navigation/native';
-import { auth, db } from '../../firebase';
-import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
+// *************************************************************
+// Imports for: React, React Native, & React Native Elements
+import React, {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from 'react';
+import {
+	Keyboard,
+	KeyboardAvoidingView,
+	Platform,
+	SafeAreaView,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
 import {
 	Alert,
 	Avatar,
@@ -13,30 +27,60 @@ import {
 	Image,
 	Input,
 	Tooltip,
-  } from 'react-native-elements';
+} from 'react-native-elements';
+import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+
+
+// Imports for: Expo
+import { StatusBar } from 'expo-status-bar';
+import ImagePicker from 'expo-image-picker';
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+
+// Imports for: Firebase
+import {
+	apps,
+	auth,
+	db,
+	firebaseConfig
+} from '../../firebase';
+import firebase from 'firebase/compat/app';
+
+// Imports for: Components
+import CustomListItem from '../../components/CustomListItem';
+import LargeButton from '../../components/LargeButton';
+import LargeTitle from '../../components/LargeTitle';
+import LineDivider from '../../components/LineDivider';
+import LoginInput from '../../components/LoginInput';
+import LoginText from '../../components/LoginText';
+import UserPrompt from '../../components/UserPrompt';
+
+// *************************************************************
+
 
 const Groups = ({ navigation }) => {
 	const [groups, setGroups] = useState([]);
+
 	const goToAddChat = () => {
 		navigation.navigate('AddChat');
-	  }
-	
-	  const goToHome = () => {
+	}
+
+	const goToHome = () => {
 		navigation.navigate('HomeTab');
-	  }
-	
-	  const goToGroupChats = () => {
+	}
+
+	const goToGroupChats = () => {
 		navigation.navigate('Groups');
-	  }
-	
-	  const goToDMs = () => {
+	}
+
+	const goToDMs = () => {
 		navigation.navigate('DMsTab');
-	  }
-	
-	  const goToProfile = () => {
+	}
+
+	const goToProfile = () => {
 		navigation.navigate('ProfileTab');
-	  }
-    const signOut = () => {
+	}
+
+	const signOut = () => {
 		auth.signOut().then(() => navigation.replace("Login"));
 	};
 
@@ -52,20 +96,13 @@ const Groups = ({ navigation }) => {
 		return unsubscribe;
 	}, []);
 
-
-    useLayoutEffect(() => {
+	useLayoutEffect(() => {
 		navigation.setOptions({
 			title: "Groups",
 			headerStyle: { backgroundColor: "white" },
 			headerTitleStyle: { color: "black" },
 			headerTintColor: "black",
-			headerLeft: () => (
-				<View style={{ marginLeft: 20 }}>
-					<TouchableOpacity activeOpacity={0.5} onPress={signOut}>
-						<Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
-					</TouchableOpacity>
-				</View>
-			),
+			headerLeft: '',
 			headerRight: () => (
 				<View
 					style={{
@@ -89,12 +126,12 @@ const Groups = ({ navigation }) => {
 		});
 	}, [navigation]);
 
-    const enterGroup = (id, groupName) => {
+	const enterGroup = (id, groupName) => {
 		navigation.navigate("Topics", { id, groupName });
 	};
 
-  return (
-    <SafeAreaView>
+	return (
+		<SafeAreaView>
 			<ScrollView style={styles.container}>
 				{groups.map(({ id, data: { groupName } }) => (
 					<GroupListItem
@@ -104,46 +141,16 @@ const Groups = ({ navigation }) => {
 						enterGroup={enterGroup}
 					/>
 				))}
-				<View style={{ padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', width: 200 }}>
-        <Text>Temporary Navigation</Text>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToHome} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0 }}>
-          <Icon
-            name='home'
-            type='material-community'
-            color='black'
-          />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToGroupChats} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 30 }}>
-          <Icon
-            name='group'
-            type='material'
-            color='black'
-          />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToDMs} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 60 }}>
-          <Icon
-            name='direction'
-            type='entypo'
-            color='black'
-          />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToProfile} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 90 }}>
-          <Icon
-            name='person-pin'
-            type='material'
-            color='black'
-          />
-        </TouchableOpacity>
-      </View>
+
 			</ScrollView>
 		</SafeAreaView>
-  )
+	)
 }
 
-export default Groups
-
 const styles = StyleSheet.create({
-    container: {
+	container: {
 		height: "100%",
 	},
 })
+
+export default Groups;

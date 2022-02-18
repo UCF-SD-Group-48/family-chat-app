@@ -69,7 +69,7 @@ const GroupChatsTab = ({ navigation }) => {
                     id: doc.id,
                     data: doc.data(),
                 }))
-                .where()
+                    .where()
             )
         ));
         return unsubscribe;

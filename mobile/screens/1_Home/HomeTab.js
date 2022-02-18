@@ -57,6 +57,10 @@ import UserPrompt from '../../components/UserPrompt';
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
 
+  const goToTestHome = () => {
+    navigation.navigate('Home');
+  }
+
   const goToAddChat = () => {
     navigation.navigate('AddChat');
   }
@@ -164,39 +168,6 @@ const HomeTab = ({ navigation, route }) => {
           >
             Start a new conversation
           </Text>
-        </TouchableOpacity>
-      </View>
-
-
-      <View style={{ padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', width: 200 }}>
-        <Text>Temporary Navigation</Text>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToHome} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0 }}>
-          <Icon
-            name='home'
-            type='material-community'
-            color='black'
-          />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToGroupChats} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 30 }}>
-          <Icon
-            name='group'
-            type='material'
-            color='black'
-          />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToDMs} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 60 }}>
-          <Icon
-            name='direction'
-            type='entypo'
-            color='black'
-          />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.5} onPress={goToProfile} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 90 }}>
-          <Icon
-            name='person-pin'
-            type='material'
-            color='black'
-          />
         </TouchableOpacity>
       </View>
     </View>

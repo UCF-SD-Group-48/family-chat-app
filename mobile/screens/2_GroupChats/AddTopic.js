@@ -29,7 +29,6 @@ const AddTopic = ({ navigation, route }) => {
 				navigation.goBack();
 			})
 			.catch((error) => alert(error));
-
 	};
     
   return (
@@ -49,8 +48,6 @@ const AddTopic = ({ navigation, route }) => {
   )
 }
 
-export default AddTopic
-
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: "white",
@@ -58,3 +55,5 @@ const styles = StyleSheet.create({
 		height: "100%",
 	},
 });
+
+export default AddTopic;
