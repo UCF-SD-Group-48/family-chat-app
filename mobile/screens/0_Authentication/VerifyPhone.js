@@ -157,7 +157,7 @@ const VerifyPhone = ({ navigation, route }) => {
 
                                 // Check the database, within the users collection, with the user's phone number
                                 const userDocs = db.collection('users');
-                                const snapshot = await userDocs.where('phoneNumber', '==', `${ phoneNumber }`).get();
+                                const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
 
                                 // Is there an existing account with the provided phone number?
                                 if (snapshot.empty) {
@@ -168,18 +168,20 @@ const VerifyPhone = ({ navigation, route }) => {
                                     navigation.navigate('PhoneSuccess', { phoneNumber });
                                     return;
                                 } else {
+                                    let userInformation;
                                     console.log('Account found.');
 
                                     // Print user account data for console.
                                     snapshot.forEach(doc => {
                                         console.log(doc.id, '=>', doc.data());
+                                        userInformation = doc.data();
                                     });
-                                    
+
                                     console.log('Successful login attempt.');
                                     console.log('User forwarded to HomeTab.');
 
                                     // User exists, phone is verified, logged in, navigate to HomeTab.
-                                    navigation.navigate('HomeTab');
+                                    navigation.navigate('HomeTab', { userInformation });
                                     return;
                                 }
                             } catch (err) {
