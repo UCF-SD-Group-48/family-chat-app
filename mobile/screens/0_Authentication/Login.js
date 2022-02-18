@@ -88,7 +88,6 @@ const Login = ({ navigation }) => {
     const [verificationCode, setVerificationCode] = useState();
     const recaptchaVerifier = useRef(null);
 
-<<<<<<< HEAD
     // useEffect(() => {
     //     const unsubscribe = auth.onAuthStateChanged((authUser) => {
     //         if (authUser) {
@@ -103,44 +102,6 @@ const Login = ({ navigation }) => {
         try {
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(
-=======
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((authUser) => {
-            if (authUser) {
-                navigation.push('HomeTab');
-            }
-        });
-        return unsubscribe;
-    }, []);
-
-
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-
-    // const signIn = () => {
-    //     auth
-    //         .signInWithEmailAndPassword(email, password)
-    //         .catch((error) => {
-    //             console.log(error);
-    //             console.log('No account found with given phone number.');
-    //             console.log('User forwarded to Registration (instead of HomeTab.)');
-    //             const credential = getAuth();
-    //             createUserWithEmailAndPassword(credential, email, password)
-    //             signInWithEmailAndPassword(credential, email, password)
-
-
-    //             let firstName = 'Line111'
-    //             let lastName = 'fromLogin'
-    //             navigation.navigate('UserCreated', { firstName, lastName, profilePic });
-    //         })
-    // }
-
-const phoneSubmit = async () => {
-    try {
-        console.log(phoneNumber)
-        const phoneProvider = new firebase.auth.PhoneAuthProvider();
-        const verificationId = await phoneProvider.verifyPhoneNumber(
->>>>>>> e128c3d0dac281f7f95d749267a5d118f32771da
             phoneNumber,
             recaptchaVerifier.current
             );
