@@ -106,7 +106,8 @@ const UserAuth = ({ navigation }) => {
                 <LargeTitle title="Family Chat" />
 
                 <View style={styles.elements}>
-                    <Logo width={150} height={150} />
+                    {/* <Logo width={150} height={150} /> */}
+                    <Text>Logo would go here, but doesn't work on Web</Text>
                 </View>
 
                 <View style={styles.elements}>

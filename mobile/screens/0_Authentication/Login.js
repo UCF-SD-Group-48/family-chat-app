@@ -85,111 +85,132 @@ const Login = ({ navigation }) => {
 
     const [phoneNumber, setPhoneNumber] = useState();
     const [verificationId, setVerificationId] = useState();
-    const [confirm, setConfirm] = useState(null);
+    const [verificationCode, setVerificationCode] = useState();
     const recaptchaVerifier = useRef(null);
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((authUser) => {
-            if (authUser) {
-                navigation.replace('HomeTab');
-            }
-        });
-        return unsubscribe;
-    }, []);
+    // useEffect(() => {
+    //     const unsubscribe = auth.onAuthStateChanged((authUser) => {
+    //         if (authUser) {
+    //             navigation.replace('HomeTab');
+    //         }
+    //     });
+    //     return unsubscribe;
+    // }, []);
+ 
 
-
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-
-    // const signIn = () => {
-    //     auth
-    //         .signInWithEmailAndPassword(email, password)
-    //         .catch((error) => {
-    //             console.log(error);
-    //             console.log('No account found with given phone number.');
-    //             console.log('User forwarded to Registration (instead of HomeTab.)');
-    //             const credential = getAuth();
-    //             createUserWithEmailAndPassword(credential, email, password)
-    //             signInWithEmailAndPassword(credential, email, password)
-
-
-    //             let firstName = 'Line111'
-    //             let lastName = 'fromLogin'
-    //             navigation.navigate('UserCreated', { firstName, lastName, profilePic });
-    //         })
-    // }
-
-const phoneSubmit = async () => {
-    try {
-        console.log(phoneNumber)
-        const phoneProvider = new firebase.auth.PhoneAuthProvider();
-        const verificationId = await phoneProvider.verifyPhoneNumber(
+    const phoneSubmit = async () => {
+        try {
+            const phoneProvider = new firebase.auth.PhoneAuthProvider();
+            const verificationId = await phoneProvider.verifyPhoneNumber(
             phoneNumber,
             recaptchaVerifier.current
-        );
-        setVerificationId(verificationId);
-        navigation.navigate('VerifyPhone', { verificationId, phoneNumber });
-    } catch (err) {
-        console.log(err)
+            );
+            setVerificationId(verificationId);
+            console.log("line 130");
+            
+        } catch (err) {
+            console.log("error caught " + err)
+        }
+    };
+
+    const confirmationSubmit = async () => {
+        try {
+            let user;
+            const credential = firebase.auth.PhoneAuthProvider.credential(
+            verificationId,
+            verificationCode
+            );
+            console.log("credential " + credential)
+            user = await auth.signInWithCredential(credential)
+            if (user){
+                console.log("user is authenticated")
+                navigation.navigate('Groups');
+            } else {
+                navigation.navigate('Login')
+            }
+            // if successful, navigate to Groups
+            // how to check if successful?
+            console.log("success!!!")
+        } catch (err) {
+            console.log("verification code " + verificationCode)
+            console.log("verifcationId " + verificationId)
+            console.log("failed")
+        }
     }
-};
 
-return (
-    <SafeAreaView>
-        <ScrollView>
-            <View style={styles.container}>
+    return (
+        <SafeAreaView>
+            <ScrollView>
+                <View style={styles.container}>
 
-                <FirebaseRecaptchaVerifierModal
-                    ref={recaptchaVerifier}
-                    firebaseConfig={firebaseConfig}
-                />
-
-                <LargeTitle title='Welcome back!' />
-
-                <LineDivider />
-
-                <Text style={styles.subtext}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elitcam.
-                    Quick use: '+1 650 555 1234'
-                </Text>
-                
-                    <Input
-                        placeholder='+1 123 456 7890'
-                        autoFocus
-                        // autoCompleteType="tel"
-                        // keyboardType="phone-pad"
-                        // textContentType="telephoneNumber"
-                        onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
+                    <FirebaseRecaptchaVerifierModal
+                        ref={recaptchaVerifier}
+                        firebaseConfig={firebaseConfig}
                     />
 
+                    <LargeTitle title='Welcome back!' />
+
+                    <LineDivider />
+
+                    <Text style={styles.subtext}>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elitcam.
+                        Quick use: '+1 650 555 1234'
+                    </Text>
+                    
+                        <Input
+                            placeholder='+1 123 456 7890'
+                            autoFocus
+                            onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
+                        />
+
+                    <Button
+                            title="Send Verification Code"
+                            disabled={!phoneNumber}
+                            onPress={phoneSubmit}
+                    />
+
+                    <Button
+                        title="Confirm Verification Code"
+                        disabled={!verificationId}
+                        onPress={confirmationSubmit}
+                    />  
+
+                        <Text style={{ marginTop: 20 }}>Enter Verification code</Text>
+                            <TextInput
+                                style={{ marginVertical: 10, fontSize: 17 }}
+                                editable={!!verificationId}
+                                placeholder="123456"
+                                onChangeText={setVerificationCode}
+                            />
+
+                        <LargeButton
+                            title='Submit'
+                            type=''
+                            onPress={phoneNumber}
+                            style={styles.button}
+                        />
+
+                    {/* <Input
+                        placeholder='john123@email.com'
+                        autoFocus
+                        onChangeText={(email) => setEmail(email)}
+                    />
+                    <Input
+                        placeholder='******'
+                        autoFocus
+                        onChangeText={(password) => setPassword(password)}
+                    />
                     <LargeButton
                         title='Submit'
                         type=''
-                        onPress={phoneSubmit}
+                        onPress={signIn}
                         style={styles.button}
-                    />
+                    /> */}
 
-                {/* <Input
-                    placeholder='john123@email.com'
-                    autoFocus
-                    onChangeText={(email) => setEmail(email)}
-                />
-                <Input
-                    placeholder='******'
-                    autoFocus
-                    onChangeText={(password) => setPassword(password)}
-                />
-                <LargeButton
-                    title='Submit'
-                    type=''
-                    onPress={signIn}
-                    style={styles.button}
-                /> */}
-
-            </View>
-        </ScrollView>
-    </SafeAreaView>
-);
+                </View>
+            </ScrollView>
+        </SafeAreaView>
+    );
 };
 
 const styles = StyleSheet.create({

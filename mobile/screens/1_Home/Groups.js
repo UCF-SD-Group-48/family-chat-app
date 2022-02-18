@@ -1,24 +1,23 @@
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import CustomListItem from '../../components/CustomListItem';
+// import CustomListItem from '../../components/CustomListItem';
+import GroupListItem from '../../components/GroupListItem';
 import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { auth, db } from '../../firebase';
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
+import { Button } from 'react-native-elements/dist/buttons/Button';
 
-const Topics = ({ navigation, route }) => {
-	const [topics, setTopics] = useState([]);
-	const groupId = route.params.id;
-	const groupName = route.params.groupName;
+const Groups = ({ navigation }) => {
+	const [groups, setGroups] = useState([]);
 
-	const signOut = () => {
+    const signOut = () => {
 		auth.signOut().then(() => navigation.replace("Login"));
 	};
 
 	useEffect(() => {
-    console.log("Topics/groupid " + groupId)
-		const unsubscribe = db.collection("groups").doc(String(groupId)).collection("topics").onSnapshot((snapshot) =>
-			setTopics(
+		const unsubscribe = db.collection("groups").onSnapshot((snapshot) =>
+			setGroups(
 				snapshot.docs.map((doc) => ({
 					id: doc.id,
 					data: doc.data(),
@@ -28,17 +27,17 @@ const Topics = ({ navigation, route }) => {
 		return unsubscribe;
 	}, []);
 
-	useLayoutEffect(() => {
+
+    useLayoutEffect(() => {
 		navigation.setOptions({
-			title: "Topics",
+			title: "Groups",
 			headerStyle: { backgroundColor: "white" },
 			headerTitleStyle: { color: "black" },
 			headerTintColor: "black",
 			headerLeft: () => (
 				<View style={{ marginLeft: 20 }}>
 					<TouchableOpacity activeOpacity={0.5} onPress={signOut}>
-						{/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} /> */}
-            <SimpleLineIcons name="arrow-left" size={24} color="black" onPress={() => {navigation.replace('Groups')}}/>
+						<Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
 					</TouchableOpacity>
 				</View>
 			),
@@ -56,9 +55,7 @@ const Topics = ({ navigation, route }) => {
 					</TouchableOpacity>
 					<TouchableOpacity
 						activeOpacity={0.5}
-						// onPress={() => navigation.navigate("AddChat")}
-						onPress={() => navigation.navigate("AddTopic", { groupId, groupName })}
-
+						onPress={() => navigation.navigate("AddGroup")}
 					>
 						<SimpleLineIcons name="pencil" size={24} color="black" />
 					</TouchableOpacity>
@@ -67,30 +64,30 @@ const Topics = ({ navigation, route }) => {
 		});
 	}, [navigation]);
 
-	const enterTopic = (id, topicName) => {
-		navigation.navigate("Chat", { id, topicName });
+    const enterGroup = (id, groupName) => {
+		navigation.navigate("Topics", { id, groupName });
 	};
 
   return (
-	<SafeAreaView>
-		<ScrollView style={styles.container}>
-			{topics.map(({ id, data: { topicName } }) => (
-				<CustomListItem
-					key={id}
-					id={id}
-					topicName={topicName}
-					enterTopic={enterTopic}
-				/>
-			))}
-		</ScrollView>
-	</SafeAreaView>
+    <SafeAreaView>
+			<ScrollView style={styles.container}>
+				{groups.map(({ id, data: { groupName } }) => (
+					<GroupListItem
+						key={id}
+						id={id}
+						groupName={groupName}
+						enterGroup={enterGroup}
+					/>
+				))}
+			</ScrollView>
+		</SafeAreaView>
   )
 }
 
-export default Topics
+export default Groups
 
 const styles = StyleSheet.create({
-	container: {
+    container: {
 		height: "100%",
 	},
 })

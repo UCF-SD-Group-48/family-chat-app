@@ -42,7 +42,7 @@ import {
   auth,
   db,
   firebaseConfig
-} from '../../firebase';
+} from '../firebase';
 import firebase from 'firebase/compat/app';
 
 // *************************************************************

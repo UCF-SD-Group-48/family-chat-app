@@ -19,7 +19,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import 'react-native-gesture-handler';
 
 // Temporary visual space for Front-End component testing.
-import FrontEndTestSpace from './screens/deprecated/FrontEndTestSpace';
+// import FrontEndTestSpace from './screens/deprecated/FrontEndTestSpace';
 
 // Screen imports.
 // ----------------- 'AUTHENTICATION' Screens
@@ -38,7 +38,10 @@ import GroupChatsTab from './screens/2_GroupChats/GroupChatsTab';
 import AddChatScreen from './screens/2_GroupChats/AddChatScreen';
 import ChatScreen from './screens/2_GroupChats/ChatScreen';
 import FamilyChatScreen from './screens/2_GroupChats/FamilyChatScreen';
+import Groups from './screens/1_Home/Groups';
+import AddGroup from './screens/2_GroupChats/AddGroup';
 import Topics from './screens/2_GroupChats/Topics';
+import AddTopic from './screens/2_GroupChats/AddTopic';
 
 // ----------------- 'DMs' Screens
 import DMsTab from './screens/3_DMs/DMsTab';
@@ -161,7 +164,9 @@ export default function App() {
         <Stack.Screen name='Chat' component={ChatScreen} />
         <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
         <Stack.Screen name='Topics' component={Topics} />
-  
+        <Stack.Screen name='Groups' component={Groups} />
+        <Stack.Screen name='AddGroup' component={AddGroup} />
+        <Stack.Screen name='AddTopic' component={AddTopic} />
 
         {/* 3 - DMs */}
         <Stack.Screen name='DMsTab' component={DMsTab} />
@@ -170,7 +175,7 @@ export default function App() {
         <Stack.Screen name='ProfileTab' component={ProfileTab} />
 
         {/* Front-End Test Screens */}
-        <Stack.Screen name='FrontEndTestSpace' component={FrontEndTestSpace} />
+        {/* <Stack.Screen name='FrontEndTestSpace' component={FrontEndTestSpace} /> */}
 
       </Stack.Navigator>
     </NavigationContainer>

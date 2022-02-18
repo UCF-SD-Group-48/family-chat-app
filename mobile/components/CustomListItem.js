@@ -4,7 +4,7 @@ import { ListItem, Avatar } from 'react-native-elements';
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 
-const CustomListItem = ({ id, chatName, enterChat }) => {
+const CustomListItem = ({ id, topicName, enterTopic }) => {
   const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
   return (
     <ListItem
       key={id}
-      onPress={() => enterChat(id, chatName)}
+      onPress={() => enterTopic(id, topicName)}
       key={id}
       buttomDivider
     >
@@ -37,7 +37,7 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
       />
       <ListItem.Content>
         <ListItem.Title style={{ fontWeight: '800' }}>
-          {chatName}
+          {topicName}
         </ListItem.Title>
         <ListItem.Subtitle
           numberOfLines={1}

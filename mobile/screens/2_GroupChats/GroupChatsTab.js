@@ -59,7 +59,7 @@ const GroupChatsTab = ({ navigation }) => {
     const [chats, setChats] = useState([]);
 
     const goToTestingGround = () => {
-        navigation.navigate('FrontEndTestSpace');
+        // navigation.navigate('FrontEndTestSpace');
     };
 
     useEffect(() => {
