@@ -45,7 +45,7 @@ import GroupChatsTab from './screens/2_GroupChats/GroupChatsTab';
 import AddChatScreen from './screens/2_GroupChats/AddChatScreen';
 import ChatScreen from './screens/2_GroupChats/ChatScreen';
 import FamilyChatScreen from './screens/2_GroupChats/FamilyChatScreen';
-import Groups from './screens/1_Home/Groups';
+import Groups from './screens/2_GroupChats/Groups';
 import AddGroup from './screens/2_GroupChats/AddGroup';
 import Topics from './screens/2_GroupChats/Topics';
 import AddTopic from './screens/2_GroupChats/AddTopic';

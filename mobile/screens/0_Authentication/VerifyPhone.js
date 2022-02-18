@@ -176,7 +176,7 @@ const VerifyPhone = ({ navigation, route }) => {
                                         console.log(doc.id, '=>', doc.data());
                                         userInformation = doc.data();
                                     });
-
+                                    
                                     console.log('Successful login attempt.');
                                     console.log('User forwarded to HomeTab.');
 

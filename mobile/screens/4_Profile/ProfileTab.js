@@ -18,6 +18,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Linking,
 } from 'react-native';
 import {
   Alert,
@@ -27,6 +28,7 @@ import {
   Image,
   Input,
   Tooltip,
+  Switch,
 } from 'react-native-elements';
 
 // Imports for: Expo
@@ -57,46 +59,261 @@ import UserPrompt from '../../components/UserPrompt';
 // Fourth tab of the application: PROFILE of currently logged in user.
 const ProfileTab = ({ navigation }) => {
 
+  let userInformation;
+  let phoneNumber;
+  let firstName;
+
+  useEffect(() => {
+    console.log(JSON.stringify(getUserFromDatabase()))
+  });
+
+  const getUserFromDatabase = async () => {
+    try {
+
+      phoneNumber = auth.currentUser.phoneNumber;
+
+      // Check the database, within the users collection, with the user's phone number
+      const userDocs = db.collection('users');
+      const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
+
+      snapshot.forEach(doc => {
+        userInformation = doc.data();
+        firstName = userInformation.firstName;
+        // console.log("INDO--------", userInformation)
+        return {userInformation};
+      });
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const consoleFunction = () => {
+    console.log("Hello")
+    console.log(phoneNumber)
+
+    return firstName
+  }
+
+  const [pushNotificationsChecked, setPushNotificationsChecked] = useState(false);
+  const [locationServicesChecked, setLocationServicesChecked] = useState(false);
+  const [importContactsChecked, setImportContactsChecked] = useState(false);
+
+  let currentSwitchState = (switchCase) => {
+    switch (switchCase) {
+      case 'pushNotifications': {
+        if (pushNotificationsChecked === true) {
+          return 'enabled'
+        } else {
+          return 'disabled'
+        }
+      }
+      case 'locationServices': {
+        if (locationServicesChecked === true) {
+          return 'enabled'
+        } else {
+          return 'disabled'
+        }
+      }
+      case 'importContacts': {
+        if (importContactsChecked === true) {
+          return 'enabled'
+        } else {
+          return 'disabled'
+        }
+      }
+    }
+  }
+
+  const openWebsite = () => {
+    Linking.openURL('https://www.familychat.app/FAQ')
+  }
+
+  const openGuidedTutorial = () => {
+  }
+
+  const reportProblem = () => {
+  }
+
   const signOutUser = () => {
     auth.signOut().then(() => {
-      // This SHOULD be replace, instead of '.navigate()'.
       navigation.replace('UserAuth');
-      // navigation.navigate('AuthStackScreen', { screen: 'UserAuth' });
-      // navigation.popToTop();
-      // navigation.navigate('AuthenticationStack', {
-      //     screen: 'AuthStackScreen', params: {
-      //         screen: 'UserAuth'
-      //     }
-      // });
-
-
     });
   };
 
   return (
-    <View>
-      <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
-        {/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }}/> */}
+    <SafeAreaView>
+      <ScrollView style={styles.container}>
+
         <View
-        style={{ backgroundColor: 'lightgray', width: 125, height: 50, borderRadius: 10, border: 'black', borderWidth: 2}}
-        >
+          style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+          <Text
+            style={{ position: 'relative', left: '-25%', marginBottom: 5, fontSize: 18 }}
+          >
+            Public Information
+          </Text>
+          <View
+            style={{
+              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: '90%', justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+            }}
+          >
+            <Text>
+              {firstName}
+            </Text>
+          </View>
 
-        <Text
-        style={{ alignContent: 'center', justifyContent: 'center', position: 'relative',}}
-        >
-          <Icon
-            name='logout'
-            type='simple-line-icon'
-            color='black'
-            style={{ marginRight: 10 }}
-          />
-          LOGOUT
-        </Text>
+          <Text
+            style={{ position: 'relative', left: '-25%', marginBottom: 5, fontSize: 18 }}
+          >
+            Private Information
+          </Text>
+          <View
+            style={{
+              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'lightgrey', borderRadius: 5, width: '90%', justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+            }}
+          >
+
+          </View>
+
+          <View
+            style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
+          >
+            <Text style={{ fontWeight: 'bold' }}>Push Notifications</Text>
+            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (currently {currentSwitchState('pushNotifications')})</Text>
+            <Switch
+              value={pushNotificationsChecked}
+              onValueChange={(value) => setPushNotificationsChecked(value)}
+              style={{
+                marginLeft: 'auto',
+                marginRight: 0
+              }}
+            />
+          </View>
+
+          <View
+            style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%', marginTop: 20 }}
+          >
+            <Text style={{ fontWeight: 'bold' }}>Location Services</Text>
+            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (currently {currentSwitchState('locationServices')})</Text>
+            <Switch
+              value={locationServicesChecked}
+              onValueChange={(value) => setLocationServicesChecked(value)}
+              style={{
+                marginLeft: 'auto',
+                marginRight: 0
+              }}
+            />
+          </View>
+
+          <View
+            style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%', marginTop: 20, marginBottom: 10 }}
+          >
+            <Text style={{ fontWeight: 'bold' }}>Import Contacts</Text>
+            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (currently {currentSwitchState('importContacts')})</Text>
+            <Switch
+              value={importContactsChecked}
+              onValueChange={(value) => setImportContactsChecked(value)}
+              style={{
+                marginLeft: 'auto',
+                marginRight: 0
+              }}
+            />
+          </View>
+
+          <LineDivider />
+
+          <View>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={openWebsite}
+              style={{
+                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+                alignItems: 'center', flexDirection: "row", backgroundColor: 'lightgray', marginTop: 30
+              }}
+            >
+              <Icon
+                name='live-help'
+                type='material'
+                color='black'
+              />
+              <Text
+                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+              >
+                Help Center
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={openWebsite}
+              style={{
+                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+                alignItems: 'center', flexDirection: "row", backgroundColor: 'lightgray', marginTop: 20
+              }}
+            >
+              <Icon
+                name='tour'
+                type='material'
+                color='black'
+              />
+              <Text
+                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+              >
+                Guided Tutorial
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={reportProblem}
+              style={{
+                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+                alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#F3889C', marginTop: 20
+              }}
+            >
+              <Icon
+                name='report-problem'
+                type='material'
+                color='black'
+              />
+              <Text
+                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+              >
+                Report a concern
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <LineDivider />
+
+          <View>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={signOutUser}
+              style={{
+                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+                alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#F3889C', marginTop: 30
+              }}
+            >
+              <Icon
+                name='logout'
+                type='simple-line-icon'
+                color='black'
+              />
+              <Text
+                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+              >
+                Logout
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-
-      </TouchableOpacity>
-
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

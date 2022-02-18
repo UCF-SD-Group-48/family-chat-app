@@ -57,15 +57,16 @@ import UserPrompt from '../../components/UserPrompt';
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
 
-  // Passing user object from VerifyPhone
-  const { userInformation } = route.params;
+  const goToAddChat = () => {
+    navigation.navigate('AddChat');
+  }
 
   const goToHome = () => {
     navigation.navigate('HomeTab');
   }
 
   const goToGroupChats = () => {
-    navigation.navigate('GroupChatsTab');
+    navigation.navigate('Groups');
   }
 
   const goToDMs = () => {
@@ -77,7 +78,6 @@ const HomeTab = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-    // navigation.replace('GroupChatsTab');
     console.log('Current User: ', JSON.stringify(auth.currentUser));
   }, []);
 
@@ -95,7 +95,7 @@ const HomeTab = ({ navigation, route }) => {
         <Text
           style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
         >
-          Welcome back {userInformation.firstName || "friend"},
+          Welcome back {route.params?.userInformation?.firstName || "friend"},
         </Text>
         <Text
           style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}
@@ -115,22 +115,16 @@ const HomeTab = ({ navigation, route }) => {
         flex: 1,
       }} />
 
-      <Text>Home Tab Screen</Text>
+      {/* <Text>Home Tab Screen</Text>
       <LargeButton
         onPress={() => { navigation.navigate('Topics') }}
       >
         Go to a Topic
-      </LargeButton>
+      </LargeButton> */}
 
-      {/* 
-      <LargeButton onPress={() => { navigation.navigate('HomeTab') }}>Home</LargeButton>
-      <LargeButton onPress={() => { navigation.navigate('GroupChatsTab') }}>Group Chats</LargeButton>
-      <LargeButton onPress={() => { navigation.navigate('DMsTab') }}>Direct Messages</LargeButton>
-      <LargeButton onPress={() => { navigation.navigate('ProfileTab') }}>Profile</LargeButton>
-      */}
       <View style={{
-        padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 8, width: 325, justifyContent: 'center',
-        alignItems: 'center', marginBottom: 20
+        padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: 325, justifyContent: 'center',
+        alignItems: 'center', marginBottom: 20, marginTop: 20
       }}>
 
         <Icon
@@ -153,14 +147,24 @@ const HomeTab = ({ navigation, route }) => {
       </View>
 
       <View>
-      <TouchableOpacity
-      onPress={goToGroupChats}
-      style={{}}
-      >
-        <Text>
-          Hello
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={goToAddChat}
+          style={{
+            width: 300, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+            alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#7DBF7F'
+          }}
+        >
+          <Icon
+            name='plus'
+            type='entypo'
+            color='black'
+          />
+          <Text
+            style={{ fontSize: 18, paddingLeft: 15 }}
+          >
+            Start a new conversation
+          </Text>
+        </TouchableOpacity>
       </View>
 
 

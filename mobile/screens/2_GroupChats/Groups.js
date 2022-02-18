@@ -3,14 +3,39 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 // import CustomListItem from '../../components/CustomListItem';
 import GroupListItem from '../../components/GroupListItem';
 import { NavigationContainer } from '@react-navigation/native';
-import { Avatar } from 'react-native-elements';
 import { auth, db } from '../../firebase';
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
-import { Button } from 'react-native-elements/dist/buttons/Button';
+import {
+	Alert,
+	Avatar,
+	Button,
+	Icon,
+	Image,
+	Input,
+	Tooltip,
+  } from 'react-native-elements';
 
 const Groups = ({ navigation }) => {
 	const [groups, setGroups] = useState([]);
-
+	const goToAddChat = () => {
+		navigation.navigate('AddChat');
+	  }
+	
+	  const goToHome = () => {
+		navigation.navigate('HomeTab');
+	  }
+	
+	  const goToGroupChats = () => {
+		navigation.navigate('Groups');
+	  }
+	
+	  const goToDMs = () => {
+		navigation.navigate('DMsTab');
+	  }
+	
+	  const goToProfile = () => {
+		navigation.navigate('ProfileTab');
+	  }
     const signOut = () => {
 		auth.signOut().then(() => navigation.replace("Login"));
 	};
@@ -79,6 +104,37 @@ const Groups = ({ navigation }) => {
 						enterGroup={enterGroup}
 					/>
 				))}
+				<View style={{ padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', width: 200 }}>
+        <Text>Temporary Navigation</Text>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToHome} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0 }}>
+          <Icon
+            name='home'
+            type='material-community'
+            color='black'
+          />
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToGroupChats} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 30 }}>
+          <Icon
+            name='group'
+            type='material'
+            color='black'
+          />
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToDMs} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 60 }}>
+          <Icon
+            name='direction'
+            type='entypo'
+            color='black'
+          />
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.5} onPress={goToProfile} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0, marginLeft: 90 }}>
+          <Icon
+            name='person-pin'
+            type='material'
+            color='black'
+          />
+        </TouchableOpacity>
+      </View>
 			</ScrollView>
 		</SafeAreaView>
   )

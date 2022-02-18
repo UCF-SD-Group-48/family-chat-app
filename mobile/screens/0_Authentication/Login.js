@@ -124,7 +124,7 @@ const Login = ({ navigation }) => {
             user = await auth.signInWithCredential(credential)
             if (user){
                 console.log("user is authenticated")
-                navigation.navigate('Groups');
+                navigation.navigate('HomeTab');
             } else {
                 navigation.navigate('Login')
             }
