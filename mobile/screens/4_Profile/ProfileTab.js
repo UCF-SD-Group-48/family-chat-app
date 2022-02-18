@@ -59,27 +59,27 @@ import UserPrompt from '../../components/UserPrompt';
 // Fourth tab of the application: PROFILE of currently logged in user.
 const ProfileTab = ({ navigation }) => {
 
+  let [phoneNumber, setPhoneNumber] = useState('')
+  let [userObject, setUserObject] = useState({})
+
   let userInformation;
-  let phoneNumber;
   let firstName;
 
   useEffect(() => {
-    console.log(JSON.stringify(getUserFromDatabase()))
+    getUserFromDatabase()
   });
 
   const getUserFromDatabase = async () => {
     try {
 
-      phoneNumber = auth.currentUser.phoneNumber;
+      setPhoneNumber(auth.currentUser.phoneNumber)
 
       // Check the database, within the users collection, with the user's phone number
       const userDocs = db.collection('users');
       const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
 
       snapshot.forEach(doc => {
-        userInformation = doc.data();
-        firstName = userInformation.firstName;
-        return { userInformation };
+        setUserObject(doc.data());
       });
 
     } catch (err) {
@@ -150,7 +150,6 @@ const ProfileTab = ({ navigation }) => {
             }}
           >
             <Text>
-              {firstName}
             </Text>
           </View>
 
@@ -164,7 +163,11 @@ const ProfileTab = ({ navigation }) => {
               padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'lightgrey', borderRadius: 5, width: '90%', justifyContent: 'center', alignItems: 'center', marginBottom: 20,
             }}
           >
-
+            <Text
+              style={{}}
+            >
+              {phoneNumber}
+            </Text>
           </View>
 
           <View
@@ -239,7 +242,7 @@ const ProfileTab = ({ navigation }) => {
           <View>
             <TouchableOpacity
               activeOpacity={0.5}
-              onPress={openWebsite}
+              onPress={openGuidedTutorial}
               style={{
                 width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
                 alignItems: 'center', flexDirection: "row", backgroundColor: 'lightgray', marginTop: 20

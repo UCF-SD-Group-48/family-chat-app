@@ -86,94 +86,101 @@ const HomeTab = ({ navigation, route }) => {
   }, []);
 
   return (
-
-    <View
-      style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <View
-        style={{ position: 'relative', width: 350, alignContent: 'center' }}
-      >
-        <Text
-          style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
+    <SafeAreaView>
+      <ScrollView style={styles.container}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          Welcome back {route.params?.userInformation?.firstName || "friend"},
-        </Text>
-        <Text
-          style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}
-        >
-          here's what you've missed:
-        </Text>
+          <View
+            style={{ position: 'relative', width: 350, alignContent: 'center' }}
+          >
+            <Text
+              style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
+            >
+              Welcome back {route.params?.userInformation?.firstName || "friend"},
+            </Text>
+            <Text
+              style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}
+            >
+              here's what you've missed:
+            </Text>
 
-      </View>
+          </View>
 
-      <LineDivider style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-      }} />
+          <LineDivider style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }} />
 
-      {/* <Text>Home Tab Screen</Text>
+          {/* <Text>Home Tab Screen</Text>
       <LargeButton
         onPress={() => { navigation.navigate('Topics') }}
       >
         Go to a Topic
       </LargeButton> */}
 
-      <View style={{
-        padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: 325, justifyContent: 'center',
-        alignItems: 'center', marginBottom: 20, marginTop: 20
-      }}>
+          <View style={{
+            padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: 325, justifyContent: 'center',
+            alignItems: 'center', marginBottom: 20, marginTop: 20
+          }}>
 
-        <Icon
-          name='checkbox-outline'
-          type='ionicon'
-          color='black'
-          size={100}
-          style={{ paddingBottom: 20 }}
-        />
-        <Text
-          style={{ fontSize: 18 }}
-        >
-          You're all up to date!
-        </Text>
-        <Text
-          style={{ fontSize: 18, paddingBottom: 20 }}
-        >
-          No new notifications at this time.
-        </Text>
-      </View>
+            <Icon
+              name='checkbox-outline'
+              type='ionicon'
+              color='black'
+              size={100}
+              style={{ paddingBottom: 20 }}
+            />
+            <Text
+              style={{ fontSize: 18 }}
+            >
+              You're all up to date!
+            </Text>
+            <Text
+              style={{ fontSize: 18, paddingBottom: 20 }}
+            >
+              No new notifications at this time.
+            </Text>
+          </View>
 
-      <View>
-        <TouchableOpacity
-          onPress={goToAddChat}
-          style={{
-            width: 300, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
-            alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#7DBF7F'
-          }}
-        >
-          <Icon
-            name='plus'
-            type='entypo'
-            color='black'
-          />
-          <Text
-            style={{ fontSize: 18, paddingLeft: 15 }}
-          >
-            Start a new conversation
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <View>
+            <TouchableOpacity
+              onPress={goToAddChat}
+              style={{
+                width: 300, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+                alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#7DBF7F'
+              }}
+            >
+              <Icon
+                name='plus'
+                type='entypo'
+                color='black'
+              />
+              <Text
+                style={{ fontSize: 18, paddingLeft: 15 }}
+              >
+                Start a new conversation
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    height: "100%",
+  },
+})
 
 export default HomeTab;

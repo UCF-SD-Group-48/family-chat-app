@@ -51,16 +51,12 @@ import LineDivider from '../../components/LineDivider';
 // *************************************************************
 
 // Take the provided phone number, from the user, and check it's validity + reCAPTCHA.
-const RegisterPhone = ({ navigation }) => {
+const RegisterPhone = ({ navigation, route}) => {
 
     const [phoneNumber, setPhoneNumber] = useState();
     const [verificationId, setVerificationId] = useState();
     const [confirm, setConfirm] = useState(null);
     const recaptchaVerifier = useRef(null);
-
-    const goBackToPreviousScreen = () => {
-        navigation.replace('UserAuth');
-    };
 
     const phoneSubmit = async () => {
         try {

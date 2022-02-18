@@ -88,7 +88,6 @@ const HomeStackScreen = () => (
 )
 
 const GroupChatsStackScreen = () => (
-  
   <Stack.Navigator headerMode="none">
     <Stack.Screen name='Groups' component={Groups} />
     <Stack.Screen name='AddChat' component={AddChatScreen} />
@@ -115,6 +114,7 @@ const ProfileStackScreen = () => (
 const TabStack = createBottomTabNavigator();
 const TabStackScreen = () => (
   <TabStack.Navigator
+  headerMode="none"
     screenOptions={({ route }) => ({
       initialRouteName: "Home",
       headerShown: false,
