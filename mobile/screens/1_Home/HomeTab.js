@@ -55,8 +55,10 @@ import UserPrompt from '../../components/UserPrompt';
 // *************************************************************
 
 // First tab of the application: HOME.
-const DirectMessagesTab = ({ navigation }) => {
+const HomeTab = ({ navigation, route }) => {
 
+  // Passing user object from VerifyPhone
+  const { userInformation } = route.params;
 
   const goToHome = () => {
     navigation.navigate('HomeTab');
@@ -79,8 +81,6 @@ const DirectMessagesTab = ({ navigation }) => {
     console.log('Current User: ', JSON.stringify(auth.currentUser));
   }, []);
 
-  console.log("CHCIEKN SDFSDFSDF", auth.currentUser.displayName)
-
   return (
 
     <View
@@ -95,7 +95,7 @@ const DirectMessagesTab = ({ navigation }) => {
         <Text
           style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
         >
-          Welcome back {auth.currentUser.displayName || "friend"},
+          Welcome back {userInformation.firstName || "friend"},
         </Text>
         <Text
           style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}
@@ -151,6 +151,19 @@ const DirectMessagesTab = ({ navigation }) => {
           No new notifications at this time.
         </Text>
       </View>
+
+      <View>
+      <TouchableOpacity
+      onPress={goToGroupChats}
+      style={{}}
+      >
+        <Text>
+          Hello
+        </Text>
+      </TouchableOpacity>
+      </View>
+
+
       <View style={{ padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', width: 200 }}>
         <Text>Temporary Navigation</Text>
         <TouchableOpacity activeOpacity={0.5} onPress={goToHome} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0 }}>
@@ -188,4 +201,4 @@ const DirectMessagesTab = ({ navigation }) => {
 
 const styles = StyleSheet.create({});
 
-export default DirectMessagesTab;
+export default HomeTab;
