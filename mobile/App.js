@@ -93,10 +93,10 @@ const GroupChatsStackScreen = () => (
     <Stack.Screen name='Groups' component={Groups} />
     <Stack.Screen name='AddChat' component={AddChatScreen} />
     <Stack.Screen name='Chat' component={ChatScreen} />
-    <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
     <Stack.Screen name='Topics' component={Topics} />
     <Stack.Screen name='AddGroup' component={AddGroup} />
     <Stack.Screen name='AddTopic' component={AddTopic} />
+    <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
   </Stack.Navigator>
 )
 

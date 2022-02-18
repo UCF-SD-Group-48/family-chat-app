@@ -53,6 +53,7 @@ import LineDivider from '../../components/LineDivider';
 import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
+import GroupListItem from '../../components/GroupListItem'
 
 // *************************************************************
 
