@@ -128,8 +128,31 @@ const DirectMessagesTab = ({ navigation }) => {
       <LargeButton onPress={() => { navigation.navigate('DMsTab') }}>Direct Messages</LargeButton>
       <LargeButton onPress={() => { navigation.navigate('ProfileTab') }}>Profile</LargeButton>
       */}
+      <View style={{
+        padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 8, width: 325, justifyContent: 'center',
+        alignItems: 'center', marginBottom: 20
+      }}>
 
+        <Icon
+          name='checkbox-outline'
+          type='ionicon'
+          color='black'
+          size={100}
+          style={{ paddingBottom: 20 }}
+        />
+        <Text
+          style={{ fontSize: 18 }}
+        >
+          You're all up to date!
+        </Text>
+        <Text
+          style={{ fontSize: 18, paddingBottom: 20 }}
+        >
+          No new notifications at this time.
+        </Text>
+      </View>
       <View style={{ padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', width: 200 }}>
+        <Text>Temporary Navigation</Text>
         <TouchableOpacity activeOpacity={0.5} onPress={goToHome} style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 0 }}>
           <Icon
             name='home'
