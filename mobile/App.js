@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   View,
+  SafeAreaView,
 } from 'react-native';
 import {
   Alert,
@@ -181,22 +182,24 @@ const TabStackScreen = () => (
 // Screen definitions for the application.
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={globalScreenOptions} >
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={globalScreenOptions} >
 
-        {/* Authentication Screens */}
-        <Stack.Screen name='UserAuth' component={UserAuth} />
-        <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
-        <Stack.Screen name='Login' component={Login} />
-        <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
-        <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
-        <Stack.Screen name="UserCreated" component={UserCreated} />
+          {/* Authentication Screens */}
+          <Stack.Screen name='UserAuth' component={UserAuth} />
+          <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
+          <Stack.Screen name='Login' component={Login} />
+          <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
+          <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
+          <Stack.Screen name="UserCreated" component={UserCreated} />
 
-        {/* Tabbed Screens */}
-        <Stack.Screen name="TabStack" component={TabStackScreen} />
+          {/* Tabbed Screens */}
+          <Stack.Screen name="TabStack" component={TabStackScreen} />
 
-      </Stack.Navigator>
-    </NavigationContainer>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaView>
   );
 }
 
@@ -206,5 +209,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  safeAreaContainer: {
+    flex: 1,
   },
 });
