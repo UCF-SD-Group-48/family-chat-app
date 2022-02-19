@@ -51,6 +51,7 @@ import firebase from 'firebase/compat/app';
 const ChatScreen = ({ navigation, route }) => {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([])
+    const [lastUser, setLastUser] = useState("")
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -145,6 +146,8 @@ const ChatScreen = ({ navigation, route }) => {
         setInput(''); // clears messaging box
     };
 
+    
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='light' />
@@ -155,57 +158,51 @@ const ChatScreen = ({ navigation, route }) => {
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <>
+                        
                         <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
-                            {messages.map(({ id, data }) => (
-                                data.email === auth.currentUser.email ? (
-                                    <View key={id} style={styles.receiver}>
-                                        <Avatar
-                                            position='absolute'
-                                            rounded
-
-                                            // WEB
-                                            containerStyle={{
-                                                position: 'absolute',
-                                                bottom: -15,
-                                                right: -5,
-                                            }}
-                                            bottom={-15}
-                                            right={-5}
-                                            size={30}
-                                            source={{ uri: data.photoURL }}
-                                        />
-                                        <Text style={styles.recieverText}>
+                            {messages.map(({ id, data, array }) => (
+                                // data.email === auth.currentUser.email ? (
+                            <View key={id} style={styles.message}>
+                                <View style={styles.userContainer}/>
+                                <View style={styles.textContainer}>
+                                    <Text style={styles.userName}>
+                                        {data.displayName || "Display Name"}
+                                    </Text>
+                                    <View style={styles.textOutline}>
+                                        <Text style={styles.text}>
                                             {data.message}
                                         </Text>
                                     </View>
-                                ) : (
-                                    <View
-                                        key={id}
-                                        style={styles.sender}
-                                    >
-                                        <Avatar
-                                            position='absolute'
-                                            rounded
+                                </View>
+                            </View>
+                                // ) : (
+                                //     <View
+                                //         key={id}
+                                //         style={styles.sender}
+                                //     >
+                                //         <Avatar
+                                //             position='absolute'
+                                //             rounded
 
-                                            // WEB
-                                            containerStyle={{
-                                                position: 'absolute',
-                                                bottom: -15,
-                                                right: -5,
-                                            }}
-                                            bottom={-15}
-                                            right={-5}
-                                            size={30}
-                                            source={{ uri: data.photoURL }}
-                                        />
-                                        <Text style={styles.senderText}>
-                                            {data.message}
-                                        </Text>
-                                        <Text style={styles.senderName}>
-                                            {data.displayName}
-                                        </Text>
-                                    </View>
-                                )
+                                //             // WEB
+                                //             containerStyle={{
+                                //                 position: 'absolute',
+                                //                 bottom: -15,
+                                //                 right: -5,
+                                //             }}
+                                //             bottom={-15}
+                                //             right={-5}
+                                //             size={30}
+                                //             source={{ uri: data.photoURL }}
+                                //         />
+                                //         <Text style={styles.senderText}>
+                                //             {data.message}
+                                //         </Text>
+                                //         <Text style={styles.senderName}>
+                                //             {data.displayName}
+                                //         </Text>
+                                //     </View>
+                                // )
                             ))}
                         </ScrollView>
                         <View style={styles.footer}>
@@ -237,6 +234,57 @@ const ChatScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+    },
+    message: {
+        flex: 1,
+        width: "100%",
+        alignItems: 'flex-start',
+        flexDirection: "row",
+        paddingTop: 20,
+        paddingHorizontal: 10,
+        backgroundColor: "#6660",
+    },
+    userContainer: {
+        width: 50,
+        height: 50,
+    
+        backgroundColor: '#0cc',
+        borderWidth: 2,
+        borderColor: '#555',
+        borderRadius: 10,
+    },
+    textContainer: {
+        flex: 1,
+        width: "100%",
+        backgroundColor: '#0cc0',
+    },
+    userName: {
+        marginLeft: 5,
+        height: 20,
+        textAlign: 'left',
+        fontSize: 12,
+        fontWeight: '600',
+        color: 'black',
+    },
+    textOutline: {
+        flex: 1,
+        flexGrow: 1,
+        marginLeft: 5,
+        minHeight: 30,
+        justifyContent: "center",
+        backgroundColor: '#cff0',
+        borderWidth: 2,
+        borderColor: '#555',
+        borderRadius: 5,
+    },
+    text: {
+        marginLeft: 10,
+        paddingVertical: 5,
+        textAlign: 'left',
+        fontSize: 16,
+        fontWeight: '500',
+        color: 'black',
     },
     receiver: {
         maxWidth: '80%',

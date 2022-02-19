@@ -102,7 +102,7 @@ const Login = ({ navigation }) => {
         try {
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(
-            phoneNumber,
+                (phoneNumber == "Dev") ? "+1 650 555 1234" : phoneNumber,
             recaptchaVerifier.current
             );
             setVerificationId(verificationId);
