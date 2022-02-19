@@ -132,8 +132,8 @@ const Groups = ({ navigation }) => {
 	};
 
 	return (
-		<SafeAreaView>
-			<ScrollView style={styles.container}>
+		<SafeAreaView style={styles.container}>
+			<ScrollView width={"100%"}>
 				{groups.map(({ id, data: { groupName } }) => (
 					<GroupListItem
 						key={id}
@@ -144,6 +144,7 @@ const Groups = ({ navigation }) => {
 				))}
 
 			</ScrollView>
+			<LineDivider />
 		</SafeAreaView>
 	)
 }
@@ -151,6 +152,9 @@ const Groups = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		height: "100%",
+        paddingVertical: 20,
+        paddingHorizontal: 10,
+		alignItems: 'center',
 	},
 })
 
