@@ -40,11 +40,11 @@ import {
 	auth,
 	db,
 	firebaseConfig
- } from '../../firebase';
- import firebase from 'firebase/compat/app';
+} from '../../firebase';
+import firebase from 'firebase/compat/app';
 
- // Imports for: Components
- import CustomListItem from '../../components/CustomListItem';
+// Imports for: Components
+import CustomListItem from '../../components/CustomListItem';
 import LargeButton from '../../components/LargeButton';
 import LargeTitle from '../../components/LargeTitle';
 import LineDivider from '../../components/LineDivider';
@@ -52,9 +52,9 @@ import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 
- // *************************************************************
+// *************************************************************
 
- // The provided phone was accepted, now take the user's input to create account.
+// The provided phone was accepted, now take the user's input to create account.
 const PhoneSuccess = ({ navigation, route }) => {
 
 	useLayoutEffect(() => {
@@ -116,8 +116,8 @@ const PhoneSuccess = ({ navigation, route }) => {
 			})
 			.then(() => {
 				console.log('Profile Updated!')
-				navigation.navigate('UserCreated', {firstName, lastName, profilePic});
-			}) 
+				navigation.navigate('UserCreated', { firstName, lastName, profilePic });
+			})
 			.catch((error) => alert(error.message));
 	};
 
@@ -128,11 +128,97 @@ const PhoneSuccess = ({ navigation, route }) => {
 			style={styles.container}
 		>
 			<StatusBar style='light' />
-			<Text h3 style={{ marginBottom: 50 }}>
-				SUCCESS PAGE
-			</Text>
+
 			<View style={styles.inputContainer}>
-				<View style={styles.profileImage}>
+				<View style={styles.pfpOptions}>
+					<TouchableOpacity>
+						<Image
+							source={require('../../assets/pfpOptions/avatar_1.png')}
+							style={{ opacity: .3, width: 50, height: 50, borderRadius: 8, margin: 5 }}
+						/>
+					</TouchableOpacity>
+					<TouchableOpacity>
+						<Image
+							source={require('../../assets/pfpOptions/avatar_2.png')}
+							style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+						/>
+					</TouchableOpacity>
+					<TouchableOpacity>
+						<Image
+							source={require('../../assets/pfpOptions/avatar_3.png')}
+							style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+						/>
+					</TouchableOpacity>
+
+					<Image
+						source={require('../../assets/pfpOptions/avatar_4.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_5.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+				</View>
+				<View style={styles.pfpOptions}>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_6.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_7.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_8.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_9.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_10.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+				</View>
+				<View style={styles.pfpOptions}>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_11.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_12.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_13.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_14.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_15.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+				</View>
+				<View style={styles.pfpOptions}>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_16.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_17.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+					<Image
+						source={require('../../assets/pfpOptions/avatar_18.png')}
+						style={{ width: 50, height: 50, borderRadius: 8, margin: 5 }}
+					/>
+				</View>
+
+				{/* <View style={styles.profileImage}>
 					{!profilePic ? (
 						<Icon
 							name='plus'
@@ -150,13 +236,15 @@ const PhoneSuccess = ({ navigation, route }) => {
 							onPress={pickImage}
 						/>
 					)}
-				</View>
+				</View> */}
+
 				<Input
 					placeholder='First Name'
 					autoFocus
 					type='text'
 					value={firstName}
 					onChangeText={(text) => setFirstName(text)}
+					style={{ marginTop: 20 }}
 				/>
 				<Input
 					placeholder='Last Name'
@@ -197,6 +285,14 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		width: 300,
+	},
+	pfpOptions: {
+		flexDirection: "row",
+	},
+	pfpSelected: {
+		opacity: 1,
+		borderWidth: 5,
+		borderColor: 'green'
 	},
 	profileImage: {
 		backgroundColor: '#2c6bed',

@@ -59,14 +59,18 @@ import UserPrompt from '../../components/UserPrompt';
 // Fourth tab of the application: PROFILE of currently logged in user.
 const ProfileTab = ({ navigation }) => {
 
-  let [phoneNumber, setPhoneNumber] = useState('')
-  let [userObject, setUserObject] = useState({})
+  let [phoneNumber, setPhoneNumber] = useState('');
+  let [userObject, setUserObject] = useState({});
 
   let userInformation;
   let firstName;
 
   useEffect(() => {
     getUserFromDatabase()
+    .then(setPushNotificationsChecked(userObject.pushNotificationEnabled))
+    .then(setLocationServicesChecked(userObject.locationServicesEnabled))
+    .then(setImportContactsChecked(userObject.importContactsEnabled))
+
   });
 
   const getUserFromDatabase = async () => {

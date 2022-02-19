@@ -56,6 +56,8 @@ import DMsTab from './screens/3_DMs/DMsTab';
 
 // ----------------- 'Profile' Screens
 import ProfileTab from './screens/4_Profile/ProfileTab';
+import GenerateProfileIcon from './screens/4_Profile/GenerateProfileIcon';
+
 
 // Default values for 'navigation.setOptions'.
 const globalScreenOptions = {
@@ -147,6 +149,7 @@ const TabStackScreen = () => (
         }
 
         return (
+
           <Icon
             name={iconName}
             type={type}
@@ -160,6 +163,7 @@ const TabStackScreen = () => (
       tabBarInactiveTintColor: 'gray',
     })}
   >
+
     <TabStack.Screen
       name='Home'
       component={HomeStackScreen}
@@ -175,6 +179,10 @@ const TabStackScreen = () => (
     <TabStack.Screen
       name='Profile'
       component={ProfileStackScreen}
+      options={{
+        tabBarLabel: 'Profile',
+        tabBarIcon: () => <GenerateProfileIcon /> 
+      }}
     />
   </TabStack.Navigator>
 );
