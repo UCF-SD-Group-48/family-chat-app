@@ -150,7 +150,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <StatusBar style='light' />
+            <StatusBar style='dark' />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
@@ -158,8 +158,22 @@ const ChatScreen = ({ navigation, route }) => {
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <>
-                        
-                        <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
+                        <View style={styles.topicNavigator}>
+                            <View style={styles.topicSpacer}>
+                                <Text style={styles.topicLabel}>
+                                    {"Topic"}
+                                </Text>
+                            </View>
+                            <TouchableOpacity style={styles.topicButton}>
+                                <Text style={styles.topicText}>
+                                    {"a"}
+                                </Text>
+                            </TouchableOpacity>
+                            <View style={styles.topicSpacer}>
+
+                            </View>
+                        </View>
+                        <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data, array }) => (
                                 // data.email === auth.currentUser.email ? (
                             <View key={id} style={styles.message}>
@@ -236,6 +250,49 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
+
+    topicNavigator: {
+        backgroundColor: "#6660",
+        flexDirection: 'row',
+        alignItems: 'center',
+
+        borderBottomColor: "#000",
+        borderBottomWidth: 2,
+    },
+    topicSpacer: {
+        flex: 1,
+        width: 200,
+        height: 30,
+        flexGrow: 1,
+        backgroundColor: "#eae0",
+        alignItems: "flex-end",
+    },
+    topicButton: {
+        minWidth: 100,
+        height: 30,
+        marginVertical: 10,
+        justifyContent: "center",
+        backgroundColor: "#aee",
+
+        borderWidth: 2,
+        borderColor: '#555',
+        borderRadius: 5,
+    },
+    topicLabel: {
+        marginRight: 5,
+        marginVertical: 5,
+        fontSize: 16,
+        fontWeight: '500',
+        color: 'black',
+    },
+    topicText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: 'black',
+        textAlign: "center",
+        paddingHorizontal: 10,
+    },
+
     message: {
         flex: 1,
         width: "100%",
