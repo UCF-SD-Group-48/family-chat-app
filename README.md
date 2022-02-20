@@ -1,6 +1,6 @@
 # :speech_balloon: Family Chat
 
-### :information_source: A Senior Design project, centered around the deployment of both a promotional website and a highlighted mobile application. The FamilyChat application _(developed using Expo, React Native, & Firebase)_ is designed specifically for family members; pairing interactive features alongside standard messaging functionality, for an improved group-chat experience.
+### :information_source: A Senior Design project, centered around the deployment of both a promotional website and a highlighted mobile application. The FamilyChat application _(developed using Expo, React Native, & Firebase)_ is designed specifically for family members; pairing interactive features, alongside standard messaging functionality: for an improved group-chat experience.
 
 →  https://www.familychat.app
 

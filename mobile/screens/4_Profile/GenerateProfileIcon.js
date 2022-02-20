@@ -57,7 +57,72 @@ import UserPrompt from '../../components/UserPrompt';
 
 // *************************************************************
 
-const GenerateProfileIcon = () => {
+
+export const imageSelection = (pfpDatabaseValue) => {
+    switch (pfpDatabaseValue) {
+        case 1: {
+            console.log("1 ENTERED HERE")
+            return require('../../assets/pfpOptions/avatar_1.png')
+        }
+        case 2: {
+            console.log("2 ENTERED HERE")
+            return require('../../assets/pfpOptions/avatar_2.png')
+        }
+        case 3: {
+            return require('../../assets/pfpOptions/avatar_3.png')
+        }
+        case 4: {
+            return require('../../assets/pfpOptions/avatar_4.png')
+        }
+        case 5: {
+            return require('../../assets/pfpOptions/avatar_5.png')
+        }
+        case 6: {
+            return require('../../assets/pfpOptions/avatar_6.png')
+        }
+        case 7: {
+            return require('../../assets/pfpOptions/avatar_7.png')
+        }
+        case 8: {
+            return require('../../assets/pfpOptions/avatar_8.png')
+        }
+        case 9: {
+            return require('../../assets/pfpOptions/avatar_9.png')
+        }
+        case 10: {
+            return require('../../assets/pfpOptions/avatar_10.png')
+        }
+        case 11: {
+            return require('../../assets/pfpOptions/avatar_11.png')
+        }
+        case 12: {
+            return require('../../assets/pfpOptions/avatar_12.png')
+        }
+        case 13: {
+            return require('../../assets/pfpOptions/avatar_13.png')
+        }
+        case 14: {
+            return require('../../assets/pfpOptions/avatar_14.png')
+        }
+        case 15: {
+            return require('../../assets/pfpOptions/avatar_15.png')
+        }
+        case 16: {
+            return require('../../assets/pfpOptions/avatar_16.png')
+        }
+        case 17: {
+            return require('../../assets/pfpOptions/avatar_17.png')
+        }
+        case 18: {
+            return require('../../assets/pfpOptions/avatar_18.png')
+        }
+        default: {
+            return;
+        }
+    }
+}
+
+const GenerateProfileIcon = (props) => {
 
     const [phoneNumber, setPhoneNumber] = useState('');
     const [userObject, setUserObject] = useState({});
@@ -70,8 +135,12 @@ const GenerateProfileIcon = () => {
 
     const getUserFromDatabase = async () => {
         try {
+            console.log(props.passedPhoneNumberValue)
+            console.log(auth?.currentUser?.phoneNumber)
 
-            setPhoneNumber(auth.currentUser.phoneNumber)
+            props.passedPhoneNumberValue ? setPhoneNumber(props.passedPhoneNumberValue) : setPhoneNumber(auth.currentUser.phoneNumber)
+
+            // setPhoneNumber(auth?.currentUser?.phoneNumber || props.passedPhoneNumberValue)
 
             // Check the database, within the users collection, with the user's phone number
             const userDocs = db.collection('users');
@@ -88,69 +157,6 @@ const GenerateProfileIcon = () => {
         }
     }
 
-
-    const images = (pfpDatabaseValue) => {
-        switch (pfpDatabaseValue) {
-            case 1: {
-                return require('../../assets/pfpOptions/avatar_1.png')
-            }
-            case 2: {
-                return require('../../assets/pfpOptions/avatar_2.png')
-            }
-            case 3: {
-                return require('../../assets/pfpOptions/avatar_3.png')
-            }
-            case 4: {
-                return require('../../assets/pfpOptions/avatar_4.png')
-            }
-            case 5: {
-                return require('../../assets/pfpOptions/avatar_5.png')
-            }
-            case 6: {
-                return require('../../assets/pfpOptions/avatar_6.png')
-            }
-            case 7: {
-                return require('../../assets/pfpOptions/avatar_7.png')
-            }
-            case 8: {
-                return require('../../assets/pfpOptions/avatar_8.png')
-            }
-            case 9: {
-                return require('../../assets/pfpOptions/avatar_9.png')
-            }
-            case 10: {
-                return require('../../assets/pfpOptions/avatar_10.png')
-            }
-            case 11: {
-                return require('../../assets/pfpOptions/avatar_11.png')
-            }
-            case 12: {
-                return require('../../assets/pfpOptions/avatar_12.png')
-            }
-            case 13: {
-                return require('../../assets/pfpOptions/avatar_13.png')
-            }
-            case 14: {
-                return require('../../assets/pfpOptions/avatar_14.png')
-            }
-            case 15: {
-                return require('../../assets/pfpOptions/avatar_15.png')
-            }
-            case 16: {
-                return require('../../assets/pfpOptions/avatar_16.png')
-            }
-            case 17: {
-                return require('../../assets/pfpOptions/avatar_17.png')
-            }
-            case 18: {
-                return require('../../assets/pfpOptions/avatar_18.png')
-            }
-            default: {
-                return;
-            }
-
-        }
-    }
     // const imageFileLocationString = '../../assets/pfpOptions/avatar_' + profileImageNumber + '.png'
 
     // console.log("not use effect", auth.currentUser)
@@ -162,7 +168,7 @@ const GenerateProfileIcon = () => {
         <View>
             {/* {console.log(imageFileLocationString)} */}
             <Image
-                source={images(profileImageNumber)}
+                source={imageSelection(profileImageNumber)}
                 style={{ width: 30, height: 30, borderRadius: 8, position: 'relative', top: 20 }}
             />
 

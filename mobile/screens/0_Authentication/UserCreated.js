@@ -47,6 +47,8 @@ import firebase from 'firebase/compat/app';
 import LargeButton from '../../components/LargeButton'
 import LargeTitle from '../../components/LargeTitle'
 import Logo from '../../assets/appLogo.svg'
+import { imageSelection } from '../4_Profile/GenerateProfileIcon';
+import GenerateProfileIcon from '../4_Profile/GenerateProfileIcon';
 
 // *************************************************************
 
@@ -54,36 +56,50 @@ import Logo from '../../assets/appLogo.svg'
 const UserCreated = ({ navigation, route }) => {
   const firstName = route.params.firstName;
   const lastName = route.params.lastName;
-  const profilePic = route.params.profilePic;
+  // const profilePic = route.params.profilePic;
+  const pfp = route.params.pfp;
+  console.log(pfp)
 
   const isLoggedIn = () => {
-    if (auth.currentUser === null) {
+    if (auth?.currentUser === null) {
       return false;
     } else {
       return true;
     }
   };
 
-  console.log(isLoggedIn() + '' + auth.currentUser.phoneNumber);
+  console.log(isLoggedIn() + '' + auth?.currentUser?.phoneNumber);
 
-  console.log(auth.currentUser != null)
+  console.log(auth?.currentUser != null)
+  console.log("CURRENT", auth?.currentUser)
+  console.log(imageSelection(1))
 
+  console.log("PFP", pfp)
+
+  const passedPhoneNumberValue = "+16505551234"
+  console.log()
   return (
     <>
       <Text h3 style={{ marginBottom: 50 }}>
         Welcome {firstName} {lastName}
       </Text>
+      
+      {/* <GenerateProfileIcon passedPhoneNumberValue={passedPhoneNumberValue}/> */}
+
       <Image
-        source={{ uri: profilePic }}
-        style={{ width: 100, height: 100 }}
+        // source={{ uri: profilePic }}
+        source={imageSelection(pfp)}
+        style={{ width: 75, height: 75, borderRadius: '10%'}}
       />
+
       <LargeButton
         style={styles.button}
         title='Guided Tour'
       />
+
       <LargeButton
         onPress={() => {
-          navigation.replace('Home');
+          navigation.replace('TabStack');
         }}
         style={styles.button}
         title='Go to Home Screen'

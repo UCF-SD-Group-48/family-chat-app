@@ -48,11 +48,24 @@ import LargeButton from '../../components/LargeButton'
 import LargeTitle from '../../components/LargeTitle'
 import Logo from '../../assets/appLogo.svg'
 
-
 // *************************************************************
 
 // First page the user sees when they open the application.
 const UserAuth = ({ navigation }) => {
+
+    // override method of navigation to view the registration screens
+    const goToScreen = () => {
+
+        // ---- params required by screens
+        const phoneNumber = '+13214125192';
+        const firstName = 'Evan';
+        const lastName = 'Navarro';
+        const profilePic = 1;
+
+        // ---- navigation for the button
+        // navigation.navigate('PhoneSuccess', {phoneNumber})
+        navigation.navigate('UserCreated', { firstName, lastName, profilePic });
+    };
 
     const goToRegisterPhone = () => {
         navigation.navigate('RegisterPhone');
@@ -121,6 +134,8 @@ const UserAuth = ({ navigation }) => {
                 <View style={styles.elements}>
                     <LargeButton title="Create an Account" type="" onPress={goToRegisterPhone} />
                     <LargeButton title="Login" type="Secondary" onPress={goToLogin} />
+
+                    {/* <LargeButton title="FrontEndTestingButton" type="Secondary" onPress={goToScreen} /> */}
                 </View>
 
             </ScrollView>
