@@ -26,7 +26,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-// Temporary visual space for Front-End component testing.
+// ----------------- Temporary visual space for Front-End component testing.
 // import FrontEndTestSpace from './screens/deprecated/FrontEndTestSpace';
 
 // Screen imports.
@@ -83,38 +83,8 @@ import firebase from 'firebase/compat/app';
 import { Tab } from 'react-native-elements/dist/tab/Tab';
 
 const Stack = createStackNavigator();
-
-const HomeStackScreen = () => (
-  <Stack.Navigator headerMode="none">
-    <Stack.Screen name='HomeTab' component={HomeTab} />
-  </Stack.Navigator>
-)
-
-const GroupChatsStackScreen = () => (
-  <Stack.Navigator headerMode="none">
-    <Stack.Screen name='Groups' component={Groups} />
-    <Stack.Screen name='AddChat' component={AddChatScreen} />
-    <Stack.Screen name='Chat' component={ChatScreen} />
-    <Stack.Screen name='Topics' component={Topics} />
-    <Stack.Screen name='AddGroup' component={AddGroup} />
-    <Stack.Screen name='AddTopic' component={AddTopic} />
-    <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
-  </Stack.Navigator>
-)
-
-const DMsStackScreen = () => (
-  <Stack.Navigator headerMode="none">
-    <Stack.Screen name='DMsTab' component={DMsTab} />
-  </Stack.Navigator>
-)
-
-const ProfileStackScreen = () => (
-  <Stack.Navigator headerMode="none">
-    <Stack.Screen name='ProfileTab' component={ProfileTab} />
-  </Stack.Navigator>
-)
-
 const TabStack = createBottomTabNavigator();
+
 const TabStackScreen = () => (
   <TabStack.Navigator
   headerMode="none"
@@ -186,6 +156,37 @@ const TabStackScreen = () => (
     />
   </TabStack.Navigator>
 );
+
+const HomeStackScreen = () => (
+  <Stack.Navigator headerMode="none">
+    <Stack.Screen name='HomeTab' component={HomeTab} />
+  </Stack.Navigator>
+)
+
+const GroupChatsStackScreen = () => (
+  <Stack.Navigator headerMode="none">
+    <Stack.Screen name='Groups' component={Groups} />
+    <Stack.Screen name='AddChat' component={AddChatScreen} />
+    <Stack.Screen name='Chat' component={ChatScreen} />
+    <Stack.Screen name='Topics' component={Topics} />
+    <Stack.Screen name='AddGroup' component={AddGroup} />
+    <Stack.Screen name='AddTopic' component={AddTopic} />
+    <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
+  </Stack.Navigator>
+)
+
+const DMsStackScreen = () => (
+  <Stack.Navigator headerMode="none">
+    <Stack.Screen name='DMsTab' component={DMsTab} />
+  </Stack.Navigator>
+)
+
+const ProfileStackScreen = () => (
+  <Stack.Navigator headerMode="none">
+    <Stack.Screen name='ProfileTab' component={ProfileTab} />
+  </Stack.Navigator>
+)
+
 
 // Screen definitions for the application.
 export default function App() {

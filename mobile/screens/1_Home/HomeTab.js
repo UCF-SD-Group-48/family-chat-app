@@ -120,13 +120,6 @@ const HomeTab = ({ navigation, route }) => {
             flex: 1,
           }} />
 
-          {/* <Text>Home Tab Screen</Text>
-      <LargeButton
-        onPress={() => { navigation.navigate('Topics') }}
-      >
-        Go to a Topic
-      </LargeButton> */}
-
           <View style={{
             padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: 325, justifyContent: 'center',
             alignItems: 'center', marginBottom: 20, marginTop: 20

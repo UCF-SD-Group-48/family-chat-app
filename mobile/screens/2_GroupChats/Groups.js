@@ -142,7 +142,6 @@ const Groups = ({ navigation }) => {
 						enterGroup={enterGroup}
 					/>
 				))}
-
 			</ScrollView>
 			<LineDivider />
 		</SafeAreaView>

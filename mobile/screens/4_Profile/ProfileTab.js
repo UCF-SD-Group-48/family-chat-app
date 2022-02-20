@@ -70,7 +70,6 @@ const ProfileTab = ({ navigation }) => {
     .then(setPushNotificationsChecked(userObject.pushNotificationEnabled))
     .then(setLocationServicesChecked(userObject.locationServicesEnabled))
     .then(setImportContactsChecked(userObject.importContactsEnabled))
-
   });
 
   const getUserFromDatabase = async () => {

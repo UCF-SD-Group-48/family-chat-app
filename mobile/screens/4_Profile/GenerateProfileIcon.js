@@ -57,15 +57,12 @@ import UserPrompt from '../../components/UserPrompt';
 
 // *************************************************************
 
-
 export const imageSelection = (pfpDatabaseValue) => {
     switch (pfpDatabaseValue) {
         case 1: {
-            console.log("1 ENTERED HERE")
             return require('../../assets/pfpOptions/avatar_1.png')
         }
         case 2: {
-            console.log("2 ENTERED HERE")
             return require('../../assets/pfpOptions/avatar_2.png')
         }
         case 3: {
@@ -135,12 +132,7 @@ const GenerateProfileIcon = (props) => {
 
     const getUserFromDatabase = async () => {
         try {
-            console.log(props.passedPhoneNumberValue)
-            console.log(auth?.currentUser?.phoneNumber)
-
             props.passedPhoneNumberValue ? setPhoneNumber(props.passedPhoneNumberValue) : setPhoneNumber(auth.currentUser.phoneNumber)
-
-            // setPhoneNumber(auth?.currentUser?.phoneNumber || props.passedPhoneNumberValue)
 
             // Check the database, within the users collection, with the user's phone number
             const userDocs = db.collection('users');
@@ -149,7 +141,6 @@ const GenerateProfileIcon = (props) => {
             snapshot.forEach(doc => {
                 setUserObject(doc.data());
                 setProfileImageNumber(userObject.pfp);
-                // console.log(userObject)
             });
 
         } catch (err) {
@@ -157,21 +148,12 @@ const GenerateProfileIcon = (props) => {
         }
     }
 
-    // const imageFileLocationString = '../../assets/pfpOptions/avatar_' + profileImageNumber + '.png'
-
-    // console.log("not use effect", auth.currentUser)
-
-    // const userDocs = db.collection('users');
-    // const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
-
     return (
         <View>
-            {/* {console.log(imageFileLocationString)} */}
             <Image
                 source={imageSelection(profileImageNumber)}
                 style={{ width: 30, height: 30, borderRadius: 8, position: 'relative', top: 20 }}
             />
-
             <Badge
                 status="success"
                 containerStyle={{ position: 'absolute', bottom: 10, left: 26, }}

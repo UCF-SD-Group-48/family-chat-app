@@ -63,14 +63,9 @@ const PhoneSuccess = ({ navigation, route }) => {
 		});
 	}, [navigation]);
 
-	let checkmarkForImage;
-
-	const [pfp, setPFP] = useState(1);
-
 	const checkIfSelected = (imageNumber) => {
 		if (pfp === imageNumber) {
-			checkmarkForImage = imageNumber;
-
+			// Selected Profile Option
 			return {
 				width: 50,
 				height: 50,
@@ -82,6 +77,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 			}
 		}
 		else {
+			// Default faded styling for profile options
 			return {
 				width: 50,
 				height: 50,
@@ -90,11 +86,12 @@ const PhoneSuccess = ({ navigation, route }) => {
 				opacity: .3
 			}
 		}
-	}
+	};
 
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
 	const [email, setEmail] = useState('');
+	const [pfp, setPFP] = useState(1);
 	const [profilePic, setProfilePic] = useState();
 	const phoneNumber = route.params.phoneNumber;
 
@@ -115,8 +112,6 @@ const PhoneSuccess = ({ navigation, route }) => {
 				aspect: [4, 3],
 				quality: 1,
 			});
-
-			console.log(result);
 
 			if (!result.cancelled) {
 				setProfilePic(result.uri);
@@ -373,83 +368,6 @@ const PhoneSuccess = ({ navigation, route }) => {
 							</View>
 						</TouchableOpacity>
 					</View>
-					{/* <View style={styles.pfpOptions}>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(16)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_16.png')}
-								style={checkIfSelected(16)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(17)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_17.png')}
-								style={checkIfSelected(17)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(18)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_18.png')}
-								style={checkIfSelected(18)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(6)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_6.png')}
-								style={checkIfSelected(6)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(6)
-							}}
-						>
-							<View
-								style={{
-									width: 50,
-									height: 50,
-									borderRadius: 8,
-									margin: 5,
-									opacity: 1,
-									backgroundColor: 'lightgrey',
-									alignContent: 'center',
-									justifyContent: 'center',
-									borderColor: 'grey',
-									borderWidth: 2,
-								}}
-							>
-								<Icon
-									name='add'
-									type='material'
-									color='grey'
-									size={32}
-									// onPress={getPermissions}
-									onPress={pickImage}
-
-								/>
-							</View>
-						</TouchableOpacity>
-					</View> */}
 				</View>
 			</View>
 
@@ -527,15 +445,6 @@ const styles = StyleSheet.create({
 	pfpOptions: {
 		flexDirection: "row",
 		justifyContent: 'center'
-	},
-	pfpSelected: {
-		width: 50,
-		height: 50,
-		borderRadius: 8,
-		margin: 5,
-		opacity: 1,
-		borderWidth: 5,
-		borderColor: '#2C6BED'
 	},
 	profileImage: {
 		backgroundColor: '#2c6bed',
