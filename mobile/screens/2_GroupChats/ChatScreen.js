@@ -18,6 +18,7 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
+    Dimensions,
 } from 'react-native';
 import {
     Alert,
@@ -27,10 +28,12 @@ import {
     Image,
     Input,
     Tooltip,
+    Overlay,
 } from 'react-native-elements';
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
+import Constants from 'expo-constants';
 import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
@@ -47,11 +50,16 @@ import firebase from 'firebase/compat/app';
 
 // *************************************************************
 
+const screenHeight = Dimensions.get('screen').height;
+const screenWidth = Dimensions.get('screen').width;
+const overlayOffset = -screenHeight + 350 + Constants.statusBarHeight*2 + 44*2 + 55*2 - 2;
+
 // Show the information (messages, users, etc.) for the group chat.
 const ChatScreen = ({ navigation, route }) => {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([])
     const [lastUser, setLastUser] = useState("")
+    const [overlayEnabled, setOverlay] = useState(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -146,7 +154,12 @@ const ChatScreen = ({ navigation, route }) => {
         setInput(''); // clears messaging box
     };
 
-    
+    const showOverlay = () => {
+        setOverlay(true);
+    };
+    const closeOverlay = () => {
+        setOverlay(false);
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -164,15 +177,34 @@ const ChatScreen = ({ navigation, route }) => {
                                     {"Topic"}
                                 </Text>
                             </View>
-                            <TouchableOpacity style={styles.topicButton}>
+                            <TouchableOpacity
+                                onPress={showOverlay}
+                                style={styles.topicButton}
+                                activeOpacity={0.7}>
                                 <Text style={styles.topicText}>
-                                    {"a"}
+                                    {"Topic's Name"}
                                 </Text>
                             </TouchableOpacity>
                             <View style={styles.topicSpacer}>
 
                             </View>
                         </View>
+                        {/* Overlay originally positioned in center,
+                            Everything must be multiplied by 2 (for some reason)
+                                -screenHeight = brings center to top of the screen
+                                350 = offsets center to align to top
+                                statusBarHeight = Apple/Androi status bar offset
+                                44 = the hard coded headerStyle height in App.js
+                                55 is the hard coded topicNavigator height
+                                -2 is for the outlines to line up */}
+                        <Overlay isVisible={overlayEnabled} onBackdropPress={closeOverlay}
+                            overlayStyle={{width: screenWidth, height: 350,
+                                marginTop: overlayOffset,
+                            borderColor: "#000", borderWidth: 2,}} >
+                            <Text style={styles.topicText}>
+                                Hello!
+                            </Text>
+                        </Overlay>
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data, array }) => (
                                 // data.email === auth.currentUser.email ? (
@@ -252,6 +284,7 @@ const styles = StyleSheet.create({
     },
 
     topicNavigator: {
+        height: 55,
         backgroundColor: "#6660",
         flexDirection: 'row',
         alignItems: 'center',
