@@ -61,7 +61,7 @@ import GenerateProfileIcon from './screens/4_Profile/GenerateProfileIcon';
 
 // Default values for 'navigation.setOptions'.
 const globalScreenOptions = {
-  headerStyle: { backgroundColor: '#2C6BED' },
+  headerStyle: { backgroundColor: '#2C6BED'},
   headerTitleStyle: { color: 'white' },
   headerBackTitleStyle: { color: 'white' },
   headerTintStyle: 'white'
