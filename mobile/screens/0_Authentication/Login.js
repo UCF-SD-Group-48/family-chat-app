@@ -102,7 +102,8 @@ const Login = ({ navigation }) => {
         try {
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(
-                (phoneNumber == "Dev") ? "+1 650 555 1234" : phoneNumber,
+                // Allow for application login entry with any variation of "DEV" string.
+                ((phoneNumber).toLowerCase() === "dev") ? "+1 650 555 1234" : phoneNumber,
             recaptchaVerifier.current
             );
             setVerificationId(verificationId);
