@@ -64,8 +64,7 @@ const NewNotificationsBlock = () => {
                 orderColor: 'black',
                 borderRadius: '10%',
                 backgroundColor: 'lightgrey',
-                marginTop: 10,
-
+                marginTop: 8,
             }}
         >
             <View
@@ -74,7 +73,6 @@ const NewNotificationsBlock = () => {
                     alignItems: 'center',
                 }}
             >
-
                 <View
                     style={{
                         flexDirection: "row",

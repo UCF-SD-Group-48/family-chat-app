@@ -52,6 +52,8 @@ import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import NewNotificationsBlock from '../../components/NewNotificationsBlock';
+import DismissButton from '../../components/DismissButton';
+import MyView from '../../components/MyView';
 
 // *************************************************************
 
@@ -80,6 +82,12 @@ const HomeTab = ({ navigation, route }) => {
 
   const goToProfile = () => {
     navigation.navigate('ProfileTab');
+  }
+
+  const [blockHidden, setBlockHidden] = useState(false);
+
+  const dismissNotificationBlock = () => {
+
   }
 
   useEffect(() => {
@@ -120,6 +128,26 @@ const HomeTab = ({ navigation, route }) => {
             justifyContent: 'center',
             flex: 1,
           }} />
+
+          <MyView hide={blockHidden}>
+            <TouchableOpacity
+              activeOpacity={0.75}
+              style={{
+                marginTop: 10,
+                marginLeft: 'auto',
+                marginRight: 20,
+              }}
+              onPress={() => {
+                setBlockHidden(true)
+              }}
+            >
+              <DismissButton />
+            </TouchableOpacity>
+          </MyView>
+
+          <MyView hide={blockHidden}>
+            <NewNotificationsBlock />
+          </MyView>
 
           <NewNotificationsBlock />
 
