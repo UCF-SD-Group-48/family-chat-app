@@ -18,6 +18,7 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
+    Dimensions,
 } from 'react-native';
 import {
     Alert,
@@ -31,6 +32,7 @@ import {
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
+import Constants from 'expo-constants';
 import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 
@@ -44,14 +46,20 @@ import {
 import firebase from 'firebase/compat/app';
 
 // Imports for: Components
+// import MyView from '../../components/MyView';
 
 // *************************************************************
+
+const screenHeight = Dimensions.get('screen').height;
+const screenWidth = Dimensions.get('screen').width;
+const overlayOffset = -screenHeight + 350 + Constants.statusBarHeight*2 + 44*2 + 55*2 - 2;
 
 // Show the information (messages, users, etc.) for the group chat.
 const ChatScreen = ({ navigation, route }) => {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([])
     const [lastUser, setLastUser] = useState("")
+    const [topicSelectionEnabled, setTopicSelection] = useState(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -146,7 +154,9 @@ const ChatScreen = ({ navigation, route }) => {
         setInput(''); // clears messaging box
     };
 
-    
+    const toggleTopicSelection = () => {
+        setTopicSelection(!topicSelectionEnabled);
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -164,15 +174,67 @@ const ChatScreen = ({ navigation, route }) => {
                                     {"Topic"}
                                 </Text>
                             </View>
-                            <TouchableOpacity style={styles.topicButton}>
+                            <TouchableOpacity
+                                onPress={toggleTopicSelection}
+                                style={styles.topicButton}
+                                activeOpacity={0.2}>
                                 <Text style={styles.topicText}>
-                                    {"a"}
+                                    {"Topic's Name"}
                                 </Text>
                             </TouchableOpacity>
                             <View style={styles.topicSpacer}>
 
                             </View>
                         </View>
+
+                        {/* <MyView hide={topicSelectionEnabled}
+                            style={{width: "100%", height: 225,
+                                marginTop: -2,
+                                borderColor: "#000",
+                                borderBottomWidth: 2,
+                                flex: 0, alignItems: "center",}} >
+                            <View style={{width: "100%", height: 50,
+                                    flex: 0, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
+                                <Text style={{fontSize: 16,
+                                        fontWeight: '500',
+                                        color: 'black',
+                                        textAlign: "center",
+                                        paddingHorizontal: 10,}}>
+                                    Navigate to Topic
+                                </Text>
+                                <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
+                                    style={{width: 35, height: 35, backgroundColor: "#ddd",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        marginRight: 5,
+                                        justifyContent: "center"}}>
+                                    <Icon
+                                        style={ styles.icon}
+                                        name='close'
+                                        type='antdesign'
+                                        color='#c00'
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{justifyContent: "space-between", alignItems: "center", flex: 1,
+                                    marginBottom: 10,}}>
+                                <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
+                                    style={{minWidth: 100, height: 35, backgroundColor: "#aee",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        justifyContent: "center",}}>
+                                    <Text style={styles.topicText}>
+                                        General
+                                    </Text>
+                                </TouchableOpacity>
+                                <View style={{minWidth: 100, height: 100, backgroundColor: "#aee",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        justifyContent: "center",}}>
+                                    <Text style={styles.topicText}>
+                                        Other Topics
+                                    </Text>
+                                </View>
+                            </View>
+                        </MyView> */}
+
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data, array }) => (
                                 // data.email === auth.currentUser.email ? (
@@ -252,6 +314,7 @@ const styles = StyleSheet.create({
     },
 
     topicNavigator: {
+        height: 55,
         backgroundColor: "#6660",
         flexDirection: 'row',
         alignItems: 'center',
