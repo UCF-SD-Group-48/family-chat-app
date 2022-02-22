@@ -46,7 +46,7 @@ import {
 import firebase from 'firebase/compat/app';
 
 // Imports for: Components
-// import MyView from '../../components/MyView';
+import MyView from '../../components/MyView';
 
 // *************************************************************
 
@@ -187,7 +187,7 @@ const ChatScreen = ({ navigation, route }) => {
                             </View>
                         </View>
 
-                        {/* <MyView hide={topicSelectionEnabled}
+                        <MyView hide={topicSelectionEnabled}
                             style={{width: "100%", height: 225,
                                 marginTop: -2,
                                 borderColor: "#000",
@@ -233,7 +233,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     </Text>
                                 </View>
                             </View>
-                        </MyView> */}
+                        </MyView>
 
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data, array }) => (
