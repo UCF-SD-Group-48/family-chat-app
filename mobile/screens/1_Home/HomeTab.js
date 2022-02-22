@@ -51,6 +51,7 @@ import LineDivider from '../../components/LineDivider';
 import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
+import NewNotificationsBlock from '../../components/NewNotificationsBlock';
 
 // *************************************************************
 
@@ -119,6 +120,8 @@ const HomeTab = ({ navigation, route }) => {
             justifyContent: 'center',
             flex: 1,
           }} />
+
+          <NewNotificationsBlock />
 
           <View style={{
             padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: 325, justifyContent: 'center',
