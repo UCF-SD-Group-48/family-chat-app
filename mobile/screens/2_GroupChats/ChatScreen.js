@@ -28,7 +28,6 @@ import {
     Image,
     Input,
     Tooltip,
-    Overlay,
 } from 'react-native-elements';
 
 // Imports for: Expo
@@ -47,6 +46,7 @@ import {
 import firebase from 'firebase/compat/app';
 
 // Imports for: Components
+import MyView from '../../components/MyView';
 
 // *************************************************************
 
@@ -59,7 +59,7 @@ const ChatScreen = ({ navigation, route }) => {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([])
     const [lastUser, setLastUser] = useState("")
-    const [overlayEnabled, setOverlay] = useState(false);
+    const [topicSelectionEnabled, setTopicSelection] = useState(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -154,11 +154,8 @@ const ChatScreen = ({ navigation, route }) => {
         setInput(''); // clears messaging box
     };
 
-    const showOverlay = () => {
-        setOverlay(true);
-    };
-    const closeOverlay = () => {
-        setOverlay(false);
+    const toggleTopicSelection = () => {
+        setTopicSelection(!topicSelectionEnabled);
     };
 
     return (
@@ -178,9 +175,9 @@ const ChatScreen = ({ navigation, route }) => {
                                 </Text>
                             </View>
                             <TouchableOpacity
-                                onPress={showOverlay}
+                                onPress={toggleTopicSelection}
                                 style={styles.topicButton}
-                                activeOpacity={0.7}>
+                                activeOpacity={0.2}>
                                 <Text style={styles.topicText}>
                                     {"Topic's Name"}
                                 </Text>
@@ -189,22 +186,54 @@ const ChatScreen = ({ navigation, route }) => {
 
                             </View>
                         </View>
-                        {/* Overlay originally positioned in center,
-                            Everything must be multiplied by 2 (for some reason)
-                                -screenHeight = brings center to top of the screen
-                                350 = offsets center to align to top
-                                statusBarHeight = Apple/Androi status bar offset
-                                44 = the hard coded headerStyle height in App.js
-                                55 is the hard coded topicNavigator height
-                                -2 is for the outlines to line up */}
-                        <Overlay isVisible={overlayEnabled} onBackdropPress={closeOverlay}
-                            overlayStyle={{width: screenWidth, height: 350,
-                                marginTop: overlayOffset,
-                            borderColor: "#000", borderWidth: 2,}} >
-                            <Text style={styles.topicText}>
-                                Hello!
-                            </Text>
-                        </Overlay>
+                        <MyView hide={topicSelectionEnabled}
+                            style={{width: "100%", height: 225,
+                                marginTop: -2,
+                                borderColor: "#000",
+                                borderBottomWidth: 2,
+                                flex: 0, alignItems: "center",}} >
+                            <View style={{width: "100%", height: 50,
+                                    flex: 0, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
+                                <Text style={{fontSize: 16,
+                                        fontWeight: '500',
+                                        color: 'black',
+                                        textAlign: "center",
+                                        paddingHorizontal: 10,}}>
+                                    Navigate to Topic
+                                </Text>
+                                <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
+                                    style={{width: 35, height: 35, backgroundColor: "#ddd",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        marginRight: 5,
+                                        justifyContent: "center"}}>
+                                    <Icon
+                                        style={ styles.icon}
+                                        name='close'
+                                        type='antdesign'
+                                        color='#c00'
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{justifyContent: "space-between", alignItems: "center", flex: 1,
+                                    marginBottom: 10,}}>
+                                <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
+                                    style={{minWidth: 100, height: 35, backgroundColor: "#aee",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        justifyContent: "center",}}>
+                                    <Text style={styles.topicText}>
+                                        General
+                                    </Text>
+                                </TouchableOpacity>
+                                <View style={{minWidth: 100, height: 100, backgroundColor: "#aee",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        justifyContent: "center",}}>
+                                    <Text style={styles.topicText}>
+                                        Other Topics
+                                    </Text>
+                                </View>
+                            </View>
+                            
+                        </MyView>
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data, array }) => (
                                 // data.email === auth.currentUser.email ? (
