@@ -62,14 +62,11 @@ const ProfileTab = ({ navigation }) => {
   let [phoneNumber, setPhoneNumber] = useState('');
   let [userObject, setUserObject] = useState({});
 
-  let userInformation;
-  let firstName;
-
   useEffect(() => {
     getUserFromDatabase()
-    .then(setPushNotificationsChecked(userObject.pushNotificationEnabled))
-    .then(setLocationServicesChecked(userObject.locationServicesEnabled))
-    .then(setImportContactsChecked(userObject.importContactsEnabled))
+      .then(setPushNotificationsChecked(userObject.pushNotificationEnabled))
+      .then(setLocationServicesChecked(userObject.locationServicesEnabled))
+      .then(setImportContactsChecked(userObject.importContactsEnabled))
   });
 
   const getUserFromDatabase = async () => {
@@ -82,7 +79,7 @@ const ProfileTab = ({ navigation }) => {
       const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
 
       snapshot.forEach(doc => {
-        setUserObject(doc.data());
+        setUserObject(doc.data())
       });
 
     } catch (err) {
@@ -125,6 +122,7 @@ const ProfileTab = ({ navigation }) => {
   }
 
   const openGuidedTutorial = () => {
+    console.log(userObject)
   }
 
   const reportProblem = () => {
