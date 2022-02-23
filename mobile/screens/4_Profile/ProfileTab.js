@@ -59,33 +59,46 @@ import UserPrompt from '../../components/UserPrompt';
 // Fourth tab of the application: PROFILE of currently logged in user.
 const ProfileTab = ({ navigation }) => {
 
-  let [phoneNumber, setPhoneNumber] = useState('');
-  let [userObject, setUserObject] = useState({});
-
-  useEffect(() => {
-    getUserFromDatabase()
-      .then(setPushNotificationsChecked(userObject.pushNotificationEnabled))
-      .then(setLocationServicesChecked(userObject.locationServicesEnabled))
-      .then(setImportContactsChecked(userObject.importContactsEnabled))
+  const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
+  const [userDocument, setUserDocument] = useState(async () => {
+    const initialState = await db
+      .collection('users')
+      .doc(phoneNumber)
+      .get()
+      .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data())});
+    return initialState;
   });
 
-  const getUserFromDatabase = async () => {
-    try {
+  useEffect(() => {
+    // getUserFromDatabase()
+    //   .then(setPushNotificationsChecked(userDocument.pushNotificationEnabled))
+    //   .then(setLocationServicesChecked(userDocument.locationServicesEnabled))
+    //   .then(setImportContactsChecked(userDocument.importContactsEnabled))
 
-      setPhoneNumber(auth.currentUser.phoneNumber)
+    setPushNotificationsChecked(userDocument.pushNotificationEnabled)
+    setLocationServicesChecked(userDocument.locationServicesEnabled)
+    setImportContactsChecked(userDocument.importContactsEnabled)
+  });
 
-      // Check the database, within the users collection, with the user's phone number
-      const userDocs = db.collection('users');
-      const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
+  // const getUserFromDatabase = async () => {
+  //   try {
 
-      snapshot.forEach(doc => {
-        setUserObject(doc.data())
-      });
+  //     setPhoneNumber(auth.currentUser.phoneNumber)
 
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  //     // Check the database, within the users collection, with the user's phone number
+  //     const userDocs = db.collection('users');
+  //     const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
+
+  //     snapshot.forEach(doc => {
+  //       setUserDocument(doc.data())
+  //     });
+
+  //     console.log(userDocument)
+
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
   const [pushNotificationsChecked, setPushNotificationsChecked] = useState(false);
   const [locationServicesChecked, setLocationServicesChecked] = useState(false);
@@ -122,7 +135,7 @@ const ProfileTab = ({ navigation }) => {
   }
 
   const openGuidedTutorial = () => {
-    console.log(userObject)
+    console.log(userDocument)
   }
 
   const reportProblem = () => {

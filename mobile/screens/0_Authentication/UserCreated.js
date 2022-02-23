@@ -99,7 +99,7 @@ const UserCreated = ({ navigation, route }) => {
 
       <LargeButton
         onPress={() => {
-          navigation.replace('TabStack');
+          navigation.push('TabStack');
         }}
         style={styles.button}
         title='Go to Home Screen'
