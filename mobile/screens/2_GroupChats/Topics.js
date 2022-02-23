@@ -68,7 +68,7 @@ const Topics = ({ navigation, route }) => {
 	}, [navigation]);
 
 	const enterTopic = (id, topicName) => {
-		navigation.navigate("Chat", { id, topicName });
+		navigation.navigate("Chat", { id, topicName, groupId });
 	};
 
 	return (

@@ -86,22 +86,15 @@ const Groups = ({ navigation }) => {
 	};
 
 	useEffect(async () => {
-		// const unsubscribe = db.collection("groups").onSnapshot((snapshot) =>
-		// 	setGroups(
-		// 		snapshot.docs.map((doc) => ({
-		// 			id: doc.id,
-		// 			data: doc.data(),
-		// 		}))
-		// 	)
-		// );
-		// return unsubscribe;
-
-		const user = await db.collection('users').doc('13214125192').get();
-		if (user) console.log(true)
-		else console.log(false)
-
-
-
+		const unsubscribe = db.collection("groups").onSnapshot((snapshot) =>
+			setGroups(
+				snapshot.docs.map((doc) => ({
+					id: doc.id,
+					data: doc.data(),
+				}))
+			)
+		);
+		return unsubscribe;
 	}, []);
 
 	useLayoutEffect(() => {

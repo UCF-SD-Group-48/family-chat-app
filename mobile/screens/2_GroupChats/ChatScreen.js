@@ -58,8 +58,22 @@ const overlayOffset = -screenHeight + 350 + Constants.statusBarHeight*2 + 44*2 +
 const ChatScreen = ({ navigation, route }) => {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([])
-    const [lastUser, setLastUser] = useState("")
-    const [topicSelectionEnabled, setTopicSelection] = useState(false);
+    const [topicSelectionEnabled, setTopicSelection] = useState(true);
+    const [topics, setTopics] = useState([]);
+    const groupId = route.params.groupId;
+
+
+    useEffect(() => {
+		const unsubscribe = db.collection("groups").doc(String(route.params.groupId)).collection("topics").onSnapshot((snapshot) =>
+			setTopics(
+				snapshot.docs.map((doc) => ({
+					id: doc.id,
+					data: doc.data(),
+				}))
+			)
+		);
+		return unsubscribe;
+	}, []);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -158,6 +172,11 @@ const ChatScreen = ({ navigation, route }) => {
         setTopicSelection(!topicSelectionEnabled);
     };
 
+    const enterTopic = (id, topicName) => {
+        navigation.navigate("Chat", { id, topicName, groupId });
+        toggleTopicSelection();
+	};
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
@@ -179,7 +198,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 style={styles.topicButton}
                                 activeOpacity={0.2}>
                                 <Text style={styles.topicText}>
-                                    {"Topic's Name"}
+                                    {route.params.topicName}
                                 </Text>
                             </TouchableOpacity>
                             <View style={styles.topicSpacer}>
@@ -215,8 +234,8 @@ const ChatScreen = ({ navigation, route }) => {
                                     />
                                 </TouchableOpacity>
                             </View>
-                            <View style={{justifyContent: "space-between", alignItems: "center", flex: 1,
-                                    marginBottom: 10,}}>
+                            <View style={{justifyContent: "flex-start", alignItems: "center", flex: 0,
+                                    marginBottom: 10, backgroundColor: "#ccf0", width: 200}}>
                                 <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
                                     style={{minWidth: 100, height: 35, backgroundColor: "#aee",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
@@ -225,13 +244,22 @@ const ChatScreen = ({ navigation, route }) => {
                                         General
                                     </Text>
                                 </TouchableOpacity>
-                                <View style={{minWidth: 100, height: 100, backgroundColor: "#aee",
+                                <View style={{height: 30, width: 10, backgroundColor: "#6660"}} />
+                                <ScrollView persistentScrollbar={true}
+                                    style={{minWidth: 100, maxHeight: 100, backgroundColor: "#aee",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        justifyContent: "center",}}>
-                                    <Text style={styles.topicText}>
-                                        Other Topics
-                                    </Text>
-                                </View>
+                                        padding: 0,}}>
+                                    {topics.map(({ id, data: { topicName } }) => (
+                                        <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
+                                            style={{height: 35, width: "100%", marginVertical: -0.5,
+                                                justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
+                                                borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1}}>
+                                            <Text style={styles.topicText}>
+                                                {topicName}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
                             </View>
                         </MyView>
 
