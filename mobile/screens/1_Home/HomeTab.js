@@ -60,61 +60,24 @@ import MyView from '../../components/MyView';
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
 
-  const goToTestHome = () => {
-    navigation.navigate('Home');
-  }
-
-  const goToAddChat = () => {
-    navigation.navigate('AddChat');
-  }
-
-  const goToHome = () => {
-    navigation.navigate('HomeTab');
-  }
-
-  const goToGroupChats = () => {
-    navigation.navigate('Groups');
-  }
-
-  const goToDMs = () => {
-    navigation.navigate('DMsTab');
-  }
-
-  const goToProfile = () => {
-    navigation.navigate('ProfileTab');
-  }
-
   const [blockHidden, setBlockHidden] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
+  const [userDocument, setUserDocument] = useState(async () => {
+    const initialState = await db
+    .collection('users')
+    .doc(phoneNumber)
+    .get()
+    .then(documentSnapshot => {
+      console.log('User exists: ', documentSnapshot.exists);
 
-  let [phoneNumber, setPhoneNumber] = useState('');
-  let [userObject, setUserObject] = useState({});
-
-  const getUserFromDatabase = async () => {
-    try {
-
-      setPhoneNumber(auth.currentUser.phoneNumber)
-
-      // Check the database, within the users collection, with the user's phone number
-      const userDocs = db.collection('users');
-      const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
-
-      snapshot.forEach(doc => {
-        setUserObject(doc.data())
-      });
-
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const printUserObject = () => {
-    console.log(userObject);
-  }
-
-  useEffect(() => {
-    getUserFromDatabase();
-    console.log('Current User: ', JSON.stringify(auth.currentUser));
-  }, []);
+      if (documentSnapshot.exists) {
+        console.log('User data1: ', documentSnapshot.data());
+        setUserDocument(documentSnapshot.data())
+        console.log('User data2: ', documentSnapshot.data());
+      }
+    });
+    return initialState;
+  });
 
   return (
     <SafeAreaView>
@@ -131,7 +94,7 @@ const HomeTab = ({ navigation, route }) => {
             <Text
               style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
             >
-              Welcome back {userObject.firstName || "friend"},
+              Welcome back {userDocument.firstName || "friend"},
             </Text>
             <Text
               style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}
@@ -165,9 +128,7 @@ const HomeTab = ({ navigation, route }) => {
             >
               <DismissButton />
             </TouchableOpacity>
-          </MyView>
 
-          <MyView hide={blockHidden}>
             <NewNotificationsBlock />
           </MyView>
 
@@ -199,7 +160,7 @@ const HomeTab = ({ navigation, route }) => {
 
           <View>
             <TouchableOpacity
-              onPress={goToAddChat}
+              // onPress={printUserObject}
               style={{
                 width: 300, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
                 alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#7DBF7F'
