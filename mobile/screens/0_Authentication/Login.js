@@ -107,7 +107,7 @@ const Login = ({ navigation }) => {
             recaptchaVerifier.current
             );
             setVerificationId(verificationId);
-            console.log("line 130");
+            console.log("Login.js line 130");
             
         } catch (err) {
             console.log("error caught " + err)
@@ -185,7 +185,7 @@ const Login = ({ navigation }) => {
                         <LargeButton
                             title='Submit'
                             type=''
-                            onPress={phoneNumber}
+                            onPress={confirmationSubmit}
                             style={styles.button}
                         />
 

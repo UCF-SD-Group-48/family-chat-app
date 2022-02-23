@@ -6,7 +6,7 @@ import { db } from '../../firebase';
 
 const AddGroup = ({navigation}) => {
     const [input, setInput] = useState("");
-
+	
     useLayoutEffect(() => {
 		navigation.setOptions({
 			title: "Add a new Group",
