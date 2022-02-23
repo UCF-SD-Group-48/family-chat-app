@@ -133,7 +133,7 @@ const Groups = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Button title={"Add a Group"} onPress={() => navigation.navigate("AddGroup")}/>
+			<Button title={"Add a Group"} onPress={() => navigation.navigate("AddGroup")} />
 			<ScrollView width={"100%"}>
 				{groups.map(({ id, data: { groupName } }) => (
 					<GroupListItem
@@ -152,8 +152,8 @@ const Groups = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		height: "100%",
-        paddingVertical: 20,
-        paddingHorizontal: 10,
+		paddingVertical: 20,
+		paddingHorizontal: 10,
 		alignItems: 'center',
 	},
 })

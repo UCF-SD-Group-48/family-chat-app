@@ -120,7 +120,6 @@ export const imageSelection = (pfpDatabaseValue) => {
 }
 
 const GenerateProfileIcon = (props) => {
-
     const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
     const [userDocument, setUserDocument] = useState(async () => {
         const initialState = await db
@@ -130,30 +129,11 @@ const GenerateProfileIcon = (props) => {
             .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
         return initialState;
     });
-    const [profileImageNumber, setProfileImageNumber] = useState()
+    const [profileImageNumber, setProfileImageNumber] = useState(userDocument.pfp)
 
     useEffect(() => {
-        getUserFromDatabase()
-            .then(setProfileImageNumber(userDocument.pfp))
+        setProfileImageNumber(userDocument.pfp)
     });
-
-    const getUserFromDatabase = async () => {
-        try {
-            props.passedPhoneNumberValue ? setPhoneNumber(props.passedPhoneNumberValue) : setPhoneNumber(auth.currentUser.phoneNumber)
-
-            // Check the database, within the users collection, with the user's phone number
-            const userDocs = db.collection('users');
-            const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
-
-            snapshot.forEach(doc => {
-                setUserDocument(doc.data());
-                setProfileImageNumber(userDocument.pfp);
-            });
-
-        } catch (err) {
-            console.log(err);
-        }
-    }
 
     return (
         <View>

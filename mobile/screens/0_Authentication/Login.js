@@ -88,16 +88,6 @@ const Login = ({ navigation }) => {
     const [verificationCode, setVerificationCode] = useState();
     const recaptchaVerifier = useRef(null);
 
-    // useEffect(() => {
-    //     const unsubscribe = auth.onAuthStateChanged((authUser) => {
-    //         if (authUser) {
-    //             navigation.replace('HomeTab');
-    //         }
-    //     });
-    //     return unsubscribe;
-    // }, []);
- 
-
     const phoneSubmit = async () => {
         try {
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
@@ -107,7 +97,6 @@ const Login = ({ navigation }) => {
             recaptchaVerifier.current
             );
             setVerificationId(verificationId);
-            console.log("Login.js line 130");
             
         } catch (err) {
             console.log("error caught " + err)
@@ -188,23 +177,6 @@ const Login = ({ navigation }) => {
                             onPress={confirmationSubmit}
                             style={styles.button}
                         />
-
-                    {/* <Input
-                        placeholder='john123@email.com'
-                        autoFocus
-                        onChangeText={(email) => setEmail(email)}
-                    />
-                    <Input
-                        placeholder='******'
-                        autoFocus
-                        onChangeText={(password) => setPassword(password)}
-                    />
-                    <LargeButton
-                        title='Submit'
-                        type=''
-                        onPress={signIn}
-                        style={styles.button}
-                    /> */}
 
                 </View>
             </ScrollView>

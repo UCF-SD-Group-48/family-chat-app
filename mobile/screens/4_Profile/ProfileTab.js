@@ -65,40 +65,15 @@ const ProfileTab = ({ navigation }) => {
       .collection('users')
       .doc(phoneNumber)
       .get()
-      .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data())});
+      .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
     return initialState;
   });
 
   useEffect(() => {
-    // getUserFromDatabase()
-    //   .then(setPushNotificationsChecked(userDocument.pushNotificationEnabled))
-    //   .then(setLocationServicesChecked(userDocument.locationServicesEnabled))
-    //   .then(setImportContactsChecked(userDocument.importContactsEnabled))
-
     setPushNotificationsChecked(userDocument.pushNotificationEnabled)
     setLocationServicesChecked(userDocument.locationServicesEnabled)
     setImportContactsChecked(userDocument.importContactsEnabled)
   });
-
-  // const getUserFromDatabase = async () => {
-  //   try {
-
-  //     setPhoneNumber(auth.currentUser.phoneNumber)
-
-  //     // Check the database, within the users collection, with the user's phone number
-  //     const userDocs = db.collection('users');
-  //     const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
-
-  //     snapshot.forEach(doc => {
-  //       setUserDocument(doc.data())
-  //     });
-
-  //     console.log(userDocument)
-
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
 
   const [pushNotificationsChecked, setPushNotificationsChecked] = useState(false);
   const [locationServicesChecked, setLocationServicesChecked] = useState(false);

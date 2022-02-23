@@ -52,7 +52,7 @@ import MyView from '../../components/MyView';
 
 const screenHeight = Dimensions.get('screen').height;
 const screenWidth = Dimensions.get('screen').width;
-const overlayOffset = -screenHeight + 350 + Constants.statusBarHeight*2 + 44*2 + 55*2 - 2;
+const overlayOffset = -screenHeight + 350 + Constants.statusBarHeight * 2 + 44 * 2 + 55 * 2 - 2;
 
 // Show the information (messages, users, etc.) for the group chat.
 const ChatScreen = ({ navigation, route }) => {
@@ -64,16 +64,16 @@ const ChatScreen = ({ navigation, route }) => {
 
 
     useEffect(() => {
-		const unsubscribe = db.collection("groups").doc(String(route.params.groupId)).collection("topics").onSnapshot((snapshot) =>
-			setTopics(
-				snapshot.docs.map((doc) => ({
-					id: doc.id,
-					data: doc.data(),
-				}))
-			)
-		);
-		return unsubscribe;
-	}, []);
+        const unsubscribe = db.collection("groups").doc(String(route.params.groupId)).collection("topics").onSnapshot((snapshot) =>
+            setTopics(
+                snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    data: doc.data(),
+                }))
+            )
+        );
+        return unsubscribe;
+    }, []);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -175,7 +175,7 @@ const ChatScreen = ({ navigation, route }) => {
     const enterTopic = (id, topicName) => {
         navigation.navigate("Chat", { id, topicName, groupId });
         toggleTopicSelection();
-	};
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -207,53 +207,69 @@ const ChatScreen = ({ navigation, route }) => {
                         </View>
 
                         <MyView hide={topicSelectionEnabled}
-                            style={{width: "100%", height: 225,
+                            style={{
+                                width: "100%", height: 225,
                                 marginTop: -2,
                                 borderColor: "#000",
                                 borderBottomWidth: 2,
-                                flex: 0, alignItems: "center",}} >
-                            <View style={{width: "100%", height: 50,
-                                    flex: 0, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
-                                <Text style={{fontSize: 16,
-                                        fontWeight: '500',
-                                        color: 'black',
-                                        textAlign: "center",
-                                        paddingHorizontal: 10,}}>
+                                flex: 0, alignItems: "center",
+                            }} >
+                            <View style={{
+                                width: "100%", height: 50,
+                                flex: 0, justifyContent: "space-between", alignItems: "center", flexDirection: "row"
+                            }}>
+                                <Text style={{
+                                    fontSize: 16,
+                                    fontWeight: '500',
+                                    color: 'black',
+                                    textAlign: "center",
+                                    paddingHorizontal: 10,
+                                }}>
                                     Navigate to Topic
                                 </Text>
                                 <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
-                                    style={{width: 35, height: 35, backgroundColor: "#ddd",
+                                    style={{
+                                        width: 35, height: 35, backgroundColor: "#ddd",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
                                         marginRight: 5,
-                                        justifyContent: "center"}}>
+                                        justifyContent: "center"
+                                    }}>
                                     <Icon
-                                        style={ styles.icon}
+                                        style={styles.icon}
                                         name='close'
                                         type='antdesign'
                                         color='#c00'
                                     />
                                 </TouchableOpacity>
                             </View>
-                            <View style={{justifyContent: "flex-start", alignItems: "center", flex: 0,
-                                    marginBottom: 10, backgroundColor: "#ccf0", width: 200}}>
+                            <View style={{
+                                justifyContent: "flex-start", alignItems: "center", flex: 0,
+                                marginBottom: 10, backgroundColor: "#ccf0", width: 200
+                            }}>
                                 <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
-                                    style={{minWidth: 100, height: 35, backgroundColor: "#aee",
+                                    style={{
+                                        minWidth: 100, height: 35, backgroundColor: "#aee",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        justifyContent: "center",}}>
+                                        justifyContent: "center",
+                                    }}>
                                     <Text style={styles.topicText}>
                                         General
                                     </Text>
                                 </TouchableOpacity>
-                                <View style={{height: 30, width: 10, backgroundColor: "#6660"}} />
+                                <View style={{ height: 30, width: 10, backgroundColor: "#6660" }} />
                                 <ScrollView persistentScrollbar={true}
-                                    style={{minWidth: 100, maxHeight: 100, backgroundColor: "#aee",
+                                    style={{
+                                        minWidth: 100, maxHeight: 100, backgroundColor: "#aee",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        padding: 0,}}>
+                                        padding: 0,
+                                    }}>
                                     {topics.map(({ id, data: { topicName } }) => (
                                         <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
-                                            style={{height: 35, width: "100%", marginVertical: -0.5,
+                                            style={{
+                                                height: 35, width: "100%", marginVertical: -0.5,
                                                 justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
-                                                borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1}}>
+                                                borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
+                                            }}>
                                             <Text style={styles.topicText}>
                                                 {topicName}
                                             </Text>
@@ -266,19 +282,19 @@ const ChatScreen = ({ navigation, route }) => {
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data, array }) => (
                                 // data.email === auth.currentUser.email ? (
-                            <View key={id} style={styles.message}>
-                                <View style={styles.userContainer}/>
-                                <View style={styles.textContainer}>
-                                    <Text style={styles.userName}>
-                                        {data.displayName || "Display Name"}
-                                    </Text>
-                                    <View style={styles.textOutline}>
-                                        <Text style={styles.text}>
-                                            {data.message}
+                                <View key={id} style={styles.message}>
+                                    <View style={styles.userContainer} />
+                                    <View style={styles.textContainer}>
+                                        <Text style={styles.userName}>
+                                            {data.displayName || "Display Name"}
                                         </Text>
+                                        <View style={styles.textOutline}>
+                                            <Text style={styles.text}>
+                                                {data.message}
+                                            </Text>
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
                                 // ) : (
                                 //     <View
                                 //         key={id}
@@ -396,7 +412,7 @@ const styles = StyleSheet.create({
     userContainer: {
         width: 50,
         height: 50,
-    
+
         backgroundColor: '#0cc',
         borderWidth: 2,
         borderColor: '#555',

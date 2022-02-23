@@ -73,7 +73,7 @@ const Topics = ({ navigation, route }) => {
 
 	return (
 		<SafeAreaView>
-			<Button title={"Add a Topic"} onPress={() => navigation.navigate("AddTopic", { groupId, groupName })}/>
+			<Button title={"Add a Topic"} onPress={() => navigation.navigate("AddTopic", { groupId, groupName })} />
 			<ScrollView style={styles.container}>
 				{topics.map(({ id, data: { topicName } }) => (
 					<CustomListItem
