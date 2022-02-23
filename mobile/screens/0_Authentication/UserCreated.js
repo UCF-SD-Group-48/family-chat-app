@@ -47,8 +47,8 @@ import firebase from 'firebase/compat/app';
 import LargeButton from '../../components/LargeButton'
 import LargeTitle from '../../components/LargeTitle'
 import Logo from '../../assets/appLogo.svg'
-import { imageSelection } from '../4_Profile/GenerateProfileIcon';
-import GenerateProfileIcon from '../4_Profile/GenerateProfileIcon';
+import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
+import GenerateProfileIcon from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
 
@@ -83,7 +83,7 @@ const UserCreated = ({ navigation, route }) => {
       <Text h3 style={{ marginBottom: 50 }}>
         Welcome {firstName} {lastName}
       </Text>
-      
+
       {/* <GenerateProfileIcon passedPhoneNumberValue={passedPhoneNumberValue}/> */}
 
       <Image

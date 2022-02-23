@@ -86,11 +86,33 @@ const HomeTab = ({ navigation, route }) => {
 
   const [blockHidden, setBlockHidden] = useState(false);
 
-  const dismissNotificationBlock = () => {
+  let [phoneNumber, setPhoneNumber] = useState('');
+  let [userObject, setUserObject] = useState({});
 
+  const getUserFromDatabase = async () => {
+    try {
+
+      setPhoneNumber(auth.currentUser.phoneNumber)
+
+      // Check the database, within the users collection, with the user's phone number
+      const userDocs = db.collection('users');
+      const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
+
+      snapshot.forEach(doc => {
+        setUserObject(doc.data())
+      });
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const printUserObject = () => {
+    console.log(userObject);
   }
 
   useEffect(() => {
+    getUserFromDatabase();
     console.log('Current User: ', JSON.stringify(auth.currentUser));
   }, []);
 
@@ -109,7 +131,7 @@ const HomeTab = ({ navigation, route }) => {
             <Text
               style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
             >
-              Welcome back {route.params?.userInformation?.firstName || "friend"},
+              Welcome back {userObject.firstName || "friend"},
             </Text>
             <Text
               style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}

@@ -56,12 +56,13 @@ import DMsTab from './screens/3_DMs/DMsTab';
 
 // ----------------- 'Profile' Screens
 import ProfileTab from './screens/4_Profile/ProfileTab';
-import GenerateProfileIcon from './screens/4_Profile/GenerateProfileIcon';
 
+// ----------------- 'Supplementary' Functions
+import GenerateProfileIcon from './screens/5_Supplementary/GenerateProfileIcon';
 
 // Default values for 'navigation.setOptions'.
 const globalScreenOptions = {
-  headerStyle: { backgroundColor: '#2C6BED'},
+  headerStyle: { backgroundColor: '#2C6BED' },
   headerTitleStyle: { color: 'white' },
   headerBackTitleStyle: { color: 'white' },
   headerTintStyle: 'white'
@@ -87,7 +88,7 @@ const TabStack = createBottomTabNavigator();
 
 const TabStackScreen = () => (
   <TabStack.Navigator
-  headerMode="none"
+    headerMode="none"
     screenOptions={({ route }) => ({
       initialRouteName: "Home",
       headerShown: false,
@@ -151,7 +152,7 @@ const TabStackScreen = () => (
       component={ProfileStackScreen}
       options={{
         tabBarLabel: 'Profile',
-        tabBarIcon: () => <GenerateProfileIcon /> 
+        tabBarIcon: () => <GenerateProfileIcon />
       }}
     />
   </TabStack.Navigator>
