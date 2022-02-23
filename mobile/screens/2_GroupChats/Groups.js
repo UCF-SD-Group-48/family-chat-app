@@ -133,6 +133,7 @@ const Groups = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<Button title={"Add a Group"} onPress={() => navigation.navigate("AddGroup")}/>
 			<ScrollView width={"100%"}>
 				{groups.map(({ id, data: { groupName } }) => (
 					<GroupListItem

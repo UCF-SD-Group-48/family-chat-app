@@ -105,7 +105,7 @@ const TabStackScreen = () => (
           iconName = 'home';
           type = 'material-community';
           size = 35;
-        } else if (route.name === 'Groups') {
+        } else if (route.name === 'Group') {
           iconName = 'group';
           type = 'material';
           size = 35;
@@ -140,7 +140,7 @@ const TabStackScreen = () => (
       component={HomeStackScreen}
     />
     <TabStack.Screen
-      name='Groups'
+      name='Group'
       component={GroupChatsStackScreen}
     />
     <TabStack.Screen
@@ -194,7 +194,8 @@ export default function App() {
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={globalScreenOptions} >
+        {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
+        <Stack.Navigator>
 
           {/* Authentication Screens */}
           <Stack.Screen name='UserAuth' component={UserAuth} />

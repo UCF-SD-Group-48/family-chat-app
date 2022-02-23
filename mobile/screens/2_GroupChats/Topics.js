@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 import { auth, db } from '../../firebase';
 import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+import { Button } from 'react-native-elements/dist/buttons/Button';
 
 const Topics = ({ navigation, route }) => {
 	const [topics, setTopics] = useState([]);
@@ -16,7 +17,6 @@ const Topics = ({ navigation, route }) => {
 	};
 
 	useEffect(() => {
-		console.log("Topics/groupid " + groupId)
 		const unsubscribe = db.collection("groups").doc(String(groupId)).collection("topics").onSnapshot((snapshot) =>
 			setTopics(
 				snapshot.docs.map((doc) => ({
@@ -73,6 +73,7 @@ const Topics = ({ navigation, route }) => {
 
 	return (
 		<SafeAreaView>
+			<Button title={"Add a Topic"} onPress={() => navigation.navigate("AddTopic", { groupId, groupName })}/>
 			<ScrollView style={styles.container}>
 				{topics.map(({ id, data: { topicName } }) => (
 					<CustomListItem
