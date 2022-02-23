@@ -93,7 +93,9 @@ const PhoneSuccess = ({ navigation, route }) => {
 	const [email, setEmail] = useState('');
 	const [pfp, setPFP] = useState(1);
 	const [profilePic, setProfilePic] = useState();
-	const phoneNumber = route.params.phoneNumber;
+	let phoneNum = route.params.phoneNumber;
+	const phoneNumber = phoneNum.slice(1, phoneNum.length);
+	console.log("phoneNumber " + phoneNumber)
 
 	const getPermissions = async () => {
 		const status = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -126,7 +128,9 @@ const PhoneSuccess = ({ navigation, route }) => {
 		console.log('Current User:' + JSON.stringify(auth.currentUser));
 		console.log("THIS SHOULD BE 6", setPFP)
 		await db
-			.collection('users').add({
+			.collection('users')
+			.doc(phoneNumber)
+			.set({
 				firstName: firstName,
 				lastName: lastName,
 				pfp: pfp,

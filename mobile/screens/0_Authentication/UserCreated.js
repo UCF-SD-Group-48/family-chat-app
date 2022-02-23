@@ -89,7 +89,7 @@ const UserCreated = ({ navigation, route }) => {
       <Image
         // source={{ uri: profilePic }}
         source={imageSelection(pfp)}
-        style={{ width: 75, height: 75, borderRadius: '10%'}}
+        style={{ width: 75, height: 75, borderRadius: 7.5}}
       />
 
       <LargeButton
