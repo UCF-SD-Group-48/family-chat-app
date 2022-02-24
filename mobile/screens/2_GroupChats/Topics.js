@@ -28,44 +28,44 @@ const Topics = ({ navigation, route }) => {
 		return unsubscribe;
 	}, []);
 
-	useLayoutEffect(() => {
-		navigation.setOptions({
-			title: "Topics",
-			headerStyle: { backgroundColor: "white" },
-			headerTitleStyle: { color: "black" },
-			headerTintColor: "black",
-			headerLeft: () => (
-				<View style={{ marginLeft: 20 }}>
-					<TouchableOpacity activeOpacity={0.5} onPress={signOut}>
-						{/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} /> */}
-						<SimpleLineIcons name="arrow-left" size={24} color="black" onPress={() => { navigation.replace('Groups') }} />
-					</TouchableOpacity>
-				</View>
-			),
-			headerRight: () => (
-				<View
-					style={{
-						flexDirection: "row",
-						justifyContent: "space-between",
-						width: 80,
-						marginRight: 20,
-					}}
-				>
-					<TouchableOpacity activeOpacity={0.5}>
-						<AntDesign name="camerao" size={24} color="black" />
-					</TouchableOpacity>
-					<TouchableOpacity
-						activeOpacity={0.5}
-						// onPress={() => navigation.navigate("AddChat")}
-						onPress={() => navigation.navigate("AddTopic", { groupId, groupName })}
+	// useLayoutEffect(() => {
+	// 	navigation.setOptions({
+	// 		title: "Topics",
+	// 		headerStyle: { backgroundColor: "white" },
+	// 		headerTitleStyle: { color: "black" },
+	// 		headerTintColor: "black",
+	// 		headerLeft: () => (
+	// 			<View style={{ marginLeft: 20 }}>
+	// 				<TouchableOpacity activeOpacity={0.5} onPress={signOut}>
+	// 					{/* <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} /> */}
+	// 					<SimpleLineIcons name="arrow-left" size={24} color="black" onPress={() => { navigation.replace('Groups') }} />
+	// 				</TouchableOpacity>
+	// 			</View>
+	// 		),
+	// 		headerRight: () => (
+	// 			<View
+	// 				style={{
+	// 					flexDirection: "row",
+	// 					justifyContent: "space-between",
+	// 					width: 80,
+	// 					marginRight: 20,
+	// 				}}
+	// 			>
+	// 				<TouchableOpacity activeOpacity={0.5}>
+	// 					<AntDesign name="camerao" size={24} color="black" />
+	// 				</TouchableOpacity>
+	// 				<TouchableOpacity
+	// 					activeOpacity={0.5}
+	// 					// onPress={() => navigation.navigate("AddChat")}
+	// 					onPress={() => navigation.navigate("AddTopic", { groupId, groupName })}
 
-					>
-						<SimpleLineIcons name="pencil" size={24} color="black" />
-					</TouchableOpacity>
-				</View>
-			),
-		});
-	}, [navigation]);
+	// 				>
+	// 					<SimpleLineIcons name="pencil" size={24} color="black" />
+	// 				</TouchableOpacity>
+	// 			</View>
+	// 		),
+	// 	});
+	// }, [navigation]);
 
 	const enterTopic = (id, topicName) => {
 		navigation.navigate("Chat", { id, topicName, groupId });
@@ -74,6 +74,8 @@ const Topics = ({ navigation, route }) => {
 	return (
 		<SafeAreaView>
 			<Button title={"Add a Topic"} onPress={() => navigation.navigate("AddTopic", { groupId, groupName })} />
+			<Button title={"Go Back"} onPress={() => navigation.goBack()}/>
+			
 			<ScrollView style={styles.container}>
 				{topics.map(({ id, data: { topicName } }) => (
 					<CustomListItem
