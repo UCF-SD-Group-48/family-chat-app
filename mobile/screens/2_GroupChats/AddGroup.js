@@ -20,15 +20,16 @@ const AddGroup = ({navigation}) => {
 			.collection("groups")
 			.add({
 				groupName: input,
+				members: [auth.currentUser.uid]
 			})
 			.then( async (docRef) => {
 				// console.log("docRef " + docRef.id)
 				// console.log("currentUser " + JSON.stringify(auth.currentUser, null, "\t"))
 				// console.log("uid " + JSON.stringify(auth.currentUser.uid))
-				const userRef = doc(db, "users", auth.currentUser.uid);
-				await updateDoc(userRef, {
-					groups: arrayUnion(docRef.id)
-				})
+				// const userRef = doc(db, "users", auth.currentUser.uid);
+				// await updateDoc(userRef, {
+				// 	groups: arrayUnion(docRef.id)
+				// })
 				
 				navigation.goBack();
 			})

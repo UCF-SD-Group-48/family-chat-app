@@ -86,7 +86,8 @@ const Groups = ({ navigation }) => {
 	};
 
 	useEffect(async () => {
-		const unsubscribe = db.collection("groups").onSnapshot((snapshot) =>
+		console.log("Groups.js current user " + JSON.stringify(auth.currentUser, null, "\t"))
+		const unsubscribe = db.collection("groups").where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) =>
 			setGroups(
 				snapshot.docs.map((doc) => ({
 					id: doc.id,
