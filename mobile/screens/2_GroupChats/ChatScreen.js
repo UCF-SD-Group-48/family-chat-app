@@ -288,7 +288,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         padding: 0,
                                     }}>
                                     {topics.map(({ id, data: { topicName } }) => (
-                                        <MyView hide={topicName == "General"}
+                                        <MyView hide={topicName == "General"} key={id}
                                             style={{
                                                 height: 37, width: "100%", marginVertical: -0.5,
                                             }}>
