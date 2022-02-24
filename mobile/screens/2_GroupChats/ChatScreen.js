@@ -61,7 +61,17 @@ const ChatScreen = ({ navigation, route }) => {
     const [topicSelectionEnabled, setTopicSelection] = useState(true);
     const [topics, setTopics] = useState([]);
     const groupId = route.params.groupId;
+    const [generalId, setgeneralId] = useState('');
 
+
+    useEffect(() => {
+        //{topics.map(({ id, data: { topicName } }) => (
+        topics.forEach(({ id, data: { topicName } }) => {
+            if(topicName == "General") {
+                setgeneralId(id);
+            }
+        });
+    }, [route]);
 
     useEffect(() => {
         const unsubscribe = db.collection("groups").doc(String(route.params.groupId)).collection("topics").onSnapshot((snapshot) =>
@@ -202,7 +212,21 @@ const ChatScreen = ({ navigation, route }) => {
                                 </Text>
                             </TouchableOpacity>
                             <View style={styles.topicSpacer}>
-
+                                <TouchableOpacity activeOpacity={0.2}
+                                    onPress={() => navigation.navigate("AddTopic", { groupId })}
+                                    style={{
+                                        width: 35, height: 35, backgroundColor: "#ddd0",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        marginRight: 5,
+                                        justifyContent: "center"
+                                    }}>
+                                    <Icon
+                                        style={styles.icon}
+                                        name='plus'
+                                        type='antdesign'
+                                        color='#080'
+                                    />
+                                </TouchableOpacity>
                             </View>
                         </View>
 
@@ -246,7 +270,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 justifyContent: "flex-start", alignItems: "center", flex: 0,
                                 marginBottom: 10, backgroundColor: "#ccf0", width: 200
                             }}>
-                                <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
+                                <TouchableOpacity onPress={() => enterTopic(generalId, "General")} activeOpacity={0.2}
                                     style={{
                                         minWidth: 100, height: 35, backgroundColor: "#aee",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
@@ -264,16 +288,21 @@ const ChatScreen = ({ navigation, route }) => {
                                         padding: 0,
                                     }}>
                                     {topics.map(({ id, data: { topicName } }) => (
-                                        <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
+                                        <MyView hide={topicName == "General"}
                                             style={{
                                                 height: 37, width: "100%", marginVertical: -0.5,
-                                                justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
-                                                borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
                                             }}>
-                                            <Text style={styles.topicText}>
-                                                {topicName}
-                                            </Text>
-                                        </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
+                                                style={{
+                                                    width: "100%", height: "100%",
+                                                    justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
+                                                    borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
+                                                }}>
+                                                <Text style={styles.topicText}>
+                                                    {topicName}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </MyView>
                                     ))}
                                 </ScrollView>
                             </View>

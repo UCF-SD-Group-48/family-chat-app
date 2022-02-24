@@ -30,8 +30,16 @@ const AddGroup = ({navigation}) => {
 				// await updateDoc(userRef, {
 				// 	groups: arrayUnion(docRef.id)
 				// })
-				
-				navigation.goBack();
+
+				await db.collection('groups').doc(docRef.id)
+				.collection("topics")
+				.add({
+					topicName: "General",
+				})
+				.then( () => {
+					navigation.goBack();
+				})
+				.catch((error) => alert(error));
 			})
 			.catch((error) => alert(error));
 	};
