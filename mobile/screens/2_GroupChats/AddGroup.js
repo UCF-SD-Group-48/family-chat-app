@@ -39,8 +39,21 @@ const AddGroup = ({navigation}) => {
 				// await updateDoc(userRef, {
 				// 	groups: arrayUnion(docRef.id)
 				// })
+<<<<<<< HEAD
 				// add group to currentUser.group
 				navigation.goBack();
+=======
+
+				await db.collection('groups').doc(docRef.id)
+				.collection("topics")
+				.add({
+					topicName: "General",
+				})
+				.then( () => {
+					navigation.goBack();
+				})
+				.catch((error) => alert(error));
+>>>>>>> 3307fded465f429fbf100cbbb255280ef1f3f035
 			})
 			.catch((error) => alert(error));
 	};

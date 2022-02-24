@@ -60,10 +60,11 @@ import UserPrompt from '../../components/UserPrompt';
 const ProfileTab = ({ navigation }) => {
 
   const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
+  const [uid, setUID] = useState(auth.currentUser.uid);
   const [userDocument, setUserDocument] = useState(async () => {
     const initialState = await db
       .collection('users')
-      .doc(phoneNumber)
+      .doc(uid)
       .get()
       .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
     return initialState;
