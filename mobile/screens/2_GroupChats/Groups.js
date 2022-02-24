@@ -129,7 +129,28 @@ const Groups = ({ navigation }) => {
 	}, [navigation]);
 
 	const enterGroup = (id, groupName) => {
-		navigation.navigate("Topics", { id, groupName });
+		// Navigating straight from Groups to Topic "General" or the first Topic found (if General does not exist)
+		let topic = null;
+		const ref = db.collection("groups").doc(id).collection("topics").get()
+			.then((snapshot) => {
+				snapshot.forEach((doc) => {
+					// console.log(doc.id, " => ", doc.data());
+					if(doc.data().topicName == "General" || topic == null) {
+						topic = doc;
+					}
+				});
+			})
+			.then(() => {
+				const topicId = topic.id;
+				const topicName = topic.data().topicName;
+				// console.log("topicId = ", topicId);
+				// console.log("topicName = ", topicName);
+				// console.log("id = ", id);
+				navigation.navigate("Chat", { id: topicId, topicName: topicName, groupId: id });
+			})
+			.catch((error) => {
+				console.log("Error getting documents: ", error);
+			});
 	};
 
 	return (
