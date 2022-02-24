@@ -62,20 +62,13 @@ const HomeTab = ({ navigation, route }) => {
 
   const [blockHidden, setBlockHidden] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
+  const [uid, setUID] = useState(auth.currentUser.uid);
   const [userDocument, setUserDocument] = useState(async () => {
     const initialState = await db
-    .collection('users')
-    .doc(phoneNumber)
-    .get()
-    .then(documentSnapshot => {
-      console.log('User exists: ', documentSnapshot.exists);
-
-      if (documentSnapshot.exists) {
-        console.log('User data1: ', documentSnapshot.data());
-        setUserDocument(documentSnapshot.data())
-        console.log('User data2: ', documentSnapshot.data());
-      }
-    });
+      .collection('users')
+      .doc(uid)
+      .get()
+      .then(documentSnapshot => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
     return initialState;
   });
 
