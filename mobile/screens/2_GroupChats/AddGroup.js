@@ -21,19 +21,14 @@ const AddGroup = ({navigation}) => {
 			.add({
 				groupName: input,
 			})
-			.then( (docRef) => {
-				console.log("docRef " + docRef.id)
-				console.log("currentUser " + JSON.stringify(auth.currentUser, null, "\t"))
-				console.log("uid " + JSON.stringify(auth.currentUser.uid))
-
-
-				// const userRef = doc(db, "users", auth.currentUser.uid);
-				// await db.collection("users").doc(auth.currentUser.uid).update({
-				// 	groups: FieldValue.arrayUnion(docRef.id)
-				// })
-				// await updateDoc(userRef, {
-				// 	groups: arrayUnion(docRef.id)
-				// })
+			.then( async (docRef) => {
+				// console.log("docRef " + docRef.id)
+				// console.log("currentUser " + JSON.stringify(auth.currentUser, null, "\t"))
+				// console.log("uid " + JSON.stringify(auth.currentUser.uid))
+				const userRef = doc(db, "users", auth.currentUser.uid);
+				await updateDoc(userRef, {
+					groups: arrayUnion(docRef.id)
+				})
 				
 				navigation.goBack();
 			})
