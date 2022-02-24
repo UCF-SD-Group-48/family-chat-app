@@ -127,8 +127,8 @@ const PhoneSuccess = ({ navigation, route }) => {
 	const register = async () => {
 		console.log("THIS IS THE PHONE NUMBER VALUE FOR DOC -----", phoneNumber, " > IS FALSE? ", phoneNumber === '3214125192')
 		await db
-			.collection('users')
-			.add({
+			.collection('users').doc(auth.currentUser.uid)
+			.set({
 				firstName: firstName,
 				lastName: lastName,
 				pfp: pfp,
