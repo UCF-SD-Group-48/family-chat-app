@@ -125,16 +125,14 @@ const PhoneSuccess = ({ navigation, route }) => {
 	};
 
 	const register = async () => {
-		console.log('Current User:' + JSON.stringify(auth.currentUser));
 		console.log("THIS IS THE PHONE NUMBER VALUE FOR DOC -----", phoneNumber, " > IS FALSE? ", phoneNumber === '3214125192')
 		await db
 			.collection('users')
-			.doc(phoneNumber)
-			.set({
+			.add({
 				firstName: firstName,
 				lastName: lastName,
 				pfp: pfp,
-				color: 'Blue',
+				color: 'Red',
 				status: 'Active',
 				statusEmoji: 'Happy',
 				email: email,

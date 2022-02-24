@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import React, { useLayoutEffect, useState } from 'react';
 import { Input, Button } from 'react-native-elements';
 import Icon from "react-native-vector-icons/FontAwesome";
-import { db } from '../../firebase';
+import { db, auth } from '../../firebase';
+import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 
 const AddGroup = ({navigation}) => {
     const [input, setInput] = useState("");
@@ -20,11 +21,26 @@ const AddGroup = ({navigation}) => {
 			.add({
 				groupName: input,
 			})
-			.then(() => {
+			.then( (docRef) => {
+				console.log("docRef " + docRef.id)
+				console.log("currentUser " + JSON.stringify(auth.currentUser, null, "\t"))
+				console.log("uid " + JSON.stringify(auth.currentUser.uid))
+
+
+				// const userRef = doc(db, "users", auth.currentUser.uid);
+				// await db.collection("users").doc(auth.currentUser.uid).update({
+				// 	groups: FieldValue.arrayUnion(docRef.id)
+				// })
+				// await updateDoc(userRef, {
+				// 	groups: arrayUnion(docRef.id)
+				// })
+				
 				navigation.goBack();
 			})
 			.catch((error) => alert(error));
 	};
+
+
 
     return (
         <View style={styles.container}>
