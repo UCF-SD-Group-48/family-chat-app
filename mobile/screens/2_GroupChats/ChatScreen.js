@@ -146,7 +146,7 @@ const ChatScreen = ({ navigation, route }) => {
             .orderBy('timestamp', 'desc')
             .onSnapshot((snapshot) =>
                 setMessages(
-                    snapshot.docs.map(doc => ({
+                    snapshot.docs.reverse().map(doc => ({
                         id: doc.id,
                         data: doc.data(),
                     }))
@@ -208,7 +208,7 @@ const ChatScreen = ({ navigation, route }) => {
 
                         <MyView hide={topicSelectionEnabled}
                             style={{
-                                width: "100%", height: 225,
+                                width: "100%",
                                 marginTop: -2,
                                 borderColor: "#000",
                                 borderBottomWidth: 2,
@@ -266,7 +266,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     {topics.map(({ id, data: { topicName } }) => (
                                         <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
                                             style={{
-                                                height: 35, width: "100%", marginVertical: -0.5,
+                                                height: 37, width: "100%", marginVertical: -0.5,
                                                 justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
                                                 borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
                                             }}>

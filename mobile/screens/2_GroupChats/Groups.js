@@ -133,8 +133,11 @@ const Groups = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Button title={"Add a Group"} onPress={() => navigation.navigate("AddGroup")} />
-			<ScrollView width={"100%"}>
+			<ScrollView width={"100%"}
+				contentContainerStyle={{
+					justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+				}}
+				>
 				{groups.map(({ id, data: { groupName } }) => (
 					<GroupListItem
 						key={id}
@@ -143,8 +146,34 @@ const Groups = ({ navigation }) => {
 						enterGroup={enterGroup}
 					/>
 				))}
+				<LineDivider topSpacing={5}/>
+				<TouchableOpacity onPress={() => navigation.navigate("AddGroup")} activeOpacity={0.7}
+					style={{
+						width: 350, height: 75,
+						marginTop: 25,
+						justifyContent: "center", alignItems: "center", flexDirection: "row",
+						backgroundColor: "#afc",
+						borderColor: "#000", borderWidth: 2, borderRadius: 10,
+					}}
+				>
+					<Icon
+						name='plus'
+                        type='antdesign'
+                        color='#000'
+						style={{
+							width: 50, height: 50, marginRight: 0, justifyContent: "center"
+						}}
+					/>
+					<Text style={{
+						textAlign: "center",
+						fontSize: 18,
+						fontWeight: '600',
+						color: 'black', marginRight: 15
+					}}>
+						{"Create New Group"}
+					</Text>
+				</TouchableOpacity>
 			</ScrollView>
-			<LineDivider />
 		</SafeAreaView>
 	)
 }
