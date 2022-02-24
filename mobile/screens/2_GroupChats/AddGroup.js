@@ -16,6 +16,7 @@ const AddGroup = ({navigation}) => {
 	}, []);
 
     const createGroup = async () => {
+		let currentUserId = auth.currentUser.uid
 		await db
 			.collection("groups")
 			.add({
@@ -25,12 +26,20 @@ const AddGroup = ({navigation}) => {
 			.then( async (docRef) => {
 				// console.log("docRef " + docRef.id)
 				// console.log("currentUser " + JSON.stringify(auth.currentUser, null, "\t"))
+				await db.collection("users").doc(currentUserId).update({
+					// groups: arrayUnion(docRef.id)
+					groups: arrayUnion(db.collection("groups").doc('/' + docRef.id))
+
+				})
+
+				// then add to ref
+
 				// console.log("uid " + JSON.stringify(auth.currentUser.uid))
 				// const userRef = doc(db, "users", auth.currentUser.uid);
 				// await updateDoc(userRef, {
 				// 	groups: arrayUnion(docRef.id)
 				// })
-				
+				// add group to currentUser.group
 				navigation.goBack();
 			})
 			.catch((error) => alert(error));

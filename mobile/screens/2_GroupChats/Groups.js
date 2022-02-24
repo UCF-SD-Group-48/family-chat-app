@@ -85,10 +85,14 @@ const Groups = ({ navigation }) => {
 		auth.signOut().then(() => navigation.replace("Login"));
 	};
 
-	useEffect(async () => {
-		console.log("Groups.js current user " + JSON.stringify(auth.currentUser, null, "\t"))
+	useEffect( async () => {
+		// const test1 =  db.collection('users').doc(auth.currentUser.uid)
+		// console.log("unicorn madness " + JSON.stringify(test1, null, "\t"))
+		// const test1 = await db.collection('users').doc(auth.currentUser.uid).get()
+		// console.log("unicorn conundrum: " )
+		// console.log(test1.ref.path)
 		const unsubscribe = db.collection("groups").where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) =>
-			setGroups(
+		setGroups(
 				snapshot.docs.map((doc) => ({
 					id: doc.id,
 					data: doc.data(),
