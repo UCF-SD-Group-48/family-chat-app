@@ -62,7 +62,34 @@ const ChatScreen = ({ navigation, route }) => {
     const [topics, setTopics] = useState([]);
     const groupId = route.params.groupId;
     const [generalId, setgeneralId] = useState('');
+    const [messageMap, setMessageMap] = useState({});
 
+    const messageMapFunction = () => {
+        if(messages.length > 1) {
+            messages.map((message, i,  array) => {
+                if(i > 0) {
+                    setMessageMap(state => ({
+                        ...state,
+                        [message.id]:  ({
+                            currentId: message.id,
+                            currentPhoneNumber: message.data.phoneNumber,
+                            currentMessage: message.data.message,
+                            previousId: array[i-1].id,
+                            previousPhoneNumber: array[i-1].data.phoneNumber,
+                            previousMessage: array[i-1].data.message,
+                        })
+                    })
+                    );
+                }
+            });
+        }
+    }
+    useEffect(() => {
+        messageMapFunction();
+        return () => {
+            setMessageMap({});
+        }
+    }, [messages]);
 
     useEffect(() => {
         //{topics.map(({ id, data: { topicName } }) => (
@@ -171,6 +198,7 @@ const ChatScreen = ({ navigation, route }) => {
             timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
             message: input,
             displayName: auth.currentUser.displayName,
+            phoneNumber: auth.currentUser.phoneNumber,
             email: auth.currentUser.email,
             photoURL: auth.currentUser.photoURL,
         }); // id passed in when we entered the chatroom
@@ -309,13 +337,42 @@ const ChatScreen = ({ navigation, route }) => {
                         </MyView>
 
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
-                            {messages.map(({ id, data, array }) => (
-                                // data.email === auth.currentUser.email ? (
+                            {messages.map(({ id, data }) => (
+                                
+                                messageMap[id] !== undefined
+                                    && data.phoneNumber == messageMap[id].previousPhoneNumber ? (
+                                <View key={id} style={{
+                                    flex: 1,
+                                    width: "100%",
+                                    alignItems: 'flex-start',
+                                    flexDirection: "row",
+                                    paddingTop: 7,
+                                    paddingHorizontal: 10,
+                                    backgroundColor: "#6660",
+                                }}>
+                                    <View style={{
+                                        width: 50,
+
+                                        backgroundColor: '#0cc0',
+                                        borderWidth: 2,
+                                        borderColor: '#5550',
+                                        borderRadius: 10,
+                                    }} />
+                                    <View style={styles.textContainer}>
+                                        <View style={styles.textOutline}>
+                                            <Text style={styles.text}>
+                                                {data.message}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+                                ) : (
                                 <View key={id} style={styles.message}>
-                                    <View style={styles.userContainer} />
+                                    <View
+                                    style={styles.userContainer} />
                                     <View style={styles.textContainer}>
                                         <Text style={styles.userName}>
-                                            {data.displayName || "Display Name"}
+                                            {data.phoneNumber || "Display Name"}
                                         </Text>
                                         <View style={styles.textOutline}>
                                             <Text style={styles.text}>
@@ -324,34 +381,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         </View>
                                     </View>
                                 </View>
-                                // ) : (
-                                //     <View
-                                //         key={id}
-                                //         style={styles.sender}
-                                //     >
-                                //         <Avatar
-                                //             position='absolute'
-                                //             rounded
-
-                                //             // WEB
-                                //             containerStyle={{
-                                //                 position: 'absolute',
-                                //                 bottom: -15,
-                                //                 right: -5,
-                                //             }}
-                                //             bottom={-15}
-                                //             right={-5}
-                                //             size={30}
-                                //             source={{ uri: data.photoURL }}
-                                //         />
-                                //         <Text style={styles.senderText}>
-                                //             {data.message}
-                                //         </Text>
-                                //         <Text style={styles.senderName}>
-                                //             {data.displayName}
-                                //         </Text>
-                                //     </View>
-                                // )
+                                )
                             ))}
                         </ScrollView>
                         <View style={styles.footer}>
