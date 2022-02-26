@@ -5,17 +5,17 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { db, auth } from '../../firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 
-const AddGroup = ({ navigation }) => {
-	const [input, setInput] = useState("");
-
-	useLayoutEffect(() => {
+const AddGroup = ({navigation}) => {
+    const [input, setInput] = useState("");
+	
+    useLayoutEffect(() => {
 		navigation.setOptions({
 			title: "Add a new Group",
 			headerBackTitle: "Groups",
 		});
 	}, []);
 
-	const createGroup = async () => {
+    const createGroup = async () => {
 		let currentUserId = auth.currentUser.uid
 		await db
 			.collection("groups")
@@ -23,30 +23,30 @@ const AddGroup = ({ navigation }) => {
 				groupName: input,
 				members: [auth.currentUser.uid]
 			})
-			.then(async (docRef) => {
+			.then( async (docRef) => {
 				await db.collection("users").doc(currentUserId).update({
-					// groups: arrayUnion(docRef.id) // adds the uid's only
-					groups: arrayUnion(db.collection("groups").doc(docRef.id)) // by reference
+					groups: arrayUnion(docRef.id) // adds the uid's only
+					// groups: arrayUnion(db.collection("groups").doc(docRef.id)) // by reference
 
 				})
 
 				await db.collection('groups').doc(docRef.id)
-					.collection("topics")
-					.add({
-						topicName: "General",
-					})
-					.then(() => {
-						navigation.goBack();
-					})
-					.catch((error) => alert(error));
+				.collection("topics")
+				.add({
+					topicName: "General",
+				})
+				.then( () => {
+					navigation.goBack();
+				})
+				.catch((error) => alert(error));
 			})
 			.catch((error) => alert(error));
 	};
 
 
 
-	return (
-		<View style={styles.container}>
+    return (
+        <View style={styles.container}>
 			<Input
 				leftIcon={
 					<Icon name="wechat" type="antdesign" size={24} color="blue" />
@@ -58,7 +58,7 @@ const AddGroup = ({ navigation }) => {
 			/>
 			<Button disabled={!input} title="Create new Group" onPress={createGroup} />
 		</View>
-	)
+  )
 }
 
 const styles = StyleSheet.create({
