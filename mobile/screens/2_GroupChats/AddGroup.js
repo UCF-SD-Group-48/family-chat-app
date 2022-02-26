@@ -24,21 +24,11 @@ const AddGroup = ({navigation}) => {
 				members: [auth.currentUser.uid]
 			})
 			.then( async (docRef) => {
-				// console.log("docRef " + docRef.id)
-				// console.log("currentUser " + JSON.stringify(auth.currentUser, null, "\t"))
 				await db.collection("users").doc(currentUserId).update({
-					// groups: arrayUnion(docRef.id)
-					groups: arrayUnion(db.collection("groups").doc('/' + docRef.id))
+					groups: arrayUnion(docRef.id) // adds the uid's only
+					// groups: arrayUnion(db.collection("groups").doc(docRef.id)) // by reference
 
 				})
-
-				// then add to ref
-
-				// console.log("uid " + JSON.stringify(auth.currentUser.uid))
-				// const userRef = doc(db, "users", auth.currentUser.uid);
-				// await updateDoc(userRef, {
-				// 	groups: arrayUnion(docRef.id)
-				// })
 
 				await db.collection('groups').doc(docRef.id)
 				.collection("topics")

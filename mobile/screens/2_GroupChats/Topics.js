@@ -6,9 +6,11 @@ import { Avatar } from 'react-native-elements';
 import { auth, db } from '../../firebase';
 import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from 'react-native-elements/dist/buttons/Button';
+import { collection } from 'firebase/firestore';
 
 const Topics = ({ navigation, route }) => {
 	const [topics, setTopics] = useState([]);
+	const [invite, setInvite] = useState();
 	const groupId = route.params.id;
 	const groupName = route.params.groupName;
 
@@ -17,7 +19,7 @@ const Topics = ({ navigation, route }) => {
 	};
 
 	useEffect(() => {
-		const unsubscribe = db.collection("groups").doc(String(groupId)).collection("topics").onSnapshot((snapshot) =>
+		const unsubscribe = db.collection("groups").doc(groupId).collection("topics").onSnapshot((snapshot) =>
 			setTopics(
 				snapshot.docs.map((doc) => ({
 					id: doc.id,
@@ -70,6 +72,43 @@ const Topics = ({ navigation, route }) => {
 	const enterTopic = (id, topicName) => {
 		navigation.navigate("Chat", { id, topicName, groupId });
 	};
+	
+	//users.groups 
+	//groups.members
+	
+	const inviteUser = (groupId) => {
+
+		// Check phone number in database,
+
+
+		const check = db.collection('users').where('phoneNumber', '==', invite).get()
+			.then((phoneNumber) => {
+				// find that invited user's uid. 
+				// add user to groups.members array
+				console.log("PhoneNumber" + phoneNumber)
+
+				// Add groupID to users's array
+			})
+			.catch((error) => {
+				console.log("didn't find phoneNumbers")
+				alert(error)
+			}	
+			);
+
+		
+
+		// if no: alert message
+		// else yes: 
+			// retrieve userID
+			// add the user's ID that corresponds to inputted number to groups.members array
+			// & add group reference to the users.groups for the user that is invited
+			// Redirect to Groups Page?
+
+		// Accept or Reject for invitee
+		
+
+
+	}
 
 	return (
 		<SafeAreaView>
@@ -86,6 +125,18 @@ const Topics = ({ navigation, route }) => {
 					/>
 				))}
 			</ScrollView>
+
+			<Input
+				leftIcon={
+					<Icon name="wechat" type="antdesign" size={24} color="blue" />
+				}
+				placeholder="Enter a number to invite to this group"
+				value={invite}
+				onSubmitEditing={inviteUser}
+				onChangeText={(invite) => setInvite(invite)}
+			/>
+			<Button disabled={!invite} title="Invite user" onPress={inviteUser} />
+
 		</SafeAreaView>
 	)
 }

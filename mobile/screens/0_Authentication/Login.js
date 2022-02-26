@@ -110,7 +110,6 @@ const Login = ({ navigation }) => {
             verificationId,
             verificationCode
             );
-            console.log("credential " + credential)
             user = await auth.signInWithCredential(credential)
             if (user){
                 console.log("user is authenticated")

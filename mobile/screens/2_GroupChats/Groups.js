@@ -54,6 +54,7 @@ import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import GroupListItem from '../../components/GroupListItem'
+import { collection } from 'firebase/firestore';
 
 // *************************************************************
 
@@ -85,20 +86,36 @@ const Groups = ({ navigation }) => {
 		auth.signOut().then(() => navigation.replace("Login"));
 	};
 
-	useEffect( async () => {
-		// const test1 =  db.collection('users').doc(auth.currentUser.uid)
-		// console.log("unicorn madness " + JSON.stringify(test1, null, "\t"))
-		// const test1 = await db.collection('users').doc(auth.currentUser.uid).get()
-		// console.log("unicorn conundrum: " )
-		// console.log(test1.ref.path)
-		const unsubscribe = db.collection("groups").where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) =>
+	useEffect(async () => {
+		const groupsFieldinUsersCollection = await db.collection('users').doc(auth.currentUser.uid).get()
+		// const categoryDocRef = firebase.firestore().collection('groups').doc('5gF5FqRPvdroRF8isOwd');
+		// const categoryDocRef = doc(db, 'groups/5gF5FqRPvdroRF8isOwd')
+
+		// const testing = await db.collection('users').doc(auth.currentUser.uid).where("groups", "array-contains", categoryDocRef).onSnapshot
+		// // const groupsFieldinUsersCollection = await db.collection('groups/').get()
+		let pathToSuccess = groupsFieldinUsersCollection.data().groups[0]
+		// console.log("\n")
+		console.log("unicorn conundrum: ")
+		console.log(JSON.stringify(pathToSuccess, null, "\t"))
+		// const test2 = await db.collection('groups')
+		// console.log(JSON.stringify(test2, null, "\t"))
+		// const pleaseWork = await db.doc(pathToSuccess.ref.path).get()
+		// console.log("\n")
+
+		// console.log(JSON.stringify(pleaseWork))
+		const unsubscribe = db.collection('groups').where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) => {
+		// const unsubscribe =  await db.collection("users").where("groups", 'array-contains-any',).onSnapshot((snapshot) => {
+
+		// const unsubscribe = await db.collection("users").doc(auth.currentUser.uid).get()
+		// unsubscribe.onSnapshot((snapshot) =>
+		
 		setGroups(
 				snapshot.docs.map((doc) => ({
 					id: doc.id,
 					data: doc.data(),
 				}))
 			)
-		);
+			});
 		return unsubscribe;
 	}, []);
 
