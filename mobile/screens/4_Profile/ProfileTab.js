@@ -53,6 +53,7 @@ import LineDivider from '../../components/LineDivider';
 import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
+import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
 
@@ -136,11 +137,39 @@ const ProfileTab = ({ navigation }) => {
           </Text>
           <View
             style={{
-              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: '90%', justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: '#8D8D8D', borderRadius: 5, width: '90%', justifyContent: 'center', marginBottom: 20,
             }}
           >
-            <Text>
-            </Text>
+
+            <View style={{ flexDirection: 'row' }}>
+
+              <Image source={imageSelection(userDocument.pfp)} style={{ width: 60, height: 60, borderRadius: 5, marginRight: 10 }} />
+
+              <View style={{ borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', paddingHorizontal: 5 }}>
+                <Text style={{ fontSize: 25, fontWeight: '600' }}>
+                  {/* John Doaberman */}
+                  {userDocument.firstName}
+                </Text>
+              </View>
+            </View>
+
+            <View>
+              <Text style={{ fontSize: 18, textAlign: 'justify', paddingTop: 20, paddingBottom: 5, fontWeight: '500' }}>
+                Current Status
+              </Text>
+              <View style={{ flexDirection: 'row' }}>
+
+                <Image source={imageSelection(userDocument.statusEmoji)} style={{ width: 45, height: 45, borderRadius: 3, marginRight: 5 }} />
+
+                <View style={{ borderStyle: 'solid', borderWidth: 2, width: '80%' }}>
+                  <Text style={{ fontSize: 16 }}>
+                    {/* This is my current status and it will change soon... */}
+                    {userDocument.status}
+                  </Text>
+                </View>
+
+              </View>
+            </View>
           </View>
 
           <Text
@@ -150,14 +179,66 @@ const ProfileTab = ({ navigation }) => {
           </Text>
           <View
             style={{
-              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'lightgrey', borderRadius: 5, width: '90%', justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'lightgrey', borderRadius: 5, width: '90%', justifyContent: 'center', marginBottom: 20,
             }}
           >
-            <Text
-              style={{}}
-            >
-              {phoneNumber}
-            </Text>
+            <View>
+            
+            <View style={{paddingBottom: 10}}>
+              <View style={{flexDirection:'row'}}> 
+
+                <View style={{paddingRight: 10}}>
+                  <Text style={{ fontSize: 12 }}>
+                    Email
+                  </Text>
+                  <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
+                    Email goes here.....
+                  </TextInput>
+                </View>
+
+                <View style={{alignItems: 'center'}}>
+                  <Text style={{fontSize: 12}}>
+                    Visibility
+                  </Text>
+                  <TouchableOpacity style={{width: 45, height: 32, backgroundColor:'#C4C4C4', borderRadius: 10, borderStyle:'solid', borderWidth: 2, justifyContent: 'center', alignItems:'center'}}>
+                    <Text>
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              </View>
+
+              <View>
+              <View style={{flexDirection:'row'}}> 
+
+                <View style={{paddingRight: 10}}>
+                  <Text style={{ fontSize: 12 }}>
+                    Phone Number
+                  </Text>
+                  <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
+                    (999) 555 - 1234
+                    {/* {phoneNumber} */}
+                  </TextInput>
+                </View>
+
+                <View style={{alignItems: 'center'}}>
+                  <Text style={{fontSize: 12}}>
+                    Visibility
+                  </Text>
+                  <TouchableOpacity style={{width: 45, height: 32, backgroundColor:'#C4C4C4', borderRadius: 10, borderStyle:'solid', borderWidth: 2, justifyContent: 'center', alignItems:'center'}}>
+                    <Text>
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              </View>
+
+            </View>
+
           </View>
 
           <View
