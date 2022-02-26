@@ -94,7 +94,7 @@ const HomeTab = ({ navigation, route }) => {
             >
               here's what you've missed:
             </Text>
-
+          <Button title={"Pending Invites"} onPress={() => {navigation.navigate('PendingInvite')}}/>
           </View>
 
           <LineDivider style={{
