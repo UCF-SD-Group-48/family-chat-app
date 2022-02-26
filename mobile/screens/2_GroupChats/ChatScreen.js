@@ -44,6 +44,8 @@ import {
     firebaseConfig
 } from '../../firebase';
 import firebase from 'firebase/compat/app';
+import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
+
 
 // Imports for: Components
 import MyView from '../../components/MyView';
@@ -63,20 +65,22 @@ const ChatScreen = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const [generalId, setgeneralId] = useState('');
     const [messageMap, setMessageMap] = useState({});
+    const [invite, setInvite] = useState();
+
 
     const messageMapFunction = () => {
-        if(messages.length > 1) {
-            messages.map((message, i,  array) => {
-                if(i > 0) {
+        if (messages.length > 1) {
+            messages.map((message, i, array) => {
+                if (i > 0) {
                     setMessageMap(state => ({
                         ...state,
-                        [message.id]:  ({
+                        [message.id]: ({
                             currentId: message.id,
                             currentPhoneNumber: message.data.phoneNumber,
                             currentMessage: message.data.message,
-                            previousId: array[i-1].id,
-                            previousPhoneNumber: array[i-1].data.phoneNumber,
-                            previousMessage: array[i-1].data.message,
+                            previousId: array[i - 1].id,
+                            previousPhoneNumber: array[i - 1].data.phoneNumber,
+                            previousMessage: array[i - 1].data.message,
                         })
                     })
                     );
@@ -94,14 +98,14 @@ const ChatScreen = ({ navigation, route }) => {
     useEffect(() => {
         //{topics.map(({ id, data: { topicName } }) => (
         topics.forEach(({ id, data: { topicName } }) => {
-            if(topicName == "General") {
+            if (topicName == "General") {
                 setgeneralId(id);
             }
         });
     }, [route]);
 
     useEffect(() => {
-        const unsubscribe = db.collection("groups").doc(String(route.params.groupId)).collection("topics").onSnapshot((snapshot) =>
+        const unsubscribe = db.collection("groups").doc(route.params.groupId).collection("topics").onSnapshot((snapshot) =>
             setTopics(
                 snapshot.docs.map((doc) => ({
                     id: doc.id,
@@ -133,6 +137,9 @@ const ChatScreen = ({ navigation, route }) => {
                     <Text style={{ color: 'white', marginLeft: 10, fontWeight: '700' }}>
                         {route.params.chatName}
                     </Text>
+
+                    <Button title="Invite user" />
+
                 </View>
             ),
             headerLeft: () => (
@@ -215,6 +222,51 @@ const ChatScreen = ({ navigation, route }) => {
         toggleTopicSelection();
     };
 
+    const inviteUser = async () => {
+
+		// Check phone number in database,
+
+        let foundUser;
+		const check = await db.collection('users').where('phoneNumber', '==', invite).get()
+
+            if (!check.empty) {
+                const snapshot = check.docs[0];
+                const data = snapshot.data();
+                console.log(data.firstName)
+                console.log(snapshot.id)
+                console.log(groupId)
+                // adding user to groups
+                db.collection("groups").doc(groupId).update({
+                    members: arrayUnion(snapshot.id) 
+                })
+                // adding group to user
+                db.collection("users").doc(snapshot.id).update({
+                    // groups: arrayUnion(groupId) // adds the uid's only
+                    groups: arrayUnion(db.collection("groups").doc(groupId)) // by reference
+
+                })
+                } else {
+                // not found
+                }
+        // })
+        // .catch((error) => {
+        //     alert(error)
+        // })
+
+
+		// if no: alert message
+		// else yes: 
+		// retrieve userID
+		// add the user's ID that corresponds to inputted number to groups.members array
+		// & add group reference to the users.groups for the user that is invited
+		// Redirect to Groups Page?
+
+		// Accept or Reject for invitee
+
+
+
+	}
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
@@ -226,6 +278,12 @@ const ChatScreen = ({ navigation, route }) => {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <>
                         <View style={styles.topicNavigator}>
+                        <Input
+                                    placeholder="InviteUser"
+                                    value={invite}
+                                    onSubmitEditing={inviteUser}
+                                    onChangeText={(invite) => setInvite(invite)}
+                                />
                             <View style={styles.topicSpacer}>
                                 <Text style={styles.topicLabel}>
                                     {"Topic"}
@@ -338,49 +396,49 @@ const ChatScreen = ({ navigation, route }) => {
 
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data }) => (
-                                
+
                                 messageMap[id] !== undefined
                                     && data.phoneNumber == messageMap[id].previousPhoneNumber ? (
-                                <View key={id} style={{
-                                    flex: 1,
-                                    width: "100%",
-                                    alignItems: 'flex-start',
-                                    flexDirection: "row",
-                                    paddingTop: 7,
-                                    paddingHorizontal: 10,
-                                    backgroundColor: "#6660",
-                                }}>
-                                    <View style={{
-                                        width: 50,
+                                    <View key={id} style={{
+                                        flex: 1,
+                                        width: "100%",
+                                        alignItems: 'flex-start',
+                                        flexDirection: "row",
+                                        paddingTop: 7,
+                                        paddingHorizontal: 10,
+                                        backgroundColor: "#6660",
+                                    }}>
+                                        <View style={{
+                                            width: 50,
 
-                                        backgroundColor: '#0cc0',
-                                        borderWidth: 2,
-                                        borderColor: '#5550',
-                                        borderRadius: 10,
-                                    }} />
-                                    <View style={styles.textContainer}>
-                                        <View style={styles.textOutline}>
-                                            <Text style={styles.text}>
-                                                {data.message}
-                                            </Text>
+                                            backgroundColor: '#0cc0',
+                                            borderWidth: 2,
+                                            borderColor: '#5550',
+                                            borderRadius: 10,
+                                        }} />
+                                        <View style={styles.textContainer}>
+                                            <View style={styles.textOutline}>
+                                                <Text style={styles.text}>
+                                                    {data.message}
+                                                </Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
                                 ) : (
-                                <View key={id} style={styles.message}>
-                                    <View
-                                    style={styles.userContainer} />
-                                    <View style={styles.textContainer}>
-                                        <Text style={styles.userName}>
-                                            {data.phoneNumber || "Display Name"}
-                                        </Text>
-                                        <View style={styles.textOutline}>
-                                            <Text style={styles.text}>
-                                                {data.message}
+                                    <View key={id} style={styles.message}>
+                                        <View
+                                            style={styles.userContainer} />
+                                        <View style={styles.textContainer}>
+                                            <Text style={styles.userName}>
+                                                {data.phoneNumber || "Display Name"}
                                             </Text>
+                                            <View style={styles.textOutline}>
+                                                <Text style={styles.text}>
+                                                    {data.message}
+                                                </Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
                                 )
                             ))}
                         </ScrollView>
