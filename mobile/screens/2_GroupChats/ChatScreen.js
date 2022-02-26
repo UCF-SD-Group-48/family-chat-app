@@ -223,10 +223,6 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const inviteUser = async () => {
-
-		// Check phone number in database,
-
-        let foundUser;
 		const check = await db.collection('users').where('phoneNumber', '==', invite).get()
 
             if (!check.empty) {
@@ -235,6 +231,7 @@ const ChatScreen = ({ navigation, route }) => {
                 console.log(data.firstName)
                 console.log(snapshot.id)
                 console.log(groupId)
+
                 // adding user to groups
                 db.collection("groups").doc(groupId).update({
                     members: arrayUnion(snapshot.id) 
@@ -243,16 +240,12 @@ const ChatScreen = ({ navigation, route }) => {
                 db.collection("users").doc(snapshot.id).update({
                     // groups: arrayUnion(groupId) // adds the uid's only
                     groups: arrayUnion(db.collection("groups").doc(groupId)) // by reference
-
                 })
+                
                 } else {
-                // not found
+                    alert("Not a valid user")
                 }
-        // })
-        // .catch((error) => {
-        //     alert(error)
-        // })
-
+       
 
 		// if no: alert message
 		// else yes: 

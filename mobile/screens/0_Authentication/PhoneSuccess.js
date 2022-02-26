@@ -141,6 +141,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 				locationServicesEnabled: true,
 				importContactsEnabled: true,
 				groups: [],
+				pendingInvite: []
 			})
 			.then((result) => {
 				console.log('Profile Updated!')
