@@ -228,18 +228,16 @@ const ChatScreen = ({ navigation, route }) => {
             if (!check.empty) {
                 const snapshot = check.docs[0];
                 const data = snapshot.data();
-                console.log(data.firstName)
-                console.log(snapshot.id)
-                console.log(groupId)
-
                 // adding user to groups
-                db.collection("groups").doc(groupId).update({
-                    members: arrayUnion(snapshot.id) 
-                })
+                // db.collection("groups").doc(groupId).update({
+                //     members: arrayUnion(snapshot.id) 
+                // })
                 // adding group to user
                 db.collection("users").doc(snapshot.id).update({
                     // groups: arrayUnion(groupId) // adds the uid's only
-                    groups: arrayUnion(db.collection("groups").doc(groupId)) // by reference
+                    // groups: arrayUnion(db.collection("groups").doc(groupId)) // by reference
+                    pendingInvite: arrayUnion(groupId) // by pendingInvite
+
                 })
                 
                 } else {

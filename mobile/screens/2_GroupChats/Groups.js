@@ -87,27 +87,6 @@ const Groups = ({ navigation }) => {
 	};
 
 	useEffect(async () => {
-		// const groupsFieldinUsersCollection = await db.collection('users').doc(auth.currentUser.uid).get()
-		// const categoryDocRef = firebase.firestore().collection('groups').doc('5gF5FqRPvdroRF8isOwd');
-		// const categoryDocRef = doc(db, 'groups/5gF5FqRPvdroRF8isOwd')
-
-		// const testing = await db.collection('users').doc(auth.currentUser.uid).where("groups", "array-contains", categoryDocRef).onSnapshot
-		// // const groupsFieldinUsersCollection = await db.collection('groups/').get()
-		// let pathToSuccess = groupsFieldinUsersCollection.data().groups[0]
-		// console.log("\n")
-		// console.log("unicorn conundrum: ")
-		// console.log(JSON.stringify(pathToSuccess, null, "\t"))
-		// const test2 = await db.collection('groups')
-		// console.log(JSON.stringify(test2, null, "\t"))
-		// const pleaseWork = await db.doc(pathToSuccess.ref.path).get()
-		// console.log("\n")
-
-		// console.log(JSON.stringify(pleaseWork))
-		// const unsubscribe = db.collection('groups').where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) => {
-		// const unsubscribe =  await db.collection("users").where("groups", 'array-contains-any',).onSnapshot((snapshot) => {
-
-		// const unsubscribe = await db.collection("users").doc(auth.currentUser.uid).get()
-		// unsubscribe.onSnapshot((snapshot) =>
 		const unsubscribe = db.collection('groups').where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) => {
 		setGroups(
 				snapshot.docs.map((doc) => ({
