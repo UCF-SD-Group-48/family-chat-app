@@ -19,6 +19,7 @@ import {
   TouchableWithoutFeedback,
   View,
   Linking,
+  TextInputComponent,
 } from 'react-native';
 import {
   Alert,
@@ -26,6 +27,7 @@ import {
   Button,
   Icon,
   Image,
+  Overlay,
   Input,
   Tooltip,
   Switch,
@@ -81,6 +83,13 @@ const ProfileTab = ({ navigation }) => {
   const [locationServicesChecked, setLocationServicesChecked] = useState(false);
   const [importContactsChecked, setImportContactsChecked] = useState(false);
 
+  const [visible, setVisible] = useState(false);
+
+  const toggleOverlay = () => {
+    setVisible(!visible);
+
+  };
+
   let currentSwitchState = (switchCase) => {
     switch (switchCase) {
       case 'pushNotifications': {
@@ -116,6 +125,7 @@ const ProfileTab = ({ navigation }) => {
   }
 
   const reportProblem = () => {
+
   }
 
   const signOutUser = () => {
@@ -148,7 +158,7 @@ const ProfileTab = ({ navigation }) => {
               <View style={{ borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', paddingHorizontal: 5 }}>
                 <Text style={{ fontSize: 25, fontWeight: '600' }}>
                   {/* John Doaberman */}
-                  {userDocument.firstName}
+                  {userDocument.firstName} {userDocument.lastName}
                 </Text>
               </View>
             </View>
@@ -183,57 +193,58 @@ const ProfileTab = ({ navigation }) => {
             }}
           >
             <View>
-            
-            <View style={{paddingBottom: 10}}>
-              <View style={{flexDirection:'row'}}> 
 
-                <View style={{paddingRight: 10}}>
-                  <Text style={{ fontSize: 12 }}>
-                    Email
-                  </Text>
-                  <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
-                    Email goes here.....
-                  </TextInput>
-                </View>
+              <View style={{ paddingBottom: 10 }}>
+                <View style={{ flexDirection: 'row' }}>
 
-                <View style={{alignItems: 'center'}}>
-                  <Text style={{fontSize: 12}}>
-                    Visibility
-                  </Text>
-                  <TouchableOpacity style={{width: 45, height: 32, backgroundColor:'#C4C4C4', borderRadius: 10, borderStyle:'solid', borderWidth: 2, justifyContent: 'center', alignItems:'center'}}>
-                    <Text>
-                      Edit
+                  <View style={{ paddingRight: 10 }}>
+                    <Text style={{ fontSize: 12 }}>
+                      Email
                     </Text>
-                  </TouchableOpacity>
+                    <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
+                      Email is
+                      {userDocument.email}
+                    </TextInput>
+                  </View>
+
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{ fontSize: 12 }}>
+                      Visibility
+                    </Text>
+                    <TouchableOpacity style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}>
+                      <Text>
+                        Edit
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
 
               </View>
 
               <View>
-              <View style={{flexDirection:'row'}}> 
+                <View style={{ flexDirection: 'row' }}>
 
-                <View style={{paddingRight: 10}}>
-                  <Text style={{ fontSize: 12 }}>
-                    Phone Number
-                  </Text>
-                  <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
-                    (999) 555 - 1234
-                    {/* {phoneNumber} */}
-                  </TextInput>
-                </View>
-
-                <View style={{alignItems: 'center'}}>
-                  <Text style={{fontSize: 12}}>
-                    Visibility
-                  </Text>
-                  <TouchableOpacity style={{width: 45, height: 32, backgroundColor:'#C4C4C4', borderRadius: 10, borderStyle:'solid', borderWidth: 2, justifyContent: 'center', alignItems:'center'}}>
-                    <Text>
-                      Edit
+                  <View style={{ paddingRight: 10 }}>
+                    <Text style={{ fontSize: 12 }}>
+                      Phone Number
                     </Text>
-                  </TouchableOpacity>
+                    <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
+                      (999) 555 - 1234
+                      {/* {phoneNumber} */}
+                    </TextInput>
+                  </View>
+
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{ fontSize: 12 }}>
+                      Visibility
+                    </Text>
+                    <TouchableOpacity style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}>
+                      <Text>
+                        Edit
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
 
               </View>
 
@@ -335,7 +346,7 @@ const ProfileTab = ({ navigation }) => {
           <View>
             <TouchableOpacity
               activeOpacity={0.5}
-              onPress={reportProblem}
+              onPress={toggleOverlay}
               style={{
                 width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
                 alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#F3889C', marginTop: 20
@@ -352,6 +363,35 @@ const ProfileTab = ({ navigation }) => {
                 Report a concern
               </Text>
             </TouchableOpacity>
+
+
+            <Overlay
+              isVisible={visible}
+              onBackdropPress={toggleOverlay}
+              style={{ borderStyle: 'solid', position: 'absolute', width: 500, height: 500 }}
+            >
+
+              <Text style={{ fontSize: 20, fontWeight: '600' }}>
+                Report Your Concern
+              </Text>
+              <Text>
+                Please write a brief description about your issue.
+              </Text>
+              <TextInput style={{alignSelf: 'center', width: 300, height: 300, borderWidth: 2, borderStyle: 'bold', borderRadius: 5}} multiline={true}>
+                This is a text box that will tell me what my issues are.
+                Shouldn't be too long.
+              </TextInput>
+
+              <TouchableOpacity style={{ position: 'relative', width: 100, height: 40, borderWidth: 2, borderStyle: 'solid', backgroundColor: 'black', borderRadius: 10, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end', right: 5, margin: 10 }}>
+
+                <Text style={{ color: 'white', fontSize: 17, fontWeight: 'bold' }}
+                      onPress={toggleOverlay}
+                >
+                  Submit
+                </Text>
+              </TouchableOpacity>
+
+            </Overlay>
           </View>
 
           <LineDivider />
