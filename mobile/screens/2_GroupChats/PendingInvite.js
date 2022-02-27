@@ -67,7 +67,7 @@ const PendingInvite = ({navigation}) => {
         } else {
             alert("Not a valid user")
         }
-        
+
     }, []);
 
   return (
@@ -75,7 +75,11 @@ const PendingInvite = ({navigation}) => {
     
     <View>
         {invites.forEach(() => {
-            <Button></Button>
+           <ListItem>
+               <ListItem.Content>
+                   
+               </ListItem.Content>
+           </ListItem>
         })}
       <Text>PendingInvite</Text>
     </View>
