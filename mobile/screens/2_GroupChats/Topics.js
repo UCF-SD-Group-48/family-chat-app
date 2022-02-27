@@ -72,10 +72,10 @@ const Topics = ({ navigation, route }) => {
 	const enterTopic = (id, topicName) => {
 		navigation.navigate("Chat", { id, topicName, groupId });
 	};
-
+	
 	//users.groups 
 	//groups.members
-
+	
 	const inviteUser = (groupId) => {
 
 		// Check phone number in database,
@@ -92,30 +92,29 @@ const Topics = ({ navigation, route }) => {
 			.catch((error) => {
 				console.log("didn't find phoneNumbers")
 				alert(error)
-			}
+			}	
 			);
 
-
+		
 
 		// if no: alert message
 		// else yes: 
-		// retrieve userID
-		// add the user's ID that corresponds to inputted number to groups.members array
-		// & add group reference to the users.groups for the user that is invited
-		// Redirect to Groups Page?
+			// retrieve userID
+			// add the user's ID that corresponds to inputted number to groups.members array
+			// & add group reference to the users.groups for the user that is invited
+			// Redirect to Groups Page?
 
 		// Accept or Reject for invitee
-
+		
 
 
 	}
 
 	return (
 		<SafeAreaView>
-
 			<Button title={"Add a Topic"} onPress={() => navigation.navigate("AddTopic", { groupId, groupName })} />
-			<Button title={"Go Back"} onPress={() => navigation.goBack()} />
-
+			<Button title={"Go Back"} onPress={() => navigation.goBack()}/>
+			
 			<ScrollView style={styles.container}>
 				{topics.map(({ id, data: { topicName } }) => (
 					<CustomListItem
@@ -127,9 +126,18 @@ const Topics = ({ navigation, route }) => {
 				))}
 			</ScrollView>
 
+			<Input
+				leftIcon={
+					<Icon name="wechat" type="antdesign" size={24} color="blue" />
+				}
+				placeholder="Enter a number to invite to this group"
+				value={invite}
+				onSubmitEditing={inviteUser}
+				onChangeText={(invite) => setInvite(invite)}
+			/>
+			<Button disabled={!invite} title="Invite user" onPress={inviteUser} />
+
 		</SafeAreaView>
-
-
 	)
 }
 

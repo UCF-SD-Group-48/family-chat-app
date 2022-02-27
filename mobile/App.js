@@ -50,7 +50,6 @@ import Groups from './screens/2_GroupChats/Groups';
 import AddGroup from './screens/2_GroupChats/AddGroup';
 import Topics from './screens/2_GroupChats/Topics';
 import AddTopic from './screens/2_GroupChats/AddTopic';
-import PendingInvite from './screens/2_GroupChats/PendingInvite';
 
 // ----------------- 'DMs' Screens
 import DMsTab from './screens/3_DMs/DMsTab';
@@ -162,7 +161,6 @@ const TabStackScreen = () => (
 const HomeStackScreen = () => (
   <Stack.Navigator headerMode="none">
     <Stack.Screen name='HomeTab' component={HomeTab} />
-    <Stack.Screen name='PendingInvite' component={PendingInvite} />
   </Stack.Navigator>
 )
 
