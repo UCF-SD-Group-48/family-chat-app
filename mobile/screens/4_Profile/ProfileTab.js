@@ -56,6 +56,7 @@ import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
+import { set } from 'react-native-reanimated';
 
 // *************************************************************
 
@@ -73,22 +74,40 @@ const ProfileTab = ({ navigation }) => {
     return initialState;
   });
 
-  useEffect(() => {
-    setPushNotificationsChecked(userDocument.pushNotificationEnabled)
-    setLocationServicesChecked(userDocument.locationServicesEnabled)
-    setImportContactsChecked(userDocument.importContactsEnabled)
-  });
+  const [pushNotificationsChecked, setPushNotificationsChecked] = useState(userDocument.pushNotificationEnabled);
+  const [locationServicesChecked, setLocationServicesChecked] = useState(userDocument.locationServicesEnabled);
+  const [importContactsChecked, setImportContactsChecked] = useState(userDocument.importContactsEnabled);
 
-  const [pushNotificationsChecked, setPushNotificationsChecked] = useState(false);
-  const [locationServicesChecked, setLocationServicesChecked] = useState(false);
-  const [importContactsChecked, setImportContactsChecked] = useState(false);
+
+  const [editMode, setEditMode] = useState(false)
+
+  const [firstName, setFirstName] = useState(userDocument.firstName)
+  const [lastName, setLastName] = useState(userDocument.lastName)
+  const [status, setStatus] = useState(userDocument.status)
+
+  const [email, setEmail] = useState(userDocument.email)
+  const updateProfile = async () => {
+    await db.collection('users').doc(auth.currentUser.uid).update({
+      firstName: firstName,
+      lastName: lastName,
+      status: status,
+      email: email,
+      pushNotificationEnabled: pushNotificationsChecked,
+      locationServicesEnabled: locationServicesChecked,
+      importContactsEnabled: importContactsChecked
+    })
+
+    setEditMode(false)
+  }
 
   const [visible, setVisible] = useState(false);
-
   const toggleOverlay = () => {
     setVisible(!visible);
 
   };
+
+  const [showEmail, setShowEmail] = useState(true);
+  const [showNumber, setShowNumber] = useState(true);
 
   let currentSwitchState = (switchCase) => {
     switch (switchCase) {
@@ -125,7 +144,6 @@ const ProfileTab = ({ navigation }) => {
   }
 
   const reportProblem = () => {
-
   }
 
   const signOutUser = () => {
@@ -140,11 +158,33 @@ const ProfileTab = ({ navigation }) => {
 
         <View
           style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
-          <Text
-            style={{ position: 'relative', left: '-25%', marginBottom: 5, fontSize: 18 }}
-          >
-            Public Information
-          </Text>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '90%', marginBottom: 5, alignItems: 'flex-end' }}>
+            <Text
+              style={{ position: 'relative', fontSize: 18 }}
+            >
+              Public Information
+            </Text>
+
+            {
+
+              editMode
+                ?
+                <TouchableOpacity
+                  style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}
+                  onPress={updateProfile}
+                >
+                  <Text> Save </Text>
+                </TouchableOpacity>
+                :
+                <TouchableOpacity
+                  style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}
+                  onPress={() => setEditMode(true)}
+                >
+                  <Text> Edit</Text>
+                </TouchableOpacity>
+            }
+          </View>
           <View
             style={{
               padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: '#8D8D8D', borderRadius: 5, width: '90%', justifyContent: 'center', marginBottom: 20,
@@ -155,12 +195,42 @@ const ProfileTab = ({ navigation }) => {
 
               <Image source={imageSelection(userDocument.pfp)} style={{ width: 60, height: 60, borderRadius: 5, marginRight: 10 }} />
 
-              <View style={{ borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', paddingHorizontal: 5 }}>
-                <Text style={{ fontSize: 25, fontWeight: '600' }}>
-                  {/* John Doaberman */}
-                  {userDocument.firstName} {userDocument.lastName}
-                </Text>
-              </View>
+
+              {
+                !editMode
+                  ?
+
+                  // <View style={{ borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', paddingHorizontal: 5 }}>
+                  <View style={{justifyContent: 'center', paddingHorizontal: 5 }}>
+
+                    <Text
+                      style={{ fontSize: 25, fontWeight: '600' }}
+                    >
+                      {firstName} {lastName}
+                    </Text>
+
+                  </View>
+                  :
+                  <View>
+                    <TextInput
+                      style={{ borderWidth: 2, width: 200, height: 32, marginBottom: 3 }}
+                      value={firstName}
+                      onChangeText={text => setFirstName(text)}
+                      placeholder='First Name'
+                    />
+
+                    <TextInput
+                      style={{ borderWidth: 2, width: 200, height: 32 }}
+                      value={lastName}
+                      onChangeText={text => setLastName(text)}
+                      placeholder='Last Name'
+                    />
+
+                  </View>
+
+              }
+
+
             </View>
 
             <View>
@@ -171,12 +241,14 @@ const ProfileTab = ({ navigation }) => {
 
                 <Image source={imageSelection(userDocument.statusEmoji)} style={{ width: 45, height: 45, borderRadius: 3, marginRight: 5 }} />
 
-                <View style={{ borderStyle: 'solid', borderWidth: 2, width: '80%' }}>
-                  <Text style={{ fontSize: 16 }}>
-                    {/* This is my current status and it will change soon... */}
-                    {userDocument.status}
-                  </Text>
-                </View>
+                <TextInput
+                  style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
+                  editable={editMode}
+                  value={status}
+                  onChangeText={(text) => setStatus(text)}
+                />
+
+
 
               </View>
             </View>
@@ -201,9 +273,11 @@ const ProfileTab = ({ navigation }) => {
                     <Text style={{ fontSize: 12 }}>
                       Email
                     </Text>
-                    <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
-                      Email is
-                      {userDocument.email}
+                    <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}
+                      onChangeText={(text) => setEmail(text)}
+                      editable={editMode}
+                    >
+
                     </TextInput>
                   </View>
 
@@ -211,11 +285,14 @@ const ProfileTab = ({ navigation }) => {
                     <Text style={{ fontSize: 12 }}>
                       Visibility
                     </Text>
-                    <TouchableOpacity style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}>
-                      <Text>
-                        Edit
-                      </Text>
-                    </TouchableOpacity>
+
+                    <Switch
+                      value={showEmail}
+                      onValueChange={(value) => (value)}
+                      style={{ marginLeft: 'auto', marginRight: 0 }}
+                      disabled={!editMode}
+                    />
+
                   </View>
                 </View>
 
@@ -228,21 +305,23 @@ const ProfileTab = ({ navigation }) => {
                     <Text style={{ fontSize: 12 }}>
                       Phone Number
                     </Text>
-                    <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}>
-                      (999) 555 - 1234
-                      {/* {phoneNumber} */}
-                    </TextInput>
+                    <TextInput
+                      style={{ borderWidth: 2, width: 250, height: 32, backgroundColor: '#D3D3D3', color: '#616161' }}
+                      editable={false}
+                      value={userDocument.phoneNumber.substring(1)}
+                    />
                   </View>
 
                   <View style={{ alignItems: 'center' }}>
                     <Text style={{ fontSize: 12 }}>
                       Visibility
                     </Text>
-                    <TouchableOpacity style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}>
-                      <Text>
-                        Edit
-                      </Text>
-                    </TouchableOpacity>
+                    <Switch
+                      value={showNumber}
+                      onValueChange={(value) => setShowNumber(value)}
+                      style={{ marginLeft: 'auto', marginRight: 0 }}
+                      disabled={!editMode}
+                    />
                   </View>
                 </View>
 
@@ -260,10 +339,8 @@ const ProfileTab = ({ navigation }) => {
             <Switch
               value={pushNotificationsChecked}
               onValueChange={(value) => setPushNotificationsChecked(value)}
-              style={{
-                marginLeft: 'auto',
-                marginRight: 0
-              }}
+              style={{marginLeft: 'auto',marginRight: 0}}
+              disabled={!editMode}
             />
           </View>
 
@@ -279,6 +356,7 @@ const ProfileTab = ({ navigation }) => {
                 marginLeft: 'auto',
                 marginRight: 0
               }}
+              disabled={!editMode}
             />
           </View>
 
@@ -294,6 +372,7 @@ const ProfileTab = ({ navigation }) => {
                 marginLeft: 'auto',
                 marginRight: 0
               }}
+              disabled={!editMode}
             />
           </View>
 
@@ -377,7 +456,7 @@ const ProfileTab = ({ navigation }) => {
               <Text>
                 Please write a brief description about your issue.
               </Text>
-              <TextInput style={{alignSelf: 'center', width: 300, height: 300, borderWidth: 2, borderStyle: 'bold', borderRadius: 5}} multiline={true}>
+              <TextInput style={{ alignSelf: 'center', width: 300, height: 300, borderWidth: 2, borderStyle: 'bold', borderRadius: 5 }} multiline={true}>
                 This is a text box that will tell me what my issues are.
                 Shouldn't be too long.
               </TextInput>
@@ -385,7 +464,7 @@ const ProfileTab = ({ navigation }) => {
               <TouchableOpacity style={{ position: 'relative', width: 100, height: 40, borderWidth: 2, borderStyle: 'solid', backgroundColor: 'black', borderRadius: 10, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end', right: 5, margin: 10 }}>
 
                 <Text style={{ color: 'white', fontSize: 17, fontWeight: 'bold' }}
-                      onPress={toggleOverlay}
+                  onPress={toggleOverlay}
                 >
                   Submit
                 </Text>

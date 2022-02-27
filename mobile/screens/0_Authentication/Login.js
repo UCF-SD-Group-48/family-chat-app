@@ -93,7 +93,7 @@ const Login = ({ navigation }) => {
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(
                 // Allow for application login entry with any variation of "DEV" string.
-                ((phoneNumber).toLowerCase() === "dev") ? "+1 650 555 1234" : phoneNumber,
+                ((phoneNumber).toLowerCase() === "dev") ? "+1 650 555 1234" : `+1 ${phoneNumber}`,
             recaptchaVerifier.current
             );
             setVerificationId(verificationId);
@@ -140,12 +140,12 @@ const Login = ({ navigation }) => {
                     <LineDivider />
 
                     <Text style={styles.subtext}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elitcam.
-                        Quick use: '+1 650 555 1234'
+                        Enter your 10 digit phone number. {'\n\n'}           
+                        Quick use: '650 555 1234'
                     </Text>
                     
                         <Input
-                            placeholder='+1 123 456 7890'
+                            placeholder='123 456 7890'
                             autoFocus
                             onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
                         />
