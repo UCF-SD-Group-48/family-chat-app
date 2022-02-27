@@ -63,7 +63,7 @@ import { set } from 'react-native-reanimated';
 // Fourth tab of the application: PROFILE of currently logged in user.
 const ProfileTab = ({ navigation }) => {
 
-  const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
+  const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(2));
   const [uid, setUID] = useState(auth.currentUser.uid);
   const [userDocument, setUserDocument] = useState(async () => {
     const initialState = await db
@@ -81,8 +81,8 @@ const ProfileTab = ({ navigation }) => {
 
   const [editMode, setEditMode] = useState(false)
 
-  const [firstName, setFirstName] = useState(userDocument.firstName)
-  const [lastName, setLastName] = useState(userDocument.lastName)
+  const [firstName, setFirstName] = useState(auth.currentUser.firstName)
+  const [lastName, setLastName] = useState(auth.currentUser.lastName)
   const [status, setStatus] = useState(userDocument.status)
 
   const [email, setEmail] = useState(userDocument.email)
@@ -308,7 +308,7 @@ const ProfileTab = ({ navigation }) => {
                     <TextInput
                       style={{ borderWidth: 2, width: 250, height: 32, backgroundColor: '#D3D3D3', color: '#616161' }}
                       editable={false}
-                      value={userDocument.phoneNumber.substring(1)}
+                      value={phoneNumber}
                     />
                   </View>
 
