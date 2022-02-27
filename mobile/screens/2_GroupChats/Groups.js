@@ -55,12 +55,14 @@ import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import GroupListItem from '../../components/GroupListItem'
 import { collection } from 'firebase/firestore';
+import { set } from 'react-native-reanimated';
 
 // *************************************************************
 
 
 const Groups = ({ navigation }) => {
 	const [groups, setGroups] = useState([]);
+	const [userGroups, setUserGroups] = useState();
 
 	const goToAddChat = () => {
 		navigation.navigate('AddChat');

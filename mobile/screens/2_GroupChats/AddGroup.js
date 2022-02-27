@@ -25,8 +25,8 @@ const AddGroup = ({ navigation }) => {
 			})
 			.then(async (docRef) => {
 				await db.collection("users").doc(currentUserId).update({
-					// groups: arrayUnion(docRef.id) // adds the uid's only
-					groups: arrayUnion(db.collection("groups").doc(docRef.id)) // by reference
+					groups: arrayUnion(docRef.id) // adds the uid's only
+					// groups: arrayUnion(db.collection("groups").doc(docRef.id)) // by reference
 
 				})
 

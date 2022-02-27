@@ -27,6 +27,7 @@ import {
     Icon,
     Image,
     Input,
+    ListItem,
     Tooltip,
 } from 'react-native-elements';
 
@@ -56,47 +57,26 @@ const PendingInvite = ({navigation}) => {
                 //     members: arrayUnion(snapshot.id) 
                 // })
     useEffect(async () => {
-        const pendingInvite = await db.collection('users').doc(auth.currentUser.uid).get() 
+        const pendingInvite = await db.collection('users').doc(auth.currentUser.uid).get()
 
-        if (!pendingInvite) {
-            // const snapshot = pendingInvite.docs;
-            // const data = snapshot.data();
+        if (pendingInvite) {
 
-            console.log(pendingInvite)
-            // console.log(data)
+            const arrayOfInvites = pendingInvite.data().pendingInvite
+            setInvite(arrayOfInvites)
             
-            // adding user to groups
-            // db.collection("groups").doc(groupId).update({
-            //     members: arrayUnion(snapshot.id) 
-            // })
-            // adding group to user
-            // db.collection("users").doc(snapshot.id).update({
-            //     // groups: arrayUnion(groupId) // adds the uid's only
-            //     // groups: arrayUnion(db.collection("groups").doc(groupId)) // by reference
-            //     pendingInvite: arrayUnion(groupId) // by pendingInvite
-
-            // })
-            
-            } else {
-                alert("Not a valid user")
-            }
-   
-
-    //     const unsubscribe = db.collection('users').doc(auth.currentUser.uid).onSnapshot((snapshot) => {
-    //     setInvite(
-    //             snapshot.docs.map((doc) => ({
-    //                 id: doc.id,
-    //                 data: doc.data(),
-    //             }))
-    //         )
-    //         });
-    //     return unsubscribe;
+        } else {
+            alert("Not a valid user")
+        }
+        
     }, []);
 
   return (
 
     
     <View>
+        {invites.forEach(() => {
+            <Button></Button>
+        })}
       <Text>PendingInvite</Text>
     </View>
   )
