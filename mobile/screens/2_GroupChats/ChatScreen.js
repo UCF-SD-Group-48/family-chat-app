@@ -354,30 +354,36 @@ const ChatScreen = ({ navigation, route }) => {
                                     </Text>
                                 </TouchableOpacity>
                                 <View style={{ height: 30, width: 10, backgroundColor: "#6660" }} />
-                                <ScrollView persistentScrollbar={true}
+                                <MyView hide={topics.length <= 1}
                                     style={{
-                                        minWidth: 100, maxHeight: 100, backgroundColor: "#aee",
+                                        minWidth: 100, maxHeight: 100,
+                                        backgroundColor: "#aee",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        padding: 0,
+                                        padding: 0, alignItems: "center", justifyContent: "flex-start", flexDirection: "column",
                                     }}>
-                                    {topics.map(({ id, data: { topicName } }) => (
-                                        <MyView hide={topicName == "General"} key={id}
-                                            style={{
-                                                height: 37, width: "100%", marginVertical: -0.5,
-                                            }}>
-                                            <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
+                                    <ScrollView persistentScrollbar={true}
+                                        style={{
+                                            maxHeight: `${topics.length - 1}`*35, minWidth: 100,
+                                        }}>
+                                        {topics.map(({ id, data: { topicName } }) => (
+                                            <MyView hide={topicName == "General"} key={id}
                                                 style={{
-                                                    width: "100%", height: "100%",
-                                                    justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
-                                                    borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
+                                                    height: 37, width: "100%", marginVertical: -0.5,
                                                 }}>
-                                                <Text style={styles.topicText}>
-                                                    {topicName}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </MyView>
-                                    ))}
-                                </ScrollView>
+                                                <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
+                                                    style={{
+                                                        width: "100%", height: "100%",
+                                                        justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
+                                                        borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
+                                                    }}>
+                                                    <Text style={styles.topicText}>
+                                                        {topicName}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </MyView>
+                                        ))}
+                                    </ScrollView>
+						        </MyView>
                             </View>
                         </MyView>
 
