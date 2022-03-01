@@ -102,6 +102,10 @@ const ChatScreen = ({ navigation, route }) => {
     }, [messages]);
 
     useEffect(() => {
+        setOverlay(false);
+    }, [route]);
+
+    useEffect(() => {
         //{topics.map(({ id, data: { topicName } }) => (
         topics.forEach(({ id, data: { topicName } }) => {
             if (topicName == "General") {
@@ -193,10 +197,10 @@ const ChatScreen = ({ navigation, route }) => {
             .collection('chats')
             .doc(route.params.id)
             .collection('messages')
-            .orderBy('timestamp', 'desc')
+            .orderBy('timestamp', 'asc')
             .onSnapshot((snapshot) =>
                 setMessages(
-                    snapshot.docs.reverse().map(doc => ({
+                    snapshot.docs.map(doc => ({
                         id: doc.id,
                         data: doc.data(),
                     }))
@@ -259,6 +263,12 @@ const ChatScreen = ({ navigation, route }) => {
 
 
 	}
+
+    const addPin = () => {
+        navigation.navigate("AddPin", { topicId: route.params.id, topicName: route.params.topicName, groupId });
+        setOverlay(false);
+        setTopicSelection(false);
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -496,7 +506,8 @@ const ChatScreen = ({ navigation, route }) => {
                                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                     }}>
                                         {/* Pins */}
-                                        <View style={styles.featuresOuterView}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={addPin}
+                                            style={styles.featuresOuterView}>
                                             <View style={styles.featuresIconView}>
                                                 <Icon
                                                     style={styles.icon}
@@ -508,7 +519,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             <Text style={styles.featuresText}>
                                                 Pins (5)
                                             </Text>
-                                        </View>
+                                        </TouchableOpacity>
 
                                         {/* Polls */}
                                         <View style={styles.featuresOuterView}>
