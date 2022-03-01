@@ -56,11 +56,38 @@ import UserPrompt from '../../components/UserPrompt';
 
 // Third tab of the application: DIRECT MESSAGES.
 const DirectMessagesTab = ({ navigation }) => {
+  const [chats, setChats] = useState([])
+
+    useEffect(() => {
+		const unsubscribe = db.collection("users").onSnapshot((snapshot) =>
+			setChats(
+				snapshot.docs.map((doc) => ({
+					id: doc.id,
+					data: doc.data(),
+				}))
+			)
+		);
+		return unsubscribe;
+	}, []);
+    
+    const enterChat = (id, firstName) => {
+		navigation.navigate("Chat", { id, firstName });
+	};
+
   return (
-    <View>
-      <Text></Text>
-    </View>
-  );
+		<SafeAreaView>
+			<ScrollView style={styles.container}>
+				{chats.map(({ id, data: { firstName } }) => (
+					<CustomListItem
+						key={id}
+						id={id}
+						chatName={firstName}
+						enterChat={enterChat}
+					/>
+				))}
+			</ScrollView>
+		</SafeAreaView>
+	);
 };
 
 const styles = StyleSheet.create({});

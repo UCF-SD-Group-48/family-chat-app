@@ -179,6 +179,8 @@ const GroupChatsStackScreen = () => (
 const DMsStackScreen = () => (
   <Stack.Navigator headerMode="none">
     <Stack.Screen name='DMsTab' component={DMsTab} />
+    <Stack.Screen name='Chat' component={ChatScreen} />
+
   </Stack.Navigator>
 )
 

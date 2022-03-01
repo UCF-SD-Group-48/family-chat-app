@@ -2,15 +2,15 @@
 
 import { ListItem, Avatar } from 'react-native-elements';
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 
-const CustomListItem = ({ id, topicName, enterTopic }) => {
+const CustomListItem = ({ id, chatName, enterChat }) => {
   const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
     const unsubscribe = db
       .collection('chats')
-      .doc(id)
+      .doc(auth.currentUser.uid).collection("dmUsers").doc(id)
       .collection('messages')
       .orderBy('timestamp', 'desc')
       .onSnapshot((snapshot) =>
@@ -23,7 +23,7 @@ const CustomListItem = ({ id, topicName, enterTopic }) => {
   return (
     <ListItem
       key={id}
-      onPress={() => enterTopic(id, topicName)}
+      onPress={() => enterChat(id, chatName)}
       key={id}
       buttomDivider
     >
@@ -37,7 +37,7 @@ const CustomListItem = ({ id, topicName, enterTopic }) => {
       />
       <ListItem.Content>
         <ListItem.Title style={{ fontWeight: '800' }}>
-          {topicName}
+          {chatName}
         </ListItem.Title>
         <ListItem.Subtitle
           numberOfLines={1}
