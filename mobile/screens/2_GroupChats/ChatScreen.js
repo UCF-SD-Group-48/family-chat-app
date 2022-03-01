@@ -28,6 +28,7 @@ import {
     Image,
     Input,
     Tooltip,
+    Overlay,
 } from 'react-native-elements';
 
 // Imports for: Expo
@@ -49,6 +50,7 @@ import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/fi
 
 // Imports for: Components
 import MyView from '../../components/MyView';
+import LineDivider from '../../components/LineDivider';
 
 // *************************************************************
 
@@ -66,7 +68,11 @@ const ChatScreen = ({ navigation, route }) => {
     const [generalId, setgeneralId] = useState('');
     const [messageMap, setMessageMap] = useState({});
     const [invite, setInvite] = useState();
+    const [overlayIsVisible, setOverlay] = useState(false);
 
+    const toggleOverlay = () => {
+        setOverlay(!overlayIsVisible);
+    };
 
     const messageMapFunction = () => {
         if (messages.length > 1) {
@@ -300,6 +306,293 @@ const ChatScreen = ({ navigation, route }) => {
                                         color='#080'
                                     />
                                 </TouchableOpacity>
+                                <TouchableOpacity activeOpacity={0.2}
+                                    onPress={toggleOverlay}
+                                    style={{
+                                        width: 45, height: 35, backgroundColor: "#ddd0",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                        marginRight: 5, marginLeft: 5,
+                                        justifyContent: "center"
+                                    }}>
+                                    <Icon
+                                        style={styles.icon}
+                                        name='dots-three-horizontal'
+                                        type='entypo'
+                                        color='#333'
+                                    />
+                                </TouchableOpacity>
+                                <Overlay isVisible={overlayIsVisible} onBackdropPress={toggleOverlay}
+                                    overlayStyle={{
+                                        width: screenWidth - 25,
+                                        borderRadius: 7,
+                                        justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                                    }}>
+                                    {/* Top section of overlay */}
+                                    <View style={{
+                                        width: "100%", marginTop: 5,
+                                        backgroundColor: "#0fc0",
+                                        justifyContent: "space-between", alignItems: "flex-start", flexDirection: "row",
+                                    }}>
+                                        {/* Flex Left section of Top section */}
+                                        <View style={{
+                                            height: "100%", minWidth: 200,
+                                            flex: 1, flexGrow: 1, flexDirection: "row",
+                                            backgroundColor: "#cf00",
+                                        }}>
+                                            {/* Group Icon -top left, height change Top section's height */}
+                                            <View style={{
+                                                width: 75, height: 75,
+                                                justifyContent: "center", alignItems: "center",
+                                                borderRadius: 10, borderWidth: 2,
+                                                backgroundColor: "#cff",
+                                            }}>
+                                                <Text style={{
+                                                    fontSize: 30,
+                                                    fontWeight: '500',
+                                                    color: 'black',
+                                                    textAlign: "center",
+                                                    paddingHorizontal: 0,
+                                                }}>
+                                                    😎
+                                                </Text>
+                                            </View>
+                                            {/* Left section aligned next to Group Icon */}
+                                            <View style={{
+                                                minWidth: 100,
+                                                marginLeft: 10,
+                                                flex: 1, flexGrow: 1, borderRadius: 30,
+                                                justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "col",
+                                                backgroundColor: "#0cc0",
+                                            }}>
+                                                {/* Group Name */}
+                                                <Text style={{
+                                                    fontSize: 24,
+                                                    fontWeight: '700',
+                                                    color: 'black',
+                                                    textAlign: "left",
+                                                    paddingHorizontal: 0,
+                                                }}>
+                                                    {"Group Name"}
+                                                </Text>
+                                                {/* sub text */}
+                                                <Text style={{
+                                                    fontSize: 16,
+                                                    fontWeight: '500',
+                                                    color: 'black',
+                                                    textAlign: "left",
+                                                    paddingHorizontal: 0,
+                                                }}>
+                                                    private group
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        {/* Top Left X -close button */}
+                                        <TouchableOpacity activeOpacity={0.7} onPress={toggleOverlay}
+                                            style={{
+                                                width: 45, height: 45,
+                                                borderWidth: 2, borderColor: "#000", borderRadius: 5,
+                                                justifyContent: "center",
+                                                backgroundColor: "#ddd",
+                                            }}>
+                                            <Icon
+                                                style={styles.icon}
+                                                name='close'
+                                                type='antdesign'
+                                                color='#c00'
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+                                    {/* Group Details outer view */}
+                                    <View style={{
+                                        width: "100%", height: 50,
+                                        marginTop: 15,
+                                        backgroundColor: "#0cf0",
+                                        justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                    }}>
+                                        {/* Settings */}
+                                        <View style={{
+                                            minWidth: 100,
+                                            backgroundColor: "#ccc0",
+                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                        }}>
+                                            <View style={styles.groupDetailsIconBubble}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='settings'
+                                                    type='materialicons'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <View style={styles.groupDetailsTextBubble}>
+                                                <Text style={styles.groupDetailsText}>
+                                                    {"Settings"}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        {/* Members */}
+                                        <View style={{
+                                            minWidth: 100,
+                                            backgroundColor: "#ccc0",
+                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                        }}>
+                                            <View style={styles.groupDetailsIconBubble}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='people-alt'
+                                                    type='materialicons'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <View style={styles.groupDetailsTextBubble}>
+                                                <Text style={styles.groupDetailsText}>
+                                                    {"99 Members"}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        {/* Invite! */}
+                                        <View style={{
+                                            minWidth: 100,
+                                            backgroundColor: "#ccc0",
+                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                        }}>
+                                            <View style={styles.groupDetailsIconBubble}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='mail'
+                                                    type='materialicons'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <View style={styles.groupDetailsTextBubble}>
+                                                <Text style={styles.groupDetailsText}>
+                                                    {"Invite!"}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    <LineDivider />
+                                    {/* Chat Features Text View (for positioning) */}
+                                    <View style={{
+                                        width: "100%",
+                                        marginTop: 20,
+                                        backgroundColor: "#c0f0",
+                                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                                    }}>
+                                        <Text style={{
+                                            fontSize: 20,
+                                            fontWeight: '600',
+                                            color: 'black',
+                                            textAlign: "left",
+                                            paddingHorizontal: 0,
+                                        }}>
+                                            {"Chat Features"}
+                                        </Text>
+                                    </View>
+                                    {/* Feature Icons 1 */}
+                                    <View style={{
+                                        width: 350,
+                                        marginTop: 10,
+                                        backgroundColor: "#0cf0",
+                                        justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                    }}>
+                                        {/* Pins */}
+                                        <View style={styles.featuresOuterView}>
+                                            <View style={styles.featuresIconView}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='pin'
+                                                    type='entypo'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <Text style={styles.featuresText}>
+                                                Pins (5)
+                                            </Text>
+                                        </View>
+
+                                        {/* Polls */}
+                                        <View style={styles.featuresOuterView}>
+                                            <View style={styles.featuresIconView}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='bar-graph'
+                                                    type='entypo'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <Text style={styles.featuresText}>
+                                                Polls (5)
+                                            </Text>
+                                        </View>
+
+                                        {/* Lists */}
+                                        <View style={styles.featuresOuterView}>
+                                            <View style={styles.featuresIconView}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='nav-icon-list-a'
+                                                    type='fontisto'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <Text style={styles.featuresText}>
+                                                Lists (13)
+                                            </Text>
+                                        </View>
+                                    </View>
+                                    {/* Feature Icons 2 */}
+                                    <View style={{
+                                        width: 350,
+                                        marginTop: 10, marginBottom: 5,
+                                        backgroundColor: "#0cf0",
+                                        justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                    }}>
+                                        {/* Events */}
+                                        <View style={styles.featuresOuterView}>
+                                            <View style={styles.featuresIconView}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='calendar'
+                                                    type='entypo'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <Text style={styles.featuresText}>
+                                                Events (0)
+                                            </Text>
+                                        </View>
+
+                                        {/* Banners */}
+                                        <View style={styles.featuresOuterView}>
+                                            <View style={styles.featuresIconView}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='flag'
+                                                    type='ionicons'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <Text style={styles.featuresText}>
+                                                Banners (5)
+                                            </Text>
+                                        </View>
+
+                                        {/* Images */}
+                                        <View style={styles.featuresOuterView}>
+                                            <View style={styles.featuresIconView}>
+                                                <Icon
+                                                    style={styles.icon}
+                                                    name='image'
+                                                    type='entypo'
+                                                    color='#000'
+                                                />
+                                            </View>
+                                            <Text style={styles.featuresText}>
+                                                Images (71)
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </Overlay>
                             </View>
                         </View>
 
@@ -466,7 +759,46 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
-
+    featuresOuterView: {
+        minWidth: 100,
+        paddingHorizontal: 8, paddingVertical: 7,
+        borderRadius: 10, borderWidth: 2,
+        backgroundColor: "#ffc",
+        justifyContent: "center", alignItems: "center", flexDirection: "column",
+    },
+    featuresIconView: {
+        width: 55, height: 55,
+        borderRadius: 10, borderWidth: 2,
+        backgroundColor: "#cff",
+        justifyContent: "center", alignItems: "center",
+    },
+    featuresText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: 'black',
+        textAlign: "center",
+        marginTop: 5,
+    },
+    groupDetailsIconBubble: {
+        width: 32, height: 32,
+        borderRadius: 10, borderWidth: 2,
+        backgroundColor: "#cff",
+        justifyContent: "center", alignItems: "center",
+    },
+    groupDetailsTextBubble: {
+        minWidth: 30, height: 30,
+        paddingHorizontal: 10,
+        borderRadius: 15, borderWidth: 2,
+        backgroundColor: "#cff",
+        justifyContent: "center", alignItems: "center",
+    },
+    groupDetailsText: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: 'black',
+        textAlign: "left",
+        paddingHorizontal: 0,
+    },
     topicNavigator: {
         height: 55,
         backgroundColor: "#6660",
@@ -482,7 +814,9 @@ const styles = StyleSheet.create({
         height: 30,
         flexGrow: 1,
         backgroundColor: "#eae0",
-        alignItems: "flex-end",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        flexDirection: "row",
     },
     topicButton: {
         minWidth: 100,
