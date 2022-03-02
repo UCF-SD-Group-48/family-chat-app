@@ -27,7 +27,7 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
 
 
 // Imports for: Expo
@@ -72,30 +72,21 @@ const Pins = ({ navigation, route }) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Pins",
-            headerStyle: { backgroundColor: "white" },
-            headerTitleStyle: { color: "black" },
-            headerTintColor: "black",
-            headerLeft: '',
             headerRight: () => (
-                <View
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        width: 80,
-                        marginRight: 20,
-                    }}
-                >
-                    <TouchableOpacity activeOpacity={0.5}>
-                        <AntDesign name="camerao" size={24} color="black" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.5}
-                        onPress={() => navigation.navigate("AddGroup")}
-                    >
-                        <SimpleLineIcons name="pencil" size={24} color="black" />
-                    </TouchableOpacity>
-                </View>
-            ),
+				<View
+					style={{
+						flexDirection: "row",
+						justifyContent: "space-between",
+						marginRight: 20,
+					}}>
+					<TouchableOpacity
+						activeOpacity={0.5}
+						onPress={addPin}
+					>
+						<Feather name="plus" size={30} color="black" />
+					</TouchableOpacity>
+				</View>
+			),
         });
     }, [navigation]);
 
@@ -140,19 +131,6 @@ const Pins = ({ navigation, route }) => {
                 flex: 1, flexGrow: 0, flexDirection: "row", justifyContent: "center", alignItems:  "center",
             }}>
                 {/* Add Pin Button */}
-                <TouchableOpacity onPress={() => {navigation.goBack()}} activeOpacity={0.7}
-                style={{
-                    width: 50, height: 50, borderWidth: 0, borderRadius: 5,
-                }}>
-                    <Icon
-						name='back'
-                        type='antdesign'
-                        color='#000'
-						style={{
-							width: 50, height: 50, marginRight: 0, justifyContent: "center"
-						}}
-					/>
-                </TouchableOpacity>
                 <TouchableOpacity onPress={addPin} activeOpacity={0.7}
                     style={{
                         width: 200, height: 75,
@@ -178,10 +156,6 @@ const Pins = ({ navigation, route }) => {
 						{"Add Pin"}
 					</Text>
                 </TouchableOpacity>
-                <View style={{
-                    width: 50, height: 50,
-                }}>
-                </View>
             </View>
         </SafeAreaView>
     )

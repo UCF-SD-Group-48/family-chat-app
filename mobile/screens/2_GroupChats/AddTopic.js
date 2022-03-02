@@ -12,8 +12,7 @@ const AddTopic = ({ navigation, route }) => {
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: "Add a new Topic to ",
-			headerBackTitle: "Topics",
+			title: "Add Topic",
 		});
 	}, []);
 

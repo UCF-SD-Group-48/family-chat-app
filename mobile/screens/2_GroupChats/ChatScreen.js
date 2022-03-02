@@ -36,6 +36,7 @@ import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+import { AntDesign, Feather, Entypo } from "@expo/vector-icons";
 
 // Imports for: Firebase
 import {
@@ -128,67 +129,21 @@ const ChatScreen = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: 'Chat',
-            headerBackTitleVisible: false,
-            headerTitleAlign: 'left',
-            headerTitle: () => (
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}
-                >
-                    <Avatar
-                        rounded
-                        source={{
-                            uri: messages[0]?.data?.photoURL || 'http://www.cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png',
-                        }}
-                    />
-                    <Text style={{ color: 'white', marginLeft: 10, fontWeight: '700' }}>
-                        {route.params.chatName}
-                    </Text>
-
-                    <Button title="Invite user" />
-
-                </View>
-            ),
-            headerLeft: () => (
-                <TouchableOpacity
-                    style={{ marginLeft: 10 }}
-                    onPress={navigation.goBack}
-                >
-                    <Icon
-                        name='arrowleft'
-                        type='antdesign'
-                        color='white'
-                    />
-                </TouchableOpacity>
-            ),
+            title: route.params.groupName,
             headerRight: () => (
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        width: 80,
-                        marginRight: 20,
-                    }}
-                >
-                    {/* <TouchableOpacity>
-                        <Icon
-                            name='video-camera'
-                            type='font-awesome'
-                            color='white'
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                        <Icon
-                            name='call'
-                            type='ionicon'
-                            color='white'
-                        />
-                    </TouchableOpacity> */}
-                </View>
-            ),
+				<View
+					style={{
+						flexDirection: "row",
+						marginRight: 20,
+					}}>
+					<TouchableOpacity
+						activeOpacity={0.5}
+						onPress={toggleOverlay}
+					>
+						<Entypo name="dots-three-horizontal" size={30} color="black" />
+					</TouchableOpacity>
+				</View>
+			),
         });
     }, [navigation, messages]);
 
@@ -314,21 +269,6 @@ const ChatScreen = ({ navigation, route }) => {
                                         name='plus'
                                         type='antdesign'
                                         color='#080'
-                                    />
-                                </TouchableOpacity>
-                                <TouchableOpacity activeOpacity={0.2}
-                                    onPress={toggleOverlay}
-                                    style={{
-                                        width: 45, height: 35, backgroundColor: "#ddd0",
-                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        marginRight: 5, marginLeft: 5,
-                                        justifyContent: "center"
-                                    }}>
-                                    <Icon
-                                        style={styles.icon}
-                                        name='dots-three-horizontal'
-                                        type='entypo'
-                                        color='#333'
                                     />
                                 </TouchableOpacity>
                                 <Overlay isVisible={overlayIsVisible} onBackdropPress={toggleOverlay}

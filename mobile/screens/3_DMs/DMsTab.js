@@ -74,6 +74,13 @@ const DirectMessagesTab = ({ navigation }) => {
 		navigation.navigate("Chat", { id, firstName });
 	};
 
+  useLayoutEffect(() => {
+		navigation.setOptions({
+			title: "Direct Messages (DMs)",
+			headerLeft: '',
+		});
+	}, [navigation]);
+
   return (
 		<SafeAreaView>
 			<ScrollView style={styles.container}>

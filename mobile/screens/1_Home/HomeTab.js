@@ -76,6 +76,13 @@ const HomeTab = ({ navigation, route }) => {
     return initialState;
   });
 
+  useLayoutEffect(() => {
+		navigation.setOptions({
+			title: "Home",
+			headerLeft: '',
+		});
+	}, [navigation]);
+
   return (
     <SafeAreaView>
       <ScrollView style={styles.container}>

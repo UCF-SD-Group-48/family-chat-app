@@ -71,30 +71,6 @@ const AddPin = ({ navigation, route }) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Add Pin",
-            headerStyle: { backgroundColor: "white" },
-            headerTitleStyle: { color: "black" },
-            headerTintColor: "black",
-            headerLeft: '',
-            headerRight: () => (
-                <View
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        width: 80,
-                        marginRight: 20,
-                    }}
-                >
-                    <TouchableOpacity activeOpacity={0.5}>
-                        <AntDesign name="camerao" size={24} color="black" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.5}
-                        onPress={() => navigation.navigate("AddGroup")}
-                    >
-                        <SimpleLineIcons name="pencil" size={24} color="black" />
-                    </TouchableOpacity>
-                </View>
-            ),
         });
     }, [navigation]);
 
@@ -247,7 +223,7 @@ const AddPin = ({ navigation, route }) => {
 						fontWeight: '600',
 						color: 'black', marginRight: 15
 					}}>
-						{"Add Pin"}
+						{"Create Pin"}
 					</Text>
                 </TouchableOpacity>
             </View>

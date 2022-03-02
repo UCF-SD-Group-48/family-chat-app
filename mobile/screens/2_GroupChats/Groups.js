@@ -28,7 +28,7 @@ import {
 	Input,
 	Tooltip,
 } from 'react-native-elements';
-import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+import { AntDesign, SimpleLineIcons, Feather } from "@expo/vector-icons";
 
 
 // Imports for: Expo
@@ -113,18 +113,13 @@ const Groups = ({ navigation }) => {
 					style={{
 						flexDirection: "row",
 						justifyContent: "space-between",
-						width: 80,
 						marginRight: 20,
-					}}
-				>
-					<TouchableOpacity activeOpacity={0.5}>
-						<AntDesign name="camerao" size={24} color="black" />
-					</TouchableOpacity>
+					}}>
 					<TouchableOpacity
 						activeOpacity={0.5}
 						onPress={() => navigation.navigate("AddGroup")}
 					>
-						<SimpleLineIcons name="pencil" size={24} color="black" />
+						<Feather name="plus" size={30} color="black" />
 					</TouchableOpacity>
 				</View>
 			),
@@ -149,7 +144,7 @@ const Groups = ({ navigation }) => {
 				// console.log("topicId = ", topicId);
 				// console.log("topicName = ", topicName);
 				// console.log("id = ", id);
-				navigation.navigate("Chat", { id: topicId, topicName: topicName, groupId: id, groupName });
+				navigation.push("Chat", { id: topicId, topicName: topicName, groupId: id, groupName });
 			})
 			.catch((error) => {
 				console.log("Error getting documents: ", error);

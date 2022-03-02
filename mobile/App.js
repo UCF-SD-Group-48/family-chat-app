@@ -160,13 +160,21 @@ const TabStackScreen = () => (
 );
 
 const HomeStackScreen = () => (
-  <Stack.Navigator headerMode="none">
+  <Stack.Navigator  screenOptions={{
+    headerBackTitleVisible: false,
+    headerTintColor: "#000",
+    headerTitleAlign: 'center',
+  }}>
     <Stack.Screen name='HomeTab' component={HomeTab} />
   </Stack.Navigator>
 )
 
 const GroupChatsStackScreen = () => (
-  <Stack.Navigator headerMode="none">
+  <Stack.Navigator screenOptions={{
+      headerBackTitleVisible: false,
+      headerTintColor: "#000",
+      headerTitleAlign: 'center',
+    }}>
     <Stack.Screen name='Groups' component={Groups} />
     <Stack.Screen name='AddChat' component={AddChatScreen} />
     <Stack.Screen name='Chat' component={ChatScreen} />
@@ -180,7 +188,11 @@ const GroupChatsStackScreen = () => (
 )
 
 const DMsStackScreen = () => (
-  <Stack.Navigator headerMode="none">
+  <Stack.Navigator screenOptions={{
+    headerBackTitleVisible: false,
+    headerTintColor: "#000",
+    headerTitleAlign: 'center',
+  }}>
     <Stack.Screen name='DMsTab' component={DMsTab} />
     <Stack.Screen name='Chat' component={ChatScreen} />
 
@@ -188,7 +200,11 @@ const DMsStackScreen = () => (
 )
 
 const ProfileStackScreen = () => (
-  <Stack.Navigator headerMode="none">
+  <Stack.Navigator screenOptions={{
+    headerBackTitleVisible: false,
+    headerTintColor: "#000",
+    headerTitleAlign: 'center',
+  }}>
     <Stack.Screen name='ProfileTab' component={ProfileTab} />
   </Stack.Navigator>
 )

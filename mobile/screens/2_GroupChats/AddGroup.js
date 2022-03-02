@@ -10,8 +10,7 @@ const AddGroup = ({navigation}) => {
 	
     useLayoutEffect(() => {
 		navigation.setOptions({
-			title: "Add a new Group",
-			headerBackTitle: "Groups",
+			title: "Create new Group",
 		});
 	}, []);
 

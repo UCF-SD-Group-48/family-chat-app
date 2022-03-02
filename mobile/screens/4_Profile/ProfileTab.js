@@ -152,6 +152,13 @@ const ProfileTab = ({ navigation }) => {
     });
   };
 
+  useLayoutEffect(() => {
+		navigation.setOptions({
+			title: "Profile",
+			headerLeft: '',
+		});
+	}, [navigation]);
+
   return (
     <SafeAreaView>
       <ScrollView style={styles.container}>
