@@ -46,15 +46,17 @@ import {
 } from '../firebase';
 import firebase from 'firebase/compat/app';
 import LineDivider from './LineDivider';
+import { imageSelection } from '../screens/5_Supplementary/GenerateProfileIcon';
+
 
 // *************************************************************
 
 const NewNotificationsBlock = () => {
 
-    const data = {
-        displayName: 'Evan C. Navarro',
-        message: 'Lorem ipsum dolor sit amica',
-    };
+    // const data = {
+    //     displayName: 'Jacob Washington',
+    //     message: 'Who is bringing flowers?',
+    // };
 
     return (
         <View
@@ -77,21 +79,24 @@ const NewNotificationsBlock = () => {
                     style={{
                         flexDirection: "row",
                         alignItems: 'center',
+                        marginLeft: 15,
+                        marginTop: 10,
                     }}
                 >
                     <View style={styles.emoji}>
                         <Text style={styles.emojiText}>
-                            {"" || '🥳'}
+                            {"" || '👪'}
                         </Text>
                     </View>
                     <Text
                         style={{
-                            fontSize: 18,
+                            fontSize: 22,
                             fontWeight: 'bold',
+                            marginLeft: 15
 
                         }}
                     >
-                        Group Name
+                        Siblings
                     </Text>
                 </View>
 
@@ -100,12 +105,10 @@ const NewNotificationsBlock = () => {
                         flexDirection: "row",
                         marginLeft: 'auto',
                         alignItems: 'center',
+                        marginTop: 20,
+                        marginRight: 15
                     }}
                 >
-                    {/* 
-                    <Badge value="99+" status="error" />
-                    <Badge value="10" status="primary" />
-                     */}
 
                     <View
                         style={{
@@ -129,7 +132,7 @@ const NewNotificationsBlock = () => {
                                     color: 'white'
                                 }}
                             >
-                                99+
+                                0
                             </Text>
                         </View>
                         <Text
@@ -163,7 +166,7 @@ const NewNotificationsBlock = () => {
                                     color: 'black'
                                 }}
                             >
-                                99+
+                                2
                             </Text>
                         </View>
                         <Text
@@ -177,7 +180,9 @@ const NewNotificationsBlock = () => {
                 </View>
             </View>
 
-            <LineDivider />
+            <View style={{ marginTop: 5, marginBottom: 5, alignItems: 'center' }}>
+                <LineDivider />
+            </View>
 
             <View
                 style={{
@@ -189,6 +194,8 @@ const NewNotificationsBlock = () => {
                     style={{
                         flexDirection: "row",
                         alignItems: 'center',
+                        marginLeft: 15,
+                        marginBottom: 7
                     }}
                 >
                     {/*
@@ -216,9 +223,10 @@ const NewNotificationsBlock = () => {
                         style={{
                             fontSize: 16,
                             fontWeight: 'bold',
+                            marginLeft: 7,
                         }}
                     >
-                        Topic
+                        Mom's Birthday
                     </Text>
                 </View>
 
@@ -228,19 +236,22 @@ const NewNotificationsBlock = () => {
                     // onPress={}
                     >
                         <View style={styles.message}>
-                            <View style={styles.userContainer} />
+                            <Image
+                                source={imageSelection(5)}
+                                style={{ width: 40, height: 40, borderRadius: 8 }}
+                            />
                             <View style={styles.textContainer}>
                                 <Text style={styles.userName}>
-                                    {data?.displayName || "Display Name"}
+                                    John Washington
                                 </Text>
                                 <Text style={styles.text}>
-                                    {data.message}
+                                    Who is bringing flowers?
                                 </Text>
                             </View>
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         activeOpacity={0.75}
                     // onPress={}
                     >
@@ -279,7 +290,7 @@ const NewNotificationsBlock = () => {
                                 See all new messages
                             </Text>
                         </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
 
@@ -293,6 +304,8 @@ const NewNotificationsBlock = () => {
                     style={{
                         flexDirection: "row",
                         alignItems: 'center',
+                        marginLeft: 15,
+                        marginBottom: 7
                     }}
                 >
                     {/*
@@ -320,25 +333,29 @@ const NewNotificationsBlock = () => {
                         style={{
                             fontSize: 16,
                             fontWeight: 'bold',
+                            marginLeft: 7,
+
                         }}
                     >
-                        Topic
+                        General
                     </Text>
                 </View>
 
-                <View style={styles.messageOutline}>
+                <View style={[styles.messageOutline, { marginBottom: 5 }]}>
                     <TouchableOpacity
                         activeOpacity={0.75}
-                    // onPress={}
                     >
                         <View style={styles.message}>
-                            <View style={styles.userContainer} />
+                            <Image
+                                source={imageSelection(6)}
+                                style={{ width: 40, height: 40, borderRadius: 8 }}
+                            />                            
                             <View style={styles.textContainer}>
                                 <Text style={styles.userName}>
-                                    {data?.displayName || "Display Name"}
+                                    Cindy K. Washington
                                 </Text>
                                 <Text style={styles.text}>
-                                    {data.message}
+                                    Yay!! Looks like Bobby finally downloaded the app 😺
                                 </Text>
                             </View>
                         </View>
@@ -357,7 +374,7 @@ const styles = StyleSheet.create({
         height: 60,
         justifyContent: 'center',
 
-        backgroundColor: '#0cc',
+        backgroundColor: 'lightblue',
         borderWidth: 2,
         borderColor: '#555',
         borderRadius: 15,

@@ -90,6 +90,7 @@ const Login = ({ navigation }) => {
 
     const phoneSubmit = async () => {
         try {
+            console.log(phoneNumber)
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(
                 // Allow for application login entry with any variation of "DEV" string.

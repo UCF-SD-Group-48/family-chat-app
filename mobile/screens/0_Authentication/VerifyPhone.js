@@ -23,6 +23,7 @@ import {
     Alert,
     Avatar,
     Button,
+    Divider,
     Icon,
     Image,
     Input,
@@ -57,138 +58,221 @@ import UserPrompt from '../../components/UserPrompt';
 /*  Verify that the provided phone number is real,
     by checking if the entered code matches the one sent. 
 */
+
 const VerifyPhone = ({ navigation, route }) => {
-    const verificationId = route.params.verificationId;
-    const [verificationCode, setVerificationCode] = useState();
-    let phoneNumber = route.params.phoneNumber;
-    const [inputText, onChangeText] = useState('');
+
+    let [phoneNumber, setPhoneNumber] = useState(route.params.phoneNumberToPass);
+    const newUserRegistration = route.params.newUserRegistration;
+
+    const phoneNumberFormatted = () => {
+        console.log(phoneNumber)
+        if (newUserRegistration) {
+            const noCountryCode = phoneNumber.substring(2)
+            const beginning = noCountryCode.slice(0, 3);
+            const middle = noCountryCode.slice(3, 6);
+            const end = noCountryCode.slice(6, 10);
+            return '(' + beginning + ') ' + middle + '-' + end;
+        } else {
+            const noCountryCode = phoneNumber.substring(3)
+            const beginning = noCountryCode.slice(0, 3);
+            const middle = noCountryCode.slice(4, 7);
+            const end = noCountryCode.slice(8, 12);
+            return '(' + beginning + ') ' + middle + '-' + end;
+        }
+    }
 
     const goBackToPreviousScreen = () => {
-        navigation.navigate('RegisterPhone');
+        if (newUserRegistration) navigation.navigate('RegisterPhone');
+        else navigation.navigate('UserAuth');
     };
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: '',
-            headerStyle: { backgroundColor: '#fff' },
+            title: 'Phone Verification',
+            headerStyle: { backgroundColor: '#FFE5B8' },
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 20 }}>
                     <TouchableOpacity activeOpacity={0.5} onPress={goBackToPreviousScreen}>
                         <Icon
-                            name='md-chevron-back-sharp'
+                            name='arrow-back'
                             type='ionicon'
                             color='black'
+                            size={28}
                         />
                     </TouchableOpacity>
                 </View>
             ),
-            headerRight: () => (
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        marginRight: 20,
-                    }}
-                >
-                    <Text>
-                        *VERIFY YOUR PHONE*
-                    </Text>
-                </View>
-            )
+            headerRight: ''
         });
     }, [navigation]);
+
+    const [confirmButtonDisabled, setConfirmButtonDisabled] = useState(true);
+    const verificationId = route.params.verificationId;
+    const [verificationCode, setVerificationCode] = useState('');
+
+    useEffect(() => {
+        setConfirmButtonDisabled((verificationCode.length === 6) ? false : true);
+        console.log(verificationCode.length.toString())
+    }, [verificationCode]);
+
+    const [shownPhoneText, setShownPhoneText] = useState('');
+
+    function formatcodeInput(value) {
+        if (!value) {
+            if (verificationCode.length === 1) setVerificationCode('');
+            return value;
+        };
+        const phoneEntry = value.replace(/[^\d]/g, '');
+        setVerificationCode(phoneEntry);
+        return phoneEntry;
+    }
+
+    const handleVerificationCodeInput = (textChange) => {
+        const codeInputFormatted = formatcodeInput(textChange);
+        setShownPhoneText(codeInputFormatted);
+    };
+
+    const confirmationSubmit = async () => {
+        try {
+            const credential = firebase.auth.PhoneAuthProvider.credential(
+                verificationId,
+                verificationCode
+            );
+            const user = await auth.signInWithCredential(credential)
+            if (newUserRegistration) {
+                console.log('No account found with given phone number.');
+                console.log('User forwarded to Registration (instead of HomeTab.)');
+
+                // No account found, phone is verified, navigate to Registration (UserCreated) screen.
+                console.log(phoneNumber)
+                navigation.navigate('PhoneSuccess', { phoneNumber });
+            } else {
+                console.log("user is authenticated")
+                navigation.replace('TabStack');
+            }
+        } catch (err) {
+            console.log("verification code " + verificationCode)
+            console.log("verifcationId " + verificationId)
+            console.log("failed")
+        }
+    }
 
     return (
         <SafeAreaView>
             <ScrollView style={styles.container}>
-
-                <LargeTitle title='Verify' />
-
-                <View style={styles.centered}>
-                    <LineDivider />
-                </View>
-
                 <View style={styles.subtext}>
-                    <Text style={{ fontSize: 18 }}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Mauris malesuada lorem vel dui porta, in molestie justo interdum.
+                    <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 10, fontWeight: 'bold' }}>
+                        We sent a code to:
+                    </Text>
+                    <View style={{
+                        backgroundColor: 'white',
+                        width: 250,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderColor: '#e3e6e8',
+                        borderRadius: 10,
+                    }}>
+                        <Text style={{ fontSize: 20, textAlign: 'center', margin: 15, fontWeight: '600' }}>
+                            {phoneNumberFormatted()}
+                        </Text>
+                    </View>
+                    <Text style={{ fontSize: 20, textAlign: 'center', marginTop: 30 }}>
+                        Check your phone and enter the provided verification code:
                     </Text>
                 </View>
                 <View style={styles.centered}>
                     <TextInput
-                        style={{ marginVertical: 10, fontSize: 17 }}
-                        editable={!!verificationId}
-                        placeholder='123456'
-                        onChangeText={setVerificationCode}
+                        style={(
+                            verificationCode.length === 0)
+                            ? styles.codeInputStart
+                            : ((verificationCode.length === 6)
+                                ? styles.codeInputEnd
+                                : styles.codeInputDuring
+                            )}
+                        onChangeText={(textChange) => handleVerificationCodeInput(textChange)}
+                        placeholder={'123456'}
+                        hideUnderline
+                        value={shownPhoneText}
+                        keyboardType={'phone-pad'}
+                        maxLength={6}
+                        autoFocus={true}
                     />
 
-                    <Button
-                        title='Confirm Verification Code'
-                        disabled={!verificationId}
-                        onPress={async () => {
-                            try {
+                    {confirmButtonDisabled
+                        ? <View>
+                            <TouchableOpacity
+                                style={styles.confirmButtonDisabledStyling}
+                                disabled={true}
+                            >
+                                <Text style={styles.confirmButtonTextEnabledStyling}>Confirm</Text>
+                            </TouchableOpacity>
+                        </View>
+                        : <TouchableOpacity
+                            style={styles.confirmButtonEnabledStyling}
+                            onPress={confirmationSubmit}
+                        // onPress={async () => {
+                        //     try {
+                        //         // Verify Phone: Check the given code with the generated code
+                        //         const credential = firebase.auth.PhoneAuthProvider.credential(
+                        //             verificationId,
+                        //             verificationCode,
+                        //         );
 
-                                /*
-                                    The way the app should function, instead of what is shown below is:
-                                        The user enters a phone number,
-                                        We remove the spaces from that input,
-                                        We check the database for a user with that phone number (also assuming there's only one),
-                                        If there exists a user, then forward them to "VerifyPhone"
-                                            If there ISN'T an account, then show an error, and give them the option to Register.
-                                */
+                        //         // Login
+                        //         await auth.signInWithCredential(credential);
 
-                                // Verify Phone: Check the given code with the generated code
-                                const credential = firebase.auth.PhoneAuthProvider.credential(
-                                    verificationId,
-                                    verificationCode,
-                                );
+                        //         console.log('Phone Verified.');
 
-                                // Login
-                                await auth.signInWithCredential(credential);
+                        //         // go from "route.params.phoneNumber" which has the spaces
+                        //         // and override with the value of the currentUser (AKA what's in the database)
+                        //         // that value in the database, doesn't have spaces
+                        //         phoneNumber = auth.currentUser.phoneNumber;
 
-                                console.log('Phone Verified.');
+                        //         // Check the database, within the users collection, with the user's phone number
+                        //         const userDocs = db.collection('users');
+                        //         const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
 
-                                // go from "route.params.phoneNumber" which has the spaces
-                                // and override with the value of the currentUser (AKA what's in the database)
-                                // that value in the database, doesn't have spaces
-                                phoneNumber = auth.currentUser.phoneNumber;
+                        //         // Is there an existing account with the provided phone number?
+                        //         if (snapshot.empty) {
+                        //             console.log('No account found with given phone number.');
+                        //             console.log('User forwarded to Registration (instead of HomeTab.)');
 
-                                // Check the database, within the users collection, with the user's phone number
-                                const userDocs = db.collection('users');
-                                const snapshot = await userDocs.where('phoneNumber', '==', `${phoneNumber}`).get();
+                        //             // No account found, phone is verified, navigate to Registration (UserCreated) screen.
+                        //             navigation.navigate('PhoneSuccess', { phoneNumber });
+                        //             return;
+                        //         } else {
+                        //             let userInformation;
+                        //             console.log('Account found.');
 
-                                // Is there an existing account with the provided phone number?
-                                if (snapshot.empty) {
-                                    console.log('No account found with given phone number.');
-                                    console.log('User forwarded to Registration (instead of HomeTab.)');
+                        //             // Print user account data for console.
+                        //             snapshot.forEach(doc => {
+                        //                 console.log(doc.id, '=>', doc.data());
+                        //                 userInformation = doc.data();
+                        //             });
 
-                                    // No account found, phone is verified, navigate to Registration (UserCreated) screen.
-                                    navigation.navigate('PhoneSuccess', { phoneNumber });
-                                    return;
-                                } else {
-                                    let userInformation;
-                                    console.log('Account found.');
+                        //             console.log('Successful login attempt.');
+                        //             console.log('User forwarded to HomeTab.');
 
-                                    // Print user account data for console.
-                                    snapshot.forEach(doc => {
-                                        console.log(doc.id, '=>', doc.data());
-                                        userInformation = doc.data();
-                                    });
-                                    
-                                    console.log('Successful login attempt.');
-                                    console.log('User forwarded to HomeTab.');
-
-                                    // User exists, phone is verified, logged in, navigate to HomeTab.
-                                    navigation.navigate('TabStack', { userInformation });
-                                    return;
-                                }
-                            } catch (err) {
-                                console.log(err);
-                            }
-                        }}
-                    />
+                        //             // User exists, phone is verified, logged in, navigate to HomeTab.
+                        //             navigation.navigate('TabStack', { userInformation });
+                        //             return;
+                        //         }
+                        //     } catch (err) {
+                        //         console.log(err);
+                        //     }
+                        // }
+                        >
+                            <Text style={styles.confirmButtonTextEnabledStyling}>Confirm</Text>
+                            <Icon
+                                name='arrow-forward'
+                                type='ionicon'
+                                color='white'
+                                size={28}
+                            />
+                        </TouchableOpacity>
+                    }
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -198,7 +282,7 @@ const VerifyPhone = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         height: '100%',
-        backgroundColor: 'white',
+        backgroundColor: '#FCF3EA',
     },
     subtext: {
         width: '85%',
@@ -208,6 +292,8 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         marginRight: 'auto',
         padding: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     elements: {
         alignItems: 'center',
@@ -226,7 +312,117 @@ const styles = StyleSheet.create({
         padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
-    }
+    },
+
+    codeInputStart: {
+        backgroundColor: 'white',
+        height: 50,
+        width: 200,
+        alignItems: 'center',
+        marginLeft: 13,
+        paddingLeft: 13,
+        borderColor: 'grey',
+        borderWidth: 2,
+        position: 'relative',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        fontSize: 17,
+        backgroundColor: 'white',
+        textAlign: 'center',
+        fontSize: 20,
+        marginBottom: 15,
+    },
+    codeInputDuring: {
+        backgroundColor: 'white',
+        height: 50,
+        width: 200,
+        alignItems: 'center',
+        marginLeft: 13,
+        paddingLeft: 13,
+        borderColor: '#F9C977',
+        borderWidth: 2,
+        position: 'relative',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        fontSize: 17,
+        backgroundColor: 'white',
+        textAlign: 'center',
+        fontSize: 20,
+        marginBottom: 15,
+    },
+    codeInputEnd: {
+        backgroundColor: 'white',
+        height: 50,
+        width: 200,
+        alignItems: 'center',
+        marginLeft: 13,
+        paddingLeft: 13,
+        borderColor: '#4492D2',
+        borderWidth: 2,
+        position: 'relative',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        fontSize: 17,
+        backgroundColor: 'white',
+        textAlign: 'center',
+        fontSize: 20,
+        marginBottom: 15,
+    },
+
+    confirmButtonEnabledStyling: {
+        height: 65,
+        width: 250,
+        textAlign: 'center',
+        marginBottom: 15,
+        backgroundColor: '#4A5060',
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: 'black',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    confirmButtonTextEnabledStyling: {
+        fontSize: 25,
+        fontWeight: '600',
+        color: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 7,
+        marginLeft: 12,
+    },
+
+    confirmButtonDisabledStyling: {
+        height: 65,
+        width: 250,
+        textAlign: 'center',
+        marginBottom: 15,
+        backgroundColor: '#e3e6e8',
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: 'lightgrey',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    confirmButtonTextDisabledStyling: {
+        fontSize: 25,
+        fontWeight: '500',
+        color: 'lightgrey',
+    },
 });
 
 export default VerifyPhone;

@@ -23,6 +23,7 @@ import {
 	Alert,
 	Avatar,
 	Button,
+	Divider,
 	Icon,
 	Image,
 	Input,
@@ -57,9 +58,35 @@ import UserPrompt from '../../components/UserPrompt';
 // The provided phone was accepted, now take the user's input to create account.
 const PhoneSuccess = ({ navigation, route }) => {
 
+    const [createButtonDisabled, setCreateButtonDisabled] = useState(true);
+
+    useEffect(() => {
+        setCreateButtonDisabled(lastName.length > 0 ? false : true);
+    }, email);
+
+	const goBackToPreviousScreen = () => {
+		navigation.navigate('RegisterPhone');
+	};
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			headerBackTitle: 'Back to Login',
+			title: 'Create Account',
+			headerStyle: { backgroundColor: '#FFE5B8' },
+			headerTitleStyle: { color: 'black' },
+			headerTintColor: 'black',
+			headerLeft: () => (
+				<View style={{ marginLeft: 20 }}>
+					<TouchableOpacity activeOpacity={0.5} onPress={goBackToPreviousScreen}>
+						<Icon
+							name='arrow-back'
+							type='ionicon'
+							color='black'
+							size={28}
+						/>
+					</TouchableOpacity>
+				</View>
+			),
+			headerRight: ''
 		});
 	}, [navigation]);
 
@@ -125,7 +152,6 @@ const PhoneSuccess = ({ navigation, route }) => {
 	};
 
 	const register = async () => {
-		console.log("THIS IS THE PHONE NUMBER VALUE FOR DOC -----", phoneNumber, " > IS FALSE? ", phoneNumber === '3214125192')
 		await db
 			.collection('users').doc(auth.currentUser.uid)
 			.set({
@@ -150,292 +176,336 @@ const PhoneSuccess = ({ navigation, route }) => {
 			.catch((error) => { alert(error.message) });
 	};
 
+    const handleEmailInput = (textChange) => {
+        setEmail(textChange);
+    };
+
 	return (
-		<KeyboardAvoidingView
-			enabled
-			behavior='padding'
-			style={styles.container}
-		>
-			<StatusBar style='light' />
-			<View>
-				<Text
-					style={{
-						fontSize: 18,
-						fontWeight: 'bold',
-						marginBottom: 10,
-					}}
-				>
-					Choose a Profile Image:
-				</Text>
-				<View style={{ borderRadius: 2, borderWidth: 2, borderColor: 'lightgrey', width: '95%', alignContent: 'center', justifyContent: 'center', padding: 20 }}>
-					<View style={styles.pfpOptions}>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(1)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_1.png')}
-								style={checkIfSelected(1)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(2)
-							}}					>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_2.png')}
-								style={checkIfSelected(2)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(3)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_3.png')}
-								style={checkIfSelected(3)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(4)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_4.png')}
-								style={checkIfSelected(4)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(5)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_5.png')}
-								style={checkIfSelected(5)}
-							/>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.pfpOptions}>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(6)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_6.png')}
-								style={checkIfSelected(6)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(7)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_7.png')}
-								style={checkIfSelected(7)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(8)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_8.png')}
-								style={checkIfSelected(8)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(9)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_9.png')}
-								style={checkIfSelected(9)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(10)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_10.png')}
-								style={checkIfSelected(10)}
-							/>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.pfpOptions}>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(11)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_11.png')}
-								style={checkIfSelected(11)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(12)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_12.png')}
-								style={checkIfSelected(12)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(13)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_13.png')}
-								style={checkIfSelected(13)}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(14)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_14.png')}
-								style={checkIfSelected(14)}
-							/>
-						</TouchableOpacity>
+		<SafeAreaView>
+			<ScrollView style={styles.container}>
+				<View style={styles.title}>
+					<Text style={{ fontSize: 30, textAlign: 'center', fontWeight: 'bold' }}>
+						User Information:
+					</Text>
+					<View style={{ width: '85%' }}>
 
-						{/* <TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(15)
-							}}
-						>
-							<Image
-								source={require('../../assets/pfpOptions/avatar_15.png')}
-								style={checkIfSelected(15)}
-							/>
-						</TouchableOpacity> */}
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => {
-								setPFP(6)
-							}}
-						>
-							<View
-								style={{
-									width: 50,
-									height: 50,
-									borderRadius: 8,
-									margin: 5,
-									opacity: 1,
-									backgroundColor: 'lightgrey',
-									alignContent: 'center',
-									justifyContent: 'center',
-									borderColor: 'grey',
-									borderWidth: 2,
-								}}
-							>
-								<Icon
-									name='add'
-									type='material'
-									color='grey'
-									size={32}
-									// onPress={getPermissions}
-									onPress={pickImage}
-
-								/>
-							</View>
-						</TouchableOpacity>
+						<Text style={{ fontSize: 20, textAlign: 'center', marginTop: 20 }}>
+							Great job! Enter these final details to create your account.
+						</Text>
 					</View>
 				</View>
-			</View>
-
-
-			{/* <View style={styles.profileImage}>
-					{!profilePic ? (
-						<Icon
-							name='plus'
-							type='antdesign'
-							color='white'
-							size={24}
-							// onPress={getPermissions}
-							onPress={pickImage}
+				<View style={styles.centered}>
+					<View>
+						<Divider
+							width={2}
+							color={'#e3e6e8'}
 						/>
-					) : (
-						<Image
-							source={{ uri: profilePic }}
-							style={{ width: 100, height: 100 }}
-							// onPress={getPermissions}
-							onPress={pickImage}
-						/>
-					)}
-				</View> */}
+						<Text
+							style={{
+								fontSize: 18,
+								fontWeight: 'bold',
+								marginBottom: 10,
+								marginTop: 20,
+							}}
+						>
+							Choose a Profile Image:
+						</Text>
+						<View
+							style={{
+								borderRadius: 10,
+								borderWidth: 2,
+								borderColor: 'lightgrey',
+								width: '95%',
+								alignContent: 'center',
+								justifyContent: 'center',
+								backgroundColor: 'white',
+								padding: 20
+							}}>
+							<View style={styles.pfpOptions}>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(1)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_1.png')}
+										style={checkIfSelected(1)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(2)
+									}}					>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_2.png')}
+										style={checkIfSelected(2)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(3)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_3.png')}
+										style={checkIfSelected(3)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(4)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_4.png')}
+										style={checkIfSelected(4)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(5)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_5.png')}
+										style={checkIfSelected(5)}
+									/>
+								</TouchableOpacity>
+							</View>
+							<View style={styles.pfpOptions}>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(6)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_6.png')}
+										style={checkIfSelected(6)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(7)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_7.png')}
+										style={checkIfSelected(7)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(8)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_8.png')}
+										style={checkIfSelected(8)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(9)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/avatar_9.png')}
+										style={checkIfSelected(9)}
+									/>
+								</TouchableOpacity>
 
-			<View style={styles.inputContainer}>
-				<Input
-					placeholder='First Name'
-					autoFocus
-					type='text'
-					value={firstName}
-					onChangeText={(text) => setFirstName(text)}
-					style={{ marginTop: 20 }}
-				/>
-				<Input
-					placeholder='Last Name'
-					autoFocus
-					type='text'
-					value={lastName}
-					onChangeText={(text) => setLastName(text)}
-				/>
-				{/* <Input
-					placeholder='Email'
-					autoFocus
-					type='text'
-					value={email}
-					onChangeText={(text) => setEmail(text)}
-				/> */}
-			</View>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(6)
+									}}
+								>
+									<View
+										style={{
+											width: 50,
+											height: 50,
+											borderRadius: 8,
+											margin: 5,
+											opacity: 1,
+											backgroundColor: '#e3e6e8',
+											alignContent: 'center',
+											justifyContent: 'center',
+											borderColor: 'grey',
+											borderWidth: 2,
+										}}
+									>
+										<Icon
+											name='add'
+											type='material'
+											color='grey'
+											size={32}
+											// onPress={getPermissions}
+											onPress={pickImage}
 
-			<Button
-				containerStyle={styles.button}
-				onPress={register}
-				title='Register'
-				raised
-			/>
-		</KeyboardAvoidingView>
+										/>
+									</View>
+								</TouchableOpacity>
+							</View>
+
+						</View>
+					</View>
+					<View style={styles.centered}>
+
+						<View style={styles.inputContainer}>
+							<KeyboardAvoidingView
+								enabled
+								behavior='padding'
+							>
+								<View>
+									<Text
+										style={{
+											marginTop: 9,
+											fontSize: 18,
+											fontWeight: 'bold',
+											marginBottom: 10,
+										}}
+									>
+										First Name:
+									</Text>
+									<TextInput
+										style={
+											(firstName.length === 0)
+												? styles.inputStart
+												: styles.inputEnd
+										}
+										onChangeText={(textChange) => setFirstName(textChange)}
+										placeholder={'John'}
+										hideUnderline
+										value={firstName}
+										keyboardType={'default'}
+										maxLength={25}
+									/>
+								</View>
+
+								<View>
+									<Text
+										style={{
+											marginTop: 20,
+											fontSize: 18,
+											fontWeight: 'bold',
+											marginBottom: 10,
+										}}
+									>
+										Last Name:
+									</Text>
+									<TextInput
+										style={
+											(lastName.length === 0)
+												? styles.inputStart
+												: styles.inputEnd
+										}
+										onChangeText={(textChange) => setLastName(textChange)}
+										placeholder={'Doe'}
+										hideUnderline
+										value={lastName}
+										keyboardType={'default'}
+										maxLength={25}
+									/>
+								</View>
+
+								<View>
+									<Text
+										style={{
+											marginTop: 20,
+											fontSize: 18,
+											fontWeight: 'bold',
+											marginBottom: 10,
+										}}
+									>
+										Email: <Text style={{ fontSize: 16, fontWeight: '400', color: 'grey', alignContent: 'center' }}>(Optional)</Text>
+									</Text>
+									<TextInput
+										style={
+											(email.length === 0)
+												? styles.inputStart
+												: styles.inputEnd
+										}
+										onChangeText={(textChange) => handleEmailInput(textChange)}
+										placeholder={'JohnDoe@gmail.com'}
+										value={email}
+										keyboardType={'email-address'}
+									/>
+								</View>
+							</KeyboardAvoidingView>
+						</View>
+
+						{createButtonDisabled
+							? <View>
+								<TouchableOpacity
+									style={styles.createButtonDisabledStyling}
+									disabled={true}
+								>
+									<Text style={styles.createButtonTextDisabledStyling}>Create</Text>
+								</TouchableOpacity>
+							</View>
+							: <View>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={register}
+									style={styles.createButtonEnabledStyling}
+									disabled={false}
+								>
+									<Text style={styles.createButtonTextEnabledStyling}>Create</Text>
+									<Icon
+										name='arrow-forward'
+										type='ionicon'
+										color='white'
+										size={28}
+									/>
+								</TouchableOpacity>
+							</View>
+						}
+					</View>
+				</View>
+
+			</ScrollView>
+		</SafeAreaView >
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		height: '100%',
+		backgroundColor: '#FCF3EA',
+	},
+	title: {
+		position: 'relative',
+		textAlign: 'center',
+		justifyContent: 'center',
+		marginLeft: 'auto',
+		marginRight: 'auto',
+		padding: 25,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	elements: {
 		alignItems: 'center',
 		justifyContent: 'center',
+		paddingVertical: 10,
+		paddingHorizontal: 25,
+	},
+	centered: {
+		width: '90%',
+		position: 'relative',
+		marginLeft: 'auto',
+		marginRight: 'auto',
 		padding: 10,
-		backgroundColor: 'white',
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	button: {
 		width: 200,
@@ -443,6 +513,10 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		width: 300,
+		justifyContent: 'center',
+		alignSelf: 'center',
+		alignItems: 'center',
+
 	},
 	pfpOptions: {
 		flexDirection: "row",
@@ -460,6 +534,78 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
+
+	inputStart: {
+		flexDirection: 'row',
+		backgroundColor: 'white',
+		height: 50,
+		width: 320,
+		alignItems: 'center',
+		marginLeft: 0,
+		paddingLeft: 13,
+		borderColor: 'grey',
+		borderWidth: 2,
+		fontSize: 20,
+	},
+
+	inputEnd: {
+		flexDirection: 'row',
+		backgroundColor: 'white',
+		height: 50,
+		width: 320,
+		alignItems: 'center',
+		marginLeft: 0,
+		paddingLeft: 13,
+		borderColor: '#4492D2',
+		borderWidth: 2,
+		fontSize: 20,
+
+	},
+
+    createButtonEnabledStyling: {
+		marginTop: 35,
+        height: 65,
+        width: 250,
+        textAlign: 'center',
+        marginBottom: 15,
+        backgroundColor: '#4A5060',
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: 'black',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    createButtonTextEnabledStyling: {
+        fontSize: 25,
+        fontWeight: '600',
+        color: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 7,
+        marginLeft: 12,
+    },
+
+    createButtonDisabledStyling: {
+		marginTop: 25,
+        height: 65,
+        width: 250,
+        textAlign: 'center',
+        marginBottom: 15,
+        backgroundColor: '#e3e6e8',
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: 'lightgrey',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    createButtonTextDisabledStyling: {
+        fontSize: 25,
+        fontWeight: '500',
+        color: 'lightgrey',
+    },
 });
 
 export default PhoneSuccess;

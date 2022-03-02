@@ -60,6 +60,10 @@ import MyView from '../../components/MyView';
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
 
+  const navigateToAddGroup = () => {
+    navigation.navigate('AddGroup')
+  }
+
   const [blockHidden, setBlockHidden] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
   const [uid, setUID] = useState(auth.currentUser.uid);
@@ -85,12 +89,12 @@ const HomeTab = ({ navigation, route }) => {
             style={{ position: 'relative', width: 350, alignContent: 'center' }}
           >
             <Text
-              style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingTop: 20 }}
+              style={{ color: 'black', fontSize: 23, paddingLeft: 25, paddingTop: 20 }}
             >
-              Welcome back {userDocument.firstName || "friend"},
+              Welcome back <Text style={{ fontWeight: 'bold' }}>{userDocument.firstName || "friend"},</Text>
             </Text>
             <Text
-              style={{ color: 'black', fontSize: 25, paddingLeft: 25, paddingBottom: 10 }}
+              style={{ color: 'black', fontSize: 23, paddingLeft: 25, paddingBottom: 0 }}
             >
               here's what you've missed:
             </Text>
@@ -106,30 +110,27 @@ const HomeTab = ({ navigation, route }) => {
             justifyContent: 'center',
             flex: 1,
           }} />
-
-          <MyView hide={blockHidden}>
+          {(blockHidden == false) ?
+          <View style={{width: '100%', alignItems: 'center' }}>
             <TouchableOpacity
-              activeOpacity={0.75}
-              style={{
-                marginTop: 10,
-                marginLeft: 'auto',
-                marginRight: 20,
-              }}
-              onPress={() => {
-                setBlockHidden(true)
-              }}
-            >
-              <DismissButton />
-            </TouchableOpacity>
+          activeOpacity={0.75}
+          style={{
+            marginTop: 20,
+            marginLeft: 'auto',
+            marginRight: 20,
+          }}
+          onPress={() => {
+            setBlockHidden(true)
+          }}
+        >
+          <DismissButton />
+        </TouchableOpacity>
 
-            <NewNotificationsBlock />
-          </MyView>
-
-          <NewNotificationsBlock />
-
-          <View style={{
-            padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 5, width: 325, justifyContent: 'center',
-            alignItems: 'center', marginBottom: 20, marginTop: 20
+        <NewNotificationsBlock />
+        </View> : <View>
+        <View style={{
+            padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'grey', borderRadius: 5, width: 325, justifyContent: 'center',
+            alignItems: 'center', marginBottom: 20, marginTop: 20, backgroundColor: '#e3e6e8'
           }}>
 
             <Icon
@@ -151,11 +152,12 @@ const HomeTab = ({ navigation, route }) => {
             </Text>
           </View>
 
-          <View>
+          <View style={{justifyContent: 'center',
+            alignItems: 'center'}}>
             <TouchableOpacity
-              // onPress={printUserObject}
+              onPress={navigateToAddGroup}
               style={{
-                width: 300, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+                width: 300, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 100, justifyContent: 'center',
                 alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#7DBF7F'
               }}
             >
@@ -171,6 +173,8 @@ const HomeTab = ({ navigation, route }) => {
               </Text>
             </TouchableOpacity>
           </View>
+          </View>
+        }
         </View>
       </ScrollView>
     </SafeAreaView>

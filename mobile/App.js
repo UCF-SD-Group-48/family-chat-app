@@ -106,7 +106,7 @@ const TabStackScreen = () => (
           iconName = 'home';
           type = 'material-community';
           size = 35;
-        } else if (route.name === 'Group') {
+        } else if (route.name === 'Groups') {
           iconName = 'group';
           type = 'material';
           size = 35;
@@ -121,7 +121,6 @@ const TabStackScreen = () => (
         }
 
         return (
-
           <Icon
             name={iconName}
             type={type}
@@ -141,7 +140,7 @@ const TabStackScreen = () => (
       component={HomeStackScreen}
     />
     <TabStack.Screen
-      name='Group'
+      name='Groups'
       component={GroupChatsStackScreen}
     />
     <TabStack.Screen
@@ -202,7 +201,7 @@ export default function App() {
         <Stack.Navigator>
 
           {/* Authentication Screens */}
-          <Stack.Screen name='UserAuth' component={UserAuth} />
+          <Stack.Screen name='UserAuth' component={UserAuth} options={{ headerShown: false }}/>
           <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
           <Stack.Screen name='Login' component={Login} />
           <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
@@ -210,7 +209,7 @@ export default function App() {
           <Stack.Screen name="UserCreated" component={UserCreated} />
 
           {/* Tabbed Screens */}
-          <Stack.Screen name="TabStack" component={TabStackScreen} />
+          <Stack.Screen name="TabStack" component={TabStackScreen} options={{ headerShown: false }} />
 
         </Stack.Navigator>
       </NavigationContainer>

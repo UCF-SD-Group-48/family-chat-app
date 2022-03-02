@@ -51,99 +51,192 @@ import LineDivider from '../../components/LineDivider';
 // *************************************************************
 
 // Take the provided phone number, from the user, and check it's validity + reCAPTCHA.
-const RegisterPhone = ({ navigation, route}) => {
+const RegisterPhone = ({ navigation, route }) => {
 
-    const [phoneNumber, setPhoneNumber] = useState();
+    // const [phoneNumber, setPhoneNumber] = useState();
+    // const [verificationId, setVerificationId] = useState();
+    // const [confirm, setConfirm] = useState(null);
+    // const recaptchaVerifier = useRef(null);
+
+    const goBackToPreviousScreen = () => {
+        navigation.navigate('UserAuth');
+    };
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: 'Register Phone',
+            headerStyle: { backgroundColor: '#FFE5B8' },
+            headerTitleStyle: { color: 'black' },
+            headerTintColor: 'black',
+            headerLeft: () => (
+                <View style={{ marginLeft: 20 }}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={goBackToPreviousScreen}>
+                        <Icon
+                            name='arrow-back'
+                            type='ionicon'
+                            color='black'
+                            size={28}
+                        />
+                    </TouchableOpacity>
+                </View>
+            ),
+            headerRight: ''
+        });
+    }, [navigation]);
+
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
+
+    useEffect(() => {
+        setSubmitButtonDisabled((phoneNumber.length === 10) ? false : true);
+    }, [phoneNumber]);
+
+    const [shownPhoneText, setShownPhoneText] = useState('');
+
+    function formatPhoneInput(value) {
+        if (!value) {
+            if (phoneNumber.length === 1) setPhoneNumber('');
+            return value;
+        };
+        const phoneEntry = value.replace(/[^\d]/g, '');
+        setPhoneNumber(phoneEntry);
+        const phoneEntryLength = phoneEntry.length;
+        if (phoneEntryLength < 4) return phoneEntry;
+        if (phoneEntryLength < 7) return `(${phoneEntry.slice(0, 3)}) ${phoneEntry.slice(3)}`;
+        return `(${phoneEntry.slice(0, 3)}) ${phoneEntry.slice(3, 6)}-${phoneEntry.slice(6, 10)}`;
+    }
+
+    const handlePhoneInput = (textChange) => {
+        const phoneInputFormatted = formatPhoneInput(textChange);
+        setShownPhoneText(phoneInputFormatted);
+    };
+
     const [verificationId, setVerificationId] = useState();
-    const [confirm, setConfirm] = useState(null);
     const recaptchaVerifier = useRef(null);
 
     const phoneSubmit = async () => {
         try {
-            console.log(phoneNumber)
+            const newUserRegistration = true;
+            console.log(phoneNumber);
+            const phoneNumberFormatted = '+1' + phoneNumber.slice(0, 3) + '' + phoneNumber.slice(3, 6) + '' + phoneNumber.slice(6, 10);
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(
-                phoneNumber,
+                ((phoneNumber).toLowerCase() === '000') ? '+1 650 555 1234' : phoneNumberFormatted,
                 recaptchaVerifier.current
             );
             setVerificationId(verificationId);
-            navigation.navigate('VerifyPhone', { verificationId, phoneNumber });
-            // showMessage({
-            //   text: "Verification code has been sent to your phone.",
-            // });
-        } catch (err) {
-            // showMessage({ text: `Error: ${err.message}`, color: "red" });
-            console.log(err)
+
+            if (verificationId) {
+                const phoneNumberToPass = (phoneNumber.length > 3) ? phoneNumberFormatted : '+1 650 555 1234';
+                navigation.navigate('VerifyPhone', { verificationId, phoneNumberToPass, newUserRegistration });
+            };
+        } catch (error) {
+            console.log('[UserAuth.js] phoneSubmit() / ERROR: ' + error);
         }
     };
 
-    // useLayoutEffect(() => {
-    //     navigation.setOptions({
-    //         headerBackTitle: 'Back to Login',
-    //     })
-    // }, [navigation])
-
-    // useEffect(() => {
-    //     navigation.setOptions({
-    //         title: 'Registration',
-    //         headerStyle: { backgroundColor: '#fff' },
-    //         headerTitleStyle: { color: 'black' },
-    //         headerTintColor: 'black',
-    //         headerLeft: () => (
-    //             <View style={{ marginLeft: 20 }}>
-    //                 <TouchableOpacity activeOpacity={0.5} onPress={goBackToPreviousScreen}>
-    //                     <Icon
-    //                         name='md-chevron-back-sharp'
-    //                         type='ionicon'
-    //                         color='black'
-    //                     />
-    //                 </TouchableOpacity>
-    //             </View>
-    //         ),
-    //         headerRight: '',
-    //     });
-    // }, [navigation]);
-
     return (
         <SafeAreaView>
-            <ScrollView>
-                <View style={styles.container}>
+            <ScrollView style={styles.container}>
 
-                    <FirebaseRecaptchaVerifierModal
-                        ref={recaptchaVerifier}
-                        firebaseConfig={firebaseConfig}
-                    />
-
-                    <LargeTitle title='Phone Number:' />
-
-                    <LineDivider />
-
-                    <Text style={styles.subtext}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Mauris malesuada lorem vel dui porta, in molestie justo interdum.
+                <FirebaseRecaptchaVerifierModal
+                    ref={recaptchaVerifier}
+                    firebaseConfig={firebaseConfig}
+                />
+                <View style={styles.title}>
+                    <Text style={{ fontSize: 30, textAlign: 'center', fontWeight: 'bold' }}>
+                        Register your phone:
                     </Text>
+                    <View style={{ width: '85%' }}>
 
-                    <View style={{ width: '90%' }}>
-                        <Input
-                            placeholder='+1 123 456 7890'
-                            autoFocus
-                            // autoCompleteType="tel"
-                            // keyboardType="phone-pad"
-                            // textContentType="telephoneNumber"
-                            onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
-                        />
+                        <Text style={{ fontSize: 20, textAlign: 'center', marginTop: 20 }}>
+                            Create a new account by first providing your phone number:
+                        </Text>
                     </View>
-
-                    <View style={styles.button}>
-                        <LargeButton
-                            title='Submit'
-                            type=''
-                            onPress={phoneSubmit}
-                            style={styles.button}
-                        />
-                    </View>
-
                 </View>
+                <View style={styles.elements}>
+
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            marginBottom: 16,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <View
+                            style={{
+                                width: 75,
+                                height: 50,
+                                borderColor: 'grey',
+                                borderRadius: '0%',
+                                borderWidth: 2,
+                                backgroundColor: 'white',
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Text style={{ fontSize: 32 }}>🇺🇸</Text>
+                            <Icon
+                                name='caret-down-sharp'
+                                type='ionicon'
+                                color='black'
+                                size={12}
+                                style={{ alignSelf: 'flex-end', marginLeft: 5 }}
+                            />
+                        </View>
+                        <View
+                            style={(
+                                phoneNumber.length === 0)
+                                ? styles.phoneInputStart
+                                : ((phoneNumber.length === 10)
+                                    ? styles.phoneInputEnd
+                                    : styles.phoneInputDuring
+                                )}
+                        >
+                            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>+1 </Text>
+                            <TextInput
+                                onChangeText={(textChange) => handlePhoneInput(textChange)}
+                                placeholder={'(201) 555-0123'}
+                                hideUnderline
+                                value={shownPhoneText}
+                                keyboardType={'phone-pad'}
+                                maxLength={14}
+                                autoFocus={true}
+                                style={{ fontSize: 18, marginLeft: 3, marginRight: 15 }}
+                            />
+                        </View>
+                    </View>
+
+                    {submitButtonDisabled
+                        ? <View>
+                            <TouchableOpacity
+                                style={styles.submitButtonDisabledStyling}
+                                disabled={true}
+                            >
+                                <Text style={styles.submitButtonTextDisabledStyling}>Register</Text>
+                            </TouchableOpacity>
+                        </View>
+                        : <View>
+                            <TouchableOpacity
+                                activeOpacity={0.75}
+                                onPress={phoneSubmit}
+                                style={styles.submitButtonEnabledStyling}
+                                disabled={false}
+                            >
+                                <Text style={styles.submitButtonTextEnabledStyling}>Register</Text>
+                                <Icon
+                                    name='arrow-forward'
+                                    type='ionicon'
+                                    color='white'
+                                    size={28}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    }
+                </View>
+                {/* </View> */}
             </ScrollView>
         </SafeAreaView>
     );
@@ -152,32 +245,111 @@ const RegisterPhone = ({ navigation, route}) => {
 const styles = StyleSheet.create({
     container: {
         height: '100%',
-        backgroundColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#FCF3EA',
     },
-    subtext: {
-        width: '85%',
+    title: {
+        position: 'relative',
+        textAlign: 'center',
         justifyContent: 'center',
-        alignItems: 'center',
         marginLeft: 'auto',
         marginRight: 'auto',
-        margin: 10,
-        padding: 15,
-        fontSize: 18,
-        textAlign: 'center',
+        padding: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     elements: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 25,
+        paddingVertical: 10,
         paddingHorizontal: 25,
     },
-    button: {
+    centered: {
+        width: '90%',
+        position: 'relative',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+
+    phoneInputStart: {
+        flexDirection: 'row',
+        backgroundColor: 'white',
+        height: 50,
         width: 200,
-        margin: 25,
+        alignItems: 'center',
+        marginLeft: 13,
+        paddingLeft: 13,
+        borderColor: 'grey',
+        borderWidth: 2,
+    },
+
+    phoneInputDuring: {
+        flexDirection: 'row',
+        backgroundColor: 'white',
+        height: 50,
+        width: 200,
+        alignItems: 'center',
+        marginLeft: 13,
+        paddingLeft: 13,
+        borderColor: '#F9C977',
+        borderWidth: 2,
+    },
+
+    phoneInputEnd: {
+        flexDirection: 'row',
+        backgroundColor: 'white',
+        height: 50,
+        width: 200,
+        alignItems: 'center',
+        marginLeft: 13,
+        paddingLeft: 13,
+        borderColor: '#4492D2',
+        borderWidth: 2,
+    },
+
+    submitButtonEnabledStyling: {
+        height: 65,
+        width: 250,
+        textAlign: 'center',
+        marginBottom: 15,
+        backgroundColor: '#4A5060',
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: 'black',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    submitButtonTextEnabledStyling: {
+        fontSize: 25,
+        fontWeight: '600',
+        color: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 7,
+        marginLeft: 12,
+    },
+
+    submitButtonDisabledStyling: {
+        height: 65,
+        width: 250,
+        textAlign: 'center',
+        marginBottom: 15,
+        backgroundColor: '#e3e6e8',
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: 'lightgrey',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    submitButtonTextDisabledStyling: {
+        fontSize: 25,
+        fontWeight: '500',
+        color: 'lightgrey',
     },
 });
 
