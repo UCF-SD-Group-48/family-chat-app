@@ -136,7 +136,9 @@ const AddPin = ({ navigation, route }) => {
 						fontWeight: '500',
 						color: 'black',
 					}}>
-						{"Fill in the information you'd like to pin\nfor everyone to reference later!"}
+						 {/* Use this top line for screen title/header later */}
+                         {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
+                        {"Fill in the information you'd like to pin\nfor everyone to reference later!"}
 					</Text>
                 </View>
 

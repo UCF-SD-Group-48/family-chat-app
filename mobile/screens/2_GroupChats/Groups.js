@@ -149,7 +149,7 @@ const Groups = ({ navigation }) => {
 				// console.log("topicId = ", topicId);
 				// console.log("topicName = ", topicName);
 				// console.log("id = ", id);
-				navigation.navigate("Chat", { id: topicId, topicName: topicName, groupId: id });
+				navigation.navigate("Chat", { id: topicId, topicName: topicName, groupId: id, groupName });
 			})
 			.catch((error) => {
 				console.log("Error getting documents: ", error);

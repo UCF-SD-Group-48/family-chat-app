@@ -228,7 +228,7 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const enterTopic = (id, topicName) => {
-        navigation.navigate("Chat", { id, topicName, groupId });
+        navigation.navigate("Chat", { id, topicName, groupId, groupName: route.params.groupName });
         toggleTopicSelection();
     };
 
@@ -265,7 +265,7 @@ const ChatScreen = ({ navigation, route }) => {
 	}
 
     const gotoPins = () => {
-        navigation.navigate("Pins", { id: route.params.id, topicName: route.params.topicName, groupId });
+        navigation.navigate("Pins", { id: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
         setOverlay(false);
         setTopicSelection(false);
     };
@@ -382,7 +382,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                     textAlign: "left",
                                                     paddingHorizontal: 0,
                                                 }}>
-                                                    {"Group Name"}
+                                                    {route.params.groupName}
                                                 </Text>
                                                 {/* sub text */}
                                                 <Text style={{
@@ -392,7 +392,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                     textAlign: "left",
                                                     paddingHorizontal: 0,
                                                 }}>
-                                                    private group
+                                                    {"Topic ",route.params.topicName}
                                                 </Text>
                                             </View>
                                         </View>

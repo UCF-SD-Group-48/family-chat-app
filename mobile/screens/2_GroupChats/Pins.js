@@ -101,7 +101,7 @@ const Pins = ({ navigation, route }) => {
 
     
     const addPin = () => {
-        navigation.navigate("AddPin", { topicId: route.params.id, topicName: route.params.topicName, groupId });
+        navigation.navigate("AddPin", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
     };
 
     return (
