@@ -51,6 +51,7 @@ import AddGroup from './screens/2_GroupChats/AddGroup';
 import Topics from './screens/2_GroupChats/Topics';
 import AddTopic from './screens/2_GroupChats/AddTopic';
 import AddPin from './screens/2_GroupChats/AddPin';
+import Pins from './screens/2_GroupChats/Pins';
 
 // ----------------- 'DMs' Screens
 import DMsTab from './screens/3_DMs/DMsTab';
@@ -173,6 +174,7 @@ const GroupChatsStackScreen = () => (
     <Stack.Screen name='AddGroup' component={AddGroup} />
     <Stack.Screen name='AddTopic' component={AddTopic} />
     <Stack.Screen name='AddPin' component={AddPin} />
+    <Stack.Screen name='Pins' component={Pins} />
     <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
   </Stack.Navigator>
 )

@@ -264,8 +264,8 @@ const ChatScreen = ({ navigation, route }) => {
 
 	}
 
-    const addPin = () => {
-        navigation.navigate("AddPin", { topicId: route.params.id, topicName: route.params.topicName, groupId });
+    const gotoPins = () => {
+        navigation.navigate("Pins", { id: route.params.id, topicName: route.params.topicName, groupId });
         setOverlay(false);
         setTopicSelection(false);
     };
@@ -506,7 +506,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                     }}>
                                         {/* Pins */}
-                                        <TouchableOpacity activeOpacity={0.7} onPress={addPin}
+                                        <TouchableOpacity activeOpacity={0.7} onPress={gotoPins}
                                             style={styles.featuresOuterView}>
                                             <View style={styles.featuresIconView}>
                                                 <Icon

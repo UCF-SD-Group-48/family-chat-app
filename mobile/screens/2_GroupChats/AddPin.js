@@ -99,12 +99,11 @@ const AddPin = ({ navigation, route }) => {
     }, [navigation]);
 
     const addPin = () => {
-        const contentWithReturns = pinContent.replaceAll("\n", "\\n");
         Keyboard.dismiss();
 
         db.collection('chats').doc(route.params.topicId).collection('pins').add({
             title: pinTitle,
-            content: contentWithReturns,
+            content: pinContent,
             originalMessageUID: route.params.messageUID || "",
             timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
             displayName: auth.currentUser.displayName,
