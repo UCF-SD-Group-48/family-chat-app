@@ -95,6 +95,10 @@ const TopicSettings = ({ navigation, route }) => {
         navigation.goBack();
     };
 
+    const deleteTopic = () => {
+        
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView width={"100%"} height={"200%"}

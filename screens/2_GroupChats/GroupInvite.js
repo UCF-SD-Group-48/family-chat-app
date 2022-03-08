@@ -92,13 +92,11 @@ const GroupInvite = ({ navigation, route }) => {
             if (!user.empty) {
                 const snapshot = user.docs[0];
                 const data = snapshot.data();
-                console.log("snapshot " + snapshot)
-                console.log("data " + data)
        
-                db.collection("users").doc(snapshot.id).update({
-                    pendingInvite: arrayUnion(route.params.groupId) // by pendingInvite
+                // db.collection("users").doc(snapshot.id).update({
+                //     pendingInvite: arrayUnion(route.params.groupId) // by pendingInvite
 
-                })
+                // })
                 db.collection('groups').doc(route.params.groupId).update({
                     members: arrayUnion(snapshot.id)
                 })
