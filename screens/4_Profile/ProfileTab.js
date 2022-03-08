@@ -463,7 +463,7 @@ const ProfileTab = ({ navigation }) => {
               <Text>
                 Please write a brief description about your issue.
               </Text>
-              <TextInput style={{ alignSelf: 'center', width: 300, height: 300, borderWidth: 2, borderStyle: 'bold', borderRadius: 5 }} multiline={true}>
+              <TextInput style={{ alignSelf: 'center', width: 300, height: 300, borderWidth: 2, borderStyle: 'solid', borderRadius: 5 }} multiline={true}>
                 This is a text box that will tell me what my issues are.
                 Shouldn't be too long.
               </TextInput>

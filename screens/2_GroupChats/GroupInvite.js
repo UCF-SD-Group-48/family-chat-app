@@ -54,25 +54,59 @@ import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import GroupListItem from '../../components/GroupListItem'
-import { collection } from 'firebase/firestore';
+import { arrayUnion, collection } from 'firebase/firestore';
 import { set } from 'react-native-reanimated';
 
 // *************************************************************
 
 
 const GroupInvite = ({ navigation, route }) => {
-    // const [pinTitle, setPinTitle] = useState("");
-    // const [pinContent, setPinContent] = useState("");
 
-    // useEffect(() => {
-    //     setPinContent(route.params.message || "");
-    // }, [route]);
+    const [invite, setInvite] = useState();
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "GroupInvite: "+route.params.groupName,
+            title: "GroupInvite: " + route.params.groupName,
         });
     }, [navigation]);
+
+    // useEffect(async () => {
+    //     const pendingInvite = await db.collection('users').doc(auth.currentUser.uid).get()
+
+    //     if (pendingInvite) {
+
+    //         const arrayOfInvites = pendingInvite.data().pendingInvite
+    //         setInvite(arrayOfInvites)
+            
+    //     } else {
+    //         alert("Not a valid user")
+    //     }
+
+    // }, []);
+
+    const inviteUser = async () => {
+
+        let reformatNumber = invite.trim();
+		const user = await db.collection('users').where('phoneNumber', '==', reformatNumber).get()
+
+            if (!user.empty) {
+                const snapshot = user.docs[0];
+                const data = snapshot.data();
+                console.log("snapshot " + snapshot)
+                console.log("data " + data)
+       
+                db.collection("users").doc(snapshot.id).update({
+                    pendingInvite: arrayUnion(route.params.groupId) // by pendingInvite
+
+                })
+                db.collection('groups').doc(route.params.groupId).update({
+                    members: arrayUnion(snapshot.id)
+                })
+                
+                } else {
+                    alert("Not a valid user")
+                }
+	}
 
     // const addPin = () => {
     //     Keyboard.dismiss();
@@ -118,6 +152,12 @@ const GroupInvite = ({ navigation, route }) => {
                             "Click a button to send the request\n"+
                             "Also button to copy an invite link, maybe just try to copy hard-coded text to the clipboard to start"}
 					</Text>
+                    <Input
+                        placeholder="Invite User"
+                        value={invite}
+                        onSubmitEditing={inviteUser}
+                        onChangeText={(invite) => setInvite(invite)}
+                    />
                 </View>
             </ScrollView>
         </SafeAreaView>

@@ -24,7 +24,7 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
     <ListItem
       key={id}
       onPress={() => enterChat(id, chatName)}
-      key={id}
+      id={id}
       buttomDivider
     >
       <Avatar

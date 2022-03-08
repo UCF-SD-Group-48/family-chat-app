@@ -187,37 +187,6 @@ const ChatScreen = ({ navigation, route }) => {
         toggleTopicSelection();
     };
 
-    const inviteUser = async () => {
-		const check = await db.collection('users').where('phoneNumber', '==', invite).get()
-
-            if (!check.empty) {
-                const snapshot = check.docs[0];
-                const data = snapshot.data();
-       
-                db.collection("users").doc(snapshot.id).update({
-                    // groups: arrayUnion(groupId) // adds the uid's only
-                    // groups: arrayUnion(db.collection("groups").doc(groupId)) // by reference
-                    pendingInvite: arrayUnion(groupId) // by pendingInvite
-
-                })
-                
-                } else {
-                    alert("Not a valid user")
-                }
-       
-
-		// if no: alert message
-		// else yes: 
-		// retrieve userID
-		// add the user's ID that corresponds to inputted number to groups.members array
-		// & add group reference to the users.groups for the user that is invited
-		// Redirect to Groups Page?
-
-		// Accept or Reject for invitee
-
-
-
-	}
 
     const gotoPins = () => {
         navigation.navigate("Pins", { id: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
@@ -269,12 +238,6 @@ const ChatScreen = ({ navigation, route }) => {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <>
                         <View style={styles.topicNavigator}>
-                        {/* <Input
-                                    placeholder="InviteUser"
-                                    value={invite}
-                                    onSubmitEditing={inviteUser}
-                                    onChangeText={(invite) => setInvite(invite)}
-                                /> */}
                             <View style={styles.topicSpacer}>
                                 <Text style={styles.topicLabel}>
                                     {"Topic"}
