@@ -52,6 +52,12 @@ import Topics from './screens/2_GroupChats/Topics';
 import AddTopic from './screens/2_GroupChats/AddTopic';
 import AddPin from './screens/2_GroupChats/AddPin';
 import Pins from './screens/2_GroupChats/Pins';
+import GroupInvite from './screens/2_GroupChats/GroupInvite';
+import GroupMembers from './screens/2_GroupChats/GroupMembers';
+import GroupSettings from './screens/2_GroupChats/GroupSettings';
+import TopicInvite from './screens/2_GroupChats/TopicInvite';
+import TopicMembers from './screens/2_GroupChats/TopicMembers';
+import TopicSettings from './screens/2_GroupChats/TopicSettings';
 
 // ----------------- 'DMs' Screens
 import DMsTab from './screens/3_DMs/DMsTab';
@@ -183,6 +189,12 @@ const GroupChatsStackScreen = () => (
     <Stack.Screen name='AddTopic' component={AddTopic} />
     <Stack.Screen name='AddPin' component={AddPin} />
     <Stack.Screen name='Pins' component={Pins} />
+    <Stack.Screen name='GroupInvite' component={GroupInvite} />
+    <Stack.Screen name='GroupMembers' component={GroupMembers} />
+    <Stack.Screen name='GroupSettings' component={GroupSettings} />
+    <Stack.Screen name='TopicInvite' component={TopicInvite} />
+    <Stack.Screen name='TopicMembers' component={TopicMembers} />
+    <Stack.Screen name='TopicSettings' component={TopicSettings} />
     <Stack.Screen name='FamilyChatScreen' component={FamilyChatScreen} />
   </Stack.Navigator>
 )

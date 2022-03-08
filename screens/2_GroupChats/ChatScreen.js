@@ -222,7 +222,40 @@ const ChatScreen = ({ navigation, route }) => {
     const gotoPins = () => {
         navigation.navigate("Pins", { id: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
         setOverlay(false);
-        setTopicSelection(false);
+        // setTopicSelection(false);
+    };
+
+    const navigateToSettings = () => {
+        setOverlay(false);
+
+        if(route.params.topicName == "General") {
+            navigation.navigate("GroupSettings", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        }
+        else {
+            navigation.navigate("TopicSettings", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        }
+    };
+
+    const navigateToInvite = () => {
+        setOverlay(false);
+
+        if(route.params.topicName == "General") {
+            navigation.navigate("GroupInvite", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        }
+        else {
+            navigation.navigate("TopicInvite", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        }
+    };
+
+    const navigateToMembers = () => {
+        setOverlay(false);
+
+        if(route.params.topicName == "General") {
+            navigation.navigate("GroupMembers", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        }
+        else {
+            navigation.navigate("TopicMembers", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        }
     };
 
     return (
@@ -326,13 +359,15 @@ const ChatScreen = ({ navigation, route }) => {
                                                 </Text>
                                                 {/* sub text */}
                                                 <Text style={{
-                                                    fontSize: 16,
+                                                    fontSize: 18,
                                                     fontWeight: '500',
                                                     color: 'black',
                                                     textAlign: "left",
                                                     paddingHorizontal: 0,
                                                 }}>
-                                                    {"Topic ",route.params.topicName}
+                                                    {(route.params.topicName == "General")
+                                                        ? "Group"
+                                                        : "Topic: "+route.params.topicName}
                                                 </Text>
                                             </View>
                                         </View>
@@ -360,11 +395,12 @@ const ChatScreen = ({ navigation, route }) => {
                                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                     }}>
                                         {/* Settings */}
-                                        <View style={{
-                                            minWidth: 100,
-                                            backgroundColor: "#ccc0",
-                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
-                                        }}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={navigateToSettings}
+                                            style={{
+                                                minWidth: 100,
+                                                backgroundColor: "#ccc0",
+                                                justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                            }}>
                                             <View style={styles.groupDetailsIconBubble}>
                                                 <Icon
                                                     style={styles.icon}
@@ -378,13 +414,14 @@ const ChatScreen = ({ navigation, route }) => {
                                                     {"Settings"}
                                                 </Text>
                                             </View>
-                                        </View>
+                                        </TouchableOpacity>
                                         {/* Members */}
-                                        <View style={{
-                                            minWidth: 100,
-                                            backgroundColor: "#ccc0",
-                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
-                                        }}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={navigateToMembers}
+                                            style={{
+                                                minWidth: 100,
+                                                backgroundColor: "#ccc0",
+                                                justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                            }}>
                                             <View style={styles.groupDetailsIconBubble}>
                                                 <Icon
                                                     style={styles.icon}
@@ -398,13 +435,14 @@ const ChatScreen = ({ navigation, route }) => {
                                                     {"99 Members"}
                                                 </Text>
                                             </View>
-                                        </View>
+                                        </TouchableOpacity>
                                         {/* Invite! */}
-                                        <View style={{
-                                            minWidth: 100,
-                                            backgroundColor: "#ccc0",
-                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
-                                        }}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={navigateToInvite}
+                                            style={{
+                                                minWidth: 100,
+                                                backgroundColor: "#ccc0",
+                                                justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                            }}>
                                             <View style={styles.groupDetailsIconBubble}>
                                                 <Icon
                                                     style={styles.icon}
@@ -418,7 +456,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                     {"Invite!"}
                                                 </Text>
                                             </View>
-                                        </View>
+                                        </TouchableOpacity>
                                     </View>
                                     <LineDivider />
                                     {/* Chat Features Text View (for positioning) */}
