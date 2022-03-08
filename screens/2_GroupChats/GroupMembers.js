@@ -61,12 +61,9 @@ import { set } from 'react-native-reanimated';
 
 
 const GroupMembers = ({ navigation, route }) => {
-    // const [pinTitle, setPinTitle] = useState("");
-    // const [pinContent, setPinContent] = useState("");
+    const [memberIDs, setMemberIDs] = useState([])
+    const [members, setMembers] = useState([])
 
-    // useEffect(() => {
-    //     setPinContent(route.params.message || "");
-    // }, [route]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -74,23 +71,41 @@ const GroupMembers = ({ navigation, route }) => {
         });
     }, [navigation]);
 
-    // const addPin = () => {
-    //     Keyboard.dismiss();
+    useEffect(() => {
+        const unsubscribe = db.collection("groups").doc(route.params.groupId).onSnapshot((snapshot) =>
+            setMemberIDs(snapshot.data().members)
+        );
+        
+        return unsubscribe;
+    }, []);
 
-    //     db.collection('chats').doc(route.params.topicId).collection('pins').add({
-    //         title: pinTitle,
-    //         content: pinContent,
-    //         originalMessageUID: route.params.messageUID || "",
-    //         timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-    //         displayName: auth.currentUser.displayName,
-    //         ownerPhoneNumber: auth.currentUser.phoneNumber,
-    //     }); // id passed in when we entered the chatroom
+    // const memberMapFunction = () => {
+    //     memberIDs.map((member) => {
+    //         async () => {
+    //             const doc = await db.collection("users").doc(member).then((doc) => {
+    //                 setMembers({
+    //                     id: doc.id,
+    //                     data: doc.data(),
+    //                 });
+    //                 // console.log("\n..members is:");
+    //                 // console.log(doc.id);
+    //                 // console.log(doc.data());
+    //             });
+    //         }
+    //     });
+    //     console.log(members), console.log("\n..members are.");
+    // }
+    // useEffect(() => {
+    //     memberMapFunction();
+    //     return () => {
+    //         // setMembers({});
+    //     }
+    // }, [memberIDs]);
 
-    //     setPinTitle(""); // clears input
-    //     setPinContent(""); // clears input
-
-    //     navigation.goBack();
-    // };
+    const printMembers = () => {
+        console.log(members);
+        console.log("..\n");
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -118,6 +133,85 @@ const GroupMembers = ({ navigation, route }) => {
                             "Options to add members, or leave group"}
 					</Text>
                 </View>
+                {/* 2 Buttons */}
+                <View style={{
+                    width: "100%", height: 60,
+                    justifyContent: "space-evenly", alignItems: "center", flexDirection: "row",
+                    paddingVertical: 15,
+                    }}>
+                    <TouchableOpacity onPress={printMembers} activeOpacity={0.7}
+                        style={{
+                            width: 100, height: 50,
+                            marginTop: 20,
+                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                            backgroundColor: "#fac",
+                            borderColor: "#000", borderWidth: 2, borderRadius: 10,
+                        }}>
+                        <Text style={{
+                            textAlign: "center",
+                            fontSize: 18,
+                            fontWeight: '600',
+                            color: 'black', marginRight: 0
+                        }}>
+                            {"Leave Group"}
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity activeOpacity={0.7}
+                        onPress={()=>{
+                            navigation.navigate("GroupInvite", { topicId: route.params.topicId, topicName: route.params.topicName, groupName: route.params.groupName, groupName: route.params.groupName });
+                        }}
+                        style={{
+                            width: 100, height: 50,
+                            marginTop: 20,
+                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                            backgroundColor: "#ccc",
+                            borderColor: "#000", borderWidth: 2, borderRadius: 10,
+                        }}>
+                        <Text style={{
+                            textAlign: "center",
+                            fontSize: 18,
+                            fontWeight: '600',
+                            color: 'black', marginRight: 0
+                        }}>
+                            {"Invite"}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
+                    {members.map(({ id, data }) => (
+
+                        // data.phoneNumber == "6505551234" ? (
+                            <View style={{
+                                height: 100, width: 100,
+                                justifyContent: "center", alignItems: "center", flexDirection: "row",
+                            }}>
+                                <Text style={{
+                                    textAlign: "center",
+                                    fontSize: 18,
+                                    fontWeight: '600',
+                                    color: 'black',
+                                }}>
+                                    {/* {"Dev: "+data.firstName+" "+data.lastName} */}
+                                    ""
+                                </Text>
+                            </View>
+                        // ) : (
+                        //     <View style={{
+                        //         height: 100, width: 100,
+                        //         justifyContent: "center", alignItems: "center", flexDirection: "row",
+                        //     }}>
+                        //         <Text style={{
+                        //             textAlign: "center",
+                        //             fontSize: 18,
+                        //             fontWeight: '600',
+                        //             color: 'black',
+                        //         }}>
+                        //             {data.firstName+" "+data.lastName}
+                        //         </Text>
+                        //     </View>
+                        // )
+                    ))}
+                </ScrollView>
             </ScrollView>
         </SafeAreaView>
     )
