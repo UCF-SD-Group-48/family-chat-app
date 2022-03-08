@@ -73,7 +73,7 @@ const TopicSettings = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "Topic Settings:  "+route.params.topicName,
+            title: "Topic Settings:  "+ route.params.topicName,
         });
     }, [navigation]);
 
@@ -95,8 +95,15 @@ const TopicSettings = ({ navigation, route }) => {
         navigation.goBack();
     };
 
-    const deleteTopic = () => {
-        
+    const deleteTopic = async () => {
+        try {
+             await db.collection('groups').doc(route.params.groupId).collection('topics').doc(route.params.topicId).delete();
+             console.log("deleted the topic")
+        } catch (error) {
+            alert(error)
+        }
+        // const query = collectionRef.orderBy('__name__').limit(batchSize)
+          
     }
 
     return (
@@ -260,7 +267,9 @@ const TopicSettings = ({ navigation, route }) => {
 					</Text>
                 </TouchableOpacity>
                 {/* Delete Topic */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
+                <TouchableOpacity 
+                    onPress={deleteTopic}
+                    activeOpacity={0.7}
                     style={{
                         width: 200, height: 50,
                         marginTop: 20,
