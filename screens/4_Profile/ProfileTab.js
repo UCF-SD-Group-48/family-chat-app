@@ -74,9 +74,9 @@ const ProfileTab = ({ navigation }) => {
     return initialState;
   });
 
-  const [pushNotificationsChecked, setPushNotificationsChecked] = useState(userDocument.pushNotificationEnabled);
-  const [locationServicesChecked, setLocationServicesChecked] = useState(userDocument.locationServicesEnabled);
-  const [importContactsChecked, setImportContactsChecked] = useState(userDocument.importContactsEnabled);
+  // const [pushNotificationsChecked, setPushNotificationsChecked] = useState(userDocument.pushNotificationEnabled);
+  // const [locationServicesChecked, setLocationServicesChecked] = useState(userDocument.locationServicesEnabled);
+  // const [importContactsChecked, setImportContactsChecked] = useState(userDocument.importContactsEnabled);
 
 
   const [editMode, setEditMode] = useState(false)
@@ -86,18 +86,33 @@ const ProfileTab = ({ navigation }) => {
   const [status, setStatus] = useState(userDocument.status)
 
   const [email, setEmail] = useState(userDocument.email)
+
   const updateProfile = async () => {
-    await db.collection('users').doc(auth.currentUser.uid).update({
-      firstName: firstName,
-      lastName: lastName,
-      status: status,
-      email: email,
-      pushNotificationEnabled: pushNotificationsChecked,
-      locationServicesEnabled: locationServicesChecked,
-      importContactsEnabled: importContactsChecked
+    
+    console.log(firstName, lastName, status, email );
+   
+    (status === undefined) ? setStatus('') : setStatus(status);
+    (email === undefined) ? setEmail('') : setEmail(email);
+
+    try{
+      await db.collection('users').doc(auth.currentUser.uid).update({
+        firstName: firstName,
+        lastName: lastName,
+        status: status,
+        email: email,
+
+      // pushNotificationEnabled: pushNotificationsChecked,
+      // locationServicesEnabled: locationServicesChecked,
+      // importContactsEnabled: importContactsChecked
     })
 
-    setEditMode(false)
+  }
+  catch(err){
+    console.log(err)
+  }
+    
+ setEditMode(false)
+    console.log(editMode)
   }
 
   const [visible, setVisible] = useState(false);
@@ -109,31 +124,33 @@ const ProfileTab = ({ navigation }) => {
   const [showEmail, setShowEmail] = useState(true);
   const [showNumber, setShowNumber] = useState(true);
 
-  let currentSwitchState = (switchCase) => {
-    switch (switchCase) {
-      case 'pushNotifications': {
-        if (pushNotificationsChecked === true) {
-          return 'enabled'
-        } else {
-          return 'disabled'
-        }
-      }
-      case 'locationServices': {
-        if (locationServicesChecked === true) {
-          return 'enabled'
-        } else {
-          return 'disabled'
-        }
-      }
-      case 'importContacts': {
-        if (importContactsChecked === true) {
-          return 'enabled'
-        } else {
-          return 'disabled'
-        }
-      }
-    }
-  }
+  // let currentSwitchState = (switchCase) => {
+  //   switch (switchCase) {
+  //     case 'pushNotifications': {
+  //       if (pushNotificationsChecked === true) {
+  //         return 'enabled'
+  //       } else {
+  //         return 'disabled'
+  //       }
+  //     }
+  //     case 'locationServices': {
+  //       if (locationServicesChecked === true) {
+  //         return 'enabled'
+  //       } else {
+  //         return 'disabled'
+  //       }
+  //     }
+  //     case 'importContacts': {
+  //       if (importContactsChecked === true) {
+  //         return 'enabled'
+  //       } else {
+  //         return 'disabled'
+  //       }
+  //     }
+  //   }
+  // }
+
+
 
   const openWebsite = () => {
     Linking.openURL('https://www.familychat.app/FAQ')
@@ -188,7 +205,7 @@ const ProfileTab = ({ navigation }) => {
                   style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}
                   onPress={() => setEditMode(true)}
                 >
-                  <Text> Edit</Text>
+                  <Text> Edit </Text>
                 </TouchableOpacity>
             }
           </View>
@@ -206,8 +223,6 @@ const ProfileTab = ({ navigation }) => {
               {
                 !editMode
                   ?
-
-                  // <View style={{ borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', paddingHorizontal: 5 }}>
                   <View style={{justifyContent: 'center', paddingHorizontal: 5 }}>
 
                     <Text
@@ -338,7 +353,7 @@ const ProfileTab = ({ navigation }) => {
 
           </View>
 
-          <View
+          {/* <View
             style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
           >
             <Text style={{ fontWeight: 'bold' }}>Push Notifications</Text>
@@ -381,7 +396,7 @@ const ProfileTab = ({ navigation }) => {
               }}
               disabled={!editMode}
             />
-          </View>
+          </View> */}
 
           <LineDivider />
 
