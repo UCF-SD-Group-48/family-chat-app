@@ -84,35 +84,52 @@ const ProfileTab = ({ navigation }) => {
   const [firstName, setFirstName] = useState(auth.currentUser.firstName)
   const [lastName, setLastName] = useState(auth.currentUser.lastName)
   const [status, setStatus] = useState(userDocument.status)
-
   const [email, setEmail] = useState(userDocument.email)
 
-  const updateProfile = async () => {
-    
-    console.log(firstName, lastName, status, email );
-   
-    (status === undefined) ? setStatus('') : setStatus(status);
-    (email === undefined) ? setEmail('') : setEmail(email);
+  const [showEmail, setShowEmail] = useState(userDocument.showEmailEnabled);
+  const [showNumber, setShowNumber] = useState(userDocument.showNumberEnabled);
 
-    try{
+  useEffect(() => {
+    setUserDocument(async () => {
+      const initialState = await db
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
+      return initialState;
+    })
+    console.log("user effect triggered")
+  }, [editMode])
+
+  const updateProfile = async () => {
+
+    // console.log(`Email enabled: ${showEmail}, Number enabled: ${showNumber}`);
+
+    // (firstName == undefined) ? setFirstName(userDocument.firstName) : setFirstName(firstName);
+    // (lastName == undefined) ? setLastName(userDocument.lastName) : setLastName(lastName);
+    // (status == undefined) ? setStatus('') : setStatus(status);
+    // (email == undefined) ? setEmail('') : setEmail(email);
+
+    try {
       await db.collection('users').doc(auth.currentUser.uid).update({
         firstName: firstName,
         lastName: lastName,
         status: status,
         email: email,
+        showEmailEnabled: showEmail,
+        showNumberEnabled: showNumber,
+        pushNotificationEnabled: pushNotificationsChecked,
+        locationServicesEnabled: locationServicesChecked,
+        importContactsEnabled: importContactsChecked
+      })
 
-      // pushNotificationEnabled: pushNotificationsChecked,
-      // locationServicesEnabled: locationServicesChecked,
-      // importContactsEnabled: importContactsChecked
-    })
+    }
+    catch (err) {
+      console.log(`Error: ${err}`)
+    }
 
-  }
-  catch(err){
-    console.log(err)
-  }
-    
- setEditMode(false)
-    console.log(editMode)
+    setEditMode(false)
+    console.log(`Edit mode is set to: ${editMode}`)
   }
 
   const [visible, setVisible] = useState(false);
@@ -121,35 +138,33 @@ const ProfileTab = ({ navigation }) => {
 
   };
 
-  const [showEmail, setShowEmail] = useState(true);
-  const [showNumber, setShowNumber] = useState(true);
-
   // let currentSwitchState = (switchCase) => {
   //   switch (switchCase) {
   //     case 'pushNotifications': {
-  //       if (pushNotificationsChecked === true) {
-  //         return 'enabled'
-  //       } else {
-  //         return 'disabled'
-  //       }
+  //       return ((pushNotificationsChecked === true) ? 'enabled' : 'disabled');
   //     }
   //     case 'locationServices': {
-  //       if (locationServicesChecked === true) {
-  //         return 'enabled'
-  //       } else {
-  //         return 'disabled'
-  //       }
+  //       return (locationServicesChecked === true ? 'enabled' : 'disable');     
   //     }
   //     case 'importContacts': {
-  //       if (importContactsChecked === true) {
-  //         return 'enabled'
-  //       } else {
-  //         return 'disabled'
-  //       }
+  //       return (importContactsChecked === true ? 'enabled' : 'disabled'); 
   //     }
   //   }
   // }
 
+  // let currentSwitchState = (switchCase) => {
+  //   switch (switchCase) {
+  //     case 'pushNotifications': {
+  //       return ((pushNotificationsChecked === true) ? true : false);
+  //     }
+  //     case 'locationServices': {
+  //       return (locationServicesChecked === true ? true : false);     
+  //     }
+  //     case 'importContacts': {
+  //       return (importContactsChecked === true ? true : false); 
+  //     }
+  //   }
+  // }
 
 
   const openWebsite = () => {
@@ -170,11 +185,11 @@ const ProfileTab = ({ navigation }) => {
   };
 
   useLayoutEffect(() => {
-		navigation.setOptions({
-			title: "Profile",
-			headerLeft: '',
-		});
-	}, [navigation]);
+    navigation.setOptions({
+      title: "Profile",
+      headerLeft: '',
+    });
+  }, [navigation]);
 
   return (
     <SafeAreaView>
@@ -207,6 +222,7 @@ const ProfileTab = ({ navigation }) => {
                 >
                   <Text> Edit </Text>
                 </TouchableOpacity>
+
             }
           </View>
           <View
@@ -221,34 +237,42 @@ const ProfileTab = ({ navigation }) => {
 
 
               {
-                !editMode
+                editMode
                   ?
-                  <View style={{justifyContent: 'center', paddingHorizontal: 5 }}>
-
-                    <Text
-                      style={{ fontSize: 25, fontWeight: '600' }}
-                    >
-                      {firstName} {lastName}
-                    </Text>
-
-                  </View>
-                  :
                   <View>
                     <TextInput
                       style={{ borderWidth: 2, width: 200, height: 32, marginBottom: 3 }}
-                      value={firstName}
-                      onChangeText={text => setFirstName(text)}
-                      placeholder='First Name'
-                    />
+                      onChangeText={text => { setFirstName(text) }}
+                    >
+                      {userDocument.firstName}
+                    </TextInput>
+
 
                     <TextInput
                       style={{ borderWidth: 2, width: 200, height: 32 }}
-                      value={lastName}
-                      onChangeText={text => setLastName(text)}
-                      placeholder='Last Name'
-                    />
+                      onChangeText={text => { return text ? setLastName(text) : userDocument.lastName }}
+                      placeholder='Lastname'
+                    >
+                      {userDocument.lastName}
+                    </TextInput>
+
 
                   </View>
+                  :
+                  <View style={{ justifyContent: 'center', paddingHorizontal: 5 }}>
+
+                    <Text
+                      //  style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
+                      style={{ fontSize: 25, fontWeight: '600', borderStyle: 'solid', borderWidth: 2, width: 200 }}
+                    >
+
+                      {userDocument.firstName} {userDocument.lastName}
+
+                    </Text>
+
+                  </View>
+
+
 
               }
 
@@ -266,9 +290,13 @@ const ProfileTab = ({ navigation }) => {
                 <TextInput
                   style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
                   editable={editMode}
-                  value={status}
-                  onChangeText={(text) => setStatus(text)}
-                />
+                  // value={userDocument.status}
+                  onChangeText={(val) => setStatus(val)}
+                >
+
+                  {userDocument.status}
+                </TextInput>
+
 
 
 
@@ -298,9 +326,11 @@ const ProfileTab = ({ navigation }) => {
                     <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}
                       onChangeText={(text) => setEmail(text)}
                       editable={editMode}
+                    // value={userDocument.email}
                     >
-
+                      {userDocument.email}
                     </TextInput>
+
                   </View>
 
                   <View style={{ alignItems: 'center' }}>
@@ -310,7 +340,7 @@ const ProfileTab = ({ navigation }) => {
 
                     <Switch
                       value={showEmail}
-                      onValueChange={(value) => (value)}
+                      onValueChange={(value) => setShowEmail(value)}
                       style={{ marginLeft: 'auto', marginRight: 0 }}
                       disabled={!editMode}
                     />
