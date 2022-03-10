@@ -227,6 +227,11 @@ const ChatScreen = ({ navigation, route }) => {
         }
     };
 
+    const navigateTo = (place) => {
+        navigation.navigate(place, { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        setOverlay(false);
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
@@ -515,7 +520,8 @@ const ChatScreen = ({ navigation, route }) => {
                                         </View>
 
                                         {/* Banners */}
-                                        <View style={styles.featuresOuterView}>
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("AddBanner")}
+                                            style={styles.featuresOuterView}>
                                             <View style={styles.featuresIconView}>
                                                 <Icon
                                                     style={styles.icon}
@@ -527,7 +533,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             <Text style={styles.featuresText}>
                                                 Banners (5)
                                             </Text>
-                                        </View>
+                                        </TouchableOpacity>
 
                                         {/* Images */}
                                         <View style={styles.featuresOuterView}>

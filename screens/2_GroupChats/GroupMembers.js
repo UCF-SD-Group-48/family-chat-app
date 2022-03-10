@@ -56,6 +56,7 @@ import UserPrompt from '../../components/UserPrompt';
 import GroupListItem from '../../components/GroupListItem'
 import { collection } from 'firebase/firestore';
 import { set } from 'react-native-reanimated';
+import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
 
@@ -78,6 +79,63 @@ const GroupMembers = ({ navigation, route }) => {
         
         return unsubscribe;
     }, []);
+
+    const fetchData = async() => {
+        if(memberIDs.length > 0) {
+            try {
+                let membersRef = [];
+                console.log('memberIDs = ', memberIDs); //documentId or uid or FieldPath.documentId
+                // const tempArray = ["Red", "Purple"];
+                membersRef = await db.collection("users").where(firebase.firestore.FieldPath.documentId(), 'in', memberIDs).get();
+                
+                if (membersRef) {
+                    setMembers(
+                        membersRef.docs.map((doc) => ({
+                            id: doc.id,
+                            data: doc.data(),
+                        }))
+                    )
+                    
+                    // membersRef.docs.map((doc) => {
+                    //     setMembers(doc.data());
+                    //     // console.log("doc = ",doc);
+                    //     // console.log("doc = ",doc.data());
+                    // });
+                }
+
+                return membersRef;
+                    // .then((docs) => {
+                    //      if (docs.exists) {
+                    //         setMembers(docs.data());
+                    //         console.log('response data = ', docs.data());
+                    //      }
+                    //      else {
+                    //          console.log("doesnt");
+                    //      }
+                    // });
+
+                    // if(membersRef.exists) {
+                    //     console.log('response data = ', membersRef.data());
+                    // }
+                    // else {
+                    //     console.log('doesnt');
+                    // }
+            } catch(err) {
+                console.error("Error fetching members from firebase");
+                console.error(err);
+
+                return null;
+            }
+        }
+    };
+
+    useLayoutEffect(() => {
+        const value = fetchData();
+        if(value != null) {
+            // console.log(value.data());
+        }
+    }, [memberIDs]);
+
 
     // const memberMapFunction = () => {
     //     memberIDs.map((member) => {
@@ -116,32 +174,84 @@ const GroupMembers = ({ navigation, route }) => {
                 }}>
                 {/* Info Blurb to descripe/encourage making of a pin */}
                 <View style={{
-                    minWidth: 150, minHeight: 75,
-                    justifyContent: "center", alignItems: "center",
-                    paddingHorizontal: 10, paddingVertical: 10,
-                    borderWidth: 2, borderRadius: 10,
+                    width: "100%", minHeight: 75,
+                    justifyContent: "space-between", alignItems: "flex-start", flexDirection: "row",
+                    paddingHorizontal: 20, paddingVertical: 10,
+                    borderWidth: 0, borderRadius: 10,
                 }}>
                     <Text style={{
-						textAlign: "center",
+						textAlign: "left",
 						fontSize: 20,
 						fontWeight: '500',
 						color: 'black',
 					}}>
 						 {/* Use this top line for screen title/header later */}
                          {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
-                        {"Show a list of members\n"+
-                            "Options to add members, or leave group"}
+                        {"Current Members in\n"+route.params.groupName}
+					</Text>
+                    <Text style={{
+						textAlign: "right",
+						fontSize: 20,
+						fontWeight: '500',
+						color: 'black',
+					}}>
+						 {/* Use this top line for screen title/header later */}
+                         {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
+                        {members.length}
 					</Text>
                 </View>
+                <ScrollView contentContainerStyle={{
+                        minWidth: "100%", paddingTop: 5,
+                        justifyContent: "flex-start", alignItems: "flex-end", flexDirection: "column",
+                        borderWidth: 0,
+                    }}>
+                    {members.map(({ id, data }) => (
+                        <View key={id}
+                                style={[
+                                {
+                                    height: 75, width: "90%", marginTop: 15, marginBottom: 3,
+                                    justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                                    borderWidth: 0, backgroundColor: "#fff",
+                                    borderTopLeftRadius: 10, borderBottomLeftRadius: 10,
+                                    elevation: 2,
+                                },
+                                {
+                                    shadowColor: "#000", shadowOffset: {width: 3, height: 3},
+                                    shadowRadius: 1.5, shadowOpacity: 0.1,
+                                }
+                            ]}>
+                            <View style={{
+                                    width: 50, height: 50, marginRight: 20, marginLeft: 15,
+                                    justifyContent: "center", alignItems: "center",
+                                    borderRadius: 10, borderWidth: 4, borderColor: "#8880",
+                                }}>
+                                <Image source={imageSelection(data.pfp)}
+                                    style={{
+                                        width: 46, height: 46,
+                                        borderRadius: 9, borderWidth: 0, borderColor: "#eee",
+                                    }}/>
+                            </View>
+                            <Text style={{
+                                textAlign: "center",
+                                fontSize: 22,
+                                fontWeight: '500',
+                                color: 'black',
+                            }}>
+                                {data.firstName+" "+data.lastName}
+                            </Text>
+                        </View>
+                    ))}
+                </ScrollView>
+                <LineDivider topSpacing={30}/>
                 {/* 2 Buttons */}
                 <View style={{
                     width: "100%", height: 60,
                     justifyContent: "space-evenly", alignItems: "center", flexDirection: "row",
-                    paddingVertical: 15,
+                    paddingVertical: 45,
                     }}>
                     <TouchableOpacity onPress={printMembers} activeOpacity={0.7}
                         style={{
-                            width: 100, height: 50,
+                            width: 150, height: 50,
                             marginTop: 20,
                             justifyContent: "center", alignItems: "center", flexDirection: "row",
                             backgroundColor: "#fac",
@@ -161,7 +271,7 @@ const GroupMembers = ({ navigation, route }) => {
                             navigation.navigate("GroupInvite", { topicId: route.params.topicId, topicName: route.params.topicName, groupName: route.params.groupName, groupName: route.params.groupName });
                         }}
                         style={{
-                            width: 100, height: 50,
+                            width: 150, height: 50,
                             marginTop: 20,
                             justifyContent: "center", alignItems: "center", flexDirection: "row",
                             backgroundColor: "#ccc",
@@ -177,41 +287,6 @@ const GroupMembers = ({ navigation, route }) => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
-                    {members.map(({ id, data }) => (
-
-                        // data.phoneNumber == "6505551234" ? (
-                            <View style={{
-                                height: 100, width: 100,
-                                justifyContent: "center", alignItems: "center", flexDirection: "row",
-                            }}>
-                                <Text style={{
-                                    textAlign: "center",
-                                    fontSize: 18,
-                                    fontWeight: '600',
-                                    color: 'black',
-                                }}>
-                                    {/* {"Dev: "+data.firstName+" "+data.lastName} */}
-                                    ""
-                                </Text>
-                            </View>
-                        // ) : (
-                        //     <View style={{
-                        //         height: 100, width: 100,
-                        //         justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        //     }}>
-                        //         <Text style={{
-                        //             textAlign: "center",
-                        //             fontSize: 18,
-                        //             fontWeight: '600',
-                        //             color: 'black',
-                        //         }}>
-                        //             {data.firstName+" "+data.lastName}
-                        //         </Text>
-                        //     </View>
-                        // )
-                    ))}
-                </ScrollView>
             </ScrollView>
         </SafeAreaView>
     )
@@ -221,8 +296,9 @@ const styles = StyleSheet.create({
     container: {
         width: "100%", height: "100%",
         paddingVertical: 20,
-        paddingHorizontal: 10,
+        paddingHorizontal: 0,
         alignItems: 'center',
+        backgroundColor: "#EFEAE2"
     },
 })
 
