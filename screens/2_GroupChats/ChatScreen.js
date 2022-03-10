@@ -520,7 +520,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         </View>
 
                                         {/* Banners */}
-                                        <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("AddBanner")}
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Banners")}
                                             style={styles.featuresOuterView}>
                                             <View style={styles.featuresIconView}>
                                                 <Icon

@@ -70,7 +70,7 @@ const AddBanner = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "Add Banner",
+            title: "New Alert",
         });
     }, [navigation]);
 
@@ -103,24 +103,25 @@ const AddBanner = ({ navigation, route }) => {
                     minWidth: 150, minHeight: 75,
                     justifyContent: "center", alignItems: "center",
                     paddingHorizontal: 10, paddingVertical: 10,
-                    borderWidth: 2, borderRadius: 10,
+                    borderWidth: 0, borderRadius: 10,
                 }}>
                     <Text style={{
 						textAlign: "center",
 						fontSize: 20,
-						fontWeight: '500',
+						fontWeight: '600',
 						color: 'black',
+                        lineHeight: 32,
 					}}>
 						 {/* Use this top line for screen title/header later */}
                          {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
-                        {"Fill out what you'd like to display to everyone!"}
+                        {"Send out an Alert to everyone\nWhat would you like to say?"}
 					</Text>
                 </View>
 
                 {/* Input Fields -Content */}
                 <View style={{
                         width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 50,
+                        marginHorizontal: 20, marginTop: 30,
                         justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
                         backgroundColor: "#6660",
                     }}>
@@ -131,7 +132,7 @@ const AddBanner = ({ navigation, route }) => {
                         fontWeight: '600',
                         color: 'black',
                         }}>
-                        {"Banner Content"}
+                        {"Alert Content"}
                     </Text>
                 </View>
                 <View style={{
@@ -187,7 +188,7 @@ const AddBanner = ({ navigation, route }) => {
                         width: 250, height: 75,
                         marginTop: 0,
                         justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#afc",
+                        backgroundColor: "#fbd",
                         borderColor: "#000", borderWidth: 2, borderRadius: 10,
                     }}>
 					<Text style={{
@@ -196,7 +197,7 @@ const AddBanner = ({ navigation, route }) => {
 						fontWeight: '600',
 						color: 'black', marginLeft: 0
 					}}>
-						{"Create Banner"}
+						{"Send Alert"}
 					</Text>
                     <Icon
 						name='plus'
