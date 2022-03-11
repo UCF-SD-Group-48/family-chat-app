@@ -20,6 +20,7 @@ const AddGroup = ({navigation}) => {
 			.collection("groups")
 			.add({
 				groupName: input,
+				groupOwner: auth.currentUser.uid,
 				members: [auth.currentUser.uid]
 			})
 			.then( async (docRef) => {
