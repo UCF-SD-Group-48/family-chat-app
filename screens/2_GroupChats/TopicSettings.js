@@ -54,7 +54,7 @@ import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import GroupListItem from '../../components/GroupListItem'
-import { collection } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
 import { set } from 'react-native-reanimated';
 
 // *************************************************************
@@ -64,7 +64,8 @@ const TopicSettings = ({ navigation, route }) => {
     const [name, setName] = useState("");
     const [emoji, setEmoji] = useState("");
     const [color, setColor] = useState("");
-
+    const topicId = route.params.topicId;
+    
     useEffect(() => {
         setName(route.params.groupName || "");
         setEmoji("Get emoji from database here");
@@ -97,12 +98,36 @@ const TopicSettings = ({ navigation, route }) => {
 
     const deleteTopic = async () => {
         try {
-             await db.collection('groups').doc(route.params.groupId).collection('topics').doc(route.params.topicId).delete();
-             console.log("deleted the topic")
-        } catch (error) {
-            alert(error)
+            console.log("deleted the topic")
+            let chatRef;
+            chatRef = await db.collection('chats').doc(topicId).collection('messages').get()
+            
+            if (chatRef) {
+                console.log("entered?")
+                chatRef.docs.map((doc) => {
+                    db.collection('chats').doc(topicId).collection('messages').doc(doc.id).delete()
+                    // await doc.delete()
+                })
+            } else {
+                console.log("didn't enter")
+            }
+
+            
+            
+            //             firestore()
+            //   .collection('Users')
+            //   .doc('ABC')
+            //   .delete()
+            //   .then(() => {
+                //     console.log('User deleted!');
+                //   });
+                
+            } catch (error) {
+                alert(error)
+            } finally {
+                await db.collection('chats').doc(topicId).delete();
+                await db.collection('groups').doc(route.params.groupId).collection('topics').doc(topicId).delete();
         }
-        // const query = collectionRef.orderBy('__name__').limit(batchSize)
           
     }
 
