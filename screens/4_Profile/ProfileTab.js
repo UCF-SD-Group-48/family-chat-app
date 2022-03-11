@@ -65,6 +65,7 @@ const ProfileTab = ({ navigation }) => {
 
   const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(2));
   const [uid, setUID] = useState(auth.currentUser.uid);
+  
   const [userDocument, setUserDocument] = useState(async () => {
     const initialState = await db
       .collection('users')
@@ -74,41 +75,41 @@ const ProfileTab = ({ navigation }) => {
     return initialState;
   });
 
-  // const [pushNotificationsChecked, setPushNotificationsChecked] = useState(userDocument.pushNotificationEnabled);
-  // const [locationServicesChecked, setLocationServicesChecked] = useState(userDocument.locationServicesEnabled);
-  // const [importContactsChecked, setImportContactsChecked] = useState(userDocument.importContactsEnabled);
-
+  const [pushNotificationsChecked, setpushNotificationsChecked] = useState(userDocument.pushNotificationEnabled);
+  const [locationServicesChecked, setLocationServicesChecked] = useState(userDocument.locationServicesEnabled);
+  const [importContactsChecked, setImportContactsChecked] = useState(userDocument.importContactsEnabled);
 
   const [editMode, setEditMode] = useState(false)
 
-  const [firstName, setFirstName] = useState(auth.currentUser.firstName)
-  const [lastName, setLastName] = useState(auth.currentUser.lastName)
+  const [firstName, setFirstName] = useState(userDocument.firstName)
+  const [lastName, setLastName] = useState(userDocument.lastName)
   const [status, setStatus] = useState(userDocument.status)
   const [email, setEmail] = useState(userDocument.email)
 
   const [showEmail, setShowEmail] = useState(userDocument.showEmailEnabled);
   const [showNumber, setShowNumber] = useState(userDocument.showNumberEnabled);
 
+
   useEffect(() => {
-    setUserDocument(async () => {
-      const initialState = await db
-        .collection('users')
-        .doc(uid)
-        .get()
-        .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
-      return initialState;
-    })
+
     console.log("user effect triggered")
-  }, [editMode])
+    // console.log(userDocument);
+
+    // firstName === undefined ? setFirstName(userDocument.firstName) : firstName;
+    // lastName === undefined ? setLastName(userDocument.lastName) : lastName;
+    // setStatus(userDocument.status)
+    // setEmail(userDocument.email)
+    // setShowEmail(userDocument.showEmailEnabled)
+    // setShowNumber(userDocument.showNumberEnabled)
+    // setpushNotificationsChecked(userDocument.pushNotificationEnabled)
+    // setLocationServicesChecked(userDocument.locationServicesEnabled)
+    // setImportContactsChecked(userDocument.importContactsEnabled)
+
+  }, [editMode == false])
 
   const updateProfile = async () => {
 
-    // console.log(`Email enabled: ${showEmail}, Number enabled: ${showNumber}`);
-
-    // (firstName == undefined) ? setFirstName(userDocument.firstName) : setFirstName(firstName);
-    // (lastName == undefined) ? setLastName(userDocument.lastName) : setLastName(lastName);
-    // (status == undefined) ? setStatus('') : setStatus(status);
-    // (email == undefined) ? setEmail('') : setEmail(email);
+    console.log(`Variables | Database\nfirstName: ${firstName} | ${userDocument.firstName}  \nlastName: ${lastName} | ${userDocument.lastName}\nstatus: ${status} | ${userDocument.status}\nemail: ${email} | ${userDocument.email}\nshowEmail enabled: ${showEmail} | ${userDocument.showEmailEnabled}\nshowNumber enabled: ${showNumber} | ${userDocument.showNumberEnabled}\nPush Notif: ${pushNotificationsChecked} | ${userDocument.pushNotificationsEnabled}\nLocation Ser: ${locationServicesChecked} | ${userDocument.locationServicesEnabled}\nImport Contacts: ${importContactsChecked} |  ${userDocument.importContactsEnabled}`);
 
     try {
       await db.collection('users').doc(auth.currentUser.uid).update({
@@ -124,13 +125,16 @@ const ProfileTab = ({ navigation }) => {
       })
 
     }
-    catch (err) {
-      console.log(`Error: ${err}`)
+    catch (error) {
+      console.log(`Error: ${error}`)
     }
 
     setEditMode(false)
     console.log(`Edit mode is set to: ${editMode}`)
   }
+  
+ 
+  const toggleSwitch = (prevState) => !(prevState) ;
 
   const [visible, setVisible] = useState(false);
   const toggleOverlay = () => {
@@ -138,34 +142,22 @@ const ProfileTab = ({ navigation }) => {
 
   };
 
-  // let currentSwitchState = (switchCase) => {
-  //   switch (switchCase) {
-  //     case 'pushNotifications': {
-  //       return ((pushNotificationsChecked === true) ? 'enabled' : 'disabled');
-  //     }
-  //     case 'locationServices': {
-  //       return (locationServicesChecked === true ? 'enabled' : 'disable');     
-  //     }
-  //     case 'importContacts': {
-  //       return (importContactsChecked === true ? 'enabled' : 'disabled'); 
-  //     }
-  //   }
-  // }
-
-  // let currentSwitchState = (switchCase) => {
-  //   switch (switchCase) {
-  //     case 'pushNotifications': {
-  //       return ((pushNotificationsChecked === true) ? true : false);
-  //     }
-  //     case 'locationServices': {
-  //       return (locationServicesChecked === true ? true : false);     
-  //     }
-  //     case 'importContacts': {
-  //       return (importContactsChecked === true ? true : false); 
-  //     }
-  //   }
-  // }
-
+  let currentSwitchState = (switchCase) => {
+    switch (switchCase) {
+      case 'pushNotifications': {
+              // (pushNotificationsChecked == undefined) ? setpushNotificationsChecked(userDocument.pushNotificationEnabled) : setpushNotificationsChecked(pushNotificationsChecked);
+        return ((pushNotificationsChecked === true) ? 'enabled' : 'disabled');
+      }
+      case 'locationServices': {
+        // ( locationServicesChecked == undefined) ? setLocationServicesChecked(userDocument.locationServicesEnabled) : setLocationServicesChecked(locationServicesChecked);
+        return (locationServicesChecked === true ? 'enabled' : 'disable');     
+      }
+      case 'importContacts': {
+          // (importContactsChecked == undefined) ? setImportContactsChecked(userDocument.importContactsEnabled) : setEmail(importContactsChecked);
+        return (importContactsChecked === true ? 'enabled' : 'disabled'); 
+      }
+    }
+  }
 
   const openWebsite = () => {
     Linking.openURL('https://www.familychat.app/FAQ')
@@ -177,6 +169,8 @@ const ProfileTab = ({ navigation }) => {
 
   const reportProblem = () => {
   }
+
+
 
   const signOutUser = () => {
     auth.signOut().then(() => {
@@ -192,9 +186,10 @@ const ProfileTab = ({ navigation }) => {
   }, [navigation]);
 
   return (
+
     <SafeAreaView>
       <ScrollView style={styles.container}>
-
+        
         <View
           style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
 
@@ -242,19 +237,18 @@ const ProfileTab = ({ navigation }) => {
                   <View>
                     <TextInput
                       style={{ borderWidth: 2, width: 200, height: 32, marginBottom: 3 }}
-                      onChangeText={text => { setFirstName(text) }}
-                    >
-                      {userDocument.firstName}
-                    </TextInput>
+                      value={userDocument.firstName}
+                      onChangeText={text => setFirstName(text) }
+                      placeholder= "FirstName"
+                    />
 
 
                     <TextInput
                       style={{ borderWidth: 2, width: 200, height: 32 }}
-                      onChangeText={text => { return text ? setLastName(text) : userDocument.lastName }}
-                      placeholder='Lastname'
-                    >
-                      {userDocument.lastName}
-                    </TextInput>
+                      value={userDocument.lastName}
+                      onChangeText={text => setLastName(text)}
+                      placeholder= 'LastName'
+                    />
 
 
                   </View>
@@ -262,18 +256,11 @@ const ProfileTab = ({ navigation }) => {
                   <View style={{ justifyContent: 'center', paddingHorizontal: 5 }}>
 
                     <Text
-                      //  style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
                       style={{ fontSize: 25, fontWeight: '600', borderStyle: 'solid', borderWidth: 2, width: 200 }}
                     >
-
-                      {userDocument.firstName} {userDocument.lastName}
-
+                      {firstName} {lastName}
                     </Text>
-
                   </View>
-
-
-
               }
 
 
@@ -290,16 +277,10 @@ const ProfileTab = ({ navigation }) => {
                 <TextInput
                   style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
                   editable={editMode}
-                  // value={userDocument.status}
                   onChangeText={(val) => setStatus(val)}
                 >
-
                   {userDocument.status}
                 </TextInput>
-
-
-
-
               </View>
             </View>
           </View>
@@ -383,14 +364,14 @@ const ProfileTab = ({ navigation }) => {
 
           </View>
 
-          {/* <View
+          <View
             style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
           >
             <Text style={{ fontWeight: 'bold' }}>Push Notifications</Text>
-            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (currently {currentSwitchState('pushNotifications')})</Text>
+            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('pushNotifications')})</Text>
             <Switch
               value={pushNotificationsChecked}
-              onValueChange={(value) => setPushNotificationsChecked(value)}
+              onValueChange={(value) => setpushNotificationsChecked(value)}
               style={{marginLeft: 'auto',marginRight: 0}}
               disabled={!editMode}
             />
@@ -400,7 +381,7 @@ const ProfileTab = ({ navigation }) => {
             style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%', marginTop: 20 }}
           >
             <Text style={{ fontWeight: 'bold' }}>Location Services</Text>
-            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (currently {currentSwitchState('locationServices')})</Text>
+            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('locationServices')})</Text>
             <Switch
               value={locationServicesChecked}
               onValueChange={(value) => setLocationServicesChecked(value)}
@@ -416,7 +397,7 @@ const ProfileTab = ({ navigation }) => {
             style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%', marginTop: 20, marginBottom: 10 }}
           >
             <Text style={{ fontWeight: 'bold' }}>Import Contacts</Text>
-            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (currently {currentSwitchState('importContacts')})</Text>
+            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('importContacts')})</Text>
             <Switch
               value={importContactsChecked}
               onValueChange={(value) => setImportContactsChecked(value)}
@@ -426,7 +407,7 @@ const ProfileTab = ({ navigation }) => {
               }}
               disabled={!editMode}
             />
-          </View> */}
+          </View>
 
           <LineDivider />
 

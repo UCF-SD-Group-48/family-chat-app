@@ -121,7 +121,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 	const [pfp, setPFP] = useState(1);
 	const [profilePic, setProfilePic] = useState();
 	let phoneNum = route.params.phoneNumber;
-	const phoneNumber = phoneNum.slice(1, phoneNum.length);
+	const phoneNumber = phoneNum.slice(2, phoneNum.length);
 	console.log("phoneNumber " + phoneNumber)
 
 	const getPermissions = async () => {
@@ -158,11 +158,13 @@ const PhoneSuccess = ({ navigation, route }) => {
 				firstName: firstName,
 				lastName: lastName,
 				pfp: pfp,
-				color: 'Red',
+				color: 'Blue',
 				status: 'Active',
 				statusEmoji: 'Happy',
 				email: email,
 				phoneNumber: phoneNumber,
+				showEmailEnabled: false,
+				showNumberEnabled: true,
 				pushNotificationEnabled: true,
 				locationServicesEnabled: true,
 				importContactsEnabled: true,
