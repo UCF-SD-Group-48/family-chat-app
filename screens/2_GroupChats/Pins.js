@@ -50,13 +50,17 @@ import firebase from 'firebase/compat/app';
 
 
 const Pins = ({ navigation, route }) => {
-    const [pins, setPins] = useState([])
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
     const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
+    const [pins, setPins] = useState([])
 
     useLayoutEffect(() => {
         const unsubscribe = db
             .collection('chats')
-            .doc(route.params.id)
+            .doc(topicId)
             .collection('pins')
             .orderBy('timestamp', 'asc')
             .onSnapshot((snapshot) =>
@@ -92,7 +96,7 @@ const Pins = ({ navigation, route }) => {
 
     
     const addPin = () => {
-        navigation.navigate("AddPin", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        navigation.push("AddPin", { topicId, topicName, groupId, groupName });
     };
 
     return (

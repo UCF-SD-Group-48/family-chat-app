@@ -117,7 +117,7 @@ const Groups = ({ navigation }) => {
 					}}>
 					<TouchableOpacity
 						activeOpacity={0.5}
-						onPress={() => navigation.navigate("AddGroup")}
+						onPress={() => navigation.push("AddGroup")}
 					>
 						<Feather name="plus" size={30} color="black" />
 					</TouchableOpacity>
@@ -126,10 +126,10 @@ const Groups = ({ navigation }) => {
 		});
 	}, [navigation]);
 
-	const enterGroup = (id, groupName) => {
+	const enterGroup = (groupId, groupName, groupOwner) => {
 		// Navigating straight from Groups to Topic "General" or the first Topic found (if General does not exist)
 		let topic = null;
-		const ref = db.collection("groups").doc(id).collection("topics").get()
+		const ref = db.collection("groups").doc(groupId).collection("topics").get()
 			.then((snapshot) => {
 				snapshot.forEach((doc) => {
 					// console.log(doc.id, " => ", doc.data());
@@ -142,7 +142,7 @@ const Groups = ({ navigation }) => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
 
-				navigation.push("Chat", { id: topicId, topicName: topicName, groupId: id, groupName });
+				navigation.push("Chat", { topicId, topicName, groupId, groupName, groupOwner });
 			})
 			.catch((error) => {
 				console.log("Error getting documents: ", error);
@@ -156,16 +156,17 @@ const Groups = ({ navigation }) => {
 					justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
 				}}
 				>
-				{groups.map(({ id, data: { groupName } }) => (
+				{groups.map(({ id, data: { groupName, groupOwner } }) => (
 					<GroupListItem
 						key={id}
 						id={id}
 						groupName={groupName}
+						groupOwner={groupOwner}
 						enterGroup={enterGroup}
 					/>
 				))}
 				<LineDivider topSpacing={5}/>
-				<TouchableOpacity onPress={() => navigation.navigate("AddGroup")} activeOpacity={0.7}
+				<TouchableOpacity onPress={() => navigation.push("AddGroup")} activeOpacity={0.7}
 					style={{
 						width: 350, height: 75,
 						marginTop: 25,

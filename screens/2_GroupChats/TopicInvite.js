@@ -61,6 +61,11 @@ import { set } from 'react-native-reanimated';
 
 
 const TopicInvite = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
     // const [pinTitle, setPinTitle] = useState("");
     // const [pinContent, setPinContent] = useState("");
 
@@ -70,7 +75,7 @@ const TopicInvite = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "TopicInvite: "+route.params.topicName,
+            title: "TopicInvite: "+topicName,
         });
     }, [navigation]);
 

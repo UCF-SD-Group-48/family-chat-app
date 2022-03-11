@@ -61,6 +61,11 @@ import { set } from 'react-native-reanimated';
 
 
 const TopicMembers = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
     // const [pinTitle, setPinTitle] = useState("");
     // const [pinContent, setPinContent] = useState("");
 
@@ -70,7 +75,7 @@ const TopicMembers = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "TopicMembers: "+route.params.topicName,
+            title: "TopicMembers: "+topicName,
         });
     }, [navigation]);
 

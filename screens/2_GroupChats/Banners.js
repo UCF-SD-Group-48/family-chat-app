@@ -50,13 +50,17 @@ import firebase from 'firebase/compat/app';
 
 
 const Banners = ({ navigation, route }) => {
-    const [banners, setBanners] = useState([])
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
     const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
+    const [banners, setBanners] = useState([])
 
     useLayoutEffect(() => {
         const unsubscribe = db
             .collection('chats')
-            .doc(route.params.topicId)
+            .doc(topicId)
             .collection('banners')
             .orderBy('timestamp', 'asc')
             .onSnapshot((snapshot) =>
@@ -92,7 +96,7 @@ const Banners = ({ navigation, route }) => {
 
     
     const addBanner = () => {
-        navigation.navigate("AddBanner", { topicId: route.params.topicId, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+        navigation.push("AddBanner", { topicId, topicName, groupId, groupName });
     };
 
     return (

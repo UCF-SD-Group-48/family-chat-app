@@ -61,6 +61,11 @@ import { set } from 'react-native-reanimated';
 
 
 const AddPin = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
     const [pinTitle, setPinTitle] = useState("");
     const [pinContent, setPinContent] = useState("");
 
@@ -77,7 +82,7 @@ const AddPin = ({ navigation, route }) => {
     const addPin = () => {
         Keyboard.dismiss();
 
-        db.collection('chats').doc(route.params.topicId).collection('pins').add({
+        db.collection('chats').doc(topicId).collection('pins').add({
             title: pinTitle,
             content: pinContent,
             originalMessageUID: route.params.messageUID || "",
@@ -113,7 +118,7 @@ const AddPin = ({ navigation, route }) => {
 						color: 'black',
 					}}>
 						 {/* Use this top line for screen title/header later */}
-                         {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
+                         {/* {groupName + ": "} {topicName+"\n\n"} */}
                         {"Fill in the information you'd like to pin\nfor everyone to reference later!"}
 					</Text>
                 </View>

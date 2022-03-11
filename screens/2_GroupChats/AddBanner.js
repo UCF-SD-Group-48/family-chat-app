@@ -62,6 +62,11 @@ import MyView from '../../components/MyView';
 
 
 const AddBanner = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
     const [content, setContent] = useState("");
 
     useEffect(() => {
@@ -77,7 +82,7 @@ const AddBanner = ({ navigation, route }) => {
     const addBanner = () => {
         Keyboard.dismiss();
 
-        db.collection('chats').doc(route.params.topicId).collection('banners').add({
+        db.collection('chats').doc(topicId).collection('banners').add({
             description: content,
             ownerPhoneNumber: auth.currentUser.phoneNumber,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions

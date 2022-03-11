@@ -61,12 +61,16 @@ import { set } from 'react-native-reanimated';
 
 
 const GroupInvite = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
 
     const [invite, setInvite] = useState();
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "GroupInvite: " + route.params.groupName,
+            title: "GroupInvite: " + groupName,
         });
     }, [navigation]);
 
@@ -97,7 +101,7 @@ const GroupInvite = ({ navigation, route }) => {
                 //     pendingInvite: arrayUnion(route.params.groupId) // by pendingInvite
 
                 // })
-                db.collection('groups').doc(route.params.groupId).update({
+                db.collection('groups').doc(groupId).update({
                     members: arrayUnion(snapshot.id)
                 })
                 
@@ -134,7 +138,7 @@ const GroupInvite = ({ navigation, route }) => {
                 {/* Info Blurb to descripe/encourage making of a pin */}
                 <View style={{
                     minWidth: 150, minHeight: 75,
-                    justifyContent: "center", alignItems: "center",
+                    justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     paddingHorizontal: 10, paddingVertical: 10,
                     borderWidth: 2, borderRadius: 10,
                 }}>
@@ -155,6 +159,9 @@ const GroupInvite = ({ navigation, route }) => {
                         value={invite}
                         onSubmitEditing={inviteUser}
                         onChangeText={(invite) => setInvite(invite)}
+                        style={{
+                            minWidth: 200, minHeight: 50, backgroundColor: "#ddd",
+                        }}
                     />
                 </View>
             </ScrollView>

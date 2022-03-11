@@ -3,27 +3,27 @@ import { StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 
-const GroupListItem = ({ id, groupName, enterGroup }) => {
+const GroupListItem = ({ id, groupName, enterGroup, groupOwner }) => {
     
-    const [groups, setGroups] = useState([]);
+    // const [groups, setGroups] = useState([]);
 
-      useEffect(() => {
-        const unsubscribe = db
-          .collection('groups')
-          .doc(id)
-          .collection('topics')
-          .onSnapshot((snapshot) =>
-            setGroups(snapshot.docs.map((doc) => doc.data()))
-          );
+    //   useEffect(() => {
+    //     const unsubscribe = db
+    //       .collection('groups')
+    //       .doc(id)
+    //       .collection('topics')
+    //       .onSnapshot((snapshot) =>
+    //         setGroups(snapshot.docs.map((doc) => doc.data()))
+    //       );
     
-        return unsubscribe;
-      })
+    //     return unsubscribe;
+    //   })
 
 
   return (
     <View style={ styles.container }>
       <TouchableOpacity
-        onPress={() => enterGroup(id, groupName)}
+        onPress={() => enterGroup(id, groupName, groupOwner)}
         style={ styles.mainView }
         activeOpacity={0.7}
       >

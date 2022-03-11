@@ -61,20 +61,25 @@ import { set } from 'react-native-reanimated';
 
 
 const GroupSettings = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+    const groupOwner = route.params.groupOwner;
+
     const [name, setName] = useState("");
     const [emoji, setEmoji] = useState("");
     const [color, setColor] = useState("");
-    const groupId = route.params.groupId;
 
     useEffect(() => {
-        setName(route.params.groupName || "");
+        setName(groupName || "");
         setEmoji("Get emoji from database here");
         setColor("Get color from database here");
     }, [route]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "Group Settings:  " + route.params.groupName,
+            title: "Group Settings:  " + groupName,
         });
     }, [navigation]);
 
@@ -85,7 +90,7 @@ const GroupSettings = ({ navigation, route }) => {
             topicRef = await db.collection('groups').doc(groupId).collection('topics').get();
 
             
-            // if (topicRef && auth.currentUser.uid === route.params.groupOwner) {
+            // if (topicRef && auth.currentUser.uid === groupOwner) {
             if (topicRef) {
                 topicRef.docs.map((doc) => {
                     db.collection('groups').doc(groupId).collection('topics').doc(doc.id).delete()
@@ -143,7 +148,7 @@ const GroupSettings = ({ navigation, route }) => {
 					}}>
 						 {/* Use this top line for screen title/header later */}
                          {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
-                        {"Change Group Settings for\n"+route.params.groupName}
+                        {"Change Group Settings for\n"+groupName}
 					</Text>
                 </View>
 

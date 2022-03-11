@@ -61,27 +61,31 @@ import { set } from 'react-native-reanimated';
 
 
 const TopicSettings = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
     const [name, setName] = useState("");
     const [emoji, setEmoji] = useState("");
     const [color, setColor] = useState("");
-    const topicId = route.params.topicId;
     
     useEffect(() => {
-        setName(route.params.groupName || "");
+        setName(groupName || "");
         setEmoji("Get emoji from database here");
         setColor("Get color from database here");
     }, [route]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "Topic Settings:  "+ route.params.topicName,
+            title: "Topic Settings:  "+ topicName,
         });
     }, [navigation]);
 
     const addPin = () => {
         Keyboard.dismiss();
 
-        db.collection('chats').doc(route.params.topicId).collection('pins').add({
+        db.collection('chats').doc(topicId).collection('pins').add({
             title: pinTitle,
             content: pinContent,
             originalMessageUID: route.params.messageUID || "",
@@ -126,7 +130,7 @@ const TopicSettings = ({ navigation, route }) => {
                 alert(error)
             } finally {
                 await db.collection('chats').doc(topicId).delete();
-                await db.collection('groups').doc(route.params.groupId).collection('topics').doc(topicId).delete();
+                await db.collection('groups').doc(groupId).collection('topics').doc(topicId).delete();
         }
           
     }
@@ -152,8 +156,8 @@ const TopicSettings = ({ navigation, route }) => {
 						color: 'black',
 					}}>
 						 {/* Use this top line for screen title/header later */}
-                         {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
-                        {"Change Topic Settings for\n"+route.params.topicName}
+                         {/* {groupName + ": "} {topicName+"\n\n"} */}
+                        {"Change Topic Settings for\n"+topicName}
 					</Text>
                 </View>
 

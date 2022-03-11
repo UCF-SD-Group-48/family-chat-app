@@ -62,18 +62,23 @@ import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 
 const GroupMembers = ({ navigation, route }) => {
+    const topicId = route.params.topicId;
+    const topicName = route.params.topicName;
+    const groupId = route.params.groupId;
+    const groupName = route.params.groupName;
+
     const [memberIDs, setMemberIDs] = useState([])
     const [members, setMembers] = useState([])
 
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "GroupMembers: "+route.params.groupName,
+            title: "GroupMembers: "+groupName,
         });
     }, [navigation]);
 
     useEffect(() => {
-        const unsubscribe = db.collection("groups").doc(route.params.groupId).onSnapshot((snapshot) =>
+        const unsubscribe = db.collection("groups").doc(groupId).onSnapshot((snapshot) =>
             setMemberIDs(snapshot.data().members)
         );
         
@@ -186,8 +191,8 @@ const GroupMembers = ({ navigation, route }) => {
 						color: 'black',
 					}}>
 						 {/* Use this top line for screen title/header later */}
-                         {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
-                        {"Current Members in\n"+route.params.groupName}
+                         {/* {groupName + ": "} {topicName+"\n\n"} */}
+                        {"Current Members in\n"+groupName}
 					</Text>
                     <Text style={{
 						textAlign: "right",
@@ -196,7 +201,7 @@ const GroupMembers = ({ navigation, route }) => {
 						color: 'black',
 					}}>
 						 {/* Use this top line for screen title/header later */}
-                         {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
+                         {/* {groupName + ": "} {topicName+"\n\n"} */}
                         {members.length}
 					</Text>
                 </View>
@@ -268,7 +273,7 @@ const GroupMembers = ({ navigation, route }) => {
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={0.7}
                         onPress={()=>{
-                            navigation.navigate("GroupInvite", { topicId: route.params.topicId, topicName: route.params.topicName, groupName: route.params.groupName, groupName: route.params.groupName });
+                            navigation.push("GroupInvite", { topicId, topicName, groupName, groupName });
                         }}
                         style={{
                             width: 150, height: 50,
