@@ -36,7 +36,7 @@ import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
-import { AntDesign, Feather, Entypo, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo, Ionicons, FontAwesome5, Fontisto } from "@expo/vector-icons";
 
 // Imports for: Firebase
 import {
@@ -524,6 +524,7 @@ const ChatScreen = ({ navigation, route }) => {
                             </View>
                         </MyView>
 
+                        {/* Topic selection dropdown */}
                         <MyView hide={topicSelectionEnabled}
                             style={{
                                 width: "100%",
@@ -607,7 +608,93 @@ const ChatScreen = ({ navigation, route }) => {
 						        </MyView>
                             </View>
                         </MyView>
+                        {/* Banner (if applicable) */}
+                        {/* Calendar for later <FontAwesome5 name="calendar-alt" size={24} color="black" /> */}
+                        <MyView hide={false}
+                            style={[
+                                {
+                                    width: "100%",
+                                    backgroundColor: "#c43", borderWidth: 0,
+                                    flex: 0, flexGrow: 0, flexDirection: "column",
+                                    justifyContent: "flex-start", alignItems: "center",
+                                    borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
+                                },
+                                {
+                                    shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                    shadowRadius: 3, shadowOpacity: 0.6,
+                                }
+                            ]} >
+                            {/* Title */}
+                            <View style={{
+                                width: "100%",
+                                paddingHorizontal: 10, paddingVertical: 10,
+                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                flex: 0, flexGrow: 0, flexDirection: "row",
+                                justifyContent: "space-between", alignItems: "center",
+                            }}>
+                                <View style={{
+                                    paddingHorizontal: 10, paddingVertical: 5,
+                                    backgroundColor: "#F3D2CB", borderRadius: 7, borderWidth: 0,
+                                    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+                                }}>
+                                    <Entypo name="megaphone" size={26} color="black" />
+                                    <Text style={{
+                                        fontSize: 18,
+                                        fontWeight: '600',
+                                        textAlign: "center",
+                                        marginLeft: 15, marginRight: 10,
+                                    }}>
+                                        Alert
+                                    </Text>
+                                </View>
+                                <View style={{
+                                    paddingHorizontal: 5, paddingVertical: 5,
+                                    backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
+                                    flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                }}>
+                                    <Fontisto name="close-a" size={20} color="#F3D2CB" />
+                                </View>
+                            </View>
+                            {/* Content */}
+                            <View style={{
+                                width: "100%",
+                                borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                paddingVertical: 5, paddingHorizontal: 15,
+                                flexDirection: "row", justifyContent: "center", alignItems: "center",
+                            }}>
+                                <Text style={{
+                                    fontSize: 16,
+                                    fontWeight: '800',
+                                    textAlign: "left",
+                                    marginHorizontal: 15,
+                                    color: "white",
+                                }}>
+                                    <Text style={{fontWeight: '600'}}>"</Text>
+                                    {"Lots of text here yay!\nThis is a message to be displayed as an alert on screen"}
+                                    <Text style={{fontWeight: '600'}}>"</Text>
+                                </Text>
+                            </View>
+                            {/* Action */}
+                            <View style={{
+                                minHeight: 50, width: "100%",
+                                borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
+                                flex: 0, flexGrow: 0,
+                                flexDirection: "row", justifyContent: "flex-end", alignItems: "center",
+                            }}>
+                                <Text style={{
+                                    fontSize: 16,
+                                    fontWeight: '500',
+                                    textAlign: "right",
+                                    marginRight: 10,
+                                    color: "white",
+                                }}>
+                                    <Text style={{fontWeight: '800'}}>From: </Text>
+                                    {"James Washington"}
+                                </Text>
+                            </View>
+                        </MyView>
 
+                        {/* Messages */}
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data }) => (
 
@@ -656,6 +743,8 @@ const ChatScreen = ({ navigation, route }) => {
                                 )
                             ))}
                         </ScrollView>
+
+                        {/* Footer */}
                         <View style={styles.footer}>
                             <TextInput
                                 value={input}
