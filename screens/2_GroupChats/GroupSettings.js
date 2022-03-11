@@ -70,6 +70,7 @@ const GroupSettings = ({ navigation, route }) => {
     const [name, setName] = useState("");
     const [emoji, setEmoji] = useState("");
     const [color, setColor] = useState("");
+    const [owner, setOwner] = useState("");
 
     useEffect(() => {
         setName(groupName || "");
@@ -125,6 +126,24 @@ const GroupSettings = ({ navigation, route }) => {
         }
     }
 
+    const reassignOwner = async () => {
+        if(auth.currentUser.uid === groupOwner) {
+
+            let reformatNumber = owner.trim();
+            const user = await db.collection('users').where('phoneNumber', '==', reformatNumber).get()
+            if (!user.empty) {
+                const snapshot = user.docs[0];
+       
+                db.collection('groups').doc(groupId).update({
+                    groupOwner: snapshot.id
+                })
+                navigation.replace('Groups');
+                } else {
+                    alert("Not a valid user")
+                }
+
+        }
+    }
     // const addPin = () => {
     //     Keyboard.dismiss();
 
@@ -365,7 +384,7 @@ const GroupSettings = ({ navigation, route }) => {
                         justifyContent: "flex-start", alignItems: "center",
                         borderWidth: 2, borderColor: 'black', borderRadius: 5,
                     }}>
-                        <TextInput placeholder={"6505551234..."} onChangeText={()=>{}} value={null}
+                        <TextInput placeholder={"6505551234..."} onChangeText={(text)=>{setOwner(text)}} value={owner}
                             multiline={true}
                             style={{
                                 minHeight: 20, width: "100%",
@@ -379,7 +398,7 @@ const GroupSettings = ({ navigation, route }) => {
                     </View>
                 </View>
                 {/* owner button */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
+                <TouchableOpacity onPress={reassignOwner} activeOpacity={0.7}
                     style={{
                         width: 200, height: 50,
                         marginTop: 20,
