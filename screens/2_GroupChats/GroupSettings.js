@@ -64,6 +64,7 @@ const GroupSettings = ({ navigation, route }) => {
     const [name, setName] = useState("");
     const [emoji, setEmoji] = useState("");
     const [color, setColor] = useState("");
+    const groupId = route.params.groupId;
 
     useEffect(() => {
         setName(route.params.groupName || "");
@@ -73,9 +74,34 @@ const GroupSettings = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "Group Settings:  "+route.params.groupName,
+            title: "Group Settings:  " + route.params.groupName,
         });
     }, [navigation]);
+
+    const deleteGroup = async () => {
+        try {
+            let topicRef;
+            // delete the topics in group first
+            topicRef = await db.collection('groups').doc(groupId).collection('topics').get();
+
+            
+            // if (topicRef && auth.currentUser.uid === route.params.groupOwner) {
+            if (topicRef) {
+                topicRef.docs.map((doc) => {
+                    db.collection('groups').doc(groupId).collection('topics').doc(doc.id).delete()
+                })
+            } else {
+                console.log("didn't enter")
+            }
+                
+            } catch (error) {
+                alert(error)
+            } finally {
+                // delete the group itself
+                await db.collection('groups').doc(groupId).delete();
+        }
+          
+    }
 
     // const addPin = () => {
     //     Keyboard.dismiss();
@@ -256,7 +282,7 @@ const GroupSettings = ({ navigation, route }) => {
 					</Text>
                 </TouchableOpacity>
                 {/* Delete Group */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
+                <TouchableOpacity onPress={deleteGroup} activeOpacity={0.7}
                     style={{
                         width: 200, height: 50,
                         marginTop: 20,

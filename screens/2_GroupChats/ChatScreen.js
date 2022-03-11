@@ -198,7 +198,7 @@ const ChatScreen = ({ navigation, route }) => {
         setOverlay(false);
 
         if(route.params.topicName == "General") {
-            navigation.navigate("GroupSettings", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });
+            navigation.navigate("GroupSettings", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName, groupOwner: route.params.groupOwner });
         }
         else {
             navigation.navigate("TopicSettings", { topicId: route.params.id, topicName: route.params.topicName, groupId, groupName: route.params.groupName });

@@ -141,9 +141,7 @@ const Groups = ({ navigation }) => {
 			.then(() => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
-				// console.log("topicId = ", topicId);
-				// console.log("topicName = ", topicName);
-				// console.log("id = ", id);
+
 				navigation.push("Chat", { id: topicId, topicName: topicName, groupId: id, groupName });
 			})
 			.catch((error) => {
