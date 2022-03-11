@@ -54,7 +54,7 @@ import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import GroupListItem from '../../components/GroupListItem'
-import { collection } from 'firebase/firestore';
+import { arrayRemove, collection } from 'firebase/firestore';
 import { set } from 'react-native-reanimated';
 
 // *************************************************************
@@ -110,6 +110,15 @@ const GroupSettings = ({ navigation, route }) => {
                 alert("Current User is not the Group Owner")
             }
           
+    }
+
+    const leaveGroup = async () => {
+        // Cannot leave group if group Owner
+        if (auth.currentUser.uid !== groupOwner) {
+            db.collection('groups').doc(groupId).update({
+                members: arrayRemove(auth.currentUser.uid)
+            })
+        }
     }
 
     // const addPin = () => {
@@ -309,7 +318,7 @@ const GroupSettings = ({ navigation, route }) => {
 					</Text>
                 </TouchableOpacity>
                 {/* Leave Group */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
+                <TouchableOpacity onPress={leaveGroup} activeOpacity={0.7}
                     style={{
                         width: 200, height: 50,
                         marginTop: 20,
