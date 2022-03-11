@@ -84,27 +84,31 @@ const GroupSettings = ({ navigation, route }) => {
     }, [navigation]);
 
     const deleteGroup = async () => {
-        try {
-            let topicRef;
-            // delete the topics in group first
-            topicRef = await db.collection('groups').doc(groupId).collection('topics').get();
-
+        if (auth.currentUser.uid === groupOwner) {
             
-            // if (topicRef && auth.currentUser.uid === groupOwner) {
-            if (topicRef) {
-                topicRef.docs.map((doc) => {
-                    db.collection('groups').doc(groupId).collection('topics').doc(doc.id).delete()
-                })
-            } else {
-                console.log("didn't enter")
-            }
+            try {
+                let topicRef;
+                // delete the topics in group first
+                topicRef = await db.collection('groups').doc(groupId).collection('topics').get();
                 
-            } catch (error) {
-                alert(error)
-            } finally {
-                // delete the group itself
-                await db.collection('groups').doc(groupId).delete();
-        }
+                
+                // if (topicRef && auth.currentUser.uid === groupOwner) {
+                    if (topicRef) {
+                        topicRef.docs.map((doc) => {
+                            db.collection('groups').doc(groupId).collection('topics').doc(doc.id).delete()
+                        })
+                    } 
+                    
+                } catch (error) {
+                    alert(error)
+                } finally {
+                    // delete the group itself
+                    await db.collection('groups').doc(groupId).delete();
+                    navigation.replace("Groups");
+                }
+            } else {
+                alert("Current User is not the Group Owner")
+            }
           
     }
 
