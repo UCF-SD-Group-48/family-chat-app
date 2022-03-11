@@ -98,10 +98,10 @@ const GroupSettings = ({ navigation, route }) => {
                 topicRef = await db.collection('groups').doc(groupId).collection('topics').get();
                 
                 
-                // if (topicRef && auth.currentUser.uid === groupOwner) {
                     if (topicRef) {
                         topicRef.docs.map((doc) => {
-                            db.collection('groups').doc(groupId).collection('topics').doc(doc.id).delete()
+                            // db.collection('groups').doc(groupId).collection('topics').doc(doc.id).delete()
+                            deleteTopic(doc.id)
                         })
                     } 
                     
@@ -115,6 +115,30 @@ const GroupSettings = ({ navigation, route }) => {
             } else {
                 alert("Current User is not the Group Owner")
             }
+          
+    }
+
+    const deleteTopic = async (topic) => {
+        try {
+            let chatRef;
+            chatRef = await db.collection('chats').doc(topic).collection('messages').get()
+            
+            if (chatRef) {
+                console.log("entered?")
+                chatRef.docs.map((doc) => {
+                    db.collection('chats').doc(topic).collection('messages').doc(doc.id).delete()
+                    // await doc.delete()
+                })
+            } else {
+                console.log("didn't enter")
+            }
+                
+        } catch (error) {
+            alert(error)
+        } finally {
+            await db.collection('chats').doc(topic).delete();
+            await db.collection('groups').doc(groupId).collection('topics').doc(topic).delete();
+        }
           
     }
 

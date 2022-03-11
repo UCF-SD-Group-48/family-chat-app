@@ -115,23 +115,13 @@ const TopicSettings = ({ navigation, route }) => {
             } else {
                 console.log("didn't enter")
             }
-
-            
-            
-            //             firestore()
-            //   .collection('Users')
-            //   .doc('ABC')
-            //   .delete()
-            //   .then(() => {
-                //     console.log('User deleted!');
-                //   });
                 
-            } catch (error) {
-                alert(error)
-            } finally {
-                await db.collection('chats').doc(topicId).delete();
-                await db.collection('groups').doc(groupId).collection('topics').doc(topicId).delete();
-        }
+        } catch (error) {
+            alert(error)
+        } finally {
+            await db.collection('chats').doc(topicId).delete();
+            await db.collection('groups').doc(groupId).collection('topics').doc(topicId).delete();
+    }
           
     }
 
