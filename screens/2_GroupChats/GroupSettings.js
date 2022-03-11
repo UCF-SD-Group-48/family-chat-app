@@ -67,15 +67,20 @@ const GroupSettings = ({ navigation, route }) => {
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
 
-    const [name, setName] = useState("");
-    const [emoji, setEmoji] = useState("");
-    const [color, setColor] = useState("");
-    const [owner, setOwner] = useState("");
+    const [name, setName] = useState(groupName || "");
+    const [emoji, setEmoji] = useState("Get emoji from database here");
+    const [color, setColor] = useState("Get color from database here");
+    const [owner, setOwner] = useState(groupOwner);
 
     useEffect(() => {
-        setName(groupName || "");
-        setEmoji("Get emoji from database here");
-        setColor("Get color from database here");
+        // setName(groupName || "");
+        // setEmoji("Get emoji from database here");
+        // setColor("Get color from database here");
+        updateGroupSettings();
+        return () => {
+            // db.collection('groups').doc(groupId).update({})
+            setName({})
+        }
     }, [route]);
 
     useLayoutEffect(() => {
@@ -143,6 +148,14 @@ const GroupSettings = ({ navigation, route }) => {
                 }
 
         }
+    }
+
+    const updateGroupSettings = () => {
+       db.collection('groups').doc(groupId).update({
+            groupName: name
+        })
+
+        alert("Changes been made");
     }
     // const addPin = () => {
     //     Keyboard.dismiss();
@@ -214,7 +227,7 @@ const GroupSettings = ({ navigation, route }) => {
                         justifyContent: 'center',
                         borderWidth: 2, borderColor: 'black', borderRadius: 5,
                     }}>
-                        <TextInput placeholder={"Group Name"} onChangeText={setName} value={name}
+                        <TextInput placeholder={"Group Name"} onChangeText={(text) => setName(text)} value={name}
                             onSubmitEditing={() => {Keyboard.dismiss()}}
                             style={{
                                 height: 35,
@@ -252,7 +265,7 @@ const GroupSettings = ({ navigation, route }) => {
                         justifyContent: "flex-start", alignItems: "center",
                         borderWidth: 2, borderColor: 'black', borderRadius: 5,
                     }}>
-                        <TextInput placeholder={"Smile"} onChangeText={setEmoji} value={emoji}
+                        <TextInput placeholder={"Smile"} onChangeText={(text) => setEmoji(text)} value={emoji}
                             multiline={true}
                             style={{
                                 minHeight: 20, width: "100%",
@@ -291,7 +304,7 @@ const GroupSettings = ({ navigation, route }) => {
                         justifyContent: "flex-start", alignItems: "center",
                         borderWidth: 2, borderColor: 'black', borderRadius: 5,
                     }}>
-                        <TextInput placeholder={"Red"} onChangeText={setColor} value={color}
+                        <TextInput placeholder={"Red"} onChangeText={(text) => setColor(text)} value={color}
                             multiline={true}
                             style={{
                                 minHeight: 20, width: "100%",
@@ -305,7 +318,7 @@ const GroupSettings = ({ navigation, route }) => {
                     </View>
                 </View>
                 {/* Save Group Data */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
+                <TouchableOpacity onPress={updateGroupSettings} activeOpacity={0.7}
                     style={{
                         width: 200, height: 50,
                         marginTop: 20,
