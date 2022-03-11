@@ -118,6 +118,10 @@ const GroupSettings = ({ navigation, route }) => {
             db.collection('groups').doc(groupId).update({
                 members: arrayRemove(auth.currentUser.uid)
             })
+
+            navigation.replace("Groups");
+        } else {
+            alert("Group Owner cannot leave group, must assign new group owner")
         }
     }
 
