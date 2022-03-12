@@ -83,6 +83,13 @@ const HomeTab = ({ navigation, route }) => {
 		});
 	}, [navigation]);
 
+
+  useEffect(() => {
+    db.collection('users').doc(auth.currentUser.uid).update({
+      lastOn: firebase.firestore.FieldValue.serverTimestamp()
+    })
+  }, [])
+
   return (
     <SafeAreaView>
       <ScrollView style={styles.container}>
