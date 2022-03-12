@@ -4,6 +4,8 @@ import { Input, Button } from 'react-native-elements';
 import Icon from "react-native-vector-icons/FontAwesome";
 import { db, auth } from '../../firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
+import firebase from 'firebase/compat/app';
+
 
 const AddGroup = ({navigation}) => {
     const [input, setInput] = useState("");
@@ -26,7 +28,6 @@ const AddGroup = ({navigation}) => {
 			.then( async (docRef) => {
 				await db.collection("users").doc(currentUserId).update({
 					groups: arrayUnion(docRef.id) // adds the uid's only
-					// groups: arrayUnion(db.collection("groups").doc(docRef.id)) // by reference
 
 				})
 
@@ -35,15 +36,20 @@ const AddGroup = ({navigation}) => {
 				.add({
 					topicName: "General",
 				})
-				.then( () => {
+				.then( (docRef) => {
 					// add the topicId to the User's TopicId Map here
+					const topicId = docRef.id
+					db.collection('users').doc(currentUserId).update({
+						topicMap: {
+							topicId : firebase.firestore.FieldValue.serverTimestamp()
+						} 
+					})
 					navigation.goBack();
 				})
 				.catch((error) => alert(error));
 			})
 			.catch((error) => alert(error));
 	};
-
 
 
     return (
