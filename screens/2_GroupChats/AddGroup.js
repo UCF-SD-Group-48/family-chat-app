@@ -36,6 +36,7 @@ const AddGroup = ({navigation}) => {
 					topicName: "General",
 				})
 				.then( () => {
+					// add the topicId to the User's TopicId Map here
 					navigation.goBack();
 				})
 				.catch((error) => alert(error));

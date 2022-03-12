@@ -88,6 +88,8 @@ const HomeTab = ({ navigation, route }) => {
     db.collection('users').doc(auth.currentUser.uid).update({
       lastOn: firebase.firestore.FieldValue.serverTimestamp()
     })
+
+    // Create dictionary of topicId and when each topic have been visited
   }, [])
 
   return (

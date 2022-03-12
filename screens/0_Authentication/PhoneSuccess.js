@@ -169,6 +169,8 @@ const PhoneSuccess = ({ navigation, route }) => {
 				locationServicesEnabled: true,
 				importContactsEnabled: true,
 				groups: [],
+				lastOn: firebase.firestore.FieldValue.serverTimestamp(),
+				topicMap: ([]),
 			})
 			.then((result) => {
 				console.log('Profile Updated!')
