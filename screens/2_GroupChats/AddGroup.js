@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import { Input, Button } from 'react-native-elements';
 import Icon from "react-native-vector-icons/FontAwesome";
 import { db, auth } from '../../firebase';
@@ -9,11 +9,20 @@ import firebase from 'firebase/compat/app';
 
 const AddGroup = ({navigation}) => {
     const [input, setInput] = useState("");
+	const [mapUpdate, setMapUpdate] = useState({});
+
 	
     useLayoutEffect(() => {
 		navigation.setOptions({
 			title: "Create new Group",
 		});
+	}, []);
+
+	useEffect(() => {
+		createGroup();
+		return () => {
+			setMapUpdate({}); // This worked for me
+		};
 	}, []);
 
     const createGroup = async () => {
@@ -39,19 +48,21 @@ const AddGroup = ({navigation}) => {
 				.then( (docRef) => {
 					// add the topicId to the User's TopicId Map here
 					const topicId = docRef.id
-					db.collection('users').doc(currentUserId).update({
-						topicMap: {
-							topicId : firebase.firestore.FieldValue.serverTimestamp()
-						} 
-					})
-					navigation.goBack();
+					mapUpdate[`topicMap.${topicId}`] = firebase.firestore.FieldValue.serverTimestamp()
+					console.log("doc.id ", mapUpdate)
+	
+					db.collection('users').doc(currentUserId).update(mapUpdate);
+					
+					// navigation.goBack(); // I have no clue where to place this
+					
 				})
 				.catch((error) => alert(error));
 			})
-			.catch((error) => alert(error));
+			.catch((error) => alert(error))
+			
 	};
 
-
+	
     return (
         <View style={styles.container}>
 			<Input

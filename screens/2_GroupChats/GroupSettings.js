@@ -110,6 +110,9 @@ const GroupSettings = ({ navigation, route }) => {
                 } finally {
                     // delete the group itself
                     await db.collection('groups').doc(groupId).delete();
+                    await db.collection('users').doc(auth.currentUser.uid).update({
+                        groups: arrayRemove(groupId)
+                    })
                     navigation.replace("Groups");
                 }
             } else {
