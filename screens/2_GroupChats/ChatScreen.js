@@ -614,14 +614,14 @@ const ChatScreen = ({ navigation, route }) => {
                             style={[
                                 {
                                     width: "100%",
-                                    backgroundColor: "#c43", borderWidth: 0,
+                                    backgroundColor: "#EC7169", borderWidth: 0,
                                     flex: 0, flexGrow: 0, flexDirection: "column",
                                     justifyContent: "flex-start", alignItems: "center",
                                     borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
                                 },
                                 {
-                                    shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                    shadowRadius: 3, shadowOpacity: 0.6,
+                                    shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                                    shadowRadius: 2, shadowOpacity: 0.5,
                                 }
                             ]} >
                             {/* Title */}
@@ -633,16 +633,16 @@ const ChatScreen = ({ navigation, route }) => {
                                 justifyContent: "space-between", alignItems: "center",
                             }}>
                                 <View style={{
-                                    paddingHorizontal: 10, paddingVertical: 5,
-                                    backgroundColor: "#F3D2CB", borderRadius: 7, borderWidth: 0,
+                                    paddingHorizontal: 15, paddingVertical: 5,
+                                    backgroundColor: "#fffb", borderRadius: 7, borderWidth: 0,
                                     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
                                 }}>
-                                    <Entypo name="megaphone" size={26} color="black" />
+                                    <Entypo name="megaphone" size={22} color="black" />
                                     <Text style={{
                                         fontSize: 18,
-                                        fontWeight: '600',
+                                        fontWeight: '800',
                                         textAlign: "center",
-                                        marginLeft: 15, marginRight: 10,
+                                        marginLeft: 15, marginRight: 5,
                                     }}>
                                         Alert
                                     </Text>
@@ -652,7 +652,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
                                     flexDirection: "row", justifyContent: "center", alignItems: "center",
                                 }}>
-                                    <Fontisto name="close-a" size={20} color="#F3D2CB" />
+                                    <Fontisto name="close-a" size={20} color="black" />
                                 </View>
                             </View>
                             {/* Content */}
@@ -664,10 +664,10 @@ const ChatScreen = ({ navigation, route }) => {
                             }}>
                                 <Text style={{
                                     fontSize: 16,
-                                    fontWeight: '800',
+                                    fontWeight: '700',
                                     textAlign: "left",
                                     marginHorizontal: 15,
-                                    color: "white",
+                                    color: "black",
                                 }}>
                                     <Text style={{fontWeight: '600'}}>"</Text>
                                     {"Lots of text here yay!\nThis is a message to be displayed as an alert on screen"}
@@ -676,21 +676,30 @@ const ChatScreen = ({ navigation, route }) => {
                             </View>
                             {/* Action */}
                             <View style={{
-                                minHeight: 50, width: "100%",
+                                minHeight: 0, width: "100%",
+                                marginTop: 5, marginBottom: 15,
                                 borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
                                 flex: 0, flexGrow: 0,
-                                flexDirection: "row", justifyContent: "flex-end", alignItems: "center",
+                                flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
                             }}>
-                                <Text style={{
-                                    fontSize: 16,
-                                    fontWeight: '500',
-                                    textAlign: "right",
-                                    marginRight: 10,
-                                    color: "white",
-                                }}>
-                                    <Text style={{fontWeight: '800'}}>From: </Text>
-                                    {"James Washington"}
-                                </Text>
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
+                                    style={{
+                                        height: 40, paddingHorizontal: 10,
+                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                        backgroundColor: "#fffb",
+                                        borderColor: "#9E4C46", borderWidth: 4, borderRadius: 20,
+                                    }}>
+                                    <Text style={{
+                                        fontSize: 15,
+                                        fontWeight: '700',
+                                        textAlign: "center",
+                                        marginHorizontal: 15,
+                                        color: "black",
+                                    }}>
+                                        {"View Alert"}
+                                    </Text>
+                                    <Entypo name="chevron-right" size={24} color="black" />
+                                </TouchableOpacity>
                             </View>
                         </MyView>
 

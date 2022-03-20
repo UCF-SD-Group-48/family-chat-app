@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "family-chat-app",
-    "slug": "family-chat-app",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "name": "Fmaily Chat",
     "icon": "./assets/icon.png",
+    "version": "1.0.0",
+    "slug": "family-chat-app",
+    "orientation": "portrait",
     "splash": {
       "image": "./assets/speechBubble.png",
       "resizeMode": "cover",
@@ -17,13 +17,18 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.parizeauinnovations.familychat",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1982FC"
-      }
+      },
+      "package": "com.parizeauinnovations.familychat",
+      "versionCode": 2,
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"
