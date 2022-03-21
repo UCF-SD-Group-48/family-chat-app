@@ -199,11 +199,11 @@ const ChatScreen = ({ navigation, route }) => {
                 navigation.push("Group"+place, { topicId, topicName, groupId, groupName, groupOwner });
             }
             else {
-                navigation.push("Topic"+place, { topicId, topicName, groupId, groupName });
+                navigation.push("Topic"+place, { topicId, topicName, groupId, groupName, groupOwner });
             }
         }
         else {
-            navigation.push(place, { topicId, topicName, groupId, groupName });
+            navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner });
         }
         setOverlay(false);
     };

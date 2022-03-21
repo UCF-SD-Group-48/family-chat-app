@@ -23,12 +23,13 @@ import {
     Alert,
     Avatar,
     Button,
+    Divider,
     Icon,
     Image,
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+import { AntDesign, SimpleLineIcons, Entypo } from "@expo/vector-icons";
 
 
 // Imports for: Expo
@@ -66,6 +67,7 @@ const AddBanner = ({ navigation, route }) => {
     const topicName = route.params.topicName;
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
+    const groupOwner = route.params.groupOwner;
 
     const [content, setContent] = useState("");
 
@@ -93,7 +95,7 @@ const AddBanner = ({ navigation, route }) => {
 
         setContent(""); // clears input
 
-        navigation.goBack();
+        navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner });
     };
 
     return (
@@ -103,91 +105,130 @@ const AddBanner = ({ navigation, route }) => {
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
-                {/* Info Blurb to descripe/encourage making of a pin */}
-                <View style={{
-                    minWidth: 150, minHeight: 75,
-                    justifyContent: "center", alignItems: "center",
-                    paddingHorizontal: 10, paddingVertical: 10,
-                    borderWidth: 0, borderRadius: 10,
-                }}>
-                    <Text style={{
-						textAlign: "center",
-						fontSize: 20,
-						fontWeight: '600',
-						color: 'black',
-                        lineHeight: 32,
-					}}>
-						 {/* Use this top line for screen title/header later */}
-                         {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
-                        {"Send out an Alert to everyone\nWhat would you like to say?"}
-					</Text>
-                </View>
-
-                {/* Input Fields -Content */}
-                <View style={{
-                        width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 30,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#6660",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 20,
-                        textAlign: 'left',
-                        fontSize: 24,
-                        fontWeight: '600',
-                        color: 'black',
-                        }}>
-                        {"Alert Content"}
-                    </Text>
-                </View>
-                <View style={{
-                    width: "100%", flexDirection: "row",
-                }}>
+                <View style={[
+                        {
+                            width: "95%",
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                            backgroundColor: "#fff", borderTopWidth: 18, borderColor: "#EC7169",
+                        },
+                        {
+                            shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                            shadowRadius: 3, shadowOpacity: 0.4,
+                        }
+                    ]}>
+                    {/* Info Blurb to descripe/encourage making of an alert */}
                     <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 5, marginHorizontal: 20, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 2, borderColor: 'black', borderRadius: 5,
+                        width: "90%",
+                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                        marginTop: 25,
+                        borderWidth: 0, borderRadius: 10,
                     }}>
-                        <TextInput placeholder={"Content"} onChangeText={setContent} value={content}
-                            multiline={true} maxLength={70}
+                        <Text style={{
+                            textAlign: "left",
+                            fontSize: 22,
+                            fontWeight: '700',
+                            color: 'black',
+                        }}>
+                            {/* Use this top line for screen title/header later */}
+                            {/* {route.params.groupName + ": "} {route.params.topicName+"\n\n"} */}
+                            {"Enter details for new alert:"}
+                        </Text>
+                    </View>
+
+                    <Divider color={"#333"} width={1} style={{width: "90%", marginTop: 15,}} />
+
+                    {/* Input Fields -Content */}
+                    <View style={{
+                            width: "90%", minHeight: 30,
+                            marginHorizontal: 20, marginTop: 30,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                            backgroundColor: "#6660",
+                        }}>
+                        <Entypo name="megaphone" size={18} color="#333" />
+                        <Text style={{
+                            paddingLeft: 10,
+                            textAlign: 'left',
+                            fontSize: 18,
+                            fontWeight: '700',
+                            color: 'black',
+                            }}>
+                            {"Message:"}
+                        </Text>
+                    </View>
+                    <View style={{
+                        width: "90%", flexDirection: "row",
+                    }}>
+                        <View style={{
+                            width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                            marginTop: 5, marginHorizontal: 0, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
+                            justifyContent: "flex-start", alignItems: "center",
+                            borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                        }}>
+                            <TextInput placeholder={"Content"} onChangeText={setContent} value={content}
+                                multiline={true} maxLength={70}
+                                style={{
+                                    minHeight: 20, width: "100%",
+                                    backgroundColor: "#6660",
+                                    textAlign: 'left',
+                                    fontSize: 18,
+                                    fontWeight: '600',
+                                    color: '#222',
+                                }}
+                            />
+                        </View>
+                    </View>
+                    {/* How many Characters content.length >= 55*/}
+                    <MyView hide={content.length < 50}
+                        style={{
+                            width: "100%",
+                            paddingHorizontal: 20,
+                            justifyContent: "flex-end", alignItems: "flex-start",
+                            flexDirection: "row", direction: "ltr",
+                            borderWidth: 2,
+                            borderColor: "#0000",
+                        }}>
+                        <Text style={{
+                            paddingLeft: 0,
+                            textAlign: 'right',
+                            fontSize: 14,
+                            fontWeight: '500',
+                            color: "#222",
+                            }}>
+                            {"Characters "+content.length+"/70"}
+                        </Text>
+                    </MyView>
+
+                    <View style={{
+                        width: "100%",
+                        justifyContent: "flex-end", alignItems: "center", flexDirection: "row",
+                    }}>
+                        {/* Create Alert Button */}
+                        <TouchableOpacity onPress={addBanner} activeOpacity={0.7}
                             style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660",
-                                textAlign: 'left',
-                                fontSize: 18,
-                                fontWeight: '600',
-                                color: '#444',
-                            }}
-                        />
+                                width: 160, minHeight: 45,
+                                marginTop: 35, marginBottom: 35, marginRight: 25, paddingLeft: 10,
+                                justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                backgroundColor: "#3D8D04",
+                                borderColor: "#000", borderWidth: 2, borderRadius: 30,
+                            }}>
+                            <Text style={{
+                                textAlign: "center",
+                                fontSize: 22,
+                                fontWeight: '700',
+                                color: 'white', marginRight: 5
+                            }}>
+                                {"Create"}
+                            </Text>
+                            <Entypo name="plus" size={30} color="white" />
+                        </TouchableOpacity>
                     </View>
                 </View>
-                {/* How many Characters content.length >= 55*/}
-                <MyView hide={content.length < 50}
-                    style={{
-                        width: "100%", height: 35,
-                        paddingHorizontal: 20,
-                        justifyContent: "flex-end", alignItems: "flex-start",
-                        flexDirection: "row", direction: "ltr",
-                        borderWidth: 2,
-                        borderColor: "#0000",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 0,
-                        textAlign: 'right',
-                        fontSize: 14,
-                        fontWeight: '500',
-                        color: 'black',
-                        }}>
-                        {"Characters "+content.length+"/70"}
-                    </Text>
-                </MyView>
             </ScrollView>
-            <View style={{
+            {/* <View style={{
                 width: "100%", minHeight: 100,
                 flex: 1, flexGrow: 0, flexDirection: "column", justifyContent: "flex-start", alignItems: "center", 
             }}>
-                {/* Add Banner Button */}
+                
                 <TouchableOpacity onPress={addBanner} activeOpacity={0.7}
                     style={{
                         width: 250, height: 75,
@@ -213,7 +254,9 @@ const AddBanner = ({ navigation, route }) => {
 						}}
 					/>
                 </TouchableOpacity>
-            </View>
+                
+                
+            */}
         </SafeAreaView>
     )
 }
@@ -224,6 +267,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 10,
         alignItems: 'center',
+        backgroundColor: "#EFEAE2",
     },
 })
 
