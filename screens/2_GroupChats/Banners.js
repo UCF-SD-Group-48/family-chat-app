@@ -58,7 +58,9 @@ const Banners = ({ navigation, route }) => {
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
 
-    const [banners, setBanners] = useState([])
+    const [banners, setBanners] = useState([]);
+    const [bannerOwners, setBannerOwners] = useState([]);
+    const [phoneNumbers, setPhoneNumbers] = useState([]);
 
     useLayoutEffect(() => {
         const unsubscribe = db
@@ -73,8 +75,24 @@ const Banners = ({ navigation, route }) => {
                         data: doc.data(),
                     }))
                 ));
+        
         return unsubscribe;
     }, [route]);
+
+    const getPhoneNumbers = () => {
+		setPhoneNumbers(
+            Array.from(banners, ({ data: { ownerPhoneNumber } }) => {
+                return ownerPhoneNumber.substring(2)
+            })
+        );
+	};
+
+    useEffect(() => {
+        getPhoneNumbers();
+        return () => {
+            setPhoneNumbers([]);
+        }
+    }, [banners]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -97,9 +115,28 @@ const Banners = ({ navigation, route }) => {
         });
     }, [navigation]);
 
+
+    useEffect(() => {
+        if(phoneNumbers.length > 0) {
+            const unsubscribe = db.collection("users").where('phoneNumber', 'in', phoneNumbers).onSnapshot((snapshot) =>
+                setBannerOwners(
+                    snapshot.docs.map((doc) => ({
+                        [doc.data().phoneNumber]: doc.data(),
+                        id: doc.id,
+                        data: doc.data(),
+                    }))
+                )
+            );
+            return unsubscribe;
+        }
+    }, []);
     
     const addBanner = () => {
         navigation.push("AddBanner", { topicId, topicName, groupId, groupName, groupOwner });
+    };
+
+    const viewBanner = (bannerId, bannerData) => {
+        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
     };
 
     return (
@@ -151,7 +188,7 @@ const Banners = ({ navigation, route }) => {
                     fontWeight: '700',
                     color: 'black', marginHorizontal: 10
                 }}>
-                    {"History: Previous Alerts (XX)"}
+                    {"History: Previous Alerts ("+banners.length+")"}
                 </Text>
                 <Divider width={2} color={"#777"}
                     style={{
@@ -163,7 +200,7 @@ const Banners = ({ navigation, route }) => {
                 {/* All Banners */}
                 <ScrollView contentContainerStyle={{ paddingTop: 30, width: "100%", paddingLeft: 20, }}>
                     {banners.map(({ id, data }) => (
-                        <View key={id}
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(id, data)}} key={id}
                             style={[
                                 {
                                     width: "100%", marginTop: 1,
@@ -239,7 +276,7 @@ const Banners = ({ navigation, route }) => {
                             }}>
                                 <Entypo name="chevron-right" size={34} color="#333" />
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
             </ScrollView>

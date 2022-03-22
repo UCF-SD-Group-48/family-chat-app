@@ -148,7 +148,7 @@ const AddBanner = ({ navigation, route }) => {
                         <Text style={{
                             paddingLeft: 10,
                             textAlign: 'left',
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: '700',
                             color: 'black',
                             }}>
@@ -160,7 +160,7 @@ const AddBanner = ({ navigation, route }) => {
                     }}>
                         <View style={{
                             width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                            marginTop: 5, marginHorizontal: 0, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
+                            marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
                             justifyContent: "flex-start", alignItems: "center",
                             borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
                         }}>
@@ -170,8 +170,8 @@ const AddBanner = ({ navigation, route }) => {
                                     minHeight: 20, width: "100%",
                                     backgroundColor: "#6660",
                                     textAlign: 'left',
-                                    fontSize: 18,
-                                    fontWeight: '600',
+                                    fontSize: 16,
+                                    fontWeight: '500',
                                     color: '#222',
                                 }}
                             />
