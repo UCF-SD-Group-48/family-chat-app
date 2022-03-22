@@ -65,7 +65,6 @@ const VerifyPhone = ({ navigation, route }) => {
     const newUserRegistration = route.params.newUserRegistration;
 
     const phoneNumberFormatted = () => {
-        console.log(phoneNumber)
         if (newUserRegistration) {
             const noCountryCode = phoneNumber.substring(2)
             const beginning = noCountryCode.slice(0, 3);
@@ -114,7 +113,6 @@ const VerifyPhone = ({ navigation, route }) => {
 
     useEffect(() => {
         setConfirmButtonDisabled((verificationCode.length === 6) ? false : true);
-        console.log(verificationCode.length.toString())
     }, [verificationCode]);
 
     const [shownPhoneText, setShownPhoneText] = useState('');
