@@ -87,6 +87,7 @@ const AddBanner = ({ navigation, route }) => {
         db.collection('chats').doc(topicId).collection('banners').add({
             description: content,
             ownerPhoneNumber: auth.currentUser.phoneNumber,
+            ownerUID: auth.currentUser.uid,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
             type: "Banner",
             referenceUID: "",

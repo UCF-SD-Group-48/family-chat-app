@@ -134,14 +134,22 @@ const ViewBanner = ({ navigation, route }) => {
                             {"Alert Details:"}
                         </Text>
                     </View>
-                    <View style={{
-                        width: 26, height: 26,
-                        marginRight: 15,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#F8D353", borderWidth: 2, borderColor: "black", borderRadius: 15,
-                    }}>
-                        <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} />
-                    </View>
+                    {(bannerData.ownerUID === auth.currentUser.uid) ? (
+                        <View style={{
+                            width: 26, height: 26,
+                            marginRight: 15,
+                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                            backgroundColor: "#F8D353", borderWidth: 2, borderColor: "black", borderRadius: 15,
+                        }}>
+                            <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} />
+                        </View>
+                    ) : (
+                        <View style={{
+                            width: 26, height: 26,
+                            marginRight: 15,
+                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                        }}></View>
+                    )}
                 </View>
                 <View style={[
                         {

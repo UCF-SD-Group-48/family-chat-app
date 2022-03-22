@@ -59,7 +59,7 @@ const Banners = ({ navigation, route }) => {
     const groupOwner = route.params.groupOwner;
 
     const [banners, setBanners] = useState([]);
-    const [bannerOwners, setBannerOwners] = useState([]);
+    const [bannerOwners, setBannerOwners] = useState({});
     const [phoneNumbers, setPhoneNumbers] = useState([]);
 
     useLayoutEffect(() => {
@@ -115,21 +115,26 @@ const Banners = ({ navigation, route }) => {
         });
     }, [navigation]);
 
-
     useEffect(() => {
-        if(phoneNumbers.length > 0) {
-            const unsubscribe = db.collection("users").where('phoneNumber', 'in', phoneNumbers).onSnapshot((snapshot) =>
-                setBannerOwners(
-                    snapshot.docs.map((doc) => ({
-                        [doc.data().phoneNumber]: doc.data(),
-                        id: doc.id,
-                        data: doc.data(),
-                    }))
-                )
-            );
-            return unsubscribe;
+        getBannerOwners();
+        return () => {
+            setBannerOwners({});
         }
-    }, []);
+    }, [phoneNumbers]);
+
+    const getBannerOwners = async () => {
+        if(phoneNumbers.length > 0) {
+            let bannerMap = {};
+
+            const snapshot = await db.collection("users").where('phoneNumber', 'in', phoneNumbers).get();
+            snapshot.docs.map((doc) => {
+                bannerMap[doc.id] = doc.data();
+                console.log("doc.id = "+doc.id);
+            });
+
+            setBannerOwners(bannerMap);
+        }
+	};
     
     const addBanner = () => {
         navigation.push("AddBanner", { topicId, topicName, groupId, groupName, groupOwner });
@@ -139,10 +144,18 @@ const Banners = ({ navigation, route }) => {
         navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
     };
 
+    const getString = (uid) => {
+        if(bannerOwners != undefined && uid != undefined && bannerOwners[uid.toString()] != undefined) {
+            return (bannerOwners[uid.toString()].firstName+" "+bannerOwners[uid.toString()].lastName);
+        }
+        else return "";
+    }
+
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView width={"100%"}
-                contentContainerStyle={{
+            <View
+                style={{
+                    width: "100%",
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
@@ -198,88 +211,94 @@ const Banners = ({ navigation, route }) => {
                 </View>
 
                 {/* All Banners */}
-                <ScrollView contentContainerStyle={{ paddingTop: 30, width: "100%", paddingLeft: 20, }}>
-                    {banners.map(({ id, data }) => (
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(id, data)}} key={id}
-                            style={[
-                                {
-                                    width: "100%", marginTop: 1,
-                                    backgroundColor: "#fff", borderWidth: 0,
-                                    flex: 0, flexGrow: 0, flexDirection: "row",
-                                    justifyContent: "flex-start", alignItems: "center",
-                                    borderRadius: 1,
-                                },
-                                {
-                                    shadowColor: "#000", shadowOffset: {width: 0, height: 1},
-                                    shadowRadius: 0, shadowOpacity: 0.5,
-                                }
-                            ]} >
-                            {/* Left Content */}
-                            <View style={{
-                                minWidth: "10%",
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                flex: 1, flexGrow: 1, flexDirection: "row",
-                                justifyContent: "flex-start", alignItems: "center",
-                            }}>
+                <View style={{
+                    marginTop: 30, marginBottom: 0, width: "100%",
+                    flexDirection: "column", flexShrink: 1,
+                    justifyContent: "flex-start", alignItems: "center",
+                }}>
+                    <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
+                        {banners.map(({ id, data }) => (
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(id, data)}} key={id}
+                                style={[
+                                    {
+                                        width: "100%", marginTop: 1,
+                                        backgroundColor: "#fff", borderWidth: 0,
+                                        flex: 0, flexGrow: 0, flexDirection: "row",
+                                        justifyContent: "flex-start", alignItems: "center",
+                                        borderRadius: 1,
+                                    },
+                                    {
+                                        shadowColor: "#000", shadowOffset: {width: 0, height: 1},
+                                        shadowRadius: 0, shadowOpacity: 0.5,
+                                    }
+                                ]} >
+                                {/* Left Content */}
                                 <View style={{
-                                    width: "100%", height: 65,
-                                    paddingHorizontal: 15, paddingVertical: 10,
-                                    backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
-                                    flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
+                                    minWidth: "10%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flex: 1, flexGrow: 1, flexDirection: "row",
+                                    justifyContent: "flex-start", alignItems: "center",
                                 }}>
                                     <View style={{
-                                        width: "100%",
-                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                        flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        width: "100%", height: 65,
+                                        paddingHorizontal: 15, paddingVertical: 10,
+                                        backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
+                                        flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
                                     }}>
-                                        <Entypo name="megaphone" size={18} color="#777" />
-                                        <Text numberOfLines={1}
+                                        <View style={{
+                                            width: "100%",
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <Entypo name="megaphone" size={18} color="#777" />
+                                            <Text numberOfLines={1}
+                                                    style={{
+                                                        fontSize: 18,
+                                                        fontWeight: '600',
+                                                        textAlign: "left",
+                                                        marginLeft: 15, marginRight: 10,
+                                                        color: "#777",
+                                                        flex: 1,
+                                                }}>
+                                                <Text style={{fontWeight: '600'}}>"</Text>
+                                                    {data.description}
+                                                <Text style={{fontWeight: '600'}}>"</Text>
+                                            </Text>
+                                        </View>
+                                        <View style={{
+                                            width: "100%",
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <Ionicons name="person-circle" size={18} color="#777" />
+                                            <Text numberOfLines={1}
                                                 style={{
-                                                    fontSize: 18,
-                                                    fontWeight: '600',
+                                                    fontSize: 16,
+                                                    fontWeight: '400',
                                                     textAlign: "left",
                                                     marginLeft: 15, marginRight: 10,
                                                     color: "#777",
                                                     flex: 1,
                                             }}>
-                                            <Text style={{fontWeight: '600'}}>"</Text>
-                                                {data.description}
-                                            <Text style={{fontWeight: '600'}}>"</Text>
-                                        </Text>
-                                    </View>
-                                    <View style={{
-                                        width: "100%",
-                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                        flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                    }}>
-                                        <Ionicons name="person-circle" size={18} color="#777" />
-                                        <Text numberOfLines={1}
-                                            style={{
-                                                fontSize: 16,
-                                                fontWeight: '400',
-                                                textAlign: "left",
-                                                marginLeft: 15, marginRight: 10,
-                                                color: "#777",
-                                                flex: 1,
-                                        }}>
-                                            {data.ownerPhoneNumber}
-                                        </Text>
+                                                { getString(data.ownerUID) || ""}
+                                            </Text>
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
-                            {/* Right Chevron */}
-                            <View style={{
-                                minWidth: 60,
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                paddingVertical: 0, paddingHorizontal: 15,
-                                flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
-                            }}>
-                                <Entypo name="chevron-right" size={34} color="#333" />
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
-            </ScrollView>
+                                {/* Right Chevron */}
+                                <View style={{
+                                    minWidth: 60,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                    paddingVertical: 0, paddingHorizontal: 15,
+                                    flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
+                                }}>
+                                    <Entypo name="chevron-right" size={34} color="#333" />
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
+            </View>
             {/* <View style={{
                 width: "100%", minHeight: 100,
                 borderTopWidth: 2, backgroundColor: "#ffc0",
