@@ -117,7 +117,7 @@ const Groups = ({ navigation }) => {
 					}}>
 					<TouchableOpacity
 						activeOpacity={0.5}
-						onPress={() => navigation.push("AddGroup")}
+						onPress={() => navigation.push("CreateGroup_1_NameImage")}
 					>
 						<Feather name="plus" size={30} color="black" />
 					</TouchableOpacity>
@@ -168,7 +168,7 @@ const Groups = ({ navigation }) => {
 					/>
 				))}
 				<LineDivider topSpacing={5}/>
-				<TouchableOpacity onPress={() => navigation.push("AddGroup")} activeOpacity={0.7}
+				<TouchableOpacity onPress={() => navigation.push("CreateGroup_1_NameImage")} activeOpacity={0.7}
 					style={{
 						width: 350, height: 75,
 						marginTop: 25,

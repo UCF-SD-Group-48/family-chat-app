@@ -47,7 +47,7 @@ import React, {
   import ChatScreen from './screens/2_GroupChats/ChatScreen';
   import FamilyChatScreen from './screens/2_GroupChats/FamilyChatScreen';
   import Groups from './screens/2_GroupChats/Groups';
-  import AddGroup from './screens/2_GroupChats/AddGroup';
+  import CreateGroup_1_NameImage from './screens/2_GroupChats/CreateGroup_1_NameImage';
   import CreateGroup_2_Members from './screens/2_GroupChats/CreateGroup_2_Members';
   import Topics from './screens/2_GroupChats/Topics';
   import AddTopic from './screens/2_GroupChats/AddTopic';
@@ -189,7 +189,7 @@ import React, {
       <Stack.Screen name='AddChat' component={AddChatScreen} />
       <Stack.Screen name='Chat' component={ChatScreen} />
       <Stack.Screen name='Topics' component={Topics} />
-      <Stack.Screen name='AddGroup' component={AddGroup} />
+      <Stack.Screen name='CreateGroup_1_NameImage' component={CreateGroup_1_NameImage} />
       <Stack.Screen name='CreateGroup_2_Members' component={CreateGroup_2_Members} />
       <Stack.Screen name='AddTopic' component={AddTopic} />
       <Stack.Screen name='AddPin' component={AddPin} />
