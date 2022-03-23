@@ -21,6 +21,8 @@ import React, {
     Input,
     Tooltip,
   } from 'react-native-elements';
+  import { HoldMenuProvider } from 'react-native-hold-menu';
+  import FeatherIcon from 'react-native-vector-icons/Feather';
   import 'react-native-gesture-handler';
   import { NavigationContainer } from '@react-navigation/native';
   import { createStackNavigator } from '@react-navigation/stack';
@@ -233,25 +235,27 @@ import React, {
   // Screen definitions for the application.
   export default function App() {
     return (
-      <SafeAreaView style={styles.safeAreaContainer}>
-        <NavigationContainer>
-          {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
-          <Stack.Navigator>
-  
-            {/* Authentication Screens */}
-            <Stack.Screen name='UserAuth' component={UserAuth} options={{ headerShown: false }}/>
-            <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
-            <Stack.Screen name='Login' component={Login} />
-            <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
-            <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
-            <Stack.Screen name="UserCreated" component={UserCreated} />
-  
-            {/* Tabbed Screens */}
-            <Stack.Screen name="TabStack" component={TabStackScreen} options={{ headerShown: false }} />
-  
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaView>
+      <HoldMenuProvider iconComponent={FeatherIcon} theme="light">
+        <SafeAreaView style={styles.safeAreaContainer}>
+          <NavigationContainer>
+            {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
+            <Stack.Navigator>
+    
+              {/* Authentication Screens */}
+              <Stack.Screen name='UserAuth' component={UserAuth} options={{ headerShown: false }}/>
+              <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
+              <Stack.Screen name='Login' component={Login} />
+              <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
+              <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
+              <Stack.Screen name="UserCreated" component={UserCreated} />
+    
+              {/* Tabbed Screens */}
+              <Stack.Screen name="TabStack" component={TabStackScreen} options={{ headerShown: false }} />
+    
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+      </HoldMenuProvider>
     );
   }
   
