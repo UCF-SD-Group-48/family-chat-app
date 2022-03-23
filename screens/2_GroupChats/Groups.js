@@ -156,13 +156,15 @@ const Groups = ({ navigation }) => {
 					justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
 				}}
 				>
-				{groups.map(({ id, data: { groupName, groupOwner } }) => (
+				{groups.map(({ id, data: { groupName, groupOwner, color, coverImageNumber } }) => (
 					<GroupListItem
 						key={id}
 						id={id}
 						groupName={groupName}
 						groupOwner={groupOwner}
 						enterGroup={enterGroup}
+						color={color}
+						coverImageNumber={coverImageNumber}
 					/>
 				))}
 				<LineDivider topSpacing={5}/>

@@ -388,7 +388,6 @@ const AddGroup = ({ navigation }) => {
 							</Text>
 						</View>
 
-
 						<View style={styles.imagesGridContainer}>
 							<View style={styles.imagesGridTop2}>
 								<View style={styles.Top2LeftHalf}>
