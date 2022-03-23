@@ -75,9 +75,6 @@ const ProfileTab = ({ navigation }) => {
     return initialState;
   });
 
-
-
-  
   const [pushNotificationsChecked, setpushNotificationsChecked] = useState(userDocument.pushNotificationEnabled);
   const [locationServicesChecked, setLocationServicesChecked] = useState(userDocument.locationServicesEnabled);
   const [importContactsChecked, setImportContactsChecked] = useState(userDocument.importContactsEnabled);
