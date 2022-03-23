@@ -25,6 +25,7 @@ import {
   Alert,
   Avatar,
   Button,
+  Divider,
   Icon,
   Image,
   Overlay,
@@ -32,6 +33,8 @@ import {
   Tooltip,
   Switch,
 } from 'react-native-elements';
+
+import { AntDesign, Entypo, Feather, FontAwesome, Ionicons } from '@expo/vector-icons';
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
@@ -43,6 +46,7 @@ import {
   apps,
   auth,
   db,
+  deleteUser,
   firebaseConfig
 } from '../../firebase';
 import firebase from 'firebase/compat/app';
@@ -65,63 +69,55 @@ const ProfileTab = ({ navigation }) => {
 
   const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(2));
   const [uid, setUID] = useState(auth.currentUser.uid);
-  
+
   const [userDocument, setUserDocument] = useState(async () => {
     const initialState = await db
       .collection('users')
       .doc(uid)
       .get()
-      .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
+      .then((documentSnapshot) => {
+        if (documentSnapshot.exists) {
+          setUserDocument(documentSnapshot.data())
+
+          setFirstName(documentSnapshot.data().firstName)
+          setLastName(documentSnapshot.data().lastName)
+          setStatus(documentSnapshot.data().statusText)
+          setEmail(documentSnapshot.data().email)
+          setPushNotification(documentSnapshot.data().pushNotificationEnabled)
+          setDiscoverable(documentSnapshot.data().discoverableEnabled)
+
+        }
+      });
     return initialState;
   });
 
-  const [pushNotificationsChecked, setpushNotificationsChecked] = useState(userDocument.pushNotificationEnabled);
-  const [locationServicesChecked, setLocationServicesChecked] = useState(userDocument.locationServicesEnabled);
-  const [importContactsChecked, setImportContactsChecked] = useState(userDocument.importContactsEnabled);
 
-  const [editMode, setEditMode] = useState(false)
+  const [editMode, setEditMode] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-  const [firstName, setFirstName] = useState(userDocument.firstName)
-  const [lastName, setLastName] = useState(userDocument.lastName)
-  const [status, setStatus] = useState(userDocument.status)
-  const [email, setEmail] = useState(userDocument.email)
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [status, setStatus] = useState('');
+  const [email, setEmail] = useState('');
 
-  const [showEmail, setShowEmail] = useState(userDocument.showEmailEnabled);
-  const [showNumber, setShowNumber] = useState(userDocument.showNumberEnabled);
+  const [pushNotification, setPushNotification] = useState();
+  const [discoverable, setDiscoverable] = useState();
 
 
-  useEffect(() => {
 
-    console.log("user effect triggered")
-    // console.log(userDocument);
 
-    // firstName === undefined ? setFirstName(userDocument.firstName) : firstName;
-    // lastName === undefined ? setLastName(userDocument.lastName) : lastName;
-    // setStatus(userDocument.status)
-    // setEmail(userDocument.email)
-    // setShowEmail(userDocument.showEmailEnabled)
-    // setShowNumber(userDocument.showNumberEnabled)
-    // setpushNotificationsChecked(userDocument.pushNotificationEnabled)
-    // setLocationServicesChecked(userDocument.locationServicesEnabled)
-    // setImportContactsChecked(userDocument.importContactsEnabled)
-
-  }, [editMode == false])
 
   const updateProfile = async () => {
 
-    console.log(`Variables | Database\nfirstName: ${firstName} | ${userDocument.firstName}  \nlastName: ${lastName} | ${userDocument.lastName}\nstatus: ${status} | ${userDocument.status}\nemail: ${email} | ${userDocument.email}\nshowEmail enabled: ${showEmail} | ${userDocument.showEmailEnabled}\nshowNumber enabled: ${showNumber} | ${userDocument.showNumberEnabled}\nPush Notif: ${pushNotificationsChecked} | ${userDocument.pushNotificationsEnabled}\nLocation Ser: ${locationServicesChecked} | ${userDocument.locationServicesEnabled}\nImport Contacts: ${importContactsChecked} |  ${userDocument.importContactsEnabled}`);
+    // console.log(`Variables | Database\nfirstName: ${firstName} | ${userDocument.firstName}  \nlastName: ${lastName} | ${userDocument.lastName}\nstatus: ${status} | ${userDocument.statusText}\nemail: ${email} | ${userDocument.email}\n`);
 
     try {
       await db.collection('users').doc(auth.currentUser.uid).update({
         firstName: firstName,
         lastName: lastName,
-        status: status,
-        email: email,
-        showEmailEnabled: showEmail,
-        showNumberEnabled: showNumber,
-        pushNotificationEnabled: pushNotificationsChecked,
-        locationServicesEnabled: locationServicesChecked,
-        importContactsEnabled: importContactsChecked
+        statusText: status,
+        email: email
+
       })
 
     }
@@ -130,34 +126,54 @@ const ProfileTab = ({ navigation }) => {
     }
 
     setEditMode(false)
-    console.log(`Edit mode is set to: ${editMode}`)
   }
-  
- 
-  const toggleSwitch = (prevState) => !(prevState) ;
 
-  const [visible, setVisible] = useState(false);
-  const toggleOverlay = () => {
-    setVisible(!visible);
+  const togglePush = () => {
+    setPushNotification(prevState => !prevState)
+  }
 
-  };
+  useEffect(async () => {
+    try {
+      await db.collection('users').doc(auth.currentUser.uid).update({
+        pushNotificationEnabled: pushNotification
+      })
+        .then(
+          console.log(`Push Notification set to: ${pushNotification}`)
+        )
+    }
+    catch (err) {
+      console.log(`Error: ${err}`)
+    }
+  }, [pushNotification])
+
+  const toggleDisc = () => {
+    setDiscoverable(prevState => !prevState)
+  }
+
+  useEffect(async () => {
+    // console.log(`[BEFORE] Push: ${pushNotification} | ${userDocument.pushNotificationEnabled}`)
+    try {
+      await db.collection('users').doc(auth.currentUser.uid).update({
+        discoverableEnabled: discoverable
+      })
+        .then(
+          console.log(`Discoverable set to: ${discoverable}`)
+        )
+    }
+    catch (err) {
+      console.log(`Error: ${err}`)
+    }
+  }, [discoverable])
 
   let currentSwitchState = (switchCase) => {
     switch (switchCase) {
-      case 'pushNotifications': {
-              // (pushNotificationsChecked == undefined) ? setpushNotificationsChecked(userDocument.pushNotificationEnabled) : setpushNotificationsChecked(pushNotificationsChecked);
-        return ((pushNotificationsChecked === true) ? 'enabled' : 'disabled');
-      }
-      case 'locationServices': {
-        // ( locationServicesChecked == undefined) ? setLocationServicesChecked(userDocument.locationServicesEnabled) : setLocationServicesChecked(locationServicesChecked);
-        return (locationServicesChecked === true ? 'enabled' : 'disable');     
-      }
-      case 'importContacts': {
-          // (importContactsChecked == undefined) ? setImportContactsChecked(userDocument.importContactsEnabled) : setEmail(importContactsChecked);
-        return (importContactsChecked === true ? 'enabled' : 'disabled'); 
-      }
+      case 'pushNotifications':
+        return ((pushNotification === true) ? 'enabled' : 'disabled');
+
+      case 'discoverable':
+        return ((discoverable === true) ? 'enabled' : 'disabled');
     }
-  }
+  };
 
   const openWebsite = () => {
     Linking.openURL('https://www.familychat.app/FAQ')
@@ -170,13 +186,26 @@ const ProfileTab = ({ navigation }) => {
   const reportProblem = () => {
   }
 
-
-
   const signOutUser = () => {
     auth.signOut().then(() => {
       navigation.replace('UserAuth');
     });
   };
+
+  const toggleOverlay = () => {
+    setVisible(prev => !prev)
+  }
+
+
+  const deleteAcc = () => {
+    deleteUser(auth.currentUser.uid).then(() => {
+      navigation.replace('UserAuth');
+    }).catch((error) => {
+      // An error ocurred
+      // ...
+    });
+  }
+
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -189,352 +218,365 @@ const ProfileTab = ({ navigation }) => {
 
     <SafeAreaView>
       <ScrollView style={styles.container}>
-        
-        <View
-          style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '90%', marginBottom: 5, alignItems: 'flex-end' }}>
-            <Text
-              style={{ position: 'relative', fontSize: 18 }}
-            >
-              Public Information
-            </Text>
+        {
+          editMode
+            ?
 
-            {
+            <View style={styles.page}>
+              <Image source={imageSelection(userDocument.pfp)} style={{ width: 100, height: 100, borderRadius: 5, marginRight: 10 }} />
 
-              editMode
-                ?
-                <TouchableOpacity
-                  style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}
-                  onPress={updateProfile}
-                >
-                  <Text> Save </Text>
-                </TouchableOpacity>
-                :
-                <TouchableOpacity
-                  style={{ width: 45, height: 32, backgroundColor: '#C4C4C4', borderRadius: 10, borderStyle: 'solid', borderWidth: 2, justifyContent: 'center', alignItems: 'center' }}
-                  onPress={() => setEditMode(true)}
-                >
-                  <Text> Edit </Text>
-                </TouchableOpacity>
+              <View style={{ width: '80%', height: 550, backgroundColor: 'white' }}>
 
-            }
-          </View>
-          <View
-            style={{
-              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: '#8D8D8D', borderRadius: 5, width: '90%', justifyContent: 'center', marginBottom: 20,
-            }}
-          >
+                <View style={{ width: '100%', height: 30, backgroundColor: '#CFC5BA', marginBottom: 20 }} />
 
-            <View style={{ flexDirection: 'row' }}>
-
-              <Image source={imageSelection(userDocument.pfp)} style={{ width: 60, height: 60, borderRadius: 5, marginRight: 10 }} />
-
-
-              {
-                editMode
-                  ?
+                <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+                  <View style={{ marginRight: 5 }}>
+                    <Text style={{ fontSize: 18 }}>
+                      First:
+                    </Text>
+                    <TextInput
+                      style={{ borderWidth: 2, width: 120, height: 32 }}
+                      value={firstName}
+                      onChangeText={text => setFirstName(text)}
+                    />
+                  </View>
                   <View>
+                    <Text style={{ fontSize: 18 }}>
+                      Last:
+                    </Text>
                     <TextInput
-                      style={{ borderWidth: 2, width: 200, height: 32, marginBottom: 3 }}
-                      value={userDocument.firstName}
-                      onChangeText={text => setFirstName(text) }
-                      placeholder= "FirstName"
-                    />
-
-
-                    <TextInput
-                      style={{ borderWidth: 2, width: 200, height: 32 }}
-                      value={userDocument.lastName}
+                      style={{ borderWidth: 2, width: 120, height: 32 }}
+                      value={lastName}
                       onChangeText={text => setLastName(text)}
-                      placeholder= 'LastName'
                     />
-
-
-                  </View>
-                  :
-                  <View style={{ justifyContent: 'center', paddingHorizontal: 5 }}>
-
-                    <Text
-                      style={{ fontSize: 25, fontWeight: '600', borderStyle: 'solid', borderWidth: 2, width: 200 }}
-                    >
-                      {firstName} {lastName}
-                    </Text>
-                  </View>
-              }
-
-
-            </View>
-
-            <View>
-              <Text style={{ fontSize: 18, textAlign: 'justify', paddingTop: 20, paddingBottom: 5, fontWeight: '500' }}>
-                Current Status
-              </Text>
-              <View style={{ flexDirection: 'row' }}>
-
-                <Image source={imageSelection(userDocument.statusEmoji)} style={{ width: 45, height: 45, borderRadius: 3, marginRight: 5 }} />
-
-                <TextInput
-                  style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
-                  editable={editMode}
-                  onChangeText={(val) => setStatus(val)}
-                >
-                  {userDocument.status}
-                </TextInput>
-              </View>
-            </View>
-          </View>
-
-          <Text
-            style={{ position: 'relative', left: '-25%', marginBottom: 5, fontSize: 18 }}
-          >
-            Private Information
-          </Text>
-          <View
-            style={{
-              padding: 20, borderWidth: 2, borderStyle: 'solid', borderColor: 'lightgrey', borderRadius: 5, width: '90%', justifyContent: 'center', marginBottom: 20,
-            }}
-          >
-            <View>
-
-              <View style={{ paddingBottom: 10 }}>
-                <View style={{ flexDirection: 'row' }}>
-
-                  <View style={{ paddingRight: 10 }}>
-                    <Text style={{ fontSize: 12 }}>
-                      Email
-                    </Text>
-                    <TextInput style={{ borderWidth: 2, width: 250, height: 32 }}
-                      onChangeText={(text) => setEmail(text)}
-                      editable={editMode}
-                    // value={userDocument.email}
-                    >
-                      {userDocument.email}
-                    </TextInput>
-
                   </View>
 
-                  <View style={{ alignItems: 'center' }}>
-                    <Text style={{ fontSize: 12 }}>
-                      Visibility
-                    </Text>
-
-                    <Switch
-                      value={showEmail}
-                      onValueChange={(value) => setShowEmail(value)}
-                      style={{ marginLeft: 'auto', marginRight: 0 }}
-                      disabled={!editMode}
-                    />
-
-                  </View>
                 </View>
 
-              </View>
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 18, textAlign: 'justify', paddingTop: 20, paddingBottom: 5, fontWeight: '500' }}>
+                    Status:
+                  </Text>
+                  <View style={{ flexDirection: 'row' }}>
 
-              <View>
-                <View style={{ flexDirection: 'row' }}>
+                    <Image source={imageSelection(userDocument.statusEmoji)} style={{ width: 32, height: 32, borderRadius: 3, marginRight: 5 }} />
 
-                  <View style={{ paddingRight: 10 }}>
-                    <Text style={{ fontSize: 12 }}>
-                      Phone Number
-                    </Text>
                     <TextInput
-                      style={{ borderWidth: 2, width: 250, height: 32, backgroundColor: '#D3D3D3', color: '#616161' }}
-                      editable={false}
-                      value={phoneNumber}
-                    />
-                  </View>
-
-                  <View style={{ alignItems: 'center' }}>
-                    <Text style={{ fontSize: 12 }}>
-                      Visibility
-                    </Text>
-                    <Switch
-                      value={showNumber}
-                      onValueChange={(value) => setShowNumber(value)}
-                      style={{ marginLeft: 'auto', marginRight: 0 }}
-                      disabled={!editMode}
+                      style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
+                      onChangeText={(val) => setStatus(val)}
+                      value={status}
                     />
                   </View>
                 </View>
 
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 18 }}>
+                    Email:
+                  </Text>
+                  <TextInput style={{ borderWidth: 2, width: '80%', height: 32 }}
+                    onChangeText={(text) => setEmail(text)}
+                    value={email}
+                  />
+
+                </View>
+
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 18 }}>
+                    Phone Number:
+                  </Text>
+                  <TextInput
+                    style={{ borderWidth: 2, width: '80%', height: 32, backgroundColor: '#D3D3D3', color: '#616161' }}
+                    editable={false}
+                    value={phoneNumber}
+                  />
+                </View>
+
+                <Button
+                  title={'Save'}
+                  style={{ right: 0, width: 80, height: 50, backgroundColor: 'blue', borderRadius: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end' }}
+                  onPress={updateProfile}
+                />
+
               </View>
 
             </View>
+            :
+            <View style={styles.page}>
 
-          </View>
+              <Image source={imageSelection(userDocument.pfp)} style={{ width: 100, height: 100, borderRadius: 5, marginRight: 10 }} />
 
-          <View
-            style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
-          >
-            <Text style={{ fontWeight: 'bold' }}>Push Notifications</Text>
-            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('pushNotifications')})</Text>
-            <Switch
-              value={pushNotificationsChecked}
-              onValueChange={(value) => setpushNotificationsChecked(value)}
-              style={{marginLeft: 'auto',marginRight: 0}}
-              disabled={!editMode}
-            />
-          </View>
-
-          <View
-            style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%', marginTop: 20 }}
-          >
-            <Text style={{ fontWeight: 'bold' }}>Location Services</Text>
-            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('locationServices')})</Text>
-            <Switch
-              value={locationServicesChecked}
-              onValueChange={(value) => setLocationServicesChecked(value)}
-              style={{
-                marginLeft: 'auto',
-                marginRight: 0
-              }}
-              disabled={!editMode}
-            />
-          </View>
-
-          <View
-            style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%', marginTop: 20, marginBottom: 10 }}
-          >
-            <Text style={{ fontWeight: 'bold' }}>Import Contacts</Text>
-            <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('importContacts')})</Text>
-            <Switch
-              value={importContactsChecked}
-              onValueChange={(value) => setImportContactsChecked(value)}
-              style={{
-                marginLeft: 'auto',
-                marginRight: 0
-              }}
-              disabled={!editMode}
-            />
-          </View>
-
-          <LineDivider />
-
-          <View>
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={openWebsite}
-              style={{
-                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
-                alignItems: 'center', flexDirection: "row", backgroundColor: 'lightgray', marginTop: 30
-              }}
-            >
-              <Icon
-                name='live-help'
-                type='material'
-                color='black'
-              />
-              <Text
-                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+              <View
+                style={{ width: '80%', height: 450, backgroundColor: 'white' }}
               >
-                Help Center
-              </Text>
-            </TouchableOpacity>
-          </View>
 
-          <View>
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={openGuidedTutorial}
-              style={{
-                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
-                alignItems: 'center', flexDirection: "row", backgroundColor: 'lightgray', marginTop: 20
-              }}
-            >
-              <Icon
-                name='tour'
-                type='material'
-                color='black'
-              />
-              <Text
-                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-              >
-                Guided Tutorial
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={toggleOverlay}
-              style={{
-                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
-                alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#F3889C', marginTop: 20
-              }}
-            >
-              <Icon
-                name='report-problem'
-                type='material'
-                color='black'
-              />
-              <Text
-                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-              >
-                Report a concern
-              </Text>
-            </TouchableOpacity>
-
-
-            <Overlay
-              isVisible={visible}
-              onBackdropPress={toggleOverlay}
-              style={{ borderStyle: 'solid', position: 'absolute', width: 500, height: 500 }}
-            >
-
-              <Text style={{ fontSize: 20, fontWeight: '600' }}>
-                Report Your Concern
-              </Text>
-              <Text>
-                Please write a brief description about your issue.
-              </Text>
-              <TextInput style={{ alignSelf: 'center', width: 300, height: 300, borderWidth: 2, borderStyle: 'solid', borderRadius: 5 }} multiline={true}>
-                This is a text box that will tell me what my issues are.
-                Shouldn't be too long.
-              </TextInput>
-
-              <TouchableOpacity style={{ position: 'relative', width: 100, height: 40, borderWidth: 2, borderStyle: 'solid', backgroundColor: 'black', borderRadius: 10, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end', right: 5, margin: 10 }}>
-
-                <Text style={{ color: 'white', fontSize: 17, fontWeight: 'bold' }}
-                  onPress={toggleOverlay}
+                <View
+                  style={{ width: '100%', height: '45%', backgroundColor: 'white', alignItems: 'center' }}
                 >
-                  Submit
-                </Text>
-              </TouchableOpacity>
 
-            </Overlay>
-          </View>
+                  <View style={{ width: '100%', height: 30, backgroundColor: '#CFC5BA', marginBottom: 30 }} />
 
-          <LineDivider />
+                  <Text
+                    style={{ fontSize: 32, marginBottom: 10 }}
+                  >
+                    {firstName} {lastName}
+                  </Text>
 
-          <View>
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={signOutUser}
-              style={{
-                width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
-                alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#F3889C', marginTop: 30
-              }}
-            >
-              <Icon
-                name='logout'
-                type='simple-line-icon'
-                color='black'
-              />
-              <Text
-                style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-              >
-                Logout
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+                  <View
+                    style={{ flexDirection: 'row' }}>
+                    <Image source={imageSelection(userDocument.statusEmoji)} style={{ width: 20, height: 20, borderRadius: 5, marginRight: 10 }} />
+                    <Text
+                      style={{ fontSize: 20 }}>
+                      {userDocument.statusText}
+                    </Text>
+                  </View>
+
+                </View>
+
+                <View style={{ backgroundColor: 'gray', width: '100%', height: '55%', padding: 30 }}>
+
+                  <View style={{ backgroundColor: 'white', width: '90%', height: '55%', borderRadius: 10, flexDirection: 'column', justifyContent: 'space-between', alignSelf: 'center', padding: 10 }}>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontSize: 20, marginBottom: 5 }}>
+                        Private Information:
+                      </Text>
+                      <Ionicons name="information-circle" size={24} color="black" />
+                    </View>
+
+                    <View style={{ flexDirection: 'row' }}>
+
+                      <Entypo name="email" size={24} color="black" />
+                      <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 5 }}>
+                        {userDocument.email}
+                      </Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row' }}>
+                      <Feather name="phone" size={24} color="black" />
+                      <Text style={{ fontSize: 18, marginLeft: 5 }}>
+                        {userDocument.phoneNumber}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Button
+                    title={'Edit'}
+                    style={{ width: 80, height: 50, bottom: 0, backgroundColor: 'blue', borderRadius: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end' }}
+                    onPress={() => setEditMode(true)}
+                  />
+                </View>
+
+              </View>
+           </View>
+        }
+              <View style={styles.page}>
+                <View style={{
+                  marginTop: 30,
+                  flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                }}>
+                  <Divider width={2} color={"#777"}
+                    style={{
+                      minWidth: "10%",
+                      flexGrow: 1, flex: 1,
+                    }} />
+                  <Text style={{
+                    textAlign: "center",
+                    fontSize: 22,
+                    fontWeight: '700',
+                    color: 'black', marginHorizontal: 10
+                  }}>
+                    Application Settings
+                  </Text>
+                  <Divider width={2} color={"#777"}
+                    style={{
+                      minWidth: "10%",
+                      flexGrow: 1, flex: 1,
+                    }} />
+                </View>
+
+
+
+                <View
+                  style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
+                >
+                  <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Push Notifications</Text>
+                  <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('pushNotifications')})</Text>
+                  <Switch
+                    value={pushNotification}
+                    onValueChange={togglePush}
+                    style={{ marginLeft: 'auto', marginRight: 0 }}
+                  />
+                </View>
+
+
+                <View
+                  style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
+                >
+                  <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Discoverable</Text>
+                  <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('discoverable')})</Text>
+                  <Switch
+                    value={discoverable}
+                    onValueChange={toggleDisc}
+                    style={{ marginLeft: 'auto', marginRight: 0 }}
+                  />
+                </View>
+
+
+                <TouchableOpacity
+                  activeOpacity={0.5}
+                  onPress={openGuidedTutorial}
+                  style={{
+                    width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
+                    alignItems: 'center', flexDirection: "row", backgroundColor: 'lightgray', marginTop: 20
+                  }}
+                >
+                  <Text
+                    style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+                  >
+                    View our App Tutorial
+                  </Text>
+
+                  <FontAwesome name="play-circle" size={24} color="black" />
+
+                </TouchableOpacity>
+
+
+                <TouchableOpacity
+                  activeOpacity={0.5}
+                  onPress={openWebsite}
+                  style={styles.resources}
+                >
+
+                  <Text
+                    style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+                  >
+                    Questions? Visit the FAQ
+                  </Text>
+
+                  <AntDesign name="questioncircle" size={24} color="black" />
+                </TouchableOpacity>
+
+
+                <TouchableOpacity
+                  activeOpacity={0.5}
+                  onPress={reportProblem}
+                  style={styles.resources}
+                >
+
+                  <Text
+                    style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+                  >
+                    Contact Developer
+                  </Text>
+
+                  <AntDesign name="exclamationcircle" size={24} color="black" />
+                </TouchableOpacity>
+
+                <LineDivider />
+
+
+                <View>
+                  <TouchableOpacity
+                    activeOpacity={0.5}
+                    onPress={signOutUser}
+                    style={styles.delete}
+                  >
+                    <Icon
+                      name='logout'
+                      type='simple-line-icon'
+                      color='black'
+                    />
+                    <Text
+                      style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+                    >
+                      Logout
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View>
+                  <TouchableOpacity
+                    activeOpacity={0.5}
+                    onPress={toggleOverlay}
+                    style={styles.delete}
+                  >
+                    <Icon
+                      name='logout'
+                      type='simple-line-icon'
+                      color='black'
+                    />
+                    <Text
+                      style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
+                    >
+                      Delete Account
+                    </Text>
+                  </TouchableOpacity>
+
+
+
+                  <Overlay
+                    isVisible={visible}
+                    onBackdropPress={toggleOverlay}
+                    style={{ borderStyle: 'solid', position: 'absolute', width: 500, height: 500 }}
+                  >
+                    <Text>
+                      Are you sure you want to delete your account?
+                    </Text>
+
+                    <Button style={{ position: 'relative', width: 100, height: 40, borderWidth: 2, borderStyle: 'solid', backgroundColor: 'red', borderRadius: 10, justifyContent: 'center', alignItems: 'center', margin: 10 }}
+                      onPress={toggleOverlay}
+                      title='Delete'
+                    />
+
+                  </Overlay>
+
+                </View>
+
+              </View>
+
+            </ScrollView >
+    </SafeAreaView >
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+
+
+  page: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+
+  resources: {
+    width: 280,
+    height: 60,
+    backgroundColor: 'lightgray',
+    borderColor: 'black',
+    borderStyle: 'solid',
+    borderWidth: 2,
+    borderRadius: 15,
+    flexDirection: "row",
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20
+  },
+
+  delete: {
+    width: 300,
+    height: 60,
+    backgroundColor: '#F3889C',
+    borderStyle: 'solid',
+    borderColor: 'black',
+    borderWidth: 2,
+    borderRadius: 15,
+    flexDirection: "row",
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 30
+  }
+});
 
 export default ProfileTab;
