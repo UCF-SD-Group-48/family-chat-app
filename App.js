@@ -21,6 +21,8 @@ import React, {
     Input,
     Tooltip,
   } from 'react-native-elements';
+  import { HoldMenuProvider } from 'react-native-hold-menu';
+  import FeatherIcon from 'react-native-vector-icons/Feather';
   import 'react-native-gesture-handler';
   import { NavigationContainer } from '@react-navigation/native';
   import { createStackNavigator } from '@react-navigation/stack';
@@ -47,7 +49,7 @@ import React, {
   import ChatScreen from './screens/2_GroupChats/ChatScreen';
   import FamilyChatScreen from './screens/2_GroupChats/FamilyChatScreen';
   import Groups from './screens/2_GroupChats/Groups';
-  import AddGroup from './screens/2_GroupChats/AddGroup';
+  import CreateGroup_1_NameImage from './screens/2_GroupChats/CreateGroup_1_NameImage';
   import CreateGroup_2_Members from './screens/2_GroupChats/CreateGroup_2_Members';
   import Topics from './screens/2_GroupChats/Topics';
   import AddTopic from './screens/2_GroupChats/AddTopic';
@@ -189,7 +191,7 @@ import React, {
       <Stack.Screen name='AddChat' component={AddChatScreen} />
       <Stack.Screen name='Chat' component={ChatScreen} />
       <Stack.Screen name='Topics' component={Topics} />
-      <Stack.Screen name='AddGroup' component={AddGroup} />
+      <Stack.Screen name='CreateGroup_1_NameImage' component={CreateGroup_1_NameImage} />
       <Stack.Screen name='CreateGroup_2_Members' component={CreateGroup_2_Members} />
       <Stack.Screen name='AddTopic' component={AddTopic} />
       <Stack.Screen name='AddPin' component={AddPin} />
@@ -233,25 +235,27 @@ import React, {
   // Screen definitions for the application.
   export default function App() {
     return (
-      <SafeAreaView style={styles.safeAreaContainer}>
-        <NavigationContainer>
-          {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
-          <Stack.Navigator>
-  
-            {/* Authentication Screens */}
-            <Stack.Screen name='UserAuth' component={UserAuth} options={{ headerShown: false }}/>
-            <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
-            <Stack.Screen name='Login' component={Login} />
-            <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
-            <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
-            <Stack.Screen name="UserCreated" component={UserCreated} />
-  
-            {/* Tabbed Screens */}
-            <Stack.Screen name="TabStack" component={TabStackScreen} options={{ headerShown: false }} />
-  
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaView>
+      <HoldMenuProvider iconComponent={FeatherIcon} theme="light">
+        <SafeAreaView style={styles.safeAreaContainer}>
+          <NavigationContainer>
+            {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
+            <Stack.Navigator>
+    
+              {/* Authentication Screens */}
+              <Stack.Screen name='UserAuth' component={UserAuth} options={{ headerShown: false }}/>
+              <Stack.Screen name='RegisterPhone' component={RegisterPhone} />
+              <Stack.Screen name='Login' component={Login} />
+              <Stack.Screen name='VerifyPhone' component={VerifyPhone} />
+              <Stack.Screen name="PhoneSuccess" component={PhoneSuccess} />
+              <Stack.Screen name="UserCreated" component={UserCreated} />
+    
+              {/* Tabbed Screens */}
+              <Stack.Screen name="TabStack" component={TabStackScreen} options={{ headerShown: false }} />
+    
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+      </HoldMenuProvider>
     );
   }
   

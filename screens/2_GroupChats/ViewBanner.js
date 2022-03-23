@@ -29,6 +29,7 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
+import { HoldItem } from 'react-native-hold-menu';
 import { AntDesign, SimpleLineIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 
 
@@ -82,12 +83,17 @@ const ViewBanner = ({ navigation, route }) => {
 						flexDirection: "row",
 						marginRight: 20,
 					}}>
-					<TouchableOpacity
-						activeOpacity={0.5}
-						onPress={() => {console.log("present Delete Alert option")}}
-					>
+                    <HoldItem activateOn="tap"
+                        items={[
+                            {
+                                text: 'Delete Alert',
+                                icon: "trash",
+                                isDestructive: true,
+                                onPress: () => {},
+                            },
+                    ]}>
 						<MaterialCommunityIcons name="dots-horizontal" size={30} color="black" />
-					</TouchableOpacity>
+                    </HoldItem>
 				</View>
 			),
         });

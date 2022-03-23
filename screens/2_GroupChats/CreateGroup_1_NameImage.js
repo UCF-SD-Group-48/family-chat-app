@@ -26,7 +26,7 @@ import { db, auth } from '../../firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 import firebase from 'firebase/compat/app';
 
-const AddGroup = ({ navigation }) => {
+const CreateGroup_1_NameImage = ({ navigation }) => {
 
 	const [mapUpdate, setMapUpdate] = useState({});
 	const [groupName, setGroupName] = useState('');
@@ -387,7 +387,6 @@ const AddGroup = ({ navigation }) => {
 								Select cover image:
 							</Text>
 						</View>
-
 
 						<View style={styles.imagesGridContainer}>
 							<View style={styles.imagesGridTop2}>
@@ -829,4 +828,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default AddGroup;
+export default CreateGroup_1_NameImage;

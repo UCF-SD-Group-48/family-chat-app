@@ -30,7 +30,6 @@ import firebase from 'firebase/compat/app';
 import * as SMS from 'expo-sms';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
-
 const CreateGroup_2_Members = ({ navigation, route }) => {
 
 	const [mapUpdate, setMapUpdate] = useState({});
@@ -92,66 +91,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		}
 	}
 
-	const createGroup = async () => {
-		let currentUserId = auth.currentUser.uid
-		await db
-			.collection("groups")
-			.add({
-				groupName: input,
-				groupOwner: auth.currentUser.uid,
-				members: [auth.currentUser.uid]
-			})
-			.then(async (docRef) => {
-				await db.collection("users").doc(currentUserId).update({
-					groups: arrayUnion(docRef.id) // adds the uid's only
-
-				})
-
-				await db.collection('groups').doc(docRef.id)
-					.collection("topics")
-					.add({
-						topicName: "General",
-					})
-					.then((docRef) => {
-						// add the topicId to the User's TopicId Map here
-						const topicId = docRef.id
-						mapUpdate[`topicMap.${topicId}`] = firebase.firestore.FieldValue.serverTimestamp()
-						console.log("doc.id ", mapUpdate)
-
-						db.collection('users').doc(currentUserId).update(mapUpdate);
-
-						// navigation.goBack(); // I have no clue where to place this
-
-					})
-					.catch((error) => alert(error));
-			})
-			.catch((error) => alert(error))
-
-	};
-
-	const enterGroup = (groupId, groupName, groupOwner) => {
-		// Navigating straight from Groups to Topic "General" or the first Topic found (if General does not exist)
-		let topic = null;
-		const ref = db.collection("groups").doc(groupId).collection("topics").get()
-			.then((snapshot) => {
-				snapshot.forEach((doc) => {
-					// console.log(doc.id, " => ", doc.data());
-					if(doc.data().topicName == "General" || topic == null) {
-						topic = doc;
-					}
-				});
-			})
-			.then(() => {
-				const topicId = topic.id;
-				const topicName = topic.data().topicName;
-
-				navigation.push("Chat", { topicId, topicName, groupId, groupName, groupOwner });
-			})
-			.catch((error) => {
-				console.log("Error getting documents: ", error);
-			});
-	};
-
 	useEffect(async () => {
 		console.log('---- RUN ONCE ---- IN THE BEGINNING -----')
 		const ownerPhoneNumber = (auth.currentUser.phoneNumber).slice(2);
@@ -161,8 +100,8 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			.get();
 		const snapshot = query.docs[0];
 		const data = snapshot.data();
-		const userName = `${data.firstName} ${data.lastName}`
-		setMembersList([...membersList, { name: `${userName}`, pfp: data.pfp, owner: true }])
+		const searchedUserFullName = `${data.firstName} ${data.lastName}`
+		setMembersList([...membersList, { uid : snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: true }])
 	}, [])
 
 	useEffect(() => {
@@ -171,9 +110,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 				searchForUser();
 			}
 		}
-		// return () => {
-		// 	setMapUpdate({});
-		// }; 
 	}, searchedUserPhoneNumber);
 
 	const checkTheMembersList = (searchedUserPhoneNumber) => {
@@ -202,8 +138,8 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			setSearchResults('exists')
 			const snapshot = query.docs[0];
 			const data = snapshot.data();
-			const searchedUserName = `${data.firstName} ${data.lastName}`
-			setSearchedUser({ name: `${searchedUserName}`, status: `${data.statusEmoji} ${data.statusText}`, pfp: data.pfp })
+			const searchedUserFullName = `${data.firstName} ${data.lastName}`;
+			setSearchedUser({ uid : snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner : false})
 			return;
 		} else { setSearchResults('nonexistent') }
 	};
@@ -228,6 +164,99 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			setSearchResults('incomplete')
 		}
 	};
+
+	const createGroup = async () => {
+		const currentUserID = auth.currentUser.uid;
+
+		let membersArray = [];
+
+		membersList.map((member) => {
+			membersArray.push(member.uid)
+		})
+
+		let groupID, topicID;
+
+		await db
+			.collection("groups")
+			.add({
+				groupName: route.params.groupName,
+				groupOwner: currentUserID,
+				coverImageNumber: route.params.coverImage.imageNumber,
+				color: route.params.coverImage.color,
+				members: membersArray
+			})
+			.then(async (newlyCreatedGroup) => {
+				groupID = newlyCreatedGroup.id;
+				membersArray.map(async (memberUID) => {
+					await db.collection("users").doc(memberUID).update({
+						groups: arrayUnion(groupID)
+					})
+				})
+
+				await db.collection('groups').doc(groupID)
+					.collection("topics")
+					.add({
+						topicName: "General",
+					})
+					.then((newlyCreatedTopic) => {
+						// add the topicId to the User's TopicId Map here
+						topicID = newlyCreatedTopic.id
+						mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
+						console.log("doc.id ", mapUpdate)
+
+						membersArray.map(async (memberUID) => {
+							await db.collection('users').doc(memberUID).update(mapUpdate);
+						})
+						
+						// navigation.goBack(); // I have no clue where to place this
+
+					})
+					.catch((error) => alert(error));
+			})
+			.catch((error) => alert(error))
+
+			enterGroup(groupID, route.params.groupName, currentUserID)
+	};
+
+	const enterGroup = (groupId, groupName, groupOwner) => {
+		// Navigating straight from Groups to Topic "General" or the first Topic found (if General does not exist)
+		let topic = null;
+		const ref = db.collection("groups").doc(groupId).collection("topics").get()
+			.then((snapshot) => {
+				snapshot.forEach((doc) => {
+					// console.log(doc.id, " => ", doc.data());
+					if (doc.data().topicName == "General" || topic == null) {
+						topic = doc;
+					}
+				});
+			})
+			.then(() => {
+				const topicId = topic.id;
+				const topicName = topic.data().topicName;
+
+				navigation.push("Chat", { topicId, topicName, groupId, groupName, groupOwner });
+			})
+			.catch((error) => {
+				console.log("Error getting documents: ", error);
+			});
+	};
+
+
+	const buttonFunction = () => {
+		console.log('CURRENT LIST ----------', membersList)
+		console.log('----')
+
+		let membersArray = [];
+
+		membersList.map((member) => {
+			membersArray.push(member.uid)
+		})
+
+		console.log(membersArray);
+
+		console.log('RUNNING THE CREATE GROUP NOW ----------******************')
+		createGroup();
+	}
 
 	return (
 		<SafeAreaView style={styles.mainContainer}>
@@ -309,7 +338,7 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 											</View>
 											: <TouchableOpacity
 												activeOpacity={0.75}
-												onPress={() => { setMembersList([...membersList, { name: `${searchedUser.name}`, pfp: `${searchedUser.pfp}`, }]) }}											>
+												onPress={() => { setMembersList([...membersList, searchedUser]) }}											>
 												<View style={styles.buttonSpacing}>
 													<View style={[styles.searchResultsButtonAdd, { orderColor: '#2352DF', }]}>
 														<Text style={styles.searchResultsButtonAddText}>
@@ -388,42 +417,28 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 												type="material-community"
 												size={18}
 												color="#363732"
-												style={{marginRight: 3}}
+												style={{ marginRight: 3 }}
 											/>
 										</TouchableOpacity>
-										: 
+										:
 										<View style={styles.ownershipBadge}>
 											<Icon
-											name="local-police"
-											type="material"
-											size={15}
-											color="#363732"
-										/>
+												name="local-police"
+												type="material"
+												size={15}
+												color="#363732"
+											/>
 										</View>
 									}
 								</View>
 							))}
 						</View>
-{/* 
-						<TouchableOpacity
-							activeOpacity={0.75}
-							onPress={() => console.log('CURRENT LIST ----------', membersList)}
-						>
-							<View style={styles.buttonSpacing}>
-								<View style={styles.buttonCreate}>
-									<Text style={styles.buttonCreateEnabled}>
-										X
-									</Text>
-									
-								</View>
-							</View>
-						</TouchableOpacity> */}
 
 						<TouchableOpacity
 							activeOpacity={0.75}
 							// onPress={() => createGroup()}
-							onPress={() => console.log('CURRENT LIST ----------', membersList)}
-
+							// onPress={() => console.log('CURRENT LIST ----------', membersList)}
+							onPressIn={() => buttonFunction()}
 						>
 							<View style={styles.buttonSpacing}>
 								<View style={[styles.buttonCreate, { borderColor: '#363732', }]}>
@@ -439,8 +454,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 								</View>
 							</View>
 						</TouchableOpacity>
-
-
 					</View>
 				</View>
 			</ScrollView>
