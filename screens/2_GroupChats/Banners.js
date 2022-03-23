@@ -28,7 +28,7 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { AntDesign, Feather, Entypo, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 
 // Imports for: Expo
@@ -45,6 +45,7 @@ import {
 } from '../../firebase';
 import firebase from 'firebase/compat/app';
 import LineDivider from '../../components/LineDivider';
+import MyView from '../../components/MyView';
 
 // Imports for: Components
 
@@ -216,6 +217,36 @@ const Banners = ({ navigation, route }) => {
                     flexDirection: "column", flexShrink: 1,
                     justifyContent: "flex-start", alignItems: "center",
                 }}>
+                    {/* Prompt for no Alerts (when Banner.length == 0) */}
+                    <MyView hide={banners.length != 0}
+                        style={{
+                            width: "100%", minHeight: 300, paddingTop: 10,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                        }}>
+                        <Entypo name="megaphone" size={65} color="#555" />
+                        <Text style={{
+                                    fontSize: 20,
+                                    fontWeight: '800',
+                                    textAlign: "center",
+                                    marginTop: 15,
+                                    color: "#555",
+                            }}>
+                                {"No alerts found."}
+                        </Text>
+                        <Text style={{
+                                    fontSize: 20,
+                                    fontWeight: '400',
+                                    textAlign: "center",
+                                    maxWidth: 350,
+                                    lineHeight: 24,
+                                    marginTop: 15,
+                                    color: "#555",
+                            }}>
+                                {"Looks like there haven't been any announced alerts within this Topic."+
+                                    "\nClick the button above to create one."}
+                        </Text>
+                        <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
+                    </MyView>
                     <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
                         {banners.map(({ id, data }) => (
                             <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(id, data)}} key={id}
