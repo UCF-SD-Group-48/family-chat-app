@@ -74,6 +74,8 @@ const ChatScreen = ({ navigation, route }) => {
     const [topics, setTopics] = useState([]);
     const [messageMap, setMessageMap] = useState({});
     const [overlayIsVisible, setOverlay] = useState(false);
+    const [alertExists, setAlertExists] = useState(false);
+    const [alert, setAlert] = useState({});
 
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
@@ -149,7 +151,27 @@ const ChatScreen = ({ navigation, route }) => {
 				</View>
 			),
         });
+
+        resetAlert();
+
     }, [navigation, messages]);
+
+    const resetAlert = async () => {
+        const snapshot = await db.collection('chats').doc(topicId).collection('banners')
+            .orderBy('timestamp', 'desc').limit(1).get();
+        if (!snapshot.empty) {
+            let doc = snapshot.docs[0];
+            let data = doc.data();
+            let viewedBy = `${data.viewedBy}`;
+            if(!viewedBy.includes(auth.currentUser.uid)) {
+                setAlert({
+                    id: doc.id,
+                    data: doc.data(),
+                });
+                setAlertExists(true);
+            }
+        }
+	};
 
     useLayoutEffect(() => {
         const unsubscribe = db
@@ -206,6 +228,25 @@ const ChatScreen = ({ navigation, route }) => {
             navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner });
         }
         setOverlay(false);
+    };
+
+    const viewBanner = (bannerId, bannerData) => {
+        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
+    };
+
+    const dismissBanner = () => {
+        console.log("dismiss");
+        db.collection('chats').doc(topicId).collection('banners').doc(alert.id).update({
+            viewedBy: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid),
+        })
+        .then(() => {
+            console.log("Document successfully updated!");
+            setAlertExists(false);
+        })
+        .catch((error) => {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+        });
     };
 
     return (
@@ -610,7 +651,7 @@ const ChatScreen = ({ navigation, route }) => {
                         </MyView>
                         {/* Banner (if applicable) */}
                         {/* Calendar for later <FontAwesome5 name="calendar-alt" size={24} color="black" /> */}
-                        <MyView hide={false}
+                        <MyView hide={!alertExists}
                             style={[
                                 {
                                     width: "100%",
@@ -647,20 +688,21 @@ const ChatScreen = ({ navigation, route }) => {
                                         Alert
                                     </Text>
                                 </View>
-                                <View style={{
-                                    paddingHorizontal: 5, paddingVertical: 5,
-                                    backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
-                                    flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                <TouchableOpacity activeOpacity={0.7} onPress={dismissBanner}
+                                    style={{
+                                        paddingHorizontal: 5, paddingVertical: 5,
+                                        backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
+                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
                                 }}>
                                     <Fontisto name="close-a" size={20} color="black" />
-                                </View>
+                                </TouchableOpacity>
                             </View>
                             {/* Content */}
                             <View style={{
                                 width: "100%",
                                 borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
                                 paddingVertical: 5, paddingHorizontal: 15,
-                                flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                             }}>
                                 <Text style={{
                                     fontSize: 16,
@@ -670,7 +712,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     color: "black",
                                 }}>
                                     <Text style={{fontWeight: '600'}}>"</Text>
-                                    {"Lots of text here yay!\nThis is a message to be displayed as an alert on screen"}
+                                    {(alert != null && alert.data != undefined) ? (alert.data.description) : ("")}
                                     <Text style={{fontWeight: '600'}}>"</Text>
                                 </Text>
                             </View>
@@ -682,7 +724,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 flex: 0, flexGrow: 0,
                                 flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
                             }}>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(alert.id, alert.data)}}
                                     style={{
                                         height: 40, paddingHorizontal: 10,
                                         flexDirection: "row", justifyContent: "center", alignItems: "center",
