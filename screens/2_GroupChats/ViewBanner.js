@@ -296,7 +296,9 @@ const ViewBanner = ({ navigation, route }) => {
                                 color: "#222",
                                 }}>
                                 {(bannerData.timestamp != null) ? (bannerData.timestamp.toDate().toLocaleDateString("en-US", {
-                                    month: "short", day: "2-digit", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
+                                    month: "short", day: "2-digit", year: "numeric", })
+                                    +" @ "+bannerData.timestamp.toDate().toLocaleTimeString("en-US", 
+                                    {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
                             </Text>
                         </View>
                     </View>

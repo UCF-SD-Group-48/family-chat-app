@@ -849,6 +849,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 messageMap[id] != undefined && messageMap[id].previousMessage != undefined
                                     && messageMap[id].previousMessage.data != undefined
                                     && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber ? (
+                                    //message without profile picture
                                     <View key={id} style={{
                                         flex: 1,
                                         width: "100%",
@@ -867,7 +868,12 @@ const ChatScreen = ({ navigation, route }) => {
                                             borderRadius: 10,
                                         }} />
                                         <View style={styles.textContainer}>
-                                            <View style={styles.textOutline}>
+                                            <View style={{
+                                                minHeight: 30, marginLeft: 5,
+                                                flex: 1, flexGrow: 1, justifyContent: "center",
+                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                            }}>
                                                 <Text style={styles.text}>
                                                     {data.message}
                                                 </Text>
@@ -875,6 +881,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         </View>
                                     </View>
                                 ) : (
+                                    //Message with profile picture and display name
                                     <View key={id} style={styles.message}>
                                         <View style={styles.userContainer}>
                                             <Image source={imageSelection(getPfp(data.ownerUID))}
@@ -884,10 +891,30 @@ const ChatScreen = ({ navigation, route }) => {
                                                 }}/>
                                         </View>
                                         <View style={styles.textContainer}>
-                                            <Text style={styles.userName}>
-                                                {getString(data.ownerUID) || "Display Name"}
-                                            </Text>
-                                            <View style={styles.textOutline}>
+                                            <View style={{
+                                                flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start",
+                                                flex: 1, flexGrow: 1, backgroundColor: "#3330",
+                                            }}>
+                                                <Text style={styles.userName}>
+                                                    {getString(data.ownerUID) || "Display Name"}
+                                                </Text>
+                                                <Text style={{
+                                                    fontSize: 14,
+                                                    fontWeight: '500',
+                                                    textAlign: "center",
+                                                    marginHorizontal: 0,
+                                                    color: "black",
+                                                }}>
+                                                    {(data.timestamp != null) ? (data.timestamp.toDate().toLocaleTimeString("en-US", {
+                                                        hour: "numeric", minute: "2-digit" })) : ("")}
+                                                </Text>
+                                            </View>
+                                            <View style={{
+                                                minHeight: 30, marginLeft: 5,
+                                                flex: 1, flexGrow: 1, justifyContent: "center",
+                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                            }}>
                                                 <Text style={styles.text}>
                                                     {data.message}
                                                 </Text>
@@ -1039,10 +1066,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#0cc0',
     },
     userName: {
-        marginLeft: 5,
+        marginLeft: 5, marginBottom: 2,
         height: 20,
         textAlign: 'left',
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: '800',
         color: 'black',
     },
@@ -1058,10 +1085,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     text: {
-        marginLeft: 10,
-        paddingVertical: 5,
+        marginLeft: 8,
+        paddingVertical: 3,
         textAlign: 'left',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '500',
         color: 'black',
     },
