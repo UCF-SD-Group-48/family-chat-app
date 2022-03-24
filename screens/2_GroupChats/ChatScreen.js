@@ -30,6 +30,7 @@ import {
     Tooltip,
     Overlay,
 } from 'react-native-elements';
+import { HoldItem } from 'react-native-hold-menu';
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
@@ -52,6 +53,7 @@ import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/fi
 // Imports for: Components
 import MyView from '../../components/MyView';
 import LineDivider from '../../components/LineDivider';
+import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
 
@@ -73,6 +75,8 @@ const ChatScreen = ({ navigation, route }) => {
     const [topicSelectionEnabled, setTopicSelection] = useState(true);
     const [topics, setTopics] = useState([]);
     const [messageMap, setMessageMap] = useState({});
+    const [messageSenderUIDs, setMessageSenderUIDs] = useState([])
+    const [messageSenders, setMessageSenders] = useState({})
     const [overlayIsVisible, setOverlay] = useState(false);
     const [alertExists, setAlertExists] = useState(false);
     const [alert, setAlert] = useState({});
@@ -82,24 +86,33 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const messageMapFunction = () => {
+        let messageSenders = [];
         if (messages.length > 1) {
             messages.map((message, i, array) => {
                 if (i > 0) {
                     setMessageMap(state => ({
                         ...state,
                         [message.id]: ({
-                            currentId: message.id,
-                            currentPhoneNumber: message.data.phoneNumber,
-                            currentMessage: message.data.message,
-                            previousId: array[i - 1].id,
-                            previousPhoneNumber: array[i - 1].data.phoneNumber,
-                            previousMessage: array[i - 1].data.message,
+                            currentMessage: {
+                                id: message.id,
+                                data: message.data,
+                            },
+                            previousMessage: {
+                                id: array[i - 1].id,
+                                data: array[i - 1].data,
+                            },
                         })
                     })
                     );
                 }
+                if(messageSenders.indexOf(message.data.ownerUID) === -1){
+                    messageSenders.push(message.data.ownerUID);
+                }
             });
         }
+        else if (messages.length == 1) { messageSenders.push(messages[0].data.ownerUID) }
+        setMessageSenderUIDs([...messageSenders]);
+        // console.log("messageSenderUIDs = "+JSON.stringify(messageSenderUIDs));
     }
     useEffect(() => {
         messageMapFunction();
@@ -107,6 +120,77 @@ const ChatScreen = ({ navigation, route }) => {
             setMessageMap({});
         }
     }, [messages]);
+
+    const messageSendersHelper = async () => {
+        let senders = {};
+        for (const uid of messageSenderUIDs){
+            await db.collection('users').doc(uid).get()
+                .then((result) => {
+
+                    senders[uid] = result.data();
+
+                    // messageSendersHelper(i+1);
+                    // return (result.data());
+                });
+        }
+        setMessageSenders(senders);
+        
+        // if(i > messageSenderUIDs.length) {
+        //     return;
+        // }
+        // else {
+        //     const ref = db.collection('users').doc(messageSenderUIDs[i]);
+        //     const doc = await ref.get()
+        //     .then((result) => {
+        //         const updated = {...messageSenders};
+        //         updated[messageSenderUIDs[i]] = result.data();
+        //         setMessageSenders({...updated});
+
+        //         messageSendersHelper(i+1);
+        //         // return (result.data());
+        //     });
+        // }
+
+        // db.collection("users").doc(messageID).get()
+        //     .then(snapshot => {
+        //         snapshot.forEach(doc => {
+        //             return doc.data();
+        //         });
+        //     })
+        //     .catch(err => {
+        //         console.log('Error getting documents', err);
+        //     });
+        
+        // const snapshot = await db.collection("users").doc(messageID).get();
+        // if (!snapshot.empty) {
+        //     // console.log(snapshot.data());
+        //     // setMessageSenders([...messageSenders, snapshot.data()]);
+        //     return (snapshot.data());
+        // }
+        // else {
+        //     return {};
+        // }
+	};
+    // const resetMessageSenders = () => {
+    //     let senders = {};
+    //     let returnVal = null;
+    //     messageSenderUIDs.forEach((senderUID) => {
+    //         returnVal = messageSendersHelper(senderUID);
+    //         if(returnVal != null){
+    //             senders[senderUID] = returnVal;
+    //         }
+    //         // senders.push(messageSendersHelper(senderUID));
+    //         // console.log(senderUID);
+    //     })
+    //     // setMessageSenders(senders);
+	// };
+    useEffect(() => {
+        //resetMessageSenders();
+        messageSendersHelper();
+        // return () => {
+        //     setMessageSenders([]);
+        // }
+    }, [messageSenderUIDs]);
 
     useEffect(() => {
         setOverlay(false);
@@ -193,12 +277,12 @@ const ChatScreen = ({ navigation, route }) => {
         Keyboard.dismiss();
 
         db.collection('chats').doc(topicId).collection('messages').add({
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
+            editedTime: null,
+            membersWhoReacted: [],
             message: input,
-            displayName: auth.currentUser.displayName,
+            ownerUID: auth.currentUser.uid,
             phoneNumber: auth.currentUser.phoneNumber,
-            email: auth.currentUser.email,
-            photoURL: auth.currentUser.photoURL,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
         }); // id passed in when we entered the chatroom
 
         setInput(''); // clears messaging box
@@ -248,6 +332,19 @@ const ChatScreen = ({ navigation, route }) => {
             console.error("Error updating document: ", error);
         });
     };
+
+    const getString = (uid) => {
+        if(messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
+            return (messageSenders[uid.toString()].firstName+" "+messageSenders[uid.toString()].lastName);
+        }
+        else return "";
+    }
+    const getPfp = (uid) => {
+        if(messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
+            return (messageSenders[uid.toString()].pfp);
+        }
+        else return "";
+    }
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -548,7 +645,7 @@ const ChatScreen = ({ navigation, route }) => {
                             </TouchableOpacity>
                             <View style={styles.topicSpacer}>
                                 <TouchableOpacity activeOpacity={0.2}
-                                    onPress={() => navigation.push("AddTopic", { groupId })}
+                                    onPress={() => {console.log("messageMap = "+JSON.stringify(messageSenders))}}//navigation.push("AddTopic", { groupId })}
                                     style={{
                                         width: 35, height: 35, backgroundColor: "#ddd0",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,
@@ -749,8 +846,9 @@ const ChatScreen = ({ navigation, route }) => {
                         <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
                             {messages.map(({ id, data }) => (
 
-                                messageMap[id] !== undefined
-                                    && data.phoneNumber == messageMap[id].previousPhoneNumber ? (
+                                messageMap[id] != undefined && messageMap[id].previousMessage != undefined
+                                    && messageMap[id].previousMessage.data != undefined
+                                    && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber ? (
                                     <View key={id} style={{
                                         flex: 1,
                                         width: "100%",
@@ -778,11 +876,16 @@ const ChatScreen = ({ navigation, route }) => {
                                     </View>
                                 ) : (
                                     <View key={id} style={styles.message}>
-                                        <View
-                                            style={styles.userContainer} />
+                                        <View style={styles.userContainer}>
+                                            <Image source={imageSelection(getPfp(data.ownerUID))}
+                                                style={{
+                                                    width: "100%", height: "100%",
+                                                    borderRadius: 7, borderWidth: 1, borderColor: "#777",
+                                                }}/>
+                                        </View>
                                         <View style={styles.textContainer}>
                                             <Text style={styles.userName}>
-                                                {data.phoneNumber || "Display Name"}
+                                                {getString(data.ownerUID) || "Display Name"}
                                             </Text>
                                             <View style={styles.textOutline}>
                                                 <Text style={styles.text}>
@@ -925,9 +1028,9 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
 
-        backgroundColor: '#0cc',
+        backgroundColor: '#0cc0',
         borderWidth: 2,
-        borderColor: '#555',
+        borderColor: '#5550',
         borderRadius: 10,
     },
     textContainer: {
@@ -939,8 +1042,8 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         height: 20,
         textAlign: 'left',
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '800',
         color: 'black',
     },
     textOutline: {
@@ -950,7 +1053,7 @@ const styles = StyleSheet.create({
         minHeight: 30,
         justifyContent: "center",
         backgroundColor: '#cff0',
-        borderWidth: 2,
+        borderWidth: 1.3,
         borderColor: '#555',
         borderRadius: 5,
     },

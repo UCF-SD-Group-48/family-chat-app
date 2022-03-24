@@ -22,18 +22,20 @@ import {
 import {
     Avatar,
     Button,
+    Divider,
     Icon,
     Image,
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
 import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+import MyView from '../../components/MyView';
 
 // Imports for: Firebase
 import {
@@ -81,13 +83,13 @@ const Pins = ({ navigation, route }) => {
 					style={{
 						flexDirection: "row",
 						justifyContent: "space-between",
-						marginRight: 20,
+						marginRight: 10,
 					}}>
 					<TouchableOpacity
 						activeOpacity={0.5}
-						onPress={addPin}
+						onPress={() => {console.log("info blurb here")}}
 					>
-						<Feather name="plus" size={30} color="black" />
+						<Ionicons name="information-circle" size={28} color="black" />
 					</TouchableOpacity>
 				</View>
 			),
@@ -101,67 +103,222 @@ const Pins = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView width={"100%"}
-                contentContainerStyle={{
+            <View
+                style={{
+                    width: "100%",
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
-                {/* Info Blurb to descripe/encourage making of a pin */}
-                <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%" }}>
-                    {pins.map(({ id, data }) => (
-                            <View key={id} style={styles.message}>
-                                <View
-                                    style={styles.userContainer} />
-                                <View style={styles.textContainer}>
-                                    <Text style={styles.userName}>
-                                        {data.ownerPhoneNumber || "Display Name"}
-                                    </Text>
-                                    <Text style={styles.titleText}>
-                                            {data.title}
-                                    </Text>
-                                    <View style={styles.textOutline}>
-                                        <Text style={styles.text}>
-                                            {data.content}
-                                        </Text>
+
+                {/* History Text */}
+                <View style={{
+                    marginTop: 30,
+                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                }}>
+                <Divider width={2} color={"#777"}
+                    style={{
+                        minWidth: "10%",
+                        flexGrow: 1, flex: 1,
+                    }}/>
+                <Text style={{
+                    textAlign: "center",
+                    fontSize: 22,
+                    fontWeight: '700',
+                    color: 'black', marginHorizontal: 10
+                }}>
+                    {"History: Pinned Messages ("+pins.length+")"}
+                </Text>
+                <Divider width={2} color={"#777"}
+                    style={{
+                        minWidth: "10%",
+                        flexGrow: 1, flex: 1,
+                    }}/>
+                </View>
+
+                {/* All Pins */}
+                <View style={{
+                    marginTop: 30, marginBottom: 0, width: "100%",
+                    flexDirection: "column", flexShrink: 1,
+                    justifyContent: "flex-start", alignItems: "center",
+                }}>
+                    {/* Prompt for no Alerts (when Pin.length == 0) */}
+                    <MyView hide={pins.length != 0}
+                        style={{
+                            width: "100%", minHeight: 300, paddingTop: 10,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                        }}>
+                        <Entypo name="pin" size={65} color="#555" />
+                        <Text style={{
+                                    fontSize: 20,
+                                    fontWeight: '800',
+                                    textAlign: "center",
+                                    marginTop: 15,
+                                    color: "#555",
+                            }}>
+                                {"No pins found."}
+                        </Text>
+                        <Text style={{
+                                    fontSize: 20,
+                                    fontWeight: '400',
+                                    textAlign: "center",
+                                    maxWidth: 350,
+                                    lineHeight: 24,
+                                    marginTop: 15,
+                                    color: "#555",
+                            }}>
+                                {"Looks like there haven't been any pinned messages within this Topic."+
+                                    "\nNavigate back to the chat, and LongPress a worthy message to create the first pin."}
+                        </Text>
+                        <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
+                    </MyView>
+                    <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
+                        {pins.map(({ id, data }) => (
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => {}} key={id} //viewBanner(id, data)
+                                style={[
+                                    {
+                                        width: "100%", marginTop: 1,
+                                        backgroundColor: "#fff", borderWidth: 0,
+                                        flex: 0, flexGrow: 0, flexDirection: "row",
+                                        justifyContent: "flex-start", alignItems: "center",
+                                        borderRadius: 1,
+                                    },
+                                    {
+                                        shadowColor: "#000", shadowOffset: {width: 0, height: 1},
+                                        shadowRadius: 0, shadowOpacity: 0.5,
+                                    }
+                                ]} >
+                                {/* Left Content */}
+                                <View style={{
+                                    minWidth: "10%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flex: 1, flexGrow: 1, flexDirection: "row",
+                                    justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <View style={{
+                                        width: "100%", height: 65,
+                                        paddingHorizontal: 15, paddingVertical: 10,
+                                        backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
+                                        flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
+                                    }}>
+                                        <View style={{
+                                            width: "100%",
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <Entypo name="megaphone" size={18} color="#777" />
+                                            <Text numberOfLines={1}
+                                                    style={{
+                                                        fontSize: 18,
+                                                        fontWeight: '600',
+                                                        textAlign: "left",
+                                                        marginLeft: 15, marginRight: 10,
+                                                        color: "#777",
+                                                        flex: 1,
+                                                }}>
+                                                <Text style={{fontWeight: '600'}}>"</Text>
+                                                    {data.description}
+                                                <Text style={{fontWeight: '600'}}>"</Text>
+                                            </Text>
+                                        </View>
+                                        <View style={{
+                                            width: "100%",
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <Ionicons name="person-circle" size={18} color="#777" />
+                                            <Text numberOfLines={1}
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontWeight: '400',
+                                                    textAlign: "left",
+                                                    marginLeft: 15, marginRight: 10,
+                                                    color: "#777",
+                                                    flex: 1,
+                                            }}>
+                                                { getString(data.ownerUID) || ""}
+                                            </Text>
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
-                    ))}
-                </ScrollView>
-            </ScrollView>
-            <View style={{
-                width: "100%", minHeight: 100,
-                borderTopWidth: 2, backgroundColor: "#ffc0",
-                flex: 1, flexGrow: 0, flexDirection: "row", justifyContent: "center", alignItems:  "center",
-            }}>
-                {/* Add Pin Button */}
-                <TouchableOpacity onPress={addPin} activeOpacity={0.7}
-                    style={{
-                        width: 200, height: 75,
-                        marginTop: 0,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#afc",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-                    <Icon
-						name='plus'
-                        type='antdesign'
-                        color='#000'
-						style={{
-							width: 50, height: 50, marginRight: 0, justifyContent: "center"
-						}}
-					/>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 15
-					}}>
-						{"Add Pin"}
-					</Text>
-                </TouchableOpacity>
+                                {/* Right Chevron */}
+                                <View style={{
+                                    minWidth: 60,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                    paddingVertical: 0, paddingHorizontal: 15,
+                                    flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
+                                }}>
+                                    <Entypo name="chevron-right" size={34} color="#333" />
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
             </View>
         </SafeAreaView>
+
+
+        // <SafeAreaView style={styles.container}>
+        //     <ScrollView width={"100%"}
+        //         contentContainerStyle={{
+        //             justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+        //             flex: 1, flexGrow: 1,
+        //         }}>
+        //         {/* Info Blurb to descripe/encourage making of a pin */}
+        //         <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%" }}>
+        //             {pins.map(({ id, data }) => (
+        //                     <View key={id} style={styles.message}>
+        //                         <View
+        //                             style={styles.userContainer} />
+        //                         <View style={styles.textContainer}>
+        //                             <Text style={styles.userName}>
+        //                                 {data.ownerPhoneNumber || "Display Name"}
+        //                             </Text>
+        //                             <Text style={styles.titleText}>
+        //                                     {data.title}
+        //                             </Text>
+        //                             <View style={styles.textOutline}>
+        //                                 <Text style={styles.text}>
+        //                                     {data.content}
+        //                                 </Text>
+        //                             </View>
+        //                         </View>
+        //                     </View>
+        //             ))}
+        //         </ScrollView>
+        //     </ScrollView>
+        //     <View style={{
+        //         width: "100%", minHeight: 100,
+        //         borderTopWidth: 2, backgroundColor: "#ffc0",
+        //         flex: 1, flexGrow: 0, flexDirection: "row", justifyContent: "center", alignItems:  "center",
+        //     }}>
+        //         {/* Add Pin Button */}
+        //         <TouchableOpacity onPress={addPin} activeOpacity={0.7}
+        //             style={{
+        //                 width: 200, height: 75,
+        //                 marginTop: 0,
+        //                 justifyContent: "center", alignItems: "center", flexDirection: "row",
+        //                 backgroundColor: "#afc",
+        //                 borderColor: "#000", borderWidth: 2, borderRadius: 10,
+        //             }}>
+        //             <Icon
+		// 				name='plus'
+        //                 type='antdesign'
+        //                 color='#000'
+		// 				style={{
+		// 					width: 50, height: 50, marginRight: 0, justifyContent: "center"
+		// 				}}
+		// 			/>
+		// 			<Text style={{
+		// 				textAlign: "center",
+		// 				fontSize: 18,
+		// 				fontWeight: '600',
+		// 				color: 'black', marginRight: 15
+		// 			}}>
+		// 				{"Add Pin"}
+		// 			</Text>
+        //         </TouchableOpacity>
+        //     </View>
+        // </SafeAreaView>
     )
 }
 
