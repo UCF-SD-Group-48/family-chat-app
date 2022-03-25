@@ -362,7 +362,6 @@ const NewNotificationsBlock = () => {
                     </TouchableOpacity>
                 </View>
             </View>
-
         </View>
     );
 };

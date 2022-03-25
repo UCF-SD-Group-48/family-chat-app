@@ -48,7 +48,7 @@ import React, {
   import AddChatScreen from './screens/2_GroupChats/AddChatScreen';
   import ChatScreen from './screens/2_GroupChats/ChatScreen';
   import FamilyChatScreen from './screens/2_GroupChats/FamilyChatScreen';
-  import Groups from './screens/2_GroupChats/Groups';
+  import GroupsTab from './screens/2_GroupChats/GroupsTab';
   import CreateGroup_1_NameImage from './screens/2_GroupChats/CreateGroup_1_NameImage';
   import CreateGroup_2_Members from './screens/2_GroupChats/CreateGroup_2_Members';
   import Topics from './screens/2_GroupChats/Topics';
@@ -187,7 +187,7 @@ import React, {
         headerTintColor: "#000",
         headerTitleAlign: 'center',
       }}>
-      <Stack.Screen name='Groups' component={Groups} />
+      <Stack.Screen name='GroupsTab' component={GroupsTab} />
       <Stack.Screen name='AddChat' component={AddChatScreen} />
       <Stack.Screen name='Chat' component={ChatScreen} />
       <Stack.Screen name='Topics' component={Topics} />

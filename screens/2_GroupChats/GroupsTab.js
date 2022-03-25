@@ -60,33 +60,8 @@ import { set } from 'react-native-reanimated';
 // *************************************************************
 
 
-const Groups = ({ navigation }) => {
+const GroupsTab = ({ navigation }) => {
 	const [groups, setGroups] = useState([]);
-	const [userGroups, setUserGroups] = useState();
-
-	const goToAddChat = () => {
-		navigation.navigate('AddChat');
-	}
-
-	const goToHome = () => {
-		navigation.navigate('HomeTab');
-	}
-
-	const goToGroupChats = () => {
-		navigation.navigate('Groups');
-	}
-
-	const goToDMs = () => {
-		navigation.navigate('DMsTab');
-	}
-
-	const goToProfile = () => {
-		navigation.navigate('ProfileTab');
-	}
-
-	const signOut = () => {
-		auth.signOut().then(() => navigation.replace("Login"));
-	};
 
 	useEffect(async () => {
 		const unsubscribe = db.collection('groups').where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) => {
@@ -209,4 +184,4 @@ const styles = StyleSheet.create({
 	},
 })
 
-export default Groups;
+export default GroupsTab;
