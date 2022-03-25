@@ -65,13 +65,15 @@ const AddPin = ({ navigation, route }) => {
     const topicName = route.params.topicName;
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
+    const message = route.params.message;
+    const messageId = route.params.messageId;
 
     const [pinTitle, setPinTitle] = useState("");
-    const [pinContent, setPinContent] = useState("");
+    // const [pinContent, setPinContent] = useState("");
 
-    useEffect(() => {
-        setPinContent(route.params.message || "");
-    }, [route]);
+    // useEffect(() => {
+    //     // setPinContent(route.params.message || "");
+    // }, [route]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -84,15 +86,15 @@ const AddPin = ({ navigation, route }) => {
 
         db.collection('chats').doc(topicId).collection('pins').add({
             title: pinTitle,
-            content: pinContent,
-            originalMessageUID: route.params.messageUID || "",
+            // content: pinContent,
+            originalMessageUID: messageId || "",
             timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-            displayName: auth.currentUser.displayName,
-            ownerPhoneNumber: auth.currentUser.phoneNumber,
+            // displayName: auth.currentUser.displayName,
+            ownerUID: auth.currentUser.uid,
         }); // id passed in when we entered the chatroom
 
         setPinTitle(""); // clears input
-        setPinContent(""); // clears input
+        // setPinContent(""); // clears input
 
         navigation.goBack();
     };
@@ -187,7 +189,7 @@ const AddPin = ({ navigation, route }) => {
                         justifyContent: "flex-start", alignItems: "center",
                         borderWidth: 2, borderColor: 'black', borderRadius: 5,
                     }}>
-                        <TextInput placeholder={"Content"} onChangeText={setPinContent} value={pinContent}
+                        {/* <TextInput placeholder={"Content"} onChangeText={setPinContent} value={pinContent}
                             multiline={true}
                             style={{
                                 minHeight: 20, width: "100%",
@@ -197,7 +199,16 @@ const AddPin = ({ navigation, route }) => {
                                 fontWeight: '600',
                                 color: '#444',
                             }}
-                        />
+                        /> */}
+                        <Text style={{
+                            // paddingLeft: 20,
+                            textAlign: 'left',
+                            fontSize: 18,
+                            fontWeight: '600',
+                            color: 'black',
+                            }}>
+                            {message.message}
+                        </Text>
                     </View>
                 </View>
             </ScrollView>

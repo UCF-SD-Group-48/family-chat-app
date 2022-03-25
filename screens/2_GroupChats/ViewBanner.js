@@ -29,7 +29,14 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { HoldItem } from 'react-native-hold-menu';
+// import { HoldItem } from 'react-native-hold-menu';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+  } from 'react-native-popup-menu';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 import { AntDesign, SimpleLineIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 
 
@@ -75,6 +82,25 @@ const ViewBanner = ({ navigation, route }) => {
     
     const [bannerOwner, setBannerOwner] = useState([]);
 
+    const spaceText = "                  "
+    const IconOption = ({iconName, text, value, isLast, isSpacer, isDestructive}) => (
+        <MenuOption value={value} style={{
+            borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
+            borderColor: "#dedede",
+            height: (isSpacer) ? 47 : 40,
+            paddingHorizontal: 15, paddingVertical: 12,
+        }}>
+          <Text style={{fontFamily: (Platform.OS === 'ios') ? 'Menlo-Regular' : 'monospace', fontSize: 14,
+                color: (isDestructive) ? "red" : "black"}}>
+            {text+spaceText.substring(text.length)}
+            <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15}/>
+          </Text>
+        </MenuOption>
+    );
+    const triggerStyles = {
+        triggerTouchable: {underlayColor: "#0001"},
+    }
+
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "View Alert",
@@ -83,17 +109,27 @@ const ViewBanner = ({ navigation, route }) => {
 						flexDirection: "row",
 						marginRight: 20,
 					}}>
-                    <HoldItem activateOn="tap"
-                        items={[
-                            {
-                                text: 'Delete Alert',
-                                icon: "trash",
-                                isDestructive: true,
-                                onPress: () => {},
+                    <Menu onSelect={(value) => {
+                            if(value == 1) {
+                                console.log("Delete");
+                            }
+                        }}>
+                        <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
+                            <MaterialCommunityIcons name="dots-horizontal" size={30} color="black" />
+                        </MenuTrigger>
+                        <MenuOptions style={{
+                            borderRadius: 12, backgroundColor: "#fff",
+                            width: 175,
+                        }}
+                        customStyles={{
+                            optionsContainer: {
+                                borderRadius: 15, backgroundColor: "#666",
+                                width: 175,
                             },
-                    ]}>
-						<MaterialCommunityIcons name="dots-horizontal" size={30} color="black" />
-                    </HoldItem>
+                        }}>
+                            <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete' />
+                        </MenuOptions>
+                    </Menu>
 				</View>
 			),
         });

@@ -21,8 +21,7 @@ import React, {
     Input,
     Tooltip,
   } from 'react-native-elements';
-  import { HoldMenuProvider } from 'react-native-hold-menu';
-  import FeatherIcon from 'react-native-vector-icons/Feather';
+  import { MenuProvider } from 'react-native-popup-menu';
   import 'react-native-gesture-handler';
   import { NavigationContainer } from '@react-navigation/native';
   import { createStackNavigator } from '@react-navigation/stack';
@@ -235,7 +234,11 @@ import React, {
   // Screen definitions for the application.
   export default function App() {
     return (
-      <HoldMenuProvider iconComponent={FeatherIcon} theme="light">
+      <MenuProvider customStyles={{
+        backdrop: {
+          opacity: 0.35, backgroundColor: "#000"
+        },
+      }}>
         <SafeAreaView style={styles.safeAreaContainer}>
           <NavigationContainer>
             {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
@@ -255,7 +258,7 @@ import React, {
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>
-      </HoldMenuProvider>
+      </MenuProvider>
     );
   }
   
