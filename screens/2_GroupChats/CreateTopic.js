@@ -123,7 +123,6 @@ const CreateTopic = ({ navigation, route }) => {
 	useEffect(() => {
 		try {
 			getGroupMembers();
-			console.log()
 		} catch (error) {
 			alert(error)
 		}
@@ -186,11 +185,8 @@ const CreateTopic = ({ navigation, route }) => {
 				members: checked,
 			})
 			.then((result) => {
-				console.log(result.id)
 				setButtonText('CREATED');
-				// console.log(typeof(result.id), '--- topicId:', result.id, ' / topicName:', newTopicName, ' / groupId:', groupId, ' / groupName:', groupName, ' / groupOwner:', groupOwner)
 				navigation.push("Chat", { topicId : String(result.id), topicName : newTopicName, groupId, groupName, groupOwner });
-				// navigation.navigate("Chat", { topicId : oldTopicId, topicName : oldTopicName, groupId, groupName, groupOwner });
 			})
 			.catch((error) => alert(error));
 	};
