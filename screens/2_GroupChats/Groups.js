@@ -141,6 +141,7 @@ const Groups = ({ navigation }) => {
 			.then(() => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
+				console.log(topicId, topicName, groupId, groupName, groupOwner);
 
 				navigation.push("Chat", { topicId, topicName, groupId, groupName, groupOwner });
 			})

@@ -294,7 +294,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     const enterTopic = (id, name) => {
         if(name != "General") {
-            navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName });
+            navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner });
         }
         toggleTopicSelection();
     };
@@ -645,7 +645,11 @@ const ChatScreen = ({ navigation, route }) => {
                             </TouchableOpacity>
                             <View style={styles.topicSpacer}>
                                 <TouchableOpacity activeOpacity={0.2}
-                                    onPress={() => {console.log("messageMap = "+JSON.stringify(messageSenders))}}//navigation.push("AddTopic", { groupId })}
+                                    // onPress={() => {console.log("messageMap = "+JSON.stringify(messageSenders))}}//navigation.push("AddTopic", { groupId })}
+                                    onPress={() => {
+                                        console.log(topicId, topicName, groupId, groupName, groupOwner);
+                                        navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner })
+                                    }}
                                     style={{
                                         width: 35, height: 35, backgroundColor: "#ddd0",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 5,

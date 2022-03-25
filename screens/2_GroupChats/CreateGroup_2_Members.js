@@ -43,7 +43,7 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 	};
 
 	const goForward = () => {
-		navigation.push('CreateGroup_Step2', { coverImage });
+		// navigation.push('CreateGroup_Step2', { coverImage });
 	};
 
 	useLayoutEffect(() => {
@@ -196,7 +196,9 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 				await db.collection('groups').doc(groupID)
 					.collection("topics")
 					.add({
+						topicOwner: currentUserID,
 						topicName: "General",
+						members: membersArray,
 					})
 					.then((newlyCreatedTopic) => {
 						// add the topicId to the User's TopicId Map here

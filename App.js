@@ -52,7 +52,7 @@ import React, {
   import CreateGroup_1_NameImage from './screens/2_GroupChats/CreateGroup_1_NameImage';
   import CreateGroup_2_Members from './screens/2_GroupChats/CreateGroup_2_Members';
   import Topics from './screens/2_GroupChats/Topics';
-  import AddTopic from './screens/2_GroupChats/AddTopic';
+  import CreateTopic from './screens/2_GroupChats/CreateTopic';
   import AddPin from './screens/2_GroupChats/AddPin';
   import Pins from './screens/2_GroupChats/Pins';
   import AddBanner from './screens/2_GroupChats/AddBanner';
@@ -193,7 +193,7 @@ import React, {
       <Stack.Screen name='Topics' component={Topics} />
       <Stack.Screen name='CreateGroup_1_NameImage' component={CreateGroup_1_NameImage} />
       <Stack.Screen name='CreateGroup_2_Members' component={CreateGroup_2_Members} />
-      <Stack.Screen name='AddTopic' component={AddTopic} />
+      <Stack.Screen name='CreateTopic' component={CreateTopic} />
       <Stack.Screen name='AddPin' component={AddPin} />
       <Stack.Screen name='Pins' component={Pins} />
       <Stack.Screen name='AddBanner' component={AddBanner} />
