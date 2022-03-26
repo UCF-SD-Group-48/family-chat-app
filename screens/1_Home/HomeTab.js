@@ -61,7 +61,7 @@ import MyView from '../../components/MyView';
 const HomeTab = ({ navigation, route }) => {
 
   const navigateToAddGroup = () => {
-    navigation.navigate('AddGroup')
+    navigation.navigate('CreateGroup_1_NameImage')
   }
 
   const [blockHidden, setBlockHidden] = useState(false);
@@ -75,6 +75,7 @@ const HomeTab = ({ navigation, route }) => {
       .then(documentSnapshot => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
     return initialState;
   });
+  const [missed, setMissed] = useState([])
 
   useLayoutEffect(() => {
 		navigation.setOptions({
@@ -84,12 +85,31 @@ const HomeTab = ({ navigation, route }) => {
 	}, [navigation]);
 
 
-  useEffect(() => {
+  useEffect(async() => {
     db.collection('users').doc(auth.currentUser.uid).update({
       lastOn: firebase.firestore.FieldValue.serverTimestamp()
     })
 
     // Create dictionary of topicId and when each topic have been visited
+    // Print all the messages.timeStamp > lastOn
+    const unsubscribe = await db.collection('chats').onSnapshot((snapshot) => {
+      // snapshot
+        // chats.doc
+        //
+        //
+
+      setMissed(
+          snapshot.docs.map(async (chatDoc) => (
+            await db.collection('chats').doc(chatDoc.id).collection('messages').docs.map((actualMsg) => ( 
+              console.log("actualMsg", actualMsg.id)
+              )
+            )
+            
+          ))
+        )
+        });
+
+      return unsubscribe;
   }, [])
 
   return (
