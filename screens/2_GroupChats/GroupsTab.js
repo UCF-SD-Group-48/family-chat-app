@@ -28,7 +28,7 @@ import {
 	Input,
 	Tooltip,
 } from 'react-native-elements';
-import { AntDesign, SimpleLineIcons, Feather } from "@expo/vector-icons";
+import { AntDesign, SimpleLineIcons, Feather } from '@expo/vector-icons';
 
 
 // Imports for: Expo
@@ -64,37 +64,44 @@ const GroupsTab = ({ navigation }) => {
 	const [groups, setGroups] = useState([]);
 
 	useEffect(async () => {
-		const unsubscribe = db.collection('groups').where('members', 'array-contains', auth.currentUser.uid).onSnapshot((snapshot) => {
-
-		setGroups(
-				snapshot.docs.map((doc) => ({
-					id: doc.id,
-					data: doc.data(),
-				}))
-			)
+		const unsubscribe = db
+			.collection('groups')
+			.where('members', 'array-contains', auth.currentUser.uid)
+			.onSnapshot((snapshot) => {
+				setGroups(
+					snapshot.docs.map((doc) => ({
+						id: doc.id,
+						data: doc.data(),
+					}))
+				)
 			});
 		return unsubscribe;
 	}, []);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: "Groups",
-			headerStyle: { backgroundColor: "white" },
-			headerTitleStyle: { color: "black" },
-			headerTintColor: "black",
+			title: 'Groups',
+			headerStyle: { backgroundColor: 'white' },
+			headerTitleStyle: { color: 'black'},
+			headerTintColor: 'black',
 			headerLeft: '',
 			headerRight: () => (
 				<View
 					style={{
-						flexDirection: "row",
-						justifyContent: "space-between",
-						marginRight: 20,
+						flexDirection: 'row',
+						justifyContent: 'space-between',
+						marginRight: 12,
 					}}>
 					<TouchableOpacity
 						activeOpacity={0.5}
-						onPress={() => navigation.push("CreateGroup_1_NameImage")}
+						onPress={() => navigation.push('CreateGroup_1_NameImage')}
 					>
-						<Feather name="plus" size={30} color="black" />
+						<Icon
+							name='folder-plus'
+							type='material-community'
+							size={24}
+							color='#363732'
+						/>
 					</TouchableOpacity>
 				</View>
 			),
@@ -102,86 +109,113 @@ const GroupsTab = ({ navigation }) => {
 	}, [navigation]);
 
 	const enterGroup = (groupId, groupName, groupOwner) => {
-		// Navigating straight from Groups to Topic "General" or the first Topic found (if General does not exist)
+		// Navigating straight from Groups to Topic 'General' or the first Topic found (if General does not exist)
 		let topic = null;
-		const ref = db.collection("groups").doc(groupId).collection("topics").get()
+		const ref = db
+			.collection('groups')
+			.doc(groupId)
+			.collection('topics')
+			.get()
 			.then((snapshot) => {
 				snapshot.forEach((doc) => {
-					// console.log(doc.id, " => ", doc.data());
-					if(doc.data().topicName == "General" || topic == null) {
-						topic = doc;
-					}
+					if (doc.data().topicName == 'General' || topic == null) { topic = doc }
 				});
 			})
 			.then(() => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
-				console.log(topicId, topicName, groupId, groupName, groupOwner);
-
-				navigation.push("Chat", { topicId, topicName, groupId, groupName, groupOwner });
+				navigation.push('Chat', { topicId, topicName, groupId, groupName, groupOwner });
 			})
 			.catch((error) => {
-				console.log("Error getting documents: ", error);
+				console.log(error);
 			});
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<ScrollView width={"100%"}
+		<SafeAreaView style={styles.mainContainer}>
+			<ScrollView
+				width={'100%'}
 				contentContainerStyle={{
-					justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+					justifyContent: 'flex-start',
+					flexDirection: 'column',
 				}}
-				>
-				{groups.map(({ id, data: { groupName, groupOwner, color, coverImageNumber } }) => (
-					<GroupListItem
-						key={id}
-						id={id}
-						groupName={groupName}
-						groupOwner={groupOwner}
-						enterGroup={enterGroup}
-						color={color}
-						coverImageNumber={coverImageNumber}
-					/>
-				))}
-				<LineDivider topSpacing={5}/>
-				<TouchableOpacity onPress={() => navigation.push("CreateGroup_1_NameImage")} activeOpacity={0.7}
-					style={{
-						width: 350, height: 75,
-						marginTop: 25,
-						justifyContent: "center", alignItems: "center", flexDirection: "row",
-						backgroundColor: "#afc",
-						borderColor: "#000", borderWidth: 2, borderRadius: 10,
-					}}
-				>
-					<Icon
-						name='plus'
-                        type='antdesign'
-                        color='#000'
-						style={{
-							width: 50, height: 50, marginRight: 0, justifyContent: "center"
-						}}
-					/>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 15
-					}}>
-						{"Create New Group"}
-					</Text>
-				</TouchableOpacity>
+			>
+				<View>
+					{groups.map(({ id, data: { groupName, groupOwner, color, coverImageNumber, members } }) => (
+						<GroupListItem
+							key={id}
+							id={id}
+							groupName={groupName}
+							groupOwner={groupOwner}
+							enterGroup={enterGroup}
+							color={color}
+							coverImageNumber={coverImageNumber}
+							groupMemberCount={members.length}
+
+						/>
+					))}
+				</View>
+
+				<View style={{ width: '100%', alignItems: 'center' }}>
+					<TouchableOpacity
+						activeOpacity={0.75}
+						onPress={() => navigation.push('CreateGroup_1_NameImage')}
+					>
+						<View style={styles.buttonSpacing}>
+							<View style={[styles.buttonCreateGroup, {}]}>
+								<Text style={styles.buttonCreateGroupText}>
+									CREATE GROUP
+								</Text>
+								<Icon
+									name='folder-plus'
+									type='material-community'
+									size={30}
+									color='#777777'
+									style={{ marginLeft: 5 }}
+								/>
+							</View>
+						</View>
+					</TouchableOpacity>
+				</View>
+
 			</ScrollView>
 		</SafeAreaView>
 	)
 }
 
 const styles = StyleSheet.create({
-	container: {
-		height: "100%",
-		paddingVertical: 20,
-		paddingHorizontal: 10,
+	mainContainer: {
+		backgroundColor: '#EFEAE2',
+		height: '100%',
+	},
+
+	buttonSpacing: {
+		flexDirection: 'row',
+		justifyContent: 'flex-end',
+		margin: 35,
+	},
+
+	buttonCreateGroup: {
+		width: 240,
+		height: 55,
+		borderColor: '#777777',
+		borderWidth: 3,
+		borderStyle: 'solid',
+		borderRadius: 200,
+		flexDirection: 'row',
+		justifyContent: 'center',
+		display: 'flex',
 		alignItems: 'center',
 	},
+
+	buttonCreateGroupText: {
+		color: '#777777',
+		fontSize: 18,
+		fontWeight: '800',
+		marginRight: 5,
+	}
+
+
 })
 
 export default GroupsTab;

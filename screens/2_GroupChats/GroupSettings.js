@@ -76,7 +76,7 @@ const GroupSettings = ({ navigation, route }) => {
         // setName(groupName || "");
         // setEmoji("Get emoji from database here");
         // setColor("Get color from database here");
-        updateGroupSettings();
+        // updateGroupSettings();
         return () => {
             // db.collection('groups').doc(groupId).update({})
             setName({})
@@ -99,8 +99,8 @@ const GroupSettings = ({ navigation, route }) => {
                 
                 
                     if (topicRef) {
-                        topicRef.docs.map((doc) => {
-                            // db.collection('groups').doc(groupId).collection('topics').doc(doc.id).delete()
+                        topicRef.docs.map((doc, index) => {
+                            // db.collection('groups').d000oc(groupId).collection('topics').doc(doc.id).delete()
                             deleteTopic(doc.id)
                         })
                     } 
@@ -177,13 +177,13 @@ const GroupSettings = ({ navigation, route }) => {
         }
     }
 
-    const updateGroupSettings = () => {
-       db.collection('groups').doc(groupId).update({
-            groupName: name
-        })
+    // const updateGroupSettings = () => {
+    //    db.collection('groups').doc(groupId).update({
+    //         groupName: name
+    //     })
 
-        alert("Changes been made");
-    }
+    //     alert("Changes been made");
+    // }
     // const addPin = () => {
     //     Keyboard.dismiss();
 
@@ -227,6 +227,12 @@ const GroupSettings = ({ navigation, route }) => {
                         {"Change Group Settings for\n"+groupName}
 					</Text>
                 </View>
+
+                <TouchableOpacity onPress={() => navigation.push('TopicSettings')}>
+                    <View style={{width: 100, height: 50, backgroundColor: 'blue'}}>
+                        <Text> New Settings Page </Text>
+                    </View>
+                </TouchableOpacity>
 
                 {/* Input Fields -Name */}
                 <View style={{
@@ -345,8 +351,9 @@ const GroupSettings = ({ navigation, route }) => {
                     </View>
                 </View>
                 {/* Save Group Data */}
-                <TouchableOpacity onPress={updateGroupSettings} activeOpacity={0.7}
-                    style={{
+                {/* <TouchableOpacity onPress={updateGroupSettings} activeOpacity={0.7} */}
+                <TouchableOpacity activeOpacity={0.7}
+                style={{
                         width: 200, height: 50,
                         marginTop: 20,
                         justifyContent: "center", alignItems: "center", flexDirection: "row",

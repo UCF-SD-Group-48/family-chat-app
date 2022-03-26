@@ -33,18 +33,11 @@ import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 const CreateGroup_2_Members = ({ navigation, route }) => {
 
 	const [mapUpdate, setMapUpdate] = useState({});
-	const [groupName, setGroupName] = useState('');
 	const [coverImage, setCoverImage] = useState({ color: 'purple', imageNumber: 1 })
 	const [members, setMembers] = useState([]);
 	let [membersList, setMembersList] = useState([])
 
-	const goBackward = () => {
-		navigation.navigate('AddGroup');
-	};
-
-	const goForward = () => {
-		// navigation.push('CreateGroup_Step2', { coverImage });
-	};
+	const goBackward = () => navigation.navigate('CreateGroup_1_NameImage');
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -53,12 +46,12 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			headerTitleStyle: { color: 'black' },
 			headerTintColor: 'black',
 			headerLeft: () => (
-				<View style={{ marginLeft: 20 }}>
+				<View style={{ marginLeft: 12 }}>
 					<TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
 						<Icon
 							name='arrow-back'
 							type='ionicon'
-							color='black'
+							color='#363732'
 							size={28}
 						/>
 					</TouchableOpacity>
@@ -92,7 +85,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 	}
 
 	useEffect(async () => {
-		console.log('---- RUN ONCE ---- IN THE BEGINNING -----')
 		const ownerPhoneNumber = (auth.currentUser.phoneNumber).slice(2);
 		const query = await db
 			.collection('users')
@@ -101,7 +93,7 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		const snapshot = query.docs[0];
 		const data = snapshot.data();
 		const searchedUserFullName = `${data.firstName} ${data.lastName}`
-		setMembersList([...membersList, { uid : snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: true }])
+		setMembersList([...membersList, { uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: true }])
 	}, [])
 
 	useEffect(() => {
@@ -139,7 +131,7 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			const snapshot = query.docs[0];
 			const data = snapshot.data();
 			const searchedUserFullName = `${data.firstName} ${data.lastName}`;
-			setSearchedUser({ uid : snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner : false})
+			setSearchedUser({ uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: false })
 			return;
 		} else { setSearchResults('nonexistent') }
 	};
@@ -192,7 +184,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 						groups: arrayUnion(groupID)
 					})
 				})
-
 				await db.collection('groups').doc(groupID)
 					.collection("topics")
 					.add({
@@ -201,23 +192,17 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 						members: membersArray,
 					})
 					.then((newlyCreatedTopic) => {
-						// add the topicId to the User's TopicId Map here
 						topicID = newlyCreatedTopic.id
 						mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
-						console.log("doc.id ", mapUpdate)
-
 						membersArray.map(async (memberUID) => {
 							await db.collection('users').doc(memberUID).update(mapUpdate);
 						})
-						
-						// navigation.goBack(); // I have no clue where to place this
-
 					})
 					.catch((error) => alert(error));
 			})
-			.catch((error) => alert(error))
+			.catch((error) => alert(error));
 
-			enterGroup(groupID, route.params.groupName, currentUserID)
+		enterGroup(groupID, route.params.groupName, currentUserID)
 	};
 
 	const enterGroup = (groupId, groupName, groupOwner) => {
@@ -226,7 +211,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		const ref = db.collection("groups").doc(groupId).collection("topics").get()
 			.then((snapshot) => {
 				snapshot.forEach((doc) => {
-					// console.log(doc.id, " => ", doc.data());
 					if (doc.data().topicName == "General" || topic == null) {
 						topic = doc;
 					}
@@ -235,28 +219,19 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			.then(() => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
-
 				navigation.push("Chat", { topicId, topicName, groupId, groupName, groupOwner });
 			})
-			.catch((error) => {
-				console.log("Error getting documents: ", error);
-			});
+			.catch((error) => console.log(error));
 	};
 
 
 	const buttonFunction = () => {
-		console.log('CURRENT LIST ----------', membersList)
-		console.log('----')
-
 		let membersArray = [];
 
 		membersList.map((member) => {
 			membersArray.push(member.uid)
 		})
 
-		console.log(membersArray);
-
-		console.log('RUNNING THE CREATE GROUP NOW ----------******************')
 		createGroup();
 	}
 
@@ -319,7 +294,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 								: (searchResults === 'exists')
 									? <View style={styles.userExistsSearchResult}>
 										<View style={styles.userResult}>
-
 											<Image
 												source={imageSelection(searchedUser.pfp)}
 												style={{ width: 30, height: 30, borderRadius: 5 }}
@@ -329,7 +303,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 											</Text>
 										</View>
 										{(membersList.some(memberObject => memberObject.name === searchedUser.name))
-
 											? <View style={styles.memberExists}>
 												<Icon
 													name="check-bold"
@@ -340,7 +313,8 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 											</View>
 											: <TouchableOpacity
 												activeOpacity={0.75}
-												onPress={() => { setMembersList([...membersList, searchedUser]) }}											>
+												onPress={() => { setMembersList([...membersList, searchedUser]) }}
+											>
 												<View style={styles.buttonSpacing}>
 													<View style={[styles.searchResultsButtonAdd, { orderColor: '#2352DF', }]}>
 														<Text style={styles.searchResultsButtonAddText}>
@@ -395,8 +369,8 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 						</View>
 
 						<View style={styles.membersListContainer}>
-							{membersList.map((individualMember) => (
-								<View style={styles.memberEditRow}>
+							{membersList.map((individualMember, index) => (
+								<View style={styles.memberEditRow} key={index} id={index}>
 									<View style={styles.member}>
 										<Image
 											source={imageSelection(individualMember.pfp)}
@@ -438,9 +412,7 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 
 						<TouchableOpacity
 							activeOpacity={0.75}
-							// onPress={() => createGroup()}
-							// onPress={() => console.log('CURRENT LIST ----------', membersList)}
-							onPressIn={() => buttonFunction()}
+							onPressIn={() => createGroup()}
 						>
 							<View style={styles.buttonSpacing}>
 								<View style={[styles.buttonCreate, { borderColor: '#363732', }]}>
@@ -576,14 +548,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		display: 'flex',
 		alignItems: 'center',
-		// shadowColor: 'black',
-		// shadowOffset: { width: 3, height: 3 },
-		// shadowRadius: 3,
-		// shadowOpacity: .3,
 		borderWidth: 1,
 		borderColor: '#9D9D9D',
 	},
-
 
 	completedSearchResultText: {
 		fontSize: 12,
@@ -676,7 +643,6 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		fontWeight: '700',
 		marginLeft: 10
-
 	},
 
 	ownershipBadge: {
@@ -690,7 +656,6 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		alignItems: 'center',
 	},
-
 
 	buttonCreate: {
 		width: 125,

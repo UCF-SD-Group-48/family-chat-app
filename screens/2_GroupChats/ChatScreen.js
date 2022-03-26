@@ -42,7 +42,7 @@ import {
     MenuOptions,
     MenuOption,
     MenuTrigger,
-  } from 'react-native-popup-menu';
+} from 'react-native-popup-menu';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { AntDesign, Feather, Entypo, Ionicons, FontAwesome5, Fontisto } from "@expo/vector-icons";
 
@@ -92,24 +92,24 @@ const ChatScreen = ({ navigation, route }) => {
         setOverlay(!overlayIsVisible);
     };
 
-    const IconOption = ({iconName, text, value, isLast, isSpacer, isDestructive, hide, selectFunction}) => (
+    const IconOption = ({ iconName, text, value, isLast, isSpacer, isDestructive, hide, selectFunction }) => (
         (!hide) ? (
-        <MenuOption value={value} onSelect={selectFunction}
-        style={{
-            borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
-            borderColor: "#dedede",
-            height: (isSpacer) ? 47 : 40,
-            paddingLeft: 15, paddingVertical: 12,
-        }}>
-          <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
-            <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15}/>
-            {"   "+text}
-          </Text>
-        </MenuOption>
-        ) : (<View/>)
+            <MenuOption value={value} onSelect={selectFunction}
+                style={{
+                    borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
+                    borderColor: "#dedede",
+                    height: (isSpacer) ? 47 : 40,
+                    paddingLeft: 15, paddingVertical: 12,
+                }}>
+                <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
+                    <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15} />
+                    {"   " + text}
+                </Text>
+            </MenuOption>
+        ) : (<View />)
     );
     const triggerStyles = {
-        triggerTouchable: {underlayColor: "#0000"},
+        triggerTouchable: { underlayColor: "#0000" },
     }
 
     const messageMapFunction = () => {
@@ -132,7 +132,7 @@ const ChatScreen = ({ navigation, route }) => {
                     })
                     );
                 }
-                if(messageSenders.indexOf(message.data.ownerUID) === -1){
+                if (messageSenders.indexOf(message.data.ownerUID) === -1) {
                     messageSenders.push(message.data.ownerUID);
                 }
             });
@@ -150,7 +150,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     const messageSendersHelper = async () => {
         let senders = {};
-        for (const uid of messageSenderUIDs){
+        for (const uid of messageSenderUIDs) {
             await db.collection('users').doc(uid).get()
                 .then((result) => {
 
@@ -161,7 +161,7 @@ const ChatScreen = ({ navigation, route }) => {
                 });
         }
         setMessageSenders(senders);
-        
+
         // if(i > messageSenderUIDs.length) {
         //     return;
         // }
@@ -187,7 +187,7 @@ const ChatScreen = ({ navigation, route }) => {
         //     .catch(err => {
         //         console.log('Error getting documents', err);
         //     });
-        
+
         // const snapshot = await db.collection("users").doc(messageID).get();
         // if (!snapshot.empty) {
         //     // console.log(snapshot.data());
@@ -197,7 +197,7 @@ const ChatScreen = ({ navigation, route }) => {
         // else {
         //     return {};
         // }
-	};
+    };
     // const resetMessageSenders = () => {
     //     let senders = {};
     //     let returnVal = null;
@@ -210,7 +210,7 @@ const ChatScreen = ({ navigation, route }) => {
     //         // console.log(senderUID);
     //     })
     //     // setMessageSenders(senders);
-	// };
+    // };
     useEffect(() => {
         //resetMessageSenders();
         messageSendersHelper();
@@ -244,23 +244,41 @@ const ChatScreen = ({ navigation, route }) => {
         return unsubscribe;
     }, []);
 
+    const goBackward = () => navigation.navigate('GroupsTab');
+
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: (topicName == "General") ? groupName : groupName+"   ➤   "+topicName,
+            title: (topicName == "General") ? groupName : groupName + "   ➤   " + topicName,
+            // title: groupName,
+            headerStyle: '',
+            headerTitleStyle: { color: 'black' },
+            headerTintColor: 'black',
+            headerLeft: () => (
+                <View style={{ marginLeft: 12 }}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
+                        <Icon
+                            name='arrow-back'
+                            type='ionicon'
+                            color='#363732'
+                            size={28}
+                        />
+                    </TouchableOpacity>
+                </View>
+            ),
             headerRight: () => (
-				<View
-					style={{
-						flexDirection: "row",
-						marginRight: 20,
-					}}>
-					<TouchableOpacity
-						activeOpacity={0.5}
-						onPress={toggleOverlay}
-					>
-						<Entypo name="dots-three-horizontal" size={30} color="black" />
-					</TouchableOpacity>
-				</View>
-			),
+                <View
+                    style={{
+                        flexDirection: "row",
+                        marginRight: 12,
+                    }}>
+                    <TouchableOpacity
+                        activeOpacity={0.5}
+                        onPress={toggleOverlay}
+                    >
+                        <Entypo name="dots-three-horizontal" size={30} color="black" />
+                    </TouchableOpacity>
+                </View>
+            ),
         });
 
         resetAlert();
@@ -274,7 +292,7 @@ const ChatScreen = ({ navigation, route }) => {
             let doc = snapshot.docs[0];
             let data = doc.data();
             let viewedBy = `${data.viewedBy}`;
-            if(!viewedBy.includes(auth.currentUser.uid)) {
+            if (!viewedBy.includes(auth.currentUser.uid)) {
                 setAlert({
                     id: doc.id,
                     data: doc.data(),
@@ -282,7 +300,7 @@ const ChatScreen = ({ navigation, route }) => {
                 setAlertExists(true);
             }
         }
-	};
+    };
 
     useLayoutEffect(() => {
         const unsubscribe = db
@@ -320,19 +338,19 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const enterTopic = (id, name) => {
-        if(name != "General") {
+        if (name != "General") {
             navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner });
         }
         toggleTopicSelection();
     };
 
     const navigateTo = (place) => {
-        if(place == "Settings" || place == "Members" || place == "Invite") {
-            if(topicName == "General") {
-                navigation.push("Group"+place, { topicId, topicName, groupId, groupName, groupOwner });
+        if (place == "Settings" || place == "Members" || place == "Invite") {
+            if (topicName == "General") {
+                navigation.push("Group" + place, { topicId, topicName, groupId, groupName, groupOwner });
             }
             else {
-                navigation.push("Topic"+place, { topicId, topicName, groupId, groupName, groupOwner });
+                navigation.push("Topic" + place, { topicId, topicName, groupId, groupName, groupOwner });
             }
         }
         else {
@@ -350,24 +368,24 @@ const ChatScreen = ({ navigation, route }) => {
         db.collection('chats').doc(topicId).collection('banners').doc(alert.id).update({
             viewedBy: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid),
         })
-        .then(() => {
-            console.log("Document successfully updated!");
-            setAlertExists(false);
-        })
-        .catch((error) => {
-            // The document probably doesn't exist.
-            console.error("Error updating document: ", error);
-        });
+            .then(() => {
+                console.log("Document successfully updated!");
+                setAlertExists(false);
+            })
+            .catch((error) => {
+                // The document probably doesn't exist.
+                console.error("Error updating document: ", error);
+            });
     };
 
     const getString = (uid) => {
-        if(messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
-            return (messageSenders[uid.toString()].firstName+" "+messageSenders[uid.toString()].lastName);
+        if (messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
+            return (messageSenders[uid.toString()].firstName + " " + messageSenders[uid.toString()].lastName);
         }
         else return "";
     }
     const getPfp = (uid) => {
-        if(messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
+        if (messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
             return (messageSenders[uid.toString()].pfp);
         }
         else return "";
@@ -451,7 +469,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         }}>
                                             {(topicName == "General")
                                                 ? "Group"
-                                                : "Topic: "+topicName}
+                                                : "Topic: " + topicName}
                                         </Text>
                                     </View>
                                 </View>
@@ -479,7 +497,10 @@ const ChatScreen = ({ navigation, route }) => {
                                 justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                             }}>
                                 {/* Settings */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {navigateTo("Settings")}}
+                                <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPressOut={() => setOverlay(false)}
+                                    onPress={() => navigation.push("TopicSettings", { topicId, topicName, groupId, groupName, groupOwner })}
                                     style={{
                                         minWidth: 100,
                                         backgroundColor: "#ccc0",
@@ -500,7 +521,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     </View>
                                 </TouchableOpacity>
                                 {/* Members */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {navigateTo("Members")}}
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Members") }}
                                     style={{
                                         minWidth: 100,
                                         backgroundColor: "#ccc0",
@@ -521,7 +542,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     </View>
                                 </TouchableOpacity>
                                 {/* Invite! */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {navigateTo("Invite")}}
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Invite") }}
                                     style={{
                                         minWidth: 100,
                                         backgroundColor: "#ccc0",
@@ -568,7 +589,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                             }}>
                                 {/* Pins */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {navigateTo("Pins")}}
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Pins") }}
                                     style={styles.featuresOuterView}>
                                     <View style={styles.featuresIconView}>
                                         <Icon
@@ -659,7 +680,7 @@ const ChatScreen = ({ navigation, route }) => {
                         </Overlay>
 
                         {/* Topic Navigator */}
-                        <MyView hide={topicName!="General"}
+                        <MyView hide={topicName != "General"}
                             style={styles.topicNavigator}>
                             <View style={styles.topicSpacer}>
                                 <Text style={styles.topicLabel}>
@@ -758,7 +779,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     }}>
                                     <ScrollView persistentScrollbar={true}
                                         style={{
-                                            maxHeight: `${topics.length - 1}`*35, minWidth: 100,
+                                            maxHeight: `${topics.length - 1}` * 35, minWidth: 100,
                                         }}>
                                         {topics.map(({ id, data: { topicName } }) => (
                                             <MyView hide={topicName == "General"} key={id}
@@ -778,7 +799,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             </MyView>
                                         ))}
                                     </ScrollView>
-						        </MyView>
+                                </MyView>
                             </View>
                         </MyView>
                         {/* Banner (if applicable) */}
@@ -793,7 +814,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
                                 },
                                 {
-                                    shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                                    shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
                                     shadowRadius: 2, shadowOpacity: 0.5,
                                 }
                             ]} >
@@ -825,7 +846,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         paddingHorizontal: 5, paddingVertical: 5,
                                         backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
                                         flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                }}>
+                                    }}>
                                     <Fontisto name="close-a" size={20} color="black" />
                                 </TouchableOpacity>
                             </View>
@@ -843,9 +864,9 @@ const ChatScreen = ({ navigation, route }) => {
                                     marginHorizontal: 15,
                                     color: "black",
                                 }}>
-                                    <Text style={{fontWeight: '600'}}>"</Text>
+                                    <Text style={{ fontWeight: '600' }}>"</Text>
                                     {(alert != null && alert.data != undefined) ? (alert.data.description) : ("")}
-                                    <Text style={{fontWeight: '600'}}>"</Text>
+                                    <Text style={{ fontWeight: '600' }}>"</Text>
                                 </Text>
                             </View>
                             {/* Action */}
@@ -856,7 +877,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 flex: 0, flexGrow: 0,
                                 flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
                             }}>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(alert.id, alert.data)}}
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(alert.id, alert.data) }}
                                     style={{
                                         height: 40, paddingHorizontal: 10,
                                         flexDirection: "row", justifyContent: "center", alignItems: "center",
@@ -904,36 +925,36 @@ const ChatScreen = ({ navigation, route }) => {
                                         }} />
                                         <View style={styles.textContainer}>
 
-                                        <Menu>
-                                            <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
-                                                <View style={{
-                                                    minHeight: 30, marginLeft: 5,
-                                                    flex: 1, flexGrow: 1, justifyContent: "center",
-                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                                }}>
-                                                    <Text style={styles.text}>
-                                                        {data.message}
-                                                    </Text>
-                                                </View>
-                                            </MenuTrigger>
-                                            <MenuOptions style={{
-                                                borderRadius: 12, backgroundColor: "#fff",
-                                            }}
-                                            customStyles={{
-                                                optionsContainer: {
-                                                    borderRadius: 15, backgroundColor: "#666",
-                                                },
-                                            }}>
-                                                <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
-                                                <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
-                                                    selectFunction={() => {addPinFromMessage(data, id)}}/>
-                                                <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
-                                                <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
-                                                <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
-                                                <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
-                                            </MenuOptions>
-                                        </Menu>
+                                            <Menu>
+                                                <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                    <View style={{
+                                                        minHeight: 30, marginLeft: 5,
+                                                        flex: 1, flexGrow: 1, justifyContent: "center",
+                                                        backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                        borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                    }}>
+                                                        <Text style={styles.text}>
+                                                            {data.message}
+                                                        </Text>
+                                                    </View>
+                                                </MenuTrigger>
+                                                <MenuOptions style={{
+                                                    borderRadius: 12, backgroundColor: "#fff",
+                                                }}
+                                                    customStyles={{
+                                                        optionsContainer: {
+                                                            borderRadius: 15, backgroundColor: "#666",
+                                                        },
+                                                    }}>
+                                                    <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                        selectFunction={() => { addPinFromMessage(data, id) }} />
+                                                    <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
+                                                </MenuOptions>
+                                            </Menu>
 
                                         </View>
                                     </View>
@@ -945,7 +966,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                 style={{
                                                     width: "100%", height: "100%",
                                                     borderRadius: 7, borderWidth: 1, borderColor: "#777",
-                                                }}/>
+                                                }} />
                                         </View>
                                         <View style={styles.textContainer}>
                                             <View style={{
@@ -963,35 +984,36 @@ const ChatScreen = ({ navigation, route }) => {
                                                     color: "black",
                                                 }}>
                                                     {(data.timestamp != null) ? (data.timestamp.toDate().toLocaleTimeString("en-US", {
-                                                        hour: "numeric", minute: "2-digit" })) : ("")}
+                                                        hour: "numeric", minute: "2-digit"
+                                                    })) : ("")}
                                                 </Text>
                                             </View>
 
 
                                             <Menu>
-                                            <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
-                                                <View style={{
-                                                    minHeight: 30, marginLeft: 5,
-                                                    flex: 1, flexGrow: 1, justifyContent: "center",
-                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                                }}>
-                                                    <Text style={styles.text}>
-                                                        {data.message}
-                                                    </Text>
-                                                </View>
-                                            </MenuTrigger>
+                                                <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                    <View style={{
+                                                        minHeight: 30, marginLeft: 5,
+                                                        flex: 1, flexGrow: 1, justifyContent: "center",
+                                                        backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                        borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                    }}>
+                                                        <Text style={styles.text}>
+                                                            {data.message}
+                                                        </Text>
+                                                    </View>
+                                                </MenuTrigger>
                                                 <MenuOptions style={{
                                                     borderRadius: 12, backgroundColor: "#fff",
                                                 }}
-                                                customStyles={{
-                                                    optionsContainer: {
-                                                        borderRadius: 15, backgroundColor: "#666",
-                                                    },
-                                                }}>
+                                                    customStyles={{
+                                                        optionsContainer: {
+                                                            borderRadius: 15, backgroundColor: "#666",
+                                                        },
+                                                    }}>
                                                     <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
                                                     <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
-                                                        selectFunction={() => {addPinFromMessage(data, id)}}/>
+                                                        selectFunction={() => { addPinFromMessage(data, id) }} />
                                                     <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
                                                     <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
                                                     <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
@@ -999,7 +1021,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                 </MenuOptions>
                                             </Menu>
 
-                                            
+
                                         </View>
                                     </View>
                                 )

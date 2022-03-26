@@ -7,6 +7,8 @@ import React, {
     useState,
 } from 'react';
 import {
+    Dimensions,
+    Linking,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
@@ -59,345 +61,227 @@ import { set } from 'react-native-reanimated';
 
 // *************************************************************
 
-
 const TopicSettings = ({ navigation, route }) => {
+
+    const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
+        const windowWidth = Dimensions.get('window').width;
+        return (windowWidth * .92);
+    });
+
     const topicId = route.params.topicId;
     const topicName = route.params.topicName;
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
+    const groupOwner = route.params.groupOwner;
 
-    const [name, setName] = useState("");
-    const [emoji, setEmoji] = useState("");
-    const [color, setColor] = useState("");
-    
-    useEffect(() => {
-        setName(groupName || "");
-        setEmoji("Get emoji from database here");
-        setColor("Get color from database here");
-    }, [route]);
+    const goBackward = () => {
+        navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner,
+        })
+    };
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "Topic Settings:  "+ topicName,
+            title: 'Settings',
+            headerStyle: '',
+            headerTitleStyle: { color: 'black' },
+            headerTintColor: 'black',
+            headerLeft: () => (
+                <View style={{ marginLeft: 12 }}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
+                        <Icon
+                            name='arrow-back'
+                            type='ionicon'
+                            color='#363732'
+                            size={28}
+                        />
+                    </TouchableOpacity>
+                </View>
+            ),
+            headerRight: () => (
+                <View
+                    style={{
+                        flexDirection: "row",
+                        marginRight: 12,
+                    }}>
+                    <TouchableOpacity activeOpacity={0.5}>
+                        <Tooltip
+                            width={toggleWindowWidth}
+                            backgroundColor={'#DFD7CE'}
+                            containerStyle={styles.toolTipBlock}
+                            popover={
+                                <View style={{ margin: 15 }}>
+                                    <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                        Nunc quis orci quam. Donec sed posuere eros.
+                                        Sed ut nulla quis elit egestas faucibus vel mollis justo.
+                                        Donec eu varius mauris. Aliquam non felis risus.
+                                        Ut auctor id felis vitae hendrerit. Aliquam erat.
+                                    </Text>
+
+                                    <View style={{ flexDirection: "row", marginTop: 10, alignItems: 'center' }}>
+                                        <Icon
+                                            name='arrow-right-alt'
+                                            type='material'
+                                            size={25}
+                                            color='#9D9D9D'
+                                        />
+                                        <Text style={{ fontWeight: '600', marginLeft: 5, marginRight: 5, }}>Still have questions?</Text>
+                                        <Text
+                                            style={{ color: 'blue', fontWeight: '600' }}
+                                            onPress={() => Linking.openURL('https://www.familychat.app/FAQ')}
+                                        >
+                                            Visit our FAQ.
+                                        </Text>
+                                    </View>
+                                </View>
+
+                            }>
+                            <Icon
+                                name='help'
+                                type='material'
+                                size={24}
+                                color='#363732'
+                            />
+                        </Tooltip>
+                    </TouchableOpacity>
+                </View>
+            ),
         });
     }, [navigation]);
 
-    const addPin = () => {
-        Keyboard.dismiss();
+    useEffect(() => {
+        getTopicData();
 
-        db.collection('chats').doc(topicId).collection('pins').add({
-            title: pinTitle,
-            content: pinContent,
-            originalMessageUID: route.params.messageUID || "",
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-            displayName: auth.currentUser.displayName,
-            ownerPhoneNumber: auth.currentUser.phoneNumber,
-        }); // id passed in when we entered the chatroom
+        return () => {
+            getTopicData();
+        };
+    }, [navigation]);
 
-        setPinTitle(""); // clears input
-        setPinContent(""); // clears input
+    const getTopicData = async () => {
+        // const query = await db
+        //     .collection('users')
+        //     .where('phoneNumber', '==', searchedUserPhoneNumber)
+        //     .get();
 
-        navigation.goBack();
-    };
+        console.log(topicName)
 
-    const deleteTopic = async () => {
-        try {
-            console.log("deleted the topic")
-            let chatRef;
-            chatRef = await db.collection('chats').doc(topicId).collection('messages').get()
-            
-            if (chatRef) {
-                console.log("entered?")
-                chatRef.docs.map((doc) => {
-                    db.collection('chats').doc(topicId).collection('messages').doc(doc.id).delete()
-                    // await doc.delete()
-                })
-            } else {
-                console.log("didn't enter")
-            }
-                
-        } catch (error) {
-            alert(error)
-        } finally {
-            await db.collection('chats').doc(topicId).delete();
-            await db.collection('groups').doc(groupId).collection('topics').doc(topicId).delete();
-    }
-          
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView width={"100%"} height={"200%"}
+        <SafeAreaView style={styles.mainContainer}>
+            <ScrollView
+                width={'100%'}
                 contentContainerStyle={{
-                    justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-                    // flex: 1, flexGrow: 1,
-                }}>
-                {/* Info Blurb to descripe/encourage making of a pin */}
-                <View style={{
-                    minWidth: 150, minHeight: 75,
-                    justifyContent: "center", alignItems: "center",
-                    paddingHorizontal: 10, paddingVertical: 10,
-                    borderWidth: 2, borderRadius: 10,
-                }}>
-                    <Text style={{
-						textAlign: "center",
-						fontSize: 20,
-						fontWeight: '500',
-						color: 'black',
-					}}>
-						 {/* Use this top line for screen title/header later */}
-                         {/* {groupName + ": "} {topicName+"\n\n"} */}
-                        {"Change Topic Settings for\n"+topicName}
-					</Text>
-                </View>
+                    justifyContent: "flex-start",
+                    flexDirection: "column",
+                }}
+            >
 
-                {/* Input Fields -Name */}
-                <View style={{
-                        width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 50,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#6660",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 20,
-                        textAlign: 'left',
-                        fontSize: 24,
-                        fontWeight: '600',
-                        color: 'black',
+
+
+
+
+                {/* <View style={styles.innerContainer}>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(id, data) }} key={id}
+                        style={[
+                            {
+                                width: "100%", marginTop: 1,
+                                backgroundColor: "#fff", borderWidth: 0,
+                                flex: 0, flexGrow: 0, flexDirection: "row",
+                                justifyContent: "flex-start", alignItems: "center",
+                                borderRadius: 1,
+                            },
+                            {
+                                shadowColor: "#000", shadowOffset: { width: 0, height: 1 },
+                                shadowRadius: 0, shadowOpacity: 0.5,
+                            }
+                        ]} >
+                        <View style={{
+                            minWidth: "10%",
+                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                            flex: 1, flexGrow: 1, flexDirection: "row",
+                            justifyContent: "flex-start", alignItems: "center",
                         }}>
-                        {"Topic Name"}
-                    </Text>
-                </View>
-                <View style={{
-                    width: "100%", flexDirection: "row",
-                }}>
-                    <View style={{
-                        width: 50, height: 50, flex: 1, flexGrow: 1,
-                        marginTop: 5, marginHorizontal: 20, paddingVertical: 0, paddingHorizontal: 10,
-                        justifyContent: 'center',
-                        borderWidth: 2, borderColor: 'black', borderRadius: 5,
-                    }}>
-                        <TextInput placeholder={"Group Name"} onChangeText={setName} value={name}
-                            onSubmitEditing={() => {Keyboard.dismiss()}}
-                            style={{
-                                height: 35,
-                                textAlign: 'left',
-                                fontSize: 18,
-                                fontWeight: '600',
-                                color: '#444',
-                            }}
-                        />
-                    </View>
-                </View>
-                {/* Input Fields -Emoji */}
-                <View style={{
-                        width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 15,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#6660",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 20,
-                        textAlign: 'left',
-                        fontSize: 24,
-                        fontWeight: '600',
-                        color: 'black',
+                            <View style={{
+                                width: "100%", height: 65,
+                                paddingHorizontal: 15, paddingVertical: 10,
+                                backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
+                                flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
+                            }}>
+                                <View style={{
+                                    width: "100%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <Icon
+                                        name='megaphone'
+                                        type='entypo'
+                                        color='#777777'
+                                        size={18}
+                                    />
+                                    <Text numberOfLines={1}
+                                        style={{
+                                            fontSize: 18,
+                                            fontWeight: '600',
+                                            textAlign: "left",
+                                            marginLeft: 15, marginRight: 10,
+                                            color: "#777",
+                                            flex: 1,
+                                        }}>
+                                        <Text style={{ fontWeight: '600' }}>"</Text>
+                                        {data.description}
+                                        <Text style={{ fontWeight: '600' }}>"</Text>
+                                    </Text>
+                                </View>
+                                <View style={{
+                                    width: "100%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <Ionicons name="person-circle" size={18} color="#777" />
+                                    <Text numberOfLines={1}
+                                        style={{
+                                            fontSize: 16,
+                                            fontWeight: '400',
+                                            textAlign: "left",
+                                            marginLeft: 15, marginRight: 10,
+                                            color: "#777",
+                                            flex: 1,
+                                        }}>
+                                        {getString(data.ownerUID) || ""}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                       <View style={{
+                            minWidth: 60,
+                            borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                            paddingVertical: 0, paddingHorizontal: 15,
+                            flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
                         }}>
-                        {"Topic Emoji"}
-                    </Text>
-                </View>
-                <View style={{
-                    width: "100%", flexDirection: "row",
-                }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 5, marginHorizontal: 20, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 2, borderColor: 'black', borderRadius: 5,
-                    }}>
-                        <TextInput placeholder={"Smile"} onChangeText={setEmoji} value={emoji}
-                            multiline={true}
-                            style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660",
-                                textAlign: 'left',
-                                fontSize: 18,
-                                fontWeight: '600',
-                                color: '#444',
-                            }}
-                        />
-                    </View>
-                </View>
-                {/* Input Fields -Color */}
-                <View style={{
-                        width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 15,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#6660",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 20,
-                        textAlign: 'left',
-                        fontSize: 24,
-                        fontWeight: '600',
-                        color: 'black',
-                        }}>
-                        {"Topic Color"}
-                    </Text>
-                </View>
-                <View style={{
-                    width: "100%", flexDirection: "row",
-                }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 5, marginHorizontal: 20, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 2, borderColor: 'black', borderRadius: 5,
-                    }}>
-                        <TextInput placeholder={"Red"} onChangeText={setColor} value={color}
-                            multiline={true}
-                            style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660",
-                                textAlign: 'left',
-                                fontSize: 18,
-                                fontWeight: '600',
-                                color: '#444',
-                            }}
-                        />
-                    </View>
-                </View>
-                {/* Save Topic Data */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
-                    style={{
-                        width: 200, height: 50,
-                        marginTop: 20,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#afc",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 0
-					}}>
-						{"Save Topic Data Changes"}
-					</Text>
-                </TouchableOpacity>
-                {/* Delete Topic */}
-                <TouchableOpacity 
-                    onPress={deleteTopic}
-                    activeOpacity={0.7}
-                    style={{
-                        width: 200, height: 50,
-                        marginTop: 20,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#fac",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 0
-					}}>
-						{"Delete Topic"}
-					</Text>
-                </TouchableOpacity>
-                {/* Leave Topic */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
-                    style={{
-                        width: 200, height: 50,
-                        marginTop: 20,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#ccc",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 0
-					}}>
-						{"Leave Topic"}
-					</Text>
-                </TouchableOpacity>
-                {/* Add Owner by phone number */}
-                <View style={{
-                        width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 15,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#6660",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 20,
-                        textAlign: 'left',
-                        fontSize: 24,
-                        fontWeight: '600',
-                        color: 'black',
-                        }}>
-                        {"Add/remove Owner by phone number"}
-                    </Text>
-                </View>
-                <View style={{
-                    width: "100%", flexDirection: "row",
-                }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 5, marginHorizontal: 20, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 2, borderColor: 'black', borderRadius: 5,
-                    }}>
-                        <TextInput placeholder={"6505551234..."} onChangeText={()=>{}} value={null}
-                            multiline={true}
-                            style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660",
-                                textAlign: 'left',
-                                fontSize: 18,
-                                fontWeight: '600',
-                                color: '#444',
-                            }}
-                        />
-                    </View>
-                </View>
-                {/* owner button */}
-                <TouchableOpacity onPress={()=>{}} activeOpacity={0.7}
-                    style={{
-                        width: 200, height: 50,
-                        marginTop: 20,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#ccc",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 0
-					}}>
-						{"owner button"}
-					</Text>
-                </TouchableOpacity>
+                            <Entypo name="chevron-right" size={34} color="#333" />
+                        </View>
+                    </TouchableOpacity>
+                </View> */}
             </ScrollView>
-            {/* <View style={{
-                width: "100%", minHeight: 100,
-                flex: 1, flexGrow: 0, flexDirection: "column", justifyContent: "flex-start", alignItems: "center", 
-            }}>
-                
-            </View> */}
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        width: "100%", height: "100%",
-        paddingVertical: 20,
-        paddingHorizontal: 10,
-        alignItems: 'center',
+    mainContainer: {
+        backgroundColor: '#EFEAE2',
+        height: '100%',
     },
+
+    toolTipBlock: {
+        height: 185,
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: 5 },
+        shadowRadius: 2,
+        shadowOpacity: .25,
+    },
+
+
 })
 
 export default TopicSettings;

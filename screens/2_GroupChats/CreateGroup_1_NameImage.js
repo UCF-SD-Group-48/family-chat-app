@@ -28,17 +28,11 @@ import firebase from 'firebase/compat/app';
 
 const CreateGroup_1_NameImage = ({ navigation }) => {
 
-	const [mapUpdate, setMapUpdate] = useState({});
 	const [groupName, setGroupName] = useState('');
 	const [coverImage, setCoverImage] = useState({ color: 'purple', imageNumber: 1 })
 
-	const goBackward = () => {
-		navigation.navigate('Groups');
-	};
-
-	const goForward = () => {
-		navigation.push('CreateGroup_2_Members', { groupName, coverImage });
-	};
+	const goBackward = () => navigation.navigate('GroupsTab');
+	const goForward = () => navigation.push('CreateGroup_2_Members', { groupName, coverImage });
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -47,12 +41,12 @@ const CreateGroup_1_NameImage = ({ navigation }) => {
 			headerTitleStyle: { color: 'black' },
 			headerTintColor: 'black',
 			headerLeft: () => (
-				<View style={{ marginLeft: 20 }}>
+				<View style={{ marginLeft: 12 }}>
 					<TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
 						<Icon
 							name='arrow-back'
 							type='ionicon'
-							color='black'
+							color='#363732'
 							size={28}
 						/>
 					</TouchableOpacity>
@@ -61,97 +55,6 @@ const CreateGroup_1_NameImage = ({ navigation }) => {
 			headerRight: ''
 		});
 	}, [navigation]);
-
-	useEffect(() => {
-		// createGroup();
-		return () => {
-			setMapUpdate({}); // This worked for me
-		};
-	}, []);
-
-	// setCoverImage({})
-
-	const createGroup = async () => {
-		let currentUserId = auth.currentUser.uid
-		await db
-			.collection("groups")
-			.add({
-				groupName: input,
-				groupOwner: auth.currentUser.uid,
-				members: [auth.currentUser.uid]
-			})
-			.then(async (docRef) => {
-				await db.collection("users").doc(currentUserId).update({
-					groups: arrayUnion(docRef.id) // adds the uid's only
-
-				})
-
-				await db.collection('groups').doc(docRef.id)
-					.collection("topics")
-					.add({
-						topicName: "General",
-					})
-					.then((docRef) => {
-						// add the topicId to the User's TopicId Map here
-						const topicId = docRef.id
-						mapUpdate[`topicMap.${topicId}`] = firebase.firestore.FieldValue.serverTimestamp()
-						console.log("doc.id ", mapUpdate)
-
-						db.collection('users').doc(currentUserId).update(mapUpdate);
-
-						// navigation.goBack(); // I have no clue where to place this
-
-					})
-					.catch((error) => alert(error));
-			})
-			.catch((error) => alert(error))
-
-	};
-
-
-	// const checkIfSelected = (imageNumber) => {
-	// 	if (coverImage === imageNumber) {
-	// 		// Selected Profile Option
-	// 		return {
-	// 			width: 50,
-	// 			height: 50,
-	// 			borderRadius: 8,
-	// 			margin: 5,
-	// 			opacity: 1,
-	// 			borderWidth: 5,
-	// 			borderColor: '#2C6BED'
-	// 		}
-	// 	}
-	// 	else {
-	// 		// Default faded styling for profile options
-	// 		return {
-	// 			width: 50,
-	// 			height: 50,
-	// 			borderRadius: 8,
-	// 			margin: 5,
-	// 			opacity: .3
-	// 		}
-	// 	}
-	// };
-
-	// const handleCoverImageSelection = () => {
-	// 	switch (coverImageSelection) {
-	// 		case 'P1': {
-
-	// 			break;
-	// 		}
-	// 		case 'P1': {
-
-	// 			break;
-	// 		}
-	// 	}
-	// }
-
-
-	// const handleInputGroupName = () => {
-	// 	setGroupName(groupNameTextInput)
-	// 	setShownGroupName()
-	// }
 
 	const getSelectedImage = () => {
 		if (coverImage.color === 'purple') {
@@ -668,9 +571,6 @@ const CreateGroup_1_NameImage = ({ navigation }) => {
 								</View>
 							</TouchableOpacity>
 						}
-
-						{/* <Button disabled={!input} title="Create new Group" /> */}
-
 					</View>
 				</View>
 			</ScrollView>

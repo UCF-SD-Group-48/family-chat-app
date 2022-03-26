@@ -76,12 +76,12 @@ const CreateTopic = ({ navigation, route }) => {
 			headerTitleStyle: { color: 'black' },
 			headerTintColor: 'black',
 			headerLeft: () => (
-				<View style={{ marginLeft: 20 }}>
+				<View style={{ marginLeft: 12 }}>
 					<TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
 						<Icon
 							name='arrow-back'
 							type='ionicon'
-							color='black'
+							color='#363732'
 							size={28}
 						/>
 					</TouchableOpacity>
