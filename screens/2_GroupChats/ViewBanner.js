@@ -29,7 +29,6 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
-// import { HoldItem } from 'react-native-hold-menu';
 import {
     Menu,
     MenuOptions,
@@ -82,18 +81,17 @@ const ViewBanner = ({ navigation, route }) => {
     
     const [bannerOwner, setBannerOwner] = useState([]);
 
-    const spaceText = "                  "
-    const IconOption = ({iconName, text, value, isLast, isSpacer, isDestructive}) => (
-        <MenuOption value={value} style={{
+    const IconOption = ({iconName, text, value, isLast, isSpacer, isDestructive, selectFunction}) => (
+        <MenuOption value={value} onSelect={selectFunction}
+        style={{
             borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
             borderColor: "#dedede",
             height: (isSpacer) ? 47 : 40,
-            paddingHorizontal: 15, paddingVertical: 12,
+            paddingLeft: 15, paddingVertical: 12,
         }}>
-          <Text style={{fontFamily: (Platform.OS === 'ios') ? 'Menlo-Regular' : 'monospace', fontSize: 14,
-                color: (isDestructive) ? "red" : "black"}}>
-            {text+spaceText.substring(text.length)}
+          <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
             <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15}/>
+            {"   "+text}
           </Text>
         </MenuOption>
     );
@@ -109,25 +107,20 @@ const ViewBanner = ({ navigation, route }) => {
 						flexDirection: "row",
 						marginRight: 20,
 					}}>
-                    <Menu onSelect={(value) => {
-                            if(value == 1) {
-                                console.log("Delete");
-                            }
-                        }}>
+                    <Menu>
                         <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
                             <MaterialCommunityIcons name="dots-horizontal" size={30} color="black" />
                         </MenuTrigger>
                         <MenuOptions style={{
                             borderRadius: 12, backgroundColor: "#fff",
-                            width: 175,
                         }}
                         customStyles={{
                             optionsContainer: {
                                 borderRadius: 15, backgroundColor: "#666",
-                                width: 175,
                             },
                         }}>
-                            <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete' />
+                            <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
+                                selectFunction={() => {console.log("Delete")}}/>
                         </MenuOptions>
                     </Menu>
 				</View>

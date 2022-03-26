@@ -37,6 +37,13 @@ import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+  } from 'react-native-popup-menu';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 import { AntDesign, Feather, Entypo, Ionicons, FontAwesome5, Fontisto } from "@expo/vector-icons";
 
 // Imports for: Firebase
@@ -84,6 +91,26 @@ const ChatScreen = ({ navigation, route }) => {
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
     };
+
+    const IconOption = ({iconName, text, value, isLast, isSpacer, isDestructive, hide, selectFunction}) => (
+        (!hide) ? (
+        <MenuOption value={value} onSelect={selectFunction}
+        style={{
+            borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
+            borderColor: "#dedede",
+            height: (isSpacer) ? 47 : 40,
+            paddingLeft: 15, paddingVertical: 12,
+        }}>
+          <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
+            <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15}/>
+            {"   "+text}
+          </Text>
+        </MenuOption>
+        ) : (<View/>)
+    );
+    const triggerStyles = {
+        triggerTouchable: {underlayColor: "#0000"},
+    }
 
     const messageMapFunction = () => {
         let messageSenders = [];
@@ -344,6 +371,10 @@ const ChatScreen = ({ navigation, route }) => {
             return (messageSenders[uid.toString()].pfp);
         }
         else return "";
+    }
+
+    const addPinFromMessage = (message, messageId) => {
+        navigation.push("AddPin", { topicId, topicName, groupId, groupName, message, messageId });
     }
 
     return (
@@ -872,16 +903,38 @@ const ChatScreen = ({ navigation, route }) => {
                                             borderRadius: 10,
                                         }} />
                                         <View style={styles.textContainer}>
-                                            <View style={{
-                                                minHeight: 30, marginLeft: 5,
-                                                flex: 1, flexGrow: 1, justifyContent: "center",
-                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+
+                                        <Menu>
+                                            <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                <View style={{
+                                                    minHeight: 30, marginLeft: 5,
+                                                    flex: 1, flexGrow: 1, justifyContent: "center",
+                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                }}>
+                                                    <Text style={styles.text}>
+                                                        {data.message}
+                                                    </Text>
+                                                </View>
+                                            </MenuTrigger>
+                                            <MenuOptions style={{
+                                                borderRadius: 12, backgroundColor: "#fff",
+                                            }}
+                                            customStyles={{
+                                                optionsContainer: {
+                                                    borderRadius: 15, backgroundColor: "#666",
+                                                },
                                             }}>
-                                                <Text style={styles.text}>
-                                                    {data.message}
-                                                </Text>
-                                            </View>
+                                                <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
+                                                <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                    selectFunction={() => {addPinFromMessage(data, id)}}/>
+                                                <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
+                                                <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
+                                                <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
+                                            </MenuOptions>
+                                        </Menu>
+
                                         </View>
                                     </View>
                                 ) : (
@@ -913,16 +966,40 @@ const ChatScreen = ({ navigation, route }) => {
                                                         hour: "numeric", minute: "2-digit" })) : ("")}
                                                 </Text>
                                             </View>
-                                            <View style={{
-                                                minHeight: 30, marginLeft: 5,
-                                                flex: 1, flexGrow: 1, justifyContent: "center",
-                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                            }}>
-                                                <Text style={styles.text}>
-                                                    {data.message}
-                                                </Text>
-                                            </View>
+
+
+                                            <Menu>
+                                            <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                <View style={{
+                                                    minHeight: 30, marginLeft: 5,
+                                                    flex: 1, flexGrow: 1, justifyContent: "center",
+                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                }}>
+                                                    <Text style={styles.text}>
+                                                        {data.message}
+                                                    </Text>
+                                                </View>
+                                            </MenuTrigger>
+                                                <MenuOptions style={{
+                                                    borderRadius: 12, backgroundColor: "#fff",
+                                                }}
+                                                customStyles={{
+                                                    optionsContainer: {
+                                                        borderRadius: 15, backgroundColor: "#666",
+                                                    },
+                                                }}>
+                                                    <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                        selectFunction={() => {addPinFromMessage(data, id)}}/>
+                                                    <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
+                                                </MenuOptions>
+                                            </Menu>
+
+                                            
                                         </View>
                                     </View>
                                 )
