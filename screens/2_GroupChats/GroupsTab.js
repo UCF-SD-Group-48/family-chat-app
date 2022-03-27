@@ -108,7 +108,7 @@ const GroupsTab = ({ navigation }) => {
 		});
 	}, [navigation]);
 
-	const enterGroup = (groupId, groupName, groupOwner) => {
+	const enterGroup = (groupId, groupName, groupOwner, color) => {
 		// Navigating straight from Groups to Topic 'General' or the first Topic found (if General does not exist)
 		let topic = null;
 		const ref = db
@@ -124,7 +124,7 @@ const GroupsTab = ({ navigation }) => {
 			.then(() => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
-				navigation.push('Chat', { topicId, topicName, groupId, groupName, groupOwner });
+				navigation.push('Chat', { topicId, topicName, groupId, groupName, groupOwner, color });
 			})
 			.catch((error) => {
 				console.log(error);

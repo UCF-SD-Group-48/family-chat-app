@@ -75,6 +75,7 @@ const ChatScreen = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
     const [generalId, setgeneralId] = useState('');
 
     const [input, setInput] = useState('');
@@ -233,14 +234,18 @@ const ChatScreen = ({ navigation, route }) => {
     }, [route]);
 
     useEffect(() => {
-        const unsubscribe = db.collection("groups").doc(groupId).collection("topics").onSnapshot((snapshot) =>
-            setTopics(
-                snapshot.docs.map((doc) => ({
+        const unsubscribe = db
+            .collection("groups")
+            .doc(groupId)
+            .collection("topics")
+            .onSnapshot((snapshot) =>
+                setTopics(snapshot.docs.map((doc) =>
+                ({
                     id: doc.id,
                     data: doc.data(),
-                }))
-            )
-        );
+                })))
+            );
+
         return unsubscribe;
     }, []);
 
@@ -339,7 +344,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     const enterTopic = (id, name) => {
         if (name != "General") {
-            navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner });
+            navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color });
         }
         toggleTopicSelection();
     };
@@ -347,20 +352,20 @@ const ChatScreen = ({ navigation, route }) => {
     const navigateTo = (place) => {
         if (place == "Settings" || place == "Members" || place == "Invite") {
             if (topicName == "General") {
-                navigation.push("Group" + place, { topicId, topicName, groupId, groupName, groupOwner });
+                navigation.push("Group" + place, { topicId, topicName, groupId, groupName, groupOwner, color });
             }
             else {
-                navigation.push("Topic" + place, { topicId, topicName, groupId, groupName, groupOwner });
+                navigation.push("Topic" + place, { topicId, topicName, groupId, groupName, groupOwner, color });
             }
         }
         else {
-            navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner });
+            navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner, color });
         }
         setOverlay(false);
     };
 
     const viewBanner = (bannerId, bannerData) => {
-        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
+        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData, color });
     };
 
     const dismissBanner = () => {
@@ -392,7 +397,7 @@ const ChatScreen = ({ navigation, route }) => {
     }
 
     const addPinFromMessage = (message, messageId) => {
-        navigation.push("AddPin", { topicId, topicName, groupId, groupName, message, messageId });
+        navigation.push("AddPin", { topicId, topicName, groupId, groupName, message, messageId, color });
     }
 
     return (
@@ -500,7 +505,25 @@ const ChatScreen = ({ navigation, route }) => {
                                 <TouchableOpacity
                                     activeOpacity={0.7}
                                     onPressOut={() => setOverlay(false)}
-                                    onPress={() => navigation.push("TopicSettings", { topicId, topicName, groupId, groupName, groupOwner })}
+                                    onPress={() => {
+                                        const topicObjectResult = topics
+                                            .filter((topicObject) => topicObject.data.topicName === topicName)
+                                            .map((currentTopic) => {
+                                                const data = currentTopic.data;
+
+                                                const topicObjectForPassing = {
+                                                    color: color,
+                                                    groupId: groupId,
+                                                    groupOwner: groupOwner,
+                                                    topicId: currentTopic.id,
+                                                    topicName: data.topicName,
+                                                    topicOwner: data.topicOwner,
+                                                    topicMembers: data.members,
+                                                }
+
+                                                navigation.push("TopicSettings", { topicObjectForPassing })
+                                            });
+                                    }}
                                     style={{
                                         minWidth: 100,
                                         backgroundColor: "#ccc0",
@@ -700,6 +723,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     // onPress={() => {console.log("messageMap = "+JSON.stringify(messageSenders))}}//navigation.push("AddTopic", { groupId })}
                                     onPress={() => {
                                         console.log(topicId, topicName, groupId, groupName, groupOwner);
+                                        console.log(topics)
                                         navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner })
                                     }}
                                     style={{

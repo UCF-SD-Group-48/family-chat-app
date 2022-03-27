@@ -46,7 +46,7 @@ import {
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 import firebase from 'firebase/compat/app';
 
-import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
+import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
 
