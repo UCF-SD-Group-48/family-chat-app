@@ -121,38 +121,48 @@ const Pins = ({ navigation, route }) => {
         else return "";
     };
 
+    const getMessage = (uid) => {
+        if(messages != undefined && uid != undefined && messages[uid.toString()] != undefined) {
+            return (messages[uid.toString()]);
+        }
+        else return null;
+    };
+
+    const viewPin = (pinId, pinData, message) => {
+        navigation.push("ViewPin", { topicId, topicName, groupId, groupName, pinId, pinData, message });
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View
                 style={{
-                    width: "100%",
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
 
                 {/* History Text */}
                 <View style={{
-                    marginTop: 30,
+                    marginTop: 30, width: "100%",
                     flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                 }}>
-                <Divider width={2} color={"#777"}
-                    style={{
-                        minWidth: "10%",
-                        flexGrow: 1, flex: 1,
-                    }}/>
-                <Text style={{
-                    textAlign: "center",
-                    fontSize: 22,
-                    fontWeight: '700',
-                    color: 'black', marginHorizontal: 10
-                }}>
-                    {"History: Pinned Messages ("+pins.length+")"}
-                </Text>
-                <Divider width={2} color={"#777"}
-                    style={{
-                        minWidth: "10%",
-                        flexGrow: 1, flex: 1,
-                    }}/>
+                    <Divider width={2} color={"#777"}
+                        style={{
+                            minWidth: "10%",
+                            flexGrow: 1, flex: 1,
+                        }}/>
+                    <Text style={{
+                        textAlign: "center",
+                        fontSize: 22,
+                        fontWeight: '700',
+                        color: 'black', marginHorizontal: 10
+                    }}>
+                        {"History: Pinned Messages ("+pins.length+")"}
+                    </Text>
+                    <Divider width={2} color={"#777"}
+                        style={{
+                            minWidth: "10%",
+                            flexGrow: 1, flex: 1,
+                        }}/>
                 </View>
 
                 {/* All Pins */}
@@ -193,7 +203,7 @@ const Pins = ({ navigation, route }) => {
                     </MyView>
                     <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
                         {pins.map(({ id, data }) => (
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {}} key={id} //viewBanner(id, data)
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data, getMessage(data.originalMessageUID))}} key={id}
                                 style={[
                                     {
                                         width: "100%", marginTop: 1,
@@ -225,7 +235,7 @@ const Pins = ({ navigation, route }) => {
                                             borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
                                             flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                         }}>
-                                            <Entypo name="megaphone" size={18} color="#777" />
+                                            <Entypo name="pin" size={18} color="#777" />
                                             <Text numberOfLines={1}
                                                     style={{
                                                         fontSize: 18,
@@ -235,9 +245,7 @@ const Pins = ({ navigation, route }) => {
                                                         color: "#777",
                                                         flex: 1,
                                                 }}>
-                                                <Text style={{fontWeight: '600'}}>"</Text>
                                                     {data.title}
-                                                <Text style={{fontWeight: '600'}}>"</Text>
                                             </Text>
                                         </View>
                                         <View style={{
@@ -255,7 +263,9 @@ const Pins = ({ navigation, route }) => {
                                                     color: "#777",
                                                     flex: 1,
                                             }}>
+                                                <Text style={{fontWeight: '600'}}>"</Text>
                                                 { getMessageString(data.originalMessageUID) || ""}
+                                                <Text style={{fontWeight: '600'}}>"</Text>
                                             </Text>
                                         </View>
                                     </View>
@@ -282,7 +292,7 @@ const styles = StyleSheet.create({
     container: {
         width: "100%", height: "100%",
         paddingTop: 20,
-        paddingHorizontal: 10,
+        paddingHorizontal: 0,
         alignItems: 'center',
         backgroundColor: "#EFEAE2",
     },

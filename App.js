@@ -57,6 +57,7 @@ import Topics from './screens/2_GroupChats/Topics';
 import CreateTopic from './screens/2_GroupChats/CreateTopic';
 import AddPin from './screens/2_GroupChats/AddPin';
 import Pins from './screens/2_GroupChats/Pins';
+import ViewPin from './screens/2_GroupChats/ViewPin';
 import AddBanner from './screens/2_GroupChats/AddBanner';
 import Banners from './screens/2_GroupChats/Banners';
 import ViewBanner from './screens/2_GroupChats/ViewBanner';
@@ -198,6 +199,7 @@ const GroupChatsStackScreen = () => (
     <Stack.Screen name='CreateTopic' component={CreateTopic} />
     <Stack.Screen name='AddPin' component={AddPin} />
     <Stack.Screen name='Pins' component={Pins} />
+    <Stack.Screen name='ViewPin' component={ViewPin} />
     <Stack.Screen name='AddBanner' component={AddBanner} />
     <Stack.Screen name='Banners' component={Banners} />
     <Stack.Screen name='ViewBanner' component={ViewBanner} />

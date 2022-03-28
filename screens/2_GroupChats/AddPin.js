@@ -264,7 +264,7 @@ const AddPin = ({ navigation, route }) => {
                                 fontWeight: '500',
                                 color: "#777",
                                 }}>
-                                {message.message}
+                                {"\""+message.message+"\""}
                             </Text>
                         </View>
                     </View>

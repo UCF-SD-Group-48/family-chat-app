@@ -153,11 +153,16 @@ const ViewBanner = ({ navigation, route }) => {
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
-                <View style={{
+                <View style={[
+                    {
                         width: "95%",
                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                         backgroundColor: "#EC7169"
-                    }}>
+                    },
+                    {
+                        shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                        shadowRadius: 3, shadowOpacity: 0.4,
+                    }]}>
                     <View style={{
                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                     }}>
