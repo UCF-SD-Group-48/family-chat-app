@@ -1046,15 +1046,59 @@ const ChatScreen = ({ navigation, route }) => {
                                     </View>
                                 )
                             ))}
+                            <View style={{height: 30}} />
                         </ScrollView>
 
                         {/* Footer */}
                         <View style={styles.footer}>
+                            
+                            <View style={{
+                                width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                                marginTop: 2, marginHorizontal: 0, paddingLeft: 15,
+                                justifyContent: "flex-start", alignItems: "flex-end",
+                                borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
+                                borderBottomRightRadius: 20, borderTopRightRadius: 20,
+                            }}>
+                                <View style={{
+                                    width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end",
+                                }}>
+                                <TextInput placeholder={"Type a message..."} onChangeText={(text) => setInput(text)} value={input}
+                                    multiline={true} maxLength={200} //onSubmitEditing={sendMessage}
+                                    style={{
+                                        minHeight: 20, maxWidth: "70%",
+                                        marginBottom: 12, marginTop: 5,
+                                        backgroundColor: "#fff",
+                                        textAlign: 'left',
+                                        fontSize: 16,
+                                        fontWeight: '500',
+                                        color: '#222',
+                                    }}
+                                />
+                                <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
+                                    style={{
+                                        height: 42, width: "25%",
+                                        backgroundColor: "#1174EC", borderRadius: 21,
+                                        justifyContent: "center", alignItems: "center",
+                                    }}>
+                                    <Text style={{
+                                        fontSize: 16,
+                                        fontWeight: '700',
+                                        textAlign: "center",
+                                        color: "white",
+                                    }}>
+                                        {"SEND"}
+                                    </Text>
+                                </TouchableOpacity>
+                                </View>
+                            </View>
+                                
+                        </View>
+                        {/* <View style={styles.footer}>
                             <TextInput
                                 value={input}
                                 onChangeText={(text) => setInput(text)}
                                 onSubmitEditing={sendMessage}
-                                placeholder='Send a message'
+                                placeholder='Type a message...'
                                 style={styles.textInput}
                             />
                             <TouchableOpacity
@@ -1067,7 +1111,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     color='#2B68E6'
                                 />
                             </TouchableOpacity>
-                        </View>
+                        </View> */}
                     </>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
@@ -1256,7 +1300,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        padding: 15,
+        padding: 12, marginTop: 3,
+        backgroundColor: "#bbb",
     },
     textInput: {
         bottom: 0,
@@ -1264,7 +1309,7 @@ const styles = StyleSheet.create({
         flex: 1,
         marginRight: 15,
         padding: 10,
-        backgroundColor: '#ECECEC',
+        backgroundColor: '#fff',
         color: 'grey',
         borderWidth: 1,
         borderColor: 'transparent',
