@@ -44,7 +44,7 @@ import {
     MenuTrigger,
 } from 'react-native-popup-menu';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import { AntDesign, Feather, Entypo, Ionicons, FontAwesome5, Fontisto } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo, Ionicons, FontAwesome5, Fontisto, MaterialIcons } from "@expo/vector-icons";
 
 // Imports for: Firebase
 import {
@@ -61,6 +61,7 @@ import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/fi
 import MyView from '../../components/MyView';
 import LineDivider from '../../components/LineDivider';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
+import helpers from '../../helperFunctions/helpers';
 
 // *************************************************************
 
@@ -76,6 +77,7 @@ const ChatScreen = ({ navigation, route }) => {
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
     const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
     const [generalId, setgeneralId] = useState('');
 
     const [input, setInput] = useState('');
@@ -363,7 +365,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     const enterTopic = (id, name) => {
         if (name != "General") {
-            navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color });
+            navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber });
         }
         toggleTopicSelection();
     };
@@ -371,20 +373,20 @@ const ChatScreen = ({ navigation, route }) => {
     const navigateTo = (place) => {
         if (place == "Settings" || place == "Members" || place == "Invite") {
             if (topicName == "General") {
-                navigation.push("Group" + place, { topicId, topicName, groupId, groupName, groupOwner, color });
+                navigation.push("Group" + place, { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
             }
             else {
-                navigation.push("Topic" + place, { topicId, topicName, groupId, groupName, groupOwner, color });
+                navigation.push("Topic" + place, { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
             }
         }
         else {
-            navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner, color });
+            navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
         }
         setOverlay(false);
     };
 
     const viewBanner = (bannerId, bannerData) => {
-        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData, color });
+        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
     };
 
     const dismissBanner = () => {
@@ -416,7 +418,7 @@ const ChatScreen = ({ navigation, route }) => {
     }
 
     const addPinFromMessage = (message, messageId) => {
-        navigation.push("AddPin", { topicId, topicName, groupId, groupName, message, messageId, color });
+        navigation.push("AddPin", { topicId, topicName, groupId, groupName, message, messageId });
     }
 
     const viewPin = (id, data) => {
@@ -446,14 +448,16 @@ const ChatScreen = ({ navigation, route }) => {
                     <>
                         {/* Overlay */}
                         <Overlay isVisible={overlayIsVisible} onBackdropPress={toggleOverlay}
+                            containerStyle={{padding: 0,}}
                             overlayStyle={{
                                 width: screenWidth - 25,
-                                borderRadius: 7,
+                                borderRadius: 20,
                                 justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                                marginHorizontal: -10,
                             }}>
                             {/* Top section of overlay */}
                             <View style={{
-                                width: "100%", marginTop: 5,
+                                width: "100%", marginTop: 0,
                                 backgroundColor: "#0fc0",
                                 justifyContent: "space-between", alignItems: "flex-start", flexDirection: "row",
                             }}>
@@ -464,76 +468,68 @@ const ChatScreen = ({ navigation, route }) => {
                                     backgroundColor: "#cf00",
                                 }}>
                                     {/* Group Icon -top left, height change Top section's height */}
-                                    <View style={{
-                                        width: 75, height: 75,
-                                        justifyContent: "center", alignItems: "center",
-                                        borderRadius: 10, borderWidth: 2,
-                                        backgroundColor: "#cff",
-                                    }}>
-                                        <Text style={{
-                                            fontSize: 30,
-                                            fontWeight: '500',
-                                            color: 'black',
-                                            textAlign: "center",
-                                            paddingHorizontal: 0,
-                                        }}>
-                                            😎
-                                        </Text>
-                                    </View>
+                                    <Image
+                                        source={helpers.getGroupCoverImage(color, coverImageNumber)}
+                                        style={{ width: 85, height: 85,
+                                            marginLeft: 10, marginTop: 10,
+                                            borderRadius: 5, }}
+                                    />
                                     {/* Left section aligned next to Group Icon */}
                                     <View style={{
                                         minWidth: 100,
-                                        marginLeft: 10,
+                                        marginLeft: 20,
                                         flex: 1, flexGrow: 1, borderRadius: 30,
-                                        justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "col",
+                                        justifyContent: "flex-end", alignItems: "flex-start", flexDirection: "column",
                                         backgroundColor: "#0cc0",
                                     }}>
                                         {/* Group Name */}
                                         <Text style={{
-                                            fontSize: 24,
+                                            fontSize: 18,
                                             fontWeight: '700',
                                             color: 'black',
                                             textAlign: "left",
-                                            paddingHorizontal: 0,
+                                            paddingHorizontal: 0, marginBottom: 5,
                                         }}>
                                             {groupName}
                                         </Text>
-                                        {/* sub text */}
-                                        <Text style={{
-                                            fontSize: 18,
-                                            fontWeight: '500',
-                                            color: 'black',
-                                            textAlign: "left",
-                                            paddingHorizontal: 0,
+                                        {/* Topic text view */}
+                                        <View style={{
+                                            paddingVertical: 3, paddingLeft: 10, paddingRight: 20,
+                                            justifyContent: "flex-end", alignItems: "center", flexDirection: "row",
+                                            borderWidth: 1.5, borderColor: "#1174EC", borderRadius: 3,
                                         }}>
-                                            {(topicName == "General")
-                                                ? "Group"
-                                                : "Topic: " + topicName}
-                                        </Text>
+                                            <Ionicons name="ios-chatbubble-ellipses-outline" size={20} color="black" />
+                                            <Text style={{
+                                                fontSize: 14,
+                                                fontWeight: '700',
+                                                color: 'black',
+                                                textAlign: "left",
+                                                marginLeft: 10,
+                                            }}>
+                                                {(topicName == "General")
+                                                    ? "General"
+                                                    : topicName}
+                                            </Text>
+                                        </View>
                                     </View>
                                 </View>
                                 {/* Top Left X -close button */}
                                 <TouchableOpacity activeOpacity={0.7} onPress={toggleOverlay}
                                     style={{
                                         width: 45, height: 45,
-                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        justifyContent: "center",
-                                        backgroundColor: "#ddd",
+                                        borderWidth: 0, borderColor: "#000", borderRadius: 5,
+                                        justifyContent: "center", alignItems: "center",
+                                        backgroundColor: "#ddd0",
                                     }}>
-                                    <Icon
-                                        style={styles.icon}
-                                        name='close'
-                                        type='antdesign'
-                                        color='#c00'
-                                    />
+                                    <Ionicons name="md-close" size={30} color="black" />
                                 </TouchableOpacity>
                             </View>
                             {/* Group Details outer view */}
                             <View style={{
-                                width: "100%", height: 50,
-                                marginTop: 15,
-                                backgroundColor: "#0cf0",
-                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                width: screenWidth - 25,
+                                marginTop: 15, paddingVertical: 15,
+                                backgroundColor: "#EFEAE2", borderTopWidth: 1, borderBottomWidth: 1, borderColor: "#777",
+                                justifyContent: "center", alignItems: "center", flexDirection: "row",
                             }}>
                                 {/* Settings */}
                                 <TouchableOpacity
@@ -559,179 +555,122 @@ const ChatScreen = ({ navigation, route }) => {
                                             });
                                     }}
                                     style={{
-                                        minWidth: 100,
-                                        backgroundColor: "#ccc0",
+                                        width: 120,
+                                        paddingVertical: 5, marginRight: 25,
+                                        backgroundColor: "#fff", borderWidth: 1, borderColor: "#333", borderRadius: 3,
                                         justifyContent: "center", alignItems: "center", flexDirection: "row",
                                     }}>
-                                    <View style={styles.groupDetailsIconBubble}>
-                                        <Icon
-                                            style={styles.icon}
-                                            name='settings'
-                                            type='materialicons'
-                                            color='#000'
-                                        />
-                                    </View>
-                                    <View style={styles.groupDetailsTextBubble}>
-                                        <Text style={styles.groupDetailsText}>
-                                            {"Settings"}
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
-                                {/* Members */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Members") }}
-                                    style={{
-                                        minWidth: 100,
-                                        backgroundColor: "#ccc0",
-                                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                                    }}>
-                                    <View style={styles.groupDetailsIconBubble}>
-                                        <Icon
-                                            style={styles.icon}
-                                            name='people-alt'
-                                            type='materialicons'
-                                            color='#000'
-                                        />
-                                    </View>
-                                    <View style={styles.groupDetailsTextBubble}>
-                                        <Text style={styles.groupDetailsText}>
-                                            {"99 Members"}
-                                        </Text>
-                                    </View>
+                                    <MaterialIcons name="settings" size={20} color="black" style={{marginRight: 10}}/>
+                                    <Text style={styles.groupDetailsText}>
+                                        {"Settings"}
+                                    </Text>
+                                    
                                 </TouchableOpacity>
                                 {/* Invite! */}
                                 <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Invite") }}
                                     style={{
-                                        minWidth: 100,
-                                        backgroundColor: "#ccc0",
+                                        width: 120,
+                                        paddingVertical: 5,
+                                        backgroundColor: "#fff", borderWidth: 1, borderColor: "#333", borderRadius: 3,
                                         justifyContent: "center", alignItems: "center", flexDirection: "row",
                                     }}>
-                                    <View style={styles.groupDetailsIconBubble}>
-                                        <Icon
-                                            style={styles.icon}
-                                            name='mail'
-                                            type='materialicons'
-                                            color='#000'
-                                        />
-                                    </View>
-                                    <View style={styles.groupDetailsTextBubble}>
-                                        <Text style={styles.groupDetailsText}>
-                                            {"Invite!"}
+                                    <MaterialIcons name="person-add" size={20} color="black" style={{marginRight: 10}}/>
+                                    <Text style={styles.groupDetailsText}>
+                                        {"Invite!"}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            
+                            <View style={{
+                                width: screenWidth - 25, borderBottomLeftRadius: 20, borderBottomRightRadius: 20,
+                                marginBottom: -10, paddingHorizontal: 25, paddingVertical: 20,
+                                backgroundColor: "#DFD7CE",
+                                justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                            }}>
+                                {/* Feature Icons 1 */}
+                                <View style={{
+                                    width: "100%", marginBottom: 20,
+                                    backgroundColor: "#DFD7CE0",
+                                    justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                }}>
+                                    {/* Pins */}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Pins") }}
+                                        style={[styles.featuresOuterView,
+                                            {
+                                                shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                                shadowRadius: 3, shadowOpacity: 0.25,
+                                            }]}>
+                                        <Entypo name="pin" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Pins
+                                        </Text>
+                                    </TouchableOpacity>
+
+                                    {/* Polls */}
+                                    <View style={[styles.featuresOuterView,
+                                        {
+                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Entypo name="bar-graph" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Polls
                                         </Text>
                                     </View>
-                                </TouchableOpacity>
-                            </View>
-                            <LineDivider />
-                            {/* Chat Features Text View (for positioning) */}
-                            <View style={{
-                                width: "100%",
-                                marginTop: 20,
-                                backgroundColor: "#c0f0",
-                                justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                            }}>
-                                <Text style={{
-                                    fontSize: 20,
-                                    fontWeight: '600',
-                                    color: 'black',
-                                    textAlign: "left",
-                                    paddingHorizontal: 0,
+
+                                    {/* Lists */}
+                                    <View style={[styles.featuresOuterView,
+                                        {
+                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Ionicons name="list" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Lists
+                                        </Text>
+                                    </View>
+                                </View>
+                                {/* Feature Icons 2 */}
+                                <View style={{
+                                    width: "100%", backgroundColor: "#0cf0",
+                                    justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                 }}>
-                                    {"Chat Features"}
-                                </Text>
-                            </View>
-                            {/* Feature Icons 1 */}
-                            <View style={{
-                                width: 350,
-                                marginTop: 10,
-                                backgroundColor: "#0cf0",
-                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                            }}>
-                                {/* Pins */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Pins") }}
-                                    style={styles.featuresOuterView}>
-                                    <View style={styles.featuresIconView}>
-                                        <Icon
-                                            style={styles.icon}
-                                            name='pin'
-                                            type='entypo'
-                                            color='#000'
-                                        />
+                                    {/* Events */}
+                                    <View style={[styles.featuresOuterView,
+                                        {
+                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Entypo name="calendar" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Events
+                                        </Text>
                                     </View>
-                                    <Text style={styles.featuresText}>
-                                        Pins (5)
-                                    </Text>
-                                </TouchableOpacity>
 
-                                {/* Polls */}
-                                <View style={styles.featuresOuterView}>
-                                    <View style={styles.featuresIconView}>
-                                        <Icon
-                                            style={styles.icon}
-                                            name='bar-graph'
-                                            type='entypo'
-                                            color='#000'
-                                        />
-                                    </View>
-                                    <Text style={styles.featuresText}>
-                                        Polls (5)
-                                    </Text>
-                                </View>
+                                    {/* Banners */}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Banners")}
+                                        style={[styles.featuresOuterView,
+                                            {
+                                                shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                                shadowRadius: 3, shadowOpacity: 0.25,
+                                            }]}>
+                                        <Entypo name="megaphone" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Alerts
+                                        </Text>
+                                    </TouchableOpacity>
 
-                                {/* Lists */}
-                                <View style={styles.featuresOuterView}>
-                                    <View style={styles.featuresIconView}>
-                                        <Ionicons name="list" size={30} color="black" />
+                                    {/* Images */}
+                                    <View style={[styles.featuresOuterView,
+                                        {
+                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Entypo name="image" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Images
+                                        </Text>
                                     </View>
-                                    <Text style={styles.featuresText}>
-                                        Lists (13)
-                                    </Text>
-                                </View>
-                            </View>
-                            {/* Feature Icons 2 */}
-                            <View style={{
-                                width: 350,
-                                marginTop: 10, marginBottom: 5,
-                                backgroundColor: "#0cf0",
-                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                            }}>
-                                {/* Events */}
-                                <View style={styles.featuresOuterView}>
-                                    <View style={styles.featuresIconView}>
-                                        <Icon
-                                            style={styles.icon}
-                                            name='calendar'
-                                            type='entypo'
-                                            color='#000'
-                                        />
-                                    </View>
-                                    <Text style={styles.featuresText}>
-                                        Events (0)
-                                    </Text>
-                                </View>
-
-                                {/* Banners */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Banners")}
-                                    style={styles.featuresOuterView}>
-                                    <View style={styles.featuresIconView}>
-                                        <Entypo name="megaphone" size={30} color="black" />
-                                    </View>
-                                    <Text style={styles.featuresText}>
-                                        Alerts (5)
-                                    </Text>
-                                </TouchableOpacity>
-
-                                {/* Images */}
-                                <View style={styles.featuresOuterView}>
-                                    <View style={styles.featuresIconView}>
-                                        <Icon
-                                            style={styles.icon}
-                                            name='image'
-                                            type='entypo'
-                                            color='#000'
-                                        />
-                                    </View>
-                                    <Text style={styles.featuresText}>
-                                        Images (71)
-                                    </Text>
                                 </View>
                             </View>
                         </Overlay>
@@ -1142,21 +1081,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     featuresOuterView: {
-        minWidth: 100,
-        paddingHorizontal: 8, paddingVertical: 7,
-        borderRadius: 10, borderWidth: 2,
-        backgroundColor: "#ffc",
+        width: 90,
+        paddingHorizontal: 5, paddingVertical: 15,
+        borderRadius: 10, borderWidth: 1, borderColor: "#777",
+        backgroundColor: "#fff",
         justifyContent: "center", alignItems: "center", flexDirection: "column",
     },
     featuresIconView: {
-        width: 55, height: 55,
-        borderRadius: 10, borderWidth: 2,
-        backgroundColor: "#cff",
+        width: 50, height: 50,
+        borderRadius: 0, borderWidth: 0,
+        backgroundColor: "#cff0",
         justifyContent: "center", alignItems: "center",
     },
     featuresText: {
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: '700',
         color: 'black',
         textAlign: "center",
         marginTop: 5,

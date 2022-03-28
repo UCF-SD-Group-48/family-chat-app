@@ -180,7 +180,7 @@ const GroupListItem = ({ id, groupName, enterGroup, groupOwner, color, coverImag
         activeOpacity={0.75}
         onPress={() => {
           setIsLoading(true)
-          enterGroup(id, groupName, groupOwner, color)
+          enterGroup(id, groupName, groupOwner, color, coverImageNumber)
         }}
         style={styles.groupListItemComponent}
       >
