@@ -88,6 +88,7 @@ const ChatScreen = ({ navigation, route }) => {
     const [overlayIsVisible, setOverlay] = useState(false);
     const [alertExists, setAlertExists] = useState(false);
     const [alert, setAlert] = useState({});
+    const [pinMap, setPinMap] = useState({});
 
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
@@ -112,6 +113,24 @@ const ChatScreen = ({ navigation, route }) => {
     const triggerStyles = {
         triggerTouchable: { underlayColor: "#0000" },
     }
+
+    const pinMapFunction = async () => {
+        let pins = {};
+        const snapshot = await db.collection('chats').doc(topicId).collection('pins').get();
+        if (!snapshot.empty) {
+            snapshot.forEach(doc => {
+                pins[`${doc.data().originalMessageUID}`] = {
+                    id: doc.id,
+                    data: doc.data(),
+                };
+            })
+        }
+        setPinMap(pins);
+    }
+
+    useEffect(() => {
+        pinMapFunction();
+    }, [messages]);
 
     const messageMapFunction = () => {
         let messageSenders = [];
@@ -399,6 +418,21 @@ const ChatScreen = ({ navigation, route }) => {
     const addPinFromMessage = (message, messageId) => {
         navigation.push("AddPin", { topicId, topicName, groupId, groupName, message, messageId, color });
     }
+
+    const viewPin = (id, data) => {
+        const pin = getPinData(id);
+        if(pin != null) {
+            navigation.push("ViewPin", { topicId, topicName, groupId, groupName, pinId: pin.id, pinData: pin.data, message: data });
+        }
+    };
+
+    const getPinData = (uid) => {
+        //pinMap != undefined && pinMap[id.toString()] != undefined
+        if(pinMap != undefined && uid != undefined && pinMap[uid.toString()] != undefined) {
+            return (pinMap[uid.toString()]);
+        }
+        else return null;
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -979,8 +1013,17 @@ const ChatScreen = ({ navigation, route }) => {
                                                     <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
                                                 </MenuOptions>
                                             </Menu>
-
                                         </View>
+                                        { (getPinData(id) != null) ? (
+                                        <View style={{
+                                            padding: 5, marginLeft: 5,
+                                            backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                            borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                            }}>
+                                            <Entypo name="pin" size={25} color="#555" />
+                                        </View>
+                                        ) : (<View style={{width: 0, height: 0,}} />)}
+
                                     </View>
                                 ) : (
                                     //Message with profile picture and display name
@@ -1013,39 +1056,53 @@ const ChatScreen = ({ navigation, route }) => {
                                                 </Text>
                                             </View>
 
+                                            <View style={{
+                                                flexDirection: "row", alignItems: "flex-start",
+                                                flex: 1, flexGrow: 1, backgroundColor: "#3330",
+                                            }}>
+                                                <Menu style={{flex: 1,}}>
+                                                    <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                        <View style={{
+                                                            minHeight: 30, marginLeft: 5,
+                                                            flex: 1, flexGrow: 1, justifyContent: "center",
+                                                            backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                            borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                        }}>
+                                                            <Text style={styles.text}>
+                                                                {data.message}
+                                                            </Text>
+                                                        </View>
+                                                    </MenuTrigger>
+                                                    <MenuOptions style={{
+                                                        borderRadius: 12, backgroundColor: "#fff",
+                                                    }}
+                                                        customStyles={{
+                                                            optionsContainer: {
+                                                                borderRadius: 15, backgroundColor: "#666",
+                                                            },
+                                                        }}>
+                                                        <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                            selectFunction={() => { addPinFromMessage(data, id) }} />
+                                                        <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    </MenuOptions>
+                                                </Menu>
 
-                                            <Menu>
-                                                <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
-                                                    <View style={{
-                                                        minHeight: 30, marginLeft: 5,
-                                                        flex: 1, flexGrow: 1, justifyContent: "center",
+                                                { (getPinData(id) != null) ? (
+                                                <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
+                                                    style={{
+                                                        padding: 5, marginLeft: 5,
                                                         backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
                                                         borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
                                                     }}>
-                                                        <Text style={styles.text}>
-                                                            {data.message}
-                                                        </Text>
-                                                    </View>
-                                                </MenuTrigger>
-                                                <MenuOptions style={{
-                                                    borderRadius: 12, backgroundColor: "#fff",
-                                                }}
-                                                    customStyles={{
-                                                        optionsContainer: {
-                                                            borderRadius: 15, backgroundColor: "#666",
-                                                        },
-                                                    }}>
-                                                    <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
-                                                        selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                    <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
-                                                </MenuOptions>
-                                            </Menu>
+                                                    <Entypo name="pin" size={25} color="#555" />
+                                                </TouchableOpacity>
+                                                ) : (<View style={{width: 0, height: 0,}} />)}
 
-
+                                            </View>
                                         </View>
                                     </View>
                                 )
