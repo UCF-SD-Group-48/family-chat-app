@@ -28,7 +28,7 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { AntDesign, Feather, Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, Feather, Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
 
 // Imports for: Expo
@@ -58,6 +58,8 @@ const Pins = ({ navigation, route }) => {
     const groupName = route.params.groupName;
 
     const [pins, setPins] = useState([])
+
+    const [messages, setMessages] = useState({});
 
     useLayoutEffect(() => {
         const unsubscribe = db
@@ -97,8 +99,26 @@ const Pins = ({ navigation, route }) => {
     }, [navigation]);
 
     
-    const addPin = () => {
-        navigation.push("AddPin", { topicId, topicName, groupId, groupName });
+    useEffect(() => {
+        getMessages();
+    }, [pins]);
+
+    const getMessages = async () => {
+        let mess = {};
+        for (const pin of pins) {
+            await db.collection("chats").doc(topicId).collection("messages").doc(pin.data.originalMessageUID).get()
+                .then((result) => {
+                    mess[pin.data.originalMessageUID] = result.data();
+                });
+        }
+        setMessages(mess);
+	};
+
+    const getMessageString = (uid) => {
+        if(messages != undefined && uid != undefined && messages[uid.toString()] != undefined) {
+            return (messages[uid.toString()].message);
+        }
+        else return "";
     };
 
     return (
@@ -216,7 +236,7 @@ const Pins = ({ navigation, route }) => {
                                                         flex: 1,
                                                 }}>
                                                 <Text style={{fontWeight: '600'}}>"</Text>
-                                                    {data.description}
+                                                    {data.title}
                                                 <Text style={{fontWeight: '600'}}>"</Text>
                                             </Text>
                                         </View>
@@ -225,7 +245,7 @@ const Pins = ({ navigation, route }) => {
                                             borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
                                             flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                         }}>
-                                            <Ionicons name="person-circle" size={18} color="#777" />
+                                            <MaterialIcons name="text-snippet" size={18} color="#777" />
                                             <Text numberOfLines={1}
                                                 style={{
                                                     fontSize: 16,
@@ -235,7 +255,7 @@ const Pins = ({ navigation, route }) => {
                                                     color: "#777",
                                                     flex: 1,
                                             }}>
-                                                { getString(data.ownerUID) || ""}
+                                                { getMessageString(data.originalMessageUID) || ""}
                                             </Text>
                                         </View>
                                     </View>
@@ -255,70 +275,6 @@ const Pins = ({ navigation, route }) => {
                 </View>
             </View>
         </SafeAreaView>
-
-
-        // <SafeAreaView style={styles.container}>
-        //     <ScrollView width={"100%"}
-        //         contentContainerStyle={{
-        //             justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-        //             flex: 1, flexGrow: 1,
-        //         }}>
-        //         {/* Info Blurb to descripe/encourage making of a pin */}
-        //         <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%" }}>
-        //             {pins.map(({ id, data }) => (
-        //                     <View key={id} style={styles.message}>
-        //                         <View
-        //                             style={styles.userContainer} />
-        //                         <View style={styles.textContainer}>
-        //                             <Text style={styles.userName}>
-        //                                 {data.ownerPhoneNumber || "Display Name"}
-        //                             </Text>
-        //                             <Text style={styles.titleText}>
-        //                                     {data.title}
-        //                             </Text>
-        //                             <View style={styles.textOutline}>
-        //                                 <Text style={styles.text}>
-        //                                     {data.content}
-        //                                 </Text>
-        //                             </View>
-        //                         </View>
-        //                     </View>
-        //             ))}
-        //         </ScrollView>
-        //     </ScrollView>
-        //     <View style={{
-        //         width: "100%", minHeight: 100,
-        //         borderTopWidth: 2, backgroundColor: "#ffc0",
-        //         flex: 1, flexGrow: 0, flexDirection: "row", justifyContent: "center", alignItems:  "center",
-        //     }}>
-        //         {/* Add Pin Button */}
-        //         <TouchableOpacity onPress={addPin} activeOpacity={0.7}
-        //             style={{
-        //                 width: 200, height: 75,
-        //                 marginTop: 0,
-        //                 justifyContent: "center", alignItems: "center", flexDirection: "row",
-        //                 backgroundColor: "#afc",
-        //                 borderColor: "#000", borderWidth: 2, borderRadius: 10,
-        //             }}>
-        //             <Icon
-		// 				name='plus'
-        //                 type='antdesign'
-        //                 color='#000'
-		// 				style={{
-		// 					width: 50, height: 50, marginRight: 0, justifyContent: "center"
-		// 				}}
-		// 			/>
-		// 			<Text style={{
-		// 				textAlign: "center",
-		// 				fontSize: 18,
-		// 				fontWeight: '600',
-		// 				color: 'black', marginRight: 15
-		// 			}}>
-		// 				{"Add Pin"}
-		// 			</Text>
-        //         </TouchableOpacity>
-        //     </View>
-        // </SafeAreaView>
     )
 }
 
@@ -328,6 +284,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingHorizontal: 10,
         alignItems: 'center',
+        backgroundColor: "#EFEAE2",
     },
     message: {
         flex: 1,
