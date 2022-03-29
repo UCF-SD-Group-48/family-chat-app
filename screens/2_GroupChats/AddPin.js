@@ -23,12 +23,13 @@ import {
     Alert,
     Avatar,
     Button,
+    Divider,
     Icon,
     Image,
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+import { AntDesign, SimpleLineIcons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
 
 // Imports for: Expo
@@ -56,6 +57,7 @@ import UserPrompt from '../../components/UserPrompt';
 import GroupListItem from '../../components/GroupListItem'
 import { collection } from 'firebase/firestore';
 import { set } from 'react-native-reanimated';
+import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
 
@@ -68,33 +70,37 @@ const AddPin = ({ navigation, route }) => {
     const message = route.params.message;
     const messageId = route.params.messageId;
 
-    const [pinTitle, setPinTitle] = useState("");
-    // const [pinContent, setPinContent] = useState("");
+    const [pinOwner, setPinOwner] = useState([]);
 
-    // useEffect(() => {
-    //     // setPinContent(route.params.message || "");
-    // }, [route]);
+    const [pinTitle, setPinTitle] = useState("");
 
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Add Pin",
         });
+
+        getPinOwner();
+
     }, [navigation]);
+
+    const getPinOwner = async () => {
+		const snapshot = await db.collection("users").doc(auth.currentUser.uid).get();
+        if (!snapshot.empty) {
+            setPinOwner(snapshot.data());
+        }
+	};
 
     const addPin = () => {
         Keyboard.dismiss();
 
         db.collection('chats').doc(topicId).collection('pins').add({
             title: pinTitle,
-            // content: pinContent,
             originalMessageUID: messageId || "",
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-            // displayName: auth.currentUser.displayName,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             ownerUID: auth.currentUser.uid,
-        }); // id passed in when we entered the chatroom
+        });
 
         setPinTitle(""); // clears input
-        // setPinContent(""); // clears input
 
         navigation.goBack();
     };
@@ -106,143 +112,190 @@ const AddPin = ({ navigation, route }) => {
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
-                {/* Info Blurb to descripe/encourage making of a pin */}
-                <View style={{
-                    minWidth: 150, minHeight: 75,
-                    justifyContent: "center", alignItems: "center",
-                    paddingHorizontal: 10, paddingVertical: 10,
-                    borderWidth: 2, borderRadius: 10,
-                }}>
-                    <Text style={{
-						textAlign: "center",
-						fontSize: 20,
-						fontWeight: '500',
-						color: 'black',
-					}}>
-						 {/* Use this top line for screen title/header later */}
-                         {/* {groupName + ": "} {topicName+"\n\n"} */}
-                        {"Fill in the information you'd like to pin\nfor everyone to reference later!"}
-					</Text>
-                </View>
-
-                {/* Input Fields -Title */}
-                <View style={{
-                        width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 50,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#6660",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 20,
-                        textAlign: 'left',
-                        fontSize: 24,
-                        fontWeight: '600',
-                        color: 'black',
-                        }}>
-                        {"Pin Title"}
-                    </Text>
-                </View>
-                <View style={{
-                    width: "100%", flexDirection: "row",
-                }}>
+                <View style={[
+                        {
+                            width: "95%",
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                            backgroundColor: "#fff", borderTopWidth: 18, borderColor: "#DFD7CE",
+                        },
+                        {
+                            shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                            shadowRadius: 3, shadowOpacity: 0.4,
+                        }
+                    ]}>
+                    {/* Prompt */}
                     <View style={{
-                        width: 50, height: 50, flex: 1, flexGrow: 1,
-                        marginTop: 5, marginHorizontal: 20, paddingVertical: 0, paddingHorizontal: 10,
-                        justifyContent: 'center',
-                        borderWidth: 2, borderColor: 'black', borderRadius: 5,
-                    }}>
-                        <TextInput placeholder={"Title"} onChangeText={setPinTitle} value={pinTitle}
-                            onSubmitEditing={() => {Keyboard.dismiss()}}
-                            style={{
-                                height: 35,
-                                textAlign: 'left',
-                                fontSize: 18,
-                                fontWeight: '600',
-                                color: '#444',
-                            }}
-                        />
-                    </View>
-                </View>
-                {/* Input Fields -Content */}
-                <View style={{
-                        width: "100%", minHeight: 30,
-                        marginHorizontal: 20, marginTop: 15,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#6660",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 20,
-                        textAlign: 'left',
-                        fontSize: 24,
-                        fontWeight: '600',
-                        color: 'black',
-                        }}>
-                        {"Pin Content"}
-                    </Text>
-                </View>
-                <View style={{
-                    width: "100%", flexDirection: "row",
-                }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 5, marginHorizontal: 20, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 2, borderColor: 'black', borderRadius: 5,
-                    }}>
-                        {/* <TextInput placeholder={"Content"} onChangeText={setPinContent} value={pinContent}
-                            multiline={true}
-                            style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660",
-                                textAlign: 'left',
-                                fontSize: 18,
-                                fontWeight: '600',
-                                color: '#444',
-                            }}
-                        /> */}
+                        width: "90%", paddingTop: 20,
+                        justifyContent: "flex-start", alignItems: "center", flexDirection: "row", }}>
                         <Text style={{
-                            // paddingLeft: 20,
+                            paddingLeft: 0,
                             textAlign: 'left',
-                            fontSize: 18,
-                            fontWeight: '600',
+                            fontSize: 26,
+                            fontWeight: '700',
                             color: 'black',
                             }}>
-                            {message.message}
+                            {"Enter title for pin:"}
                         </Text>
                     </View>
+
+                    <Divider width={2} style={{width: "90%", marginTop: 10,}}/>
+                    
+                    {/* Message Content */}
+                        {/* -label */}
+                    <View style={{
+                            width: "90%", minHeight: 30,
+                            marginHorizontal: 20, marginTop: 25,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                            backgroundColor: "#6660",
+                        }}>
+                        <AntDesign name="caretright" size={18} color="black" style={{marginLeft: -5}}/>
+                        <Text style={{
+                            paddingLeft: 7,
+                            textAlign: 'left',
+                            fontSize: 16,
+                            fontWeight: '700',
+                            color: 'black',
+                            }}>
+                            {"Title:"}
+                        </Text>
+                    </View>
+                        {/* -content */}
+                    <View style={{
+                        width: "90%", flexDirection: "row",
+                    }}>
+                        <View style={{
+                            width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                            marginTop: 0, marginHorizontal: 0, marginBottom: 0,
+                            paddingTop: 10, paddingBottom: 12, paddingHorizontal: 15,
+                            justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "row",
+                            borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                        }}>
+                            <TextInput placeholder={"Title"} onChangeText={setPinTitle} value={pinTitle}
+                                multiline={false} maxLength={50}
+                                style={{
+                                    minHeight: 20, width: "100%",
+                                    backgroundColor: "#6660",
+                                    textAlign: 'left',
+                                    fontSize: 16,
+                                    fontWeight: '500',
+                                    color: '#222',
+                                }}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Announcer */}
+                        {/* -label */}
+                        <View style={{
+                            width: "90%", minHeight: 30,
+                            marginHorizontal: 20, marginTop: 35,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                            backgroundColor: "#6660",
+                        }}>
+                        <Text style={{
+                            paddingLeft: 0,
+                            textAlign: 'left',
+                            fontSize: 16,
+                            fontWeight: '700',
+                            color: '#777',
+                            }}>
+                            {"Message Overview:"}
+                        </Text>
+                    </View>
+                        {/* -content */}
+                    <View style={{
+                        width: "90%", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", //maybe start?
+                        borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8", marginBottom: 0,
+                    }}>
+                        <View style={{
+                            width: "100%", minHeight: 10, maxHeight: 250,
+                            paddingTop: 10, paddingBottom: 10, paddingHorizontal: 12,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                        }}>
+                            <Image source={imageSelection(pinOwner.pfp)}
+                                style={{
+                                    width: 25, height: 25,
+                                    borderRadius: 4, borderWidth: 0, borderColor: "#333",
+                                }}/>
+                            <Text style={{
+                                paddingLeft: 12,
+                                textAlign: 'left',
+                                fontSize: 16,
+                                fontWeight: '500',
+                                color: "#777",
+                                }}>
+                                {pinOwner.firstName+" "+pinOwner.lastName}
+                            </Text>
+                        </View>
+
+                        <Divider width={2} style={{width: "100%", marginTop: 0,}}/>
+
+                        <View style={{
+                            width: "100%", minHeight: 10, maxHeight: 250,
+                            paddingTop: 10, paddingBottom: 10, paddingHorizontal: 12,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                        }}>
+                            <MaterialCommunityIcons name="calendar-clock" size={24} color="#777" />
+                            <Text style={{
+                                paddingLeft: 12,
+                                textAlign: 'left',
+                                fontSize: 16,
+                                fontWeight: '500',
+                                color: "#777",
+                                }}>
+                                {(message.timestamp != null) ? (message.timestamp.toDate().toLocaleDateString("en-US", {
+                                    month: "short", day: "2-digit", year: "numeric", })
+                                    +" @ "+message.timestamp.toDate().toLocaleTimeString("en-US", 
+                                    {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
+                            </Text>
+                        </View>
+
+                        <Divider width={2} style={{width: "100%", marginTop: 0,}}/>
+
+                        <View style={{
+                            width: "100%", minHeight: 10, maxHeight: 250,
+                            paddingTop: 10, paddingBottom: 10, paddingHorizontal: 12,
+                            justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                        }}>
+                            <Text style={{
+                                paddingLeft: 5,
+                                textAlign: 'left',
+                                fontSize: 16,
+                                fontWeight: '500',
+                                color: "#777",
+                                }}>
+                                {"\""+message.message+"\""}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={{
+                        width: "100%",
+                        justifyContent: "flex-end", alignItems: "center", flexDirection: "row",
+                    }}>
+                        {/* Create Alert Button */}
+                        <TouchableOpacity onPress={addPin} activeOpacity={0.7}
+                            style={{
+                                width: 160, minHeight: 45,
+                                marginTop: 35, marginBottom: 35, marginRight: 25, paddingLeft: 10,
+                                justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                backgroundColor: "#3D8D04",
+                                borderColor: "#000", borderWidth: 2, borderRadius: 30,
+                            }}>
+                            <Text style={{
+                                textAlign: "center",
+                                fontSize: 22,
+                                fontWeight: '700',
+                                color: 'white', marginRight: 5
+                            }}>
+                                {"Create"}
+                            </Text>
+                            <Entypo name="plus" size={30} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                    
                 </View>
             </ScrollView>
-            <View style={{
-                width: "100%", minHeight: 100,
-                flex: 1, flexGrow: 0, flexDirection: "column", justifyContent: "flex-start", alignItems: "center", 
-            }}>
-                {/* Add Pin Button */}
-                <TouchableOpacity onPress={addPin} activeOpacity={0.7}
-                    style={{
-                        width: 200, height: 75,
-                        marginTop: 0,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#afc",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-                    <Icon
-						name='plus'
-                        type='antdesign'
-                        color='#000'
-						style={{
-							width: 50, height: 50, marginRight: 0, justifyContent: "center"
-						}}
-					/>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 15
-					}}>
-						{"Create Pin"}
-					</Text>
-                </TouchableOpacity>
-            </View>
         </SafeAreaView>
     )
 }
@@ -253,6 +306,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 10,
         alignItems: 'center',
+        backgroundColor: "#EFEAE2"
     },
 })
 

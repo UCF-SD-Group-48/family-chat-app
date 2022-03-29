@@ -57,6 +57,32 @@ import UserPrompt from '../../components/UserPrompt';
 
 // *************************************************************
 
+export const getHexValue = (colorName) => {
+    switch (colorName) {
+        case 'purple': {
+            return '#C0B7CC'
+        }
+        case 'blue': {
+            return '#9DAFD1'
+        }
+        case 'green': {
+            return '#87AC7B'
+        }
+        case 'yellow': {
+            return '#DFCF8C'
+        }
+        case 'orange': {
+            return '#D5B592'
+        }
+        case 'red': {
+            return '#CB9B99'
+        }
+        default: {
+            return '#777777'
+        }
+    }
+}
+
 export const imageSelection = (pfpDatabaseValue) => {
     switch (pfpDatabaseValue) {
         case 1: {

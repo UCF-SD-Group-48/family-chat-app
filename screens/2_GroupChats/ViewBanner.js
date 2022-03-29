@@ -107,22 +107,27 @@ const ViewBanner = ({ navigation, route }) => {
 						flexDirection: "row",
 						marginRight: 20,
 					}}>
-                    <Menu>
-                        <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
-                            <MaterialCommunityIcons name="dots-horizontal" size={30} color="black" />
-                        </MenuTrigger>
-                        <MenuOptions style={{
-                            borderRadius: 12, backgroundColor: "#fff",
-                        }}
-                        customStyles={{
-                            optionsContainer: {
-                                borderRadius: 15, backgroundColor: "#666",
-                            },
-                        }}>
-                            <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
-                                selectFunction={() => {console.log("Delete")}}/>
-                        </MenuOptions>
-                    </Menu>
+                    <MyView hide={bannerData.ownerUID != auth.currentUser.uid}>
+                        <Menu>
+                            <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
+                                <MaterialCommunityIcons name="dots-horizontal" size={30} color="black" />
+                            </MenuTrigger>
+                            <MenuOptions style={{
+                                borderRadius: 12, backgroundColor: "#fff",
+                            }}
+                            customStyles={{
+                                optionsContainer: {
+                                    borderRadius: 15, backgroundColor: "#666",
+                                },
+                            }}>
+                                <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
+                                    selectFunction={() => {
+                                        db.collection("chats").doc(topicId).collection("banners").doc(bannerId).delete();
+                                        navigation.goBack();
+                                    }}/>
+                            </MenuOptions>
+                        </Menu>
+                    </MyView>
 				</View>
 			),
         });
@@ -148,11 +153,16 @@ const ViewBanner = ({ navigation, route }) => {
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
-                <View style={{
+                <View style={[
+                    {
                         width: "95%",
                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                         backgroundColor: "#EC7169"
-                    }}>
+                    },
+                    {
+                        shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                        shadowRadius: 3, shadowOpacity: 0.4,
+                    }]}>
                     <View style={{
                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                     }}>
