@@ -24,6 +24,7 @@ import {
     Alert,
     Avatar,
     Button,
+    Divider,
     Icon,
     Image,
     Input,
@@ -274,8 +275,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: (topicName == "General") ? groupName : groupName + "   ➤   " + topicName,
-            // title: groupName,
+            title: groupName,
             headerStyle: '',
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
@@ -364,9 +364,9 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const enterTopic = (id, name) => {
-        if (name != "General") {
-            navigation.push("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber });
-        }
+        // if (name != "General") {
+            navigation.navigate("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber });
+        // }
         toggleTopicSelection();
     };
 
@@ -676,43 +676,53 @@ const ChatScreen = ({ navigation, route }) => {
                         </Overlay>
 
                         {/* Topic Navigator */}
-                        <MyView hide={topicName != "General"}
-                            style={styles.topicNavigator}>
-                            <View style={styles.topicSpacer}>
-                                <Text style={styles.topicLabel}>
-                                    {"Topic"}
-                                </Text>
-                            </View>
-                            <TouchableOpacity
-                                onPress={toggleTopicSelection}
-                                style={styles.topicButton}
-                                activeOpacity={0.2}>
-                                <Text style={styles.topicText}>
+                        <MyView hide={false} //topicName != "General"
+                            style={{
+                                backgroundColor: "#EFEAE2",
+                                justifyContent: "flex-start", alignItems: 'center', flexDirection: 'row',
+                                borderColor: "#777",
+                                borderBottomWidth: 0.5, borderTopWidth: 1,
+                                paddingVertical: 10,
+                            }}>
+                            <View style={{
+                                marginHorizontal: 15, paddingLeft: 15,
+                                flex: 1, flexGrow: 1,
+                                justifyContent: "flex-start", alignItems: 'center', flexDirection: 'row',
+                                backgroundColor: "#fff", borderRadius: 3, borderWidth: 1, borderColor: "#777",
+                            }}>
+                                <Fontisto name="play" size={15} color="black" />
+                                <Text style={{
+                                    fontSize: 16,
+                                    fontWeight: '700',
+                                    color: 'black',
+                                    textAlign: "left",
+                                    paddingLeft: 15,
+                                    marginVertical: 7,
+                                }}>
                                     {topicName}
                                 </Text>
-                            </TouchableOpacity>
-                            <View style={styles.topicSpacer}>
-                                <TouchableOpacity activeOpacity={0.2}
-                                    // onPress={() => {console.log("messageMap = "+JSON.stringify(messageSenders))}}//navigation.push("AddTopic", { groupId })}
-                                    onPress={() => {
-                                        console.log(topicId, topicName, groupId, groupName, groupOwner);
-                                        console.log(topics)
-                                        navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner })
-                                    }}
-                                    style={{
-                                        width: 35, height: 35, backgroundColor: "#ddd0",
-                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        marginRight: 5,
-                                        justifyContent: "center"
-                                    }}>
-                                    <Icon
-                                        style={styles.icon}
-                                        name='plus'
-                                        type='antdesign'
-                                        color='#080'
-                                    />
-                                </TouchableOpacity>
                             </View>
+                            <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
+                                style={{
+                                    paddingVertical: 3, paddingHorizontal: 15, marginRight: 5,
+                                    justifyContent: "center", alignItems: 'center', flexDirection: 'row',
+                                    backgroundColor: "#333", borderRadius: 50, borderWidth: 2, borderColor: "#1174EC",
+                                }}>
+                                <Text style={{
+                                    fontSize: 15,
+                                    fontWeight: '800',
+                                    color: 'white',
+                                    textAlign: "center",
+                                    paddingRight: 10,
+                                }}>
+                                    {"TOPICS"}
+                                </Text>
+                                { (topicSelectionEnabled) ? (
+                                    <Entypo name="chevron-down" size={25} color="white" />
+                                ) : (
+                                    <Entypo name="chevron-up" size={25} color="white" />
+                                )}
+                            </TouchableOpacity>
                         </MyView>
 
                         {/* Topic selection dropdown */}
@@ -720,84 +730,153 @@ const ChatScreen = ({ navigation, route }) => {
                             style={{
                                 width: "100%",
                                 marginTop: -2,
-                                borderColor: "#000",
-                                borderBottomWidth: 2,
+                                borderColor: "#000", backgroundColor: "#333",
+                                borderBottomWidth: 1,
                                 flex: 0, alignItems: "center",
                             }} >
-                            <View style={{
-                                width: "100%", height: 50,
-                                flex: 0, justifyContent: "space-between", alignItems: "center", flexDirection: "row"
-                            }}>
-                                <Text style={{
-                                    fontSize: 16,
-                                    fontWeight: '500',
-                                    color: 'black',
-                                    textAlign: "center",
-                                    paddingHorizontal: 10,
+                            <ScrollView persistentScrollbar={true}
+                                style={{
+                                    width: "100%", maxHeight: 225,
+                                }}
+                                contentContainerStyle={{
+                                    justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                                 }}>
-                                    Navigate to Topic
-                                </Text>
-                                <TouchableOpacity onPress={toggleTopicSelection} activeOpacity={0.2}
+                                <TouchableOpacity onPress={() => {navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner })}} activeOpacity={0.2} //toggleTopicSelection
                                     style={{
-                                        width: 35, height: 35, backgroundColor: "#ddd",
-                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        marginRight: 5,
-                                        justifyContent: "center"
+                                        height: 40, maxWidth: 220, backgroundColor: "#3D8D04",
+                                        borderWidth: 2, borderColor: "#000", borderRadius: 20,
+                                        paddingHorizontal: 20, marginVertical: 15,
+                                        justifyContent: "center", alignItems: "center", flexDirection: "row",
                                     }}>
-                                    <Icon
-                                        style={styles.icon}
-                                        name='close'
-                                        type='antdesign'
-                                        color='#c00'
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{
-                                justifyContent: "flex-start", alignItems: "center", flex: 0,
-                                marginBottom: 10, backgroundColor: "#ccf0", width: 200
-                            }}>
-                                <TouchableOpacity onPress={() => enterTopic(generalId, "General")} activeOpacity={0.2}
-                                    style={{
-                                        minWidth: 100, height: 35, backgroundColor: "#aee",
-                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        justifyContent: "center",
+                                    <Text style={{
+                                        fontSize: 16,
+                                        fontWeight: '800',
+                                        color: 'white',
+                                        textAlign: "center",
+                                        paddingRight: 10,
                                     }}>
-                                    <Text style={styles.topicText}>
-                                        General
+                                        Create New Topic
                                     </Text>
+                                    <Ionicons name="chatbubble-ellipses-outline" size={20} color="white" />
                                 </TouchableOpacity>
-                                <View style={{ height: 30, width: 10, backgroundColor: "#6660" }} />
-                                <MyView hide={topics.length <= 1}
-                                    style={{
-                                        minWidth: 100, maxHeight: 100,
-                                        backgroundColor: "#aee",
-                                        borderWidth: 2, borderColor: "#000", borderRadius: 5,
-                                        padding: 0, alignItems: "center", justifyContent: "flex-start", flexDirection: "column",
-                                    }}>
-                                    <ScrollView persistentScrollbar={true}
+
+                                <Divider width={1} style={{width: "90%",}}/>
+
+                                <View style={{
+                                    justifyContent: "flex-start", alignItems: "center", flex: 0,
+                                    marginBottom: 0, marginTop: 15, backgroundColor: "#ccf0", width: "100%",
+                                }}>
+                                    { (topicName!="General") ? (
+                                    <TouchableOpacity onPress={() => {enterTopic(generalId, "General")}} activeOpacity={0.7}
                                         style={{
-                                            maxHeight: `${topics.length - 1}` * 35, minWidth: 100,
+                                            width: 250, height: 45, backgroundColor: "#E5E5E5",
+                                            borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
+                                            justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                         }}>
-                                        {topics.map(({ id, data: { topicName } }) => (
-                                            <MyView hide={topicName == "General"} key={id}
-                                                style={{
-                                                    height: 37, width: "100%", marginVertical: -0.5,
-                                                }}>
-                                                <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
+                                        <Text style={{
+                                            fontSize: 16,
+                                            fontWeight: '600',
+                                            color: '#333',
+                                            textAlign: "center",
+                                            paddingLeft: 12,
+                                        }}>
+                                            General
+                                        </Text>
+                                        <Entypo name="chevron-right" size={25} color="black" />
+                                    </TouchableOpacity>
+                                    ) : (
+                                    <TouchableOpacity onPress={() => {}} activeOpacity={1}
+                                        style={{
+                                            width: 300, height: 45, backgroundColor: "#fff",
+                                            borderWidth: 2, borderColor: "#3D8D04", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
+                                            justifyContent: "justify-start", alignItems: "center", flexDirection: "row",
+                                            borderLeftWidth: 50, marginLeft: -50,
+                                        }}>
+                                        <Fontisto name="play" size={15} color="white" style={{marginLeft: -30,}}/>
+                                        <Text style={{
+                                            fontSize: 16,
+                                            fontWeight: '800',
+                                            color: 'black',
+                                            textAlign: "center",
+                                            paddingLeft: 28,
+                                        }}>
+                                            General
+                                        </Text>
+                                    </TouchableOpacity>
+                                    )}
+                                    {/* <View style={{ height: 30, width: 10, backgroundColor: "#6660" }} /> */}
+                                    <MyView hide={topics.length <= 1}
+                                        style={{
+                                            width: "100%", height: `${topics.length - 1}` * 60,
+                                            backgroundColor: "#aee0",
+                                            borderWidth: 0, borderColor: "#fff",
+                                            padding: 0, alignItems: "center", justifyContent: "flex-start", flexDirection: "column",
+                                        }}>
+                                        {/* The topics as a map */}
+                                        <View style={{
+                                                maxHeight: `${topics.length - 1}` * 45, width: "100%",
+                                            }}>
+                                            {topics.map(({ id, data }) => (
+                                                <MyView hide={data.topicName == "General"} key={id}
                                                     style={{
-                                                        width: "100%", height: "100%",
-                                                        justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
-                                                        borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
+                                                        height: 45, width: "100%", marginBottom: 15,
+                                                        alignItems: "center", justifyContent: "flex-start", flexDirection: "column",
                                                     }}>
-                                                    <Text style={styles.topicText}>
-                                                        {topicName}
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            </MyView>
-                                        ))}
-                                    </ScrollView>
-                                </MyView>
-                            </View>
+                                                    {/* <TouchableOpacity onPress={() => enterTopic(id, topicName)} activeOpacity={0.2}
+                                                        style={{
+                                                            width: "100%", height: "100%",
+                                                            justifyContent: "center", alignItems: "center", backgroundColor: "#aef0",
+                                                            borderColor: "#000", borderBottomWidth: 1, borderTopWidth: 1
+                                                        }}>
+                                                        <Text style={styles.topicText}>
+                                                            {topicName}
+                                                        </Text>
+                                                    </TouchableOpacity> */}
+
+                                                    { (topicName != data.topicName) ? (
+                                                    <TouchableOpacity onPress={() => enterTopic(id, data.topicName)} activeOpacity={0.7}
+                                                        style={{
+                                                            width: 250, height: 45, backgroundColor: "#E5E5E5",
+                                                            borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
+                                                            justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                                        }}>
+                                                        <Text style={{
+                                                            fontSize: 16,
+                                                            fontWeight: '600',
+                                                            color: '#333',
+                                                            textAlign: "center",
+                                                            paddingLeft: 12,
+                                                        }}>
+                                                            {data.topicName}
+                                                        </Text>
+                                                        <Entypo name="chevron-right" size={25} color="black" />
+                                                    </TouchableOpacity>
+                                                    ) : (
+                                                    <TouchableOpacity onPress={() => {}} activeOpacity={1}
+                                                        style={{
+                                                            width: 300, height: 45, backgroundColor: "#fff",
+                                                            borderWidth: 2, borderColor: "#3D8D04", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
+                                                            justifyContent: "justify-start", alignItems: "center", flexDirection: "row",
+                                                            borderLeftWidth: 50, marginLeft: -50,
+                                                        }}>
+                                                        <Fontisto name="play" size={15} color="white" style={{marginLeft: -30,}}/>
+                                                        <Text style={{
+                                                            fontSize: 16,
+                                                            fontWeight: '800',
+                                                            color: 'black',
+                                                            textAlign: "center",
+                                                            paddingLeft: 28,
+                                                        }}>
+                                                            {data.topicName}
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                    )}
+                                                </MyView>
+                                            ))}
+                                        </View>
+                                    </MyView>
+                                </View>
+                            </ScrollView>
                         </MyView>
                         {/* Banner (if applicable) */}
                         {/* Calendar for later <FontAwesome5 name="calendar-alt" size={24} color="black" /> */}
@@ -1165,13 +1244,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
     },
     topicNavigator: {
-        height: 55,
-        backgroundColor: "#6660",
-        flexDirection: 'row',
-        alignItems: 'center',
-
-        borderBottomColor: "#000",
-        borderBottomWidth: 2,
+        
     },
     topicSpacer: {
         flex: 1,
