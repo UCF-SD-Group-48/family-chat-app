@@ -544,6 +544,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                 const topicObjectForPassing = {
                                                     color: color,
                                                     groupId: groupId,
+                                                    groupName: groupName,
                                                     groupOwner: groupOwner,
                                                     topicId: currentTopic.id,
                                                     topicName: data.topicName,

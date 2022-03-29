@@ -78,9 +78,10 @@ const TopicSettings = ({ navigation, route }) => {
             groupOwner: topicObjectForPassing.groupOwner,
             topicId: topicObjectForPassing.topicId,
             topicName: topicObjectForPassing.topicName,
+            topicOwner: topicObjectForPassing.topicOwner,
+            topicMembers: topicObjectForPassing.topicMembers,
         }
     )
-
 
     const goForward = () => {
         console.log(topicObjectForPassing)
@@ -203,7 +204,7 @@ const TopicSettings = ({ navigation, route }) => {
         return () => {
             setGroupMembersList();
         }
-    }, [navigation])
+    }, [])
 
     const [isLoading, setIsLoading] = useState(false);
     const isFocused = useIsFocused();
