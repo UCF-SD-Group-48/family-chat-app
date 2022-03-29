@@ -122,7 +122,6 @@ const PhoneSuccess = ({ navigation, route }) => {
 	const [profilePic, setProfilePic] = useState();
 	let phoneNum = route.params.phoneNumber;
 	const phoneNumber = phoneNum.slice(2, phoneNum.length);
-	console.log("phoneNumber " + phoneNumber)
 
 	const getPermissions = async () => {
 		const status = await ImagePicker.requestMediaLibraryPermissionsAsync();

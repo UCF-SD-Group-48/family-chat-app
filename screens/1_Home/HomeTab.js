@@ -54,13 +54,14 @@ import UserPrompt from '../../components/UserPrompt';
 import NewNotificationsBlock from '../../components/NewNotificationsBlock';
 import DismissButton from '../../components/DismissButton';
 import MyView from '../../components/MyView';
+import { PinchGestureHandler } from 'react-native-gesture-handler';
 
 // *************************************************************
 
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
 
-  const navigateToAddGroup = () => {
+  const navigateToAddGroup = async () => {
     navigation.navigate('CreateGroup_1_NameImage')
   }
 
@@ -75,42 +76,72 @@ const HomeTab = ({ navigation, route }) => {
       .then(documentSnapshot => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
     return initialState;
   });
-  const [missed, setMissed] = useState([])
-
+  
   useLayoutEffect(() => {
-		navigation.setOptions({
-			title: "Home",
+    navigation.setOptions({
+      title: "Home",
 			headerLeft: '',
 		});
 	}, [navigation]);
+  
+  
+  const [pinOwners, setPinOwners] = useState([])
+  const [missed, setMissed] = useState([])
 
-
+  // Sets date to check against for missed messages
   useEffect(async() => {
+    let previous;
+    const userData = await db.collection('users').doc(auth.currentUser.uid).get()
+    previous = userData.data().lastOn;
+    // console.log("userData ", userData.data().lastOn)
     db.collection('users').doc(auth.currentUser.uid).update({
+      prevOn: previous,
       lastOn: firebase.firestore.FieldValue.serverTimestamp()
     })
 
-    // Create dictionary of topicId and when each topic have been visited
-    // Print all the messages.timeStamp > lastOn
-    const unsubscribe = await db.collection('chats').onSnapshot((snapshot) => {
-      // snapshot
-        // chats.doc
-        //
-        //
-
-      setMissed(
-          snapshot.docs.map(async (chatDoc) => (
-            await db.collection('chats').doc(chatDoc.id).collection('messages').docs.map((actualMsg) => ( 
-              console.log("actualMsg", actualMsg.id)
-              )
-            )
-            
-          ))
-        )
-        });
-
-      return unsubscribe;
   }, [])
+  
+
+  // Collect missed messages ids
+  useEffect(async() => {
+    let topicArray = await db.collection('users').doc(auth.currentUser.uid).get()
+    // const userTopicMap = topicArray.data()
+    const topicMap = topicArray.data().topicMap
+    console.log("topicArray: ", (JSON.stringify(topicMap)));
+
+    let values = []
+    let i = 0;
+    for (let key in topicMap) {
+      values.push(key)
+    }
+    //values = ["TIOOb8T7FFsm3W0bC8V7"]
+
+    // for loop through user's topic  Map
+    for (let x in values) {
+      
+    }
+    console.log("values array: ", values);
+  }, [])
+
+  const getPinOwners = async () => {
+    // owners == missed messages array
+    let topics = {};
+    // for each message within chat
+    for (const pin of pins) {
+      await db.collection('users').doc(pin.data.ownerUID).get()
+        .then((result) => {
+          owners[pin.data.ownerUID] = result.data();
+        });
+    }
+    setPinOwners(owners);
+  }
+
+// collecting all messages.id from topics currentUser is part of. 
+
+
+
+
+
 
   return (
     <SafeAreaView>

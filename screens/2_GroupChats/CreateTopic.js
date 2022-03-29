@@ -54,6 +54,7 @@ const CreateTopic = ({ navigation, route }) => {
 	
 
 	const [input, setInput] = useState("");
+	const [mapUpdate, setMapUpdate] = useState({});
 
 	const oldTopicId = route.params.topicId;
 	const oldTopicName = route.params.topicName;
@@ -175,8 +176,17 @@ const CreateTopic = ({ navigation, route }) => {
 	}
 
 	const [buttonText, setButtonText] = useState('CREATE')
+	let [membersList, setMembersList] = useState([])
 
 	const createTopic = async () => {
+		const currentUserID = auth.currentUser.uid;
+
+		let membersArray = [];
+
+		membersList.map((member) => {
+			membersArray.push(member.uid)
+		})
+
 		await db.collection('groups').doc(groupId)
 			.collection("topics")
 			.add({
@@ -184,10 +194,19 @@ const CreateTopic = ({ navigation, route }) => {
 				topicName: newTopicName,
 				members: checked,
 			})
-			.then((result) => {
+			.then(async (newlyCreatedTopic) => {
+						let topicID = newlyCreatedTopic.id
+						mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
+						membersArray.map(async (memberUID) => {
+							await db.collection('users').doc(memberUID).update(mapUpdate);
+						})
 				setButtonText('CREATED');
-				navigation.push("Chat", { topicId : String(result.id), topicName : newTopicName, groupId, groupName, groupOwner });
+				navigation.push("Chat", { topicId : newlyCreatedTopic.id, topicName : newTopicName, groupId, groupName, groupOwner });
 			})
+			// .then((result) => {
+			// 	setButtonText('CREATED');
+			// 	navigation.push("Chat", { topicId : String(result.id), topicName : newTopicName, groupId, groupName, groupOwner });
+			// })
 			.catch((error) => alert(error));
 	};
 

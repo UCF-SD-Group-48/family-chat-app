@@ -104,6 +104,10 @@ const GroupInvite = ({ navigation, route }) => {
                 db.collection('groups').doc(groupId).update({
                     members: arrayUnion(snapshot.id)
                 })
+
+                db.collection('user').doc(auth.currentUser.uid).update({
+                    groups: arrayUnion(groupId)
+                })
                 
                 } else {
                     alert("Not a valid user")
