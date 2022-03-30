@@ -94,6 +94,7 @@ const ChatScreen = ({ navigation, route }) => {
     const [alertExists, setAlertExists] = useState(false);
     const [alert, setAlert] = useState({});
     const [pinMap, setPinMap] = useState({});
+    const [topicMap, setTopicMap] = useState({});
 
     const isFocused = useIsFocused();
     const flatList = useRef(null);
@@ -258,13 +259,30 @@ const ChatScreen = ({ navigation, route }) => {
                 setgeneralId(id);
             }
         });
-    }, [route]);
+
+        resetTopicMap();
+
+    }, [topics, isFocused]);
+
+    const resetTopicMap = () => {
+        let values = {};
+        for (const topic of topics) {
+            if(topic.data.originalMessageUID != undefined) {
+                values[topic.data.originalMessageUID] = {
+                    id: topic.id,
+                    data: topic.data,
+                }
+            }
+        }
+        setTopicMap(values);
+    }
 
     useEffect(() => {
         const unsubscribe = db
             .collection("groups")
             .doc(groupId)
             .collection("topics")
+            .where('members', 'array-contains', auth.currentUser.uid)
             .onSnapshot((snapshot) =>
                 setTopics(snapshot.docs.map((doc) =>
                 ({
@@ -375,6 +393,13 @@ const ChatScreen = ({ navigation, route }) => {
         toggleTopicSelection();
     };
 
+    const enterTopicFromMessage = (id) => {
+        const topic = getTopicData(id);
+        if(topic != null) {
+            navigation.navigate("Chat", { topicId: topic.id, topicName: topic.data.topicName, groupId, groupName, groupOwner, color, coverImageNumber });
+        }
+    };
+
     const navigateTo = (place) => {
         if (place == "Settings" || place == "Members" || place == "Invite") {
             if (topicName == "General") {
@@ -437,6 +462,13 @@ const ChatScreen = ({ navigation, route }) => {
         //pinMap != undefined && pinMap[id.toString()] != undefined
         if(pinMap != undefined && uid != undefined && pinMap[uid.toString()] != undefined) {
             return (pinMap[uid.toString()]);
+        }
+        else return null;
+    };
+
+    const getTopicData = (uid) => {
+        if(topicMap != undefined && uid != undefined && topicMap[uid.toString()] != undefined) {
+            return (topicMap[uid.toString()]);
         }
         else return null;
     };
@@ -1091,7 +1123,9 @@ const ChatScreen = ({ navigation, route }) => {
                                                             selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
                                                         <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
                                                             selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                        <IconOption value={3} isSpacer={true} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic'
+                                                            hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
+                                                            selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, originalMessageUID: id }) }} />
                                                         <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
                                                         <IconOption value={5} iconName='edit' text='Edit' hide={true} />
                                                         <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
@@ -1099,6 +1133,8 @@ const ChatScreen = ({ navigation, route }) => {
                                                     </MenuOptions>
                                                 </Menu>
                                             </View>
+
+                                            {/* PIN */}
                                             { (getPinData(id) != null) ? (
                                             <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
                                                 style={{
@@ -1107,6 +1143,19 @@ const ChatScreen = ({ navigation, route }) => {
                                                     borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
                                                 }}>
                                                 <Entypo name="pin" size={25} color="#555" />
+                                            </TouchableOpacity>
+                                            ) : (<View style={{width: 0, height: 0,}} />)}
+
+                                            {/* TOPIC */}
+                                            { (getTopicData(id) != null
+                                                && getTopicData(id).data.members.some(u => (u == auth.currentUser.uid))) ? (
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {enterTopicFromMessage(id)}}
+                                                style={{
+                                                    padding: 5, marginLeft: 5,
+                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                }}>
+                                                <Ionicons name="chatbubble-ellipses-outline" size={25} color="#555" />
                                             </TouchableOpacity>
                                             ) : (<View style={{width: 0, height: 0,}} />)}
 
@@ -1206,7 +1255,9 @@ const ChatScreen = ({ navigation, route }) => {
                                                                 selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
                                                             <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
                                                                 selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                            <IconOption value={3} isSpacer={true} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                            <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
+                                                                hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
+                                                                selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, originalMessageUID: id }) }} />
                                                             <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
                                                             <IconOption value={5} iconName='edit' text='Edit' hide={true} />
                                                             <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
@@ -1214,6 +1265,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                         </MenuOptions>
                                                     </Menu>
 
+                                                    {/* PIN */}
                                                     { (getPinData(id) != null) ? (
                                                     <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
                                                         style={{
@@ -1222,6 +1274,19 @@ const ChatScreen = ({ navigation, route }) => {
                                                             borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
                                                         }}>
                                                         <Entypo name="pin" size={25} color="#555" />
+                                                    </TouchableOpacity>
+                                                    ) : (<View style={{width: 0, height: 0,}} />)}
+
+                                                    {/* TOPIC */}
+                                                    { (getTopicData(id) != null
+                                                        && getTopicData(id).data.members.some(u => (u == auth.currentUser.uid))) ? (
+                                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {enterTopicFromMessage(id)}}
+                                                        style={{
+                                                            padding: 5, marginLeft: 5,
+                                                            backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                            borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                        }}>
+                                                        <Ionicons name="chatbubble-ellipses-outline" size={25} color="#555" />
                                                     </TouchableOpacity>
                                                     ) : (<View style={{width: 0, height: 0,}} />)}
 

@@ -61,6 +61,7 @@ const CreateTopic = ({ navigation, route }) => {
 	const groupId = route.params.groupId;
 	const groupName = route.params.groupName;
 	const groupOwner = route.params.groupOwner;
+	const originalMessageUID = route.params.originalMessageUID;
 	const currentUserPhoneNumber = (auth.currentUser.phoneNumber).slice(2);
 
 	const [newTopicName, setNewTopicName] = useState('')
@@ -193,6 +194,7 @@ const CreateTopic = ({ navigation, route }) => {
 				topicOwner: auth.currentUser.uid,
 				topicName: newTopicName,
 				members: checked,
+				originalMessageUID: originalMessageUID || "",
 			})
 			.then(async (newlyCreatedTopic) => {
 						let topicID = newlyCreatedTopic.id
