@@ -451,6 +451,25 @@ const ChatScreen = ({ navigation, route }) => {
         db.collection("chats").doc(topicId).collection("messages").doc(id).delete();
     };
 
+    const likeMessage = (id, membersWhoReacted) => {
+        if((membersWhoReacted.some(u => (u == auth.currentUser.uid)))) {
+            removeUserLike(id);
+        }
+        else {
+            addUserLike(id);
+        }
+    };
+    const addUserLike = async (id) => {
+        db.collection('chats').doc(topicId).collection('messages').doc(id).update({
+            membersWhoReacted: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid),
+        });
+    };
+    const removeUserLike = async (id) => {
+        db.collection('chats').doc(topicId).collection('messages').doc(id).update({
+            membersWhoReacted: firebase.firestore.FieldValue.arrayRemove(auth.currentUser.uid),
+        });
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
@@ -1010,117 +1029,42 @@ const ChatScreen = ({ navigation, route }) => {
                         <FlatList ref={flatList}
                             data={messages} keyExtractor={item => item.id}
                             initialNumToRender={20}
-                            onContentSizeChange= {()=> flatList.current.scrollToEnd()}
+                            // onContentSizeChange= {()=> {}} flatList.current.scrollToEnd()
                             onEndReachedThreshold={0.5} onEndReached={() => {console.log("End reached!")}}
                             renderItem={({ item: { id, data} }) => {
                             return (
-                            
-                        // <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
-                        //     {messages.map(({ id, data }) => (
 
                                 messageMap[id] != undefined && messageMap[id].previousMessage != undefined
                                     && messageMap[id].previousMessage.data != undefined
                                     && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber ? (
                                     //message without profile picture
                                     <View key={id} style={{
-                                        flex: 1,
                                         width: "100%",
-                                        alignItems: 'flex-start',
-                                        flexDirection: "row",
+                                        justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
                                         paddingTop: 7,
                                         paddingHorizontal: 10,
                                         backgroundColor: "#6660",
                                     }}>
                                         <View style={{
-                                            width: 50,
-
-                                            backgroundColor: '#0cc0',
-                                            borderWidth: 2,
-                                            borderColor: '#5550',
-                                            borderRadius: 10,
-                                        }} />
-                                        <View style={styles.textContainer}>
-
-                                            <Menu>
-                                                <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
-                                                    <View style={{
-                                                        minHeight: 30, marginLeft: 5,
-                                                        flex: 1, flexGrow: 1, justifyContent: "center",
-                                                        backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                        borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                                    }}>
-                                                        <Text style={styles.text}>
-                                                            {data.message}
-                                                        </Text>
-                                                    </View>
-                                                </MenuTrigger>
-                                                <MenuOptions style={{
-                                                    borderRadius: 12, backgroundColor: "#fff",
-                                                }}
-                                                    customStyles={{
-                                                        optionsContainer: {
-                                                            borderRadius: 15, backgroundColor: "#666",
-                                                        },
-                                                    }}>
-                                                    <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
-                                                        selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                    <IconOption value={3} isSpacer={true} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
-                                                    <IconOption value={5} iconName='edit' text='Edit' hide={true} />
-                                                    <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
-                                                        selectFunction={() => {deleteMessage(id)}}/>
-                                                </MenuOptions>
-                                            </Menu>
-                                        </View>
-                                        { (getPinData(id) != null) ? (
-                                        <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
-                                            style={{
-                                                padding: 5, marginLeft: 5,
-                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                            }}>
-                                            <Entypo name="pin" size={25} color="#555" />
-                                        </TouchableOpacity>
-                                        ) : (<View style={{width: 0, height: 0,}} />)}
-
-                                    </View>
-                                ) : (
-                                    //Message with profile picture and display name
-                                    <View key={id} style={styles.message}>
-                                        <View style={styles.userContainer}>
-                                            <Image source={imageSelection(getPfp(data.ownerUID))}
-                                                style={{
-                                                    width: "100%", height: "100%",
-                                                    borderRadius: 7, borderWidth: 1, borderColor: "#777",
-                                                }} />
-                                        </View>
-                                        <View style={styles.textContainer}>
+                                            flex: 1,
+                                            width: "100%",
+                                            alignItems: 'flex-start',
+                                            flexDirection: "row",
+                                            // paddingTop: 7,
+                                            // paddingHorizontal: 10,
+                                            backgroundColor: "#6660",
+                                        }}>
                                             <View style={{
-                                                flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start",
-                                                flex: 1, flexGrow: 1, backgroundColor: "#3330",
-                                            }}>
-                                                <Text style={styles.userName}>
-                                                    {getString(data.ownerUID) || "Display Name"}
-                                                </Text>
-                                                <Text style={{
-                                                    fontSize: 14,
-                                                    fontWeight: '500',
-                                                    textAlign: "center",
-                                                    marginHorizontal: 0,
-                                                    color: "black",
-                                                }}>
-                                                    {(data.timestamp != null) ? (data.timestamp.toDate().toLocaleTimeString("en-US", {
-                                                        hour: "numeric", minute: "2-digit"
-                                                    })) : ("")}
-                                                </Text>
-                                            </View>
+                                                width: 50,
 
-                                            <View style={{
-                                                flexDirection: "row", alignItems: "flex-start",
-                                                flex: 1, flexGrow: 1, backgroundColor: "#3330",
-                                            }}>
-                                                <Menu style={{flex: 1,}}>
+                                                backgroundColor: '#0cc0',
+                                                borderWidth: 2,
+                                                borderColor: '#5550',
+                                                borderRadius: 10,
+                                            }} />
+                                            <View style={styles.textContainer}>
+
+                                                <Menu>
                                                     <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
                                                         <View style={{
                                                             minHeight: 30, marginLeft: 5,
@@ -1141,7 +1085,9 @@ const ChatScreen = ({ navigation, route }) => {
                                                                 borderRadius: 15, backgroundColor: "#666",
                                                             },
                                                         }}>
-                                                        <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
+                                                            isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
+                                                            selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
                                                         <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
                                                             selectFunction={() => { addPinFromMessage(data, id) }} />
                                                         <IconOption value={3} isSpacer={true} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
@@ -1151,20 +1097,162 @@ const ChatScreen = ({ navigation, route }) => {
                                                             selectFunction={() => {deleteMessage(id)}}/>
                                                     </MenuOptions>
                                                 </Menu>
+                                            </View>
+                                            { (getPinData(id) != null) ? (
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
+                                                style={{
+                                                    padding: 5, marginLeft: 5,
+                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                }}>
+                                                <Entypo name="pin" size={25} color="#555" />
+                                            </TouchableOpacity>
+                                            ) : (<View style={{width: 0, height: 0,}} />)}
 
-                                                { (getPinData(id) != null) ? (
-                                                <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
+                                        </View>
+                                        <MyView hide={data.membersWhoReacted.length == 0} style={{
+                                            width: "100%",
+                                            justifyContent: "flex-end", alignItems: 'flex-start', flexDirection: "row",
+                                            paddingTop: 3, backgroundColor: "#abc0",
+                                        }}>
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {likeMessage(id, data.membersWhoReacted)}}
+                                                style={{
+                                                    paddingLeft: 5, paddingRight: 7, paddingVertical: 2.5,
+                                                    justifyContent: "center", alignItems: 'center', flexDirection: "row",
+                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                    borderWidth: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 2.3 : 1.3,
+                                                    borderColor: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? '#226EDA' : '#9D9D9D',
+                                                    borderRadius: 5,
+                                                }}>
+                                                <Entypo name="heart" size={20} color="#f66" />
+                                                <Text style={{
+                                                    fontSize: 14,
+                                                    fontWeight: '600',
+                                                    textAlign: "left",
+                                                    marginLeft: 5,
+                                                    color: "black",
+                                                }}>
+                                                    {data.membersWhoReacted.length}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </MyView>
+                                    </View>
+                                ) : (
+                                    //Message with profile picture and display name
+                                    <View key={id} style={{
+                                        width: "100%",
+                                        justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
+                                        paddingTop: 20,
+                                        paddingHorizontal: 10,
+                                        backgroundColor: "#6660",
+                                    }}>
+                                        <View style={styles.message}>
+                                            <View style={styles.userContainer}>
+                                                <Image source={imageSelection(getPfp(data.ownerUID))}
                                                     style={{
-                                                        padding: 5, marginLeft: 5,
-                                                        backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                        borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                        width: "100%", height: "100%",
+                                                        borderRadius: 7, borderWidth: 1, borderColor: "#777",
+                                                    }} />
+                                            </View>
+                                            <View style={styles.textContainer}>
+                                                <View style={{
+                                                    flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start",
+                                                    flex: 1, flexGrow: 1, backgroundColor: "#3330",
+                                                }}>
+                                                    <Text style={styles.userName}>
+                                                        {getString(data.ownerUID) || "Display Name"}
+                                                    </Text>
+                                                    <Text style={{
+                                                        fontSize: 14,
+                                                        fontWeight: '500',
+                                                        textAlign: "center",
+                                                        marginHorizontal: 0,
+                                                        color: "#555",
                                                     }}>
-                                                    <Entypo name="pin" size={25} color="#555" />
-                                                </TouchableOpacity>
-                                                ) : (<View style={{width: 0, height: 0,}} />)}
+                                                        {(data.timestamp != null) ? (data.timestamp.toDate().toLocaleTimeString("en-US", {
+                                                            hour: "numeric", minute: "2-digit"
+                                                        })) : ("")}
+                                                    </Text>
+                                                </View>
 
+                                                <View style={{
+                                                    flexDirection: "row", alignItems: "flex-start",
+                                                    flex: 1, flexGrow: 1, backgroundColor: "#3330",
+                                                }}>
+                                                    <Menu style={{flex: 1,}}>
+                                                        <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                            <View style={{
+                                                                minHeight: 30, marginLeft: 5,
+                                                                flex: 1, flexGrow: 1, justifyContent: "center",
+                                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                            }}>
+                                                                <Text style={styles.text}>
+                                                                    {data.message}
+                                                                </Text>
+                                                            </View>
+                                                        </MenuTrigger>
+                                                        <MenuOptions style={{
+                                                            borderRadius: 12, backgroundColor: "#fff",
+                                                        }}
+                                                            customStyles={{
+                                                                optionsContainer: {
+                                                                    borderRadius: 15, backgroundColor: "#666",
+                                                                },
+                                                            }}>
+                                                            <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
+                                                                isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
+                                                                selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
+                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                                selectFunction={() => { addPinFromMessage(data, id) }} />
+                                                            <IconOption value={3} isSpacer={true} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                            <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
+                                                            <IconOption value={5} iconName='edit' text='Edit' hide={true} />
+                                                            <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
+                                                                selectFunction={() => {deleteMessage(id)}}/>
+                                                        </MenuOptions>
+                                                    </Menu>
+
+                                                    { (getPinData(id) != null) ? (
+                                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
+                                                        style={{
+                                                            padding: 5, marginLeft: 5,
+                                                            backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                            borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                        }}>
+                                                        <Entypo name="pin" size={25} color="#555" />
+                                                    </TouchableOpacity>
+                                                    ) : (<View style={{width: 0, height: 0,}} />)}
+
+                                                </View>
                                             </View>
                                         </View>
+                                        <MyView hide={data.membersWhoReacted.length == 0} style={{
+                                            width: "100%",
+                                            justifyContent: "flex-end", alignItems: 'flex-start', flexDirection: "row",
+                                            paddingTop: 3, backgroundColor: "#abc0",
+                                        }}>
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {likeMessage(id, data.membersWhoReacted)}}
+                                                style={{
+                                                    paddingLeft: 5, paddingRight: 7, paddingVertical: 2.5,
+                                                    justifyContent: "center", alignItems: 'center', flexDirection: "row",
+                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                    borderWidth: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 2.3 : 1.3,
+                                                    borderColor: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? '#226EDA' : '#9D9D9D',
+                                                    borderRadius: 5,
+                                                }}>
+                                                <Entypo name="heart" size={20} color="#f66" />
+                                                <Text style={{
+                                                    fontSize: 14,
+                                                    fontWeight: '600',
+                                                    textAlign: "left",
+                                                    marginLeft: 5,
+                                                    color: "black",
+                                                }}>
+                                                    {data.membersWhoReacted.length}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </MyView>
                                     </View>
                                 )
                             
@@ -1343,8 +1431,8 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: 'flex-start',
         flexDirection: "row",
-        paddingTop: 20,
-        paddingHorizontal: 10,
+        // paddingTop: 20,
+        // paddingHorizontal: 10,
         backgroundColor: "#6660",
     },
     userContainer: {
