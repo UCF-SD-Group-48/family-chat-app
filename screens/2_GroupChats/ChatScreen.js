@@ -12,6 +12,7 @@ import {
     Platform,
     SafeAreaView,
     ScrollView,
+    FlatList,
     StyleSheet,
     Text,
     TextInput,
@@ -31,6 +32,7 @@ import {
     Tooltip,
     Overlay,
 } from 'react-native-elements';
+import { useIsFocused } from "@react-navigation/native";
 import { HoldItem } from 'react-native-hold-menu';
 
 // Imports for: Expo
@@ -93,6 +95,9 @@ const ChatScreen = ({ navigation, route }) => {
     const [alert, setAlert] = useState({});
     const [pinMap, setPinMap] = useState({});
 
+    const isFocused = useIsFocused();
+    const flatList = useRef(null);
+
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
     };
@@ -104,7 +109,7 @@ const ChatScreen = ({ navigation, route }) => {
                     borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
                     borderColor: "#dedede",
                     height: (isSpacer) ? 47 : 40,
-                    paddingLeft: 15, paddingVertical: 12,
+                    paddingLeft: 15, paddingVertical: 10,
                 }}>
                 <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
                     <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15} />
@@ -133,7 +138,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         pinMapFunction();
-    }, [messages]);
+    }, [messages, isFocused]);
 
     const messageMapFunction = () => {
         let messageSenders = [];
@@ -436,6 +441,16 @@ const ChatScreen = ({ navigation, route }) => {
         else return null;
     };
 
+    const deleteMessage = (id) => {
+        //delete pin(if applicable), then message
+        const pinData = getPinData(id);
+        if(pinData != null) { //then delete pin before deleting message
+            db.collection("chats").doc(topicId).collection("pins").doc(pinData.id).delete();
+        }
+
+        db.collection("chats").doc(topicId).collection("messages").doc(id).delete();
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
@@ -527,9 +542,9 @@ const ChatScreen = ({ navigation, route }) => {
                             {/* Group Details outer view */}
                             <View style={{
                                 width: screenWidth - 25,
-                                marginTop: 15, paddingVertical: 15,
+                                marginTop: 15, paddingVertical: 15, paddingHorizontal: 20,
                                 backgroundColor: "#EFEAE2", borderTopWidth: 1, borderBottomWidth: 1, borderColor: "#777",
-                                justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                             }}>
                                 {/* Settings */}
                                 <TouchableOpacity
@@ -544,6 +559,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                 const topicObjectForPassing = {
                                                     color: color,
                                                     groupId: groupId,
+                                                    groupName: groupName,
                                                     groupOwner: groupOwner,
                                                     topicId: currentTopic.id,
                                                     topicName: data.topicName,
@@ -555,7 +571,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             });
                                     }}
                                     style={{
-                                        width: 120,
+                                        flex: 1, flexGrow: 1,
                                         paddingVertical: 5, marginRight: 25,
                                         backgroundColor: "#fff", borderWidth: 1, borderColor: "#333", borderRadius: 3,
                                         justifyContent: "center", alignItems: "center", flexDirection: "row",
@@ -569,21 +585,21 @@ const ChatScreen = ({ navigation, route }) => {
                                 {/* Invite! */}
                                 <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Invite") }}
                                     style={{
-                                        width: 120,
+                                        flex: 1, flexGrow: 1,
                                         paddingVertical: 5,
                                         backgroundColor: "#fff", borderWidth: 1, borderColor: "#333", borderRadius: 3,
                                         justifyContent: "center", alignItems: "center", flexDirection: "row",
                                     }}>
                                     <MaterialIcons name="person-add" size={20} color="black" style={{marginRight: 10}}/>
                                     <Text style={styles.groupDetailsText}>
-                                        {"Invite!"}
+                                        {"Invite to group"}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
                             
                             <View style={{
                                 width: screenWidth - 25, borderBottomLeftRadius: 20, borderBottomRightRadius: 20,
-                                marginBottom: -10, paddingHorizontal: 25, paddingVertical: 20,
+                                marginBottom: -10, paddingHorizontal: 20, paddingVertical: 20,
                                 backgroundColor: "#DFD7CE",
                                 justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                             }}>
@@ -606,47 +622,6 @@ const ChatScreen = ({ navigation, route }) => {
                                         </Text>
                                     </TouchableOpacity>
 
-                                    {/* Polls */}
-                                    <View style={[styles.featuresOuterView,
-                                        {
-                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                            shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
-                                        <Entypo name="bar-graph" size={30} color="#333" />
-                                        <Text style={styles.featuresText}>
-                                            Polls
-                                        </Text>
-                                    </View>
-
-                                    {/* Lists */}
-                                    <View style={[styles.featuresOuterView,
-                                        {
-                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                            shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
-                                        <Ionicons name="list" size={30} color="#333" />
-                                        <Text style={styles.featuresText}>
-                                            Lists
-                                        </Text>
-                                    </View>
-                                </View>
-                                {/* Feature Icons 2 */}
-                                <View style={{
-                                    width: "100%", backgroundColor: "#0cf0",
-                                    justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                                }}>
-                                    {/* Events */}
-                                    <View style={[styles.featuresOuterView,
-                                        {
-                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                            shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
-                                        <Entypo name="calendar" size={30} color="#333" />
-                                        <Text style={styles.featuresText}>
-                                            Events
-                                        </Text>
-                                    </View>
-
                                     {/* Banners */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Banners")}
                                         style={[styles.featuresOuterView,
@@ -660,15 +635,72 @@ const ChatScreen = ({ navigation, route }) => {
                                         </Text>
                                     </TouchableOpacity>
 
-                                    {/* Images */}
+                                    {/* Events */}
                                     <View style={[styles.featuresOuterView,
                                         {
                                             shadowColor: "#000", shadowOffset: {width: 0, height: 5},
                                             shadowRadius: 3, shadowOpacity: 0.25,
                                         }]}>
-                                        <Entypo name="image" size={30} color="#333" />
+                                        <Entypo name="calendar" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
+                                            Events
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                <Divider width={1} color={"#777"} style={{width: screenWidth - 25, marginTop: 10,}}/>
+                                <View style={{
+                                    width: "100%", marginBottom: 10, marginTop: 10,
+                                    justifyContent: "felx-start", alignItems: "center", flexDirection: "row",
+                                }}>
+                                    <Text style={{
+                                        fontSize: 16,
+                                        fontWeight: '700',
+                                        color: '#777',
+                                        textAlign: "left",
+                                    }}>
+                                        In Progress Features
+                                    </Text>
+                                </View>
+
+                                {/* Feature Icons 2 */}
+                                <View style={{
+                                    width: "100%", backgroundColor: "#0cf0",
+                                    justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                }}>
+                                    {/* Polls */}
+                                    <View style={[styles.featuresOuterViewDisabled,
+                                        {
+                                            // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                            // shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Entypo name="bar-graph" size={30} color="#777" />
+                                        <Text style={styles.featuresTextDisabled}>
+                                            Polls
+                                        </Text>
+                                    </View>
+
+                                    {/* Images */}
+                                    <View style={[styles.featuresOuterViewDisabled,
+                                        {
+                                            // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                            // shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Entypo name="images" size={30} color="#777" />
+                                        <Text style={styles.featuresTextDisabled}>
                                             Images
+                                        </Text>
+                                    </View>
+
+                                    {/* Lists */}
+                                    <View style={[styles.featuresOuterViewDisabled,
+                                        {
+                                            // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                            // shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Ionicons name="list" size={30} color="#777" />
+                                        <Text style={styles.featuresTextDisabled}>
+                                            Lists
                                         </Text>
                                     </View>
                                 </View>
@@ -816,7 +848,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         <View style={{
                                                 maxHeight: `${topics.length - 1}` * 45, width: "100%",
                                             }}>
-                                            {topics.map(({ id, data }) => (
+                                            {topics.filter((topic) => topic.data.topicName != "General").map(({ id, data }) => (
                                                 <MyView hide={data.topicName == "General"} key={id}
                                                     style={{
                                                         height: 45, width: "100%", marginBottom: 15,
@@ -975,8 +1007,16 @@ const ChatScreen = ({ navigation, route }) => {
                         </MyView>
 
                         {/* Messages */}
-                        <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
-                            {messages.map(({ id, data }) => (
+                        <FlatList ref={flatList}
+                            data={messages} keyExtractor={item => item.id}
+                            initialNumToRender={20}
+                            onContentSizeChange= {()=> flatList.current.scrollToEnd()}
+                            onEndReachedThreshold={0.5} onEndReached={() => {console.log("End reached!")}}
+                            renderItem={({ item: { id, data} }) => {
+                            return (
+                            
+                        // <ScrollView contentContainerStyle={{ paddingTop: 0 }}>
+                        //     {messages.map(({ id, data }) => (
 
                                 messageMap[id] != undefined && messageMap[id].previousMessage != undefined
                                     && messageMap[id].previousMessage.data != undefined
@@ -1025,21 +1065,23 @@ const ChatScreen = ({ navigation, route }) => {
                                                     <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
                                                     <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
                                                         selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                    <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
-                                                    <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={3} isSpacer={true} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                    <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
+                                                    <IconOption value={5} iconName='edit' text='Edit' hide={true} />
+                                                    <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
+                                                        selectFunction={() => {deleteMessage(id)}}/>
                                                 </MenuOptions>
                                             </Menu>
                                         </View>
                                         { (getPinData(id) != null) ? (
-                                        <View style={{
-                                            padding: 5, marginLeft: 5,
-                                            backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                            borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                        <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
+                                            style={{
+                                                padding: 5, marginLeft: 5,
+                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
                                             }}>
                                             <Entypo name="pin" size={25} color="#555" />
-                                        </View>
+                                        </TouchableOpacity>
                                         ) : (<View style={{width: 0, height: 0,}} />)}
 
                                     </View>
@@ -1102,10 +1144,11 @@ const ChatScreen = ({ navigation, route }) => {
                                                         <IconOption value={1} iconName='heart' text='Like' isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid} />
                                                         <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
                                                             selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                        <IconOption value={3} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
-                                                        <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={data.ownerUID != auth.currentUser.uid} />
-                                                        <IconOption value={5} iconName='edit' text='Edit' hide={data.ownerUID != auth.currentUser.uid} />
-                                                        <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={3} isSpacer={true} iconName='arrow-right' text='Make into Topic' hide={data.ownerUID != auth.currentUser.uid} />
+                                                        <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
+                                                        <IconOption value={5} iconName='edit' text='Edit' hide={true} />
+                                                        <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
+                                                            selectFunction={() => {deleteMessage(id)}}/>
                                                     </MenuOptions>
                                                 </Menu>
 
@@ -1124,9 +1167,8 @@ const ChatScreen = ({ navigation, route }) => {
                                         </View>
                                     </View>
                                 )
-                            ))}
-                            <View style={{height: 30}} />
-                        </ScrollView>
+                            
+                        )}}/>
 
                         {/* Footer */}
                         <View style={styles.footer}>
@@ -1210,6 +1252,13 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         justifyContent: "center", alignItems: "center", flexDirection: "column",
     },
+    featuresOuterViewDisabled: {
+        width: 90,
+        paddingHorizontal: 5, paddingVertical: 15,
+        borderRadius: 10, borderWidth: 1, borderColor: "#777",
+        backgroundColor: "#CFC5BA00",
+        justifyContent: "center", alignItems: "center", flexDirection: "column",
+    },
     featuresIconView: {
         width: 50, height: 50,
         borderRadius: 0, borderWidth: 0,
@@ -1220,6 +1269,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         color: 'black',
+        textAlign: "center",
+        marginTop: 5,
+    },
+    featuresTextDisabled: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#777',
         textAlign: "center",
         marginTop: 5,
     },
