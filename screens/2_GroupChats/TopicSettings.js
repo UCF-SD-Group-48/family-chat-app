@@ -25,6 +25,7 @@ import {
     Alert,
     Avatar,
     Button,
+    CheckBox,
     Icon,
     Image,
     Input,
@@ -40,6 +41,7 @@ import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import {
     Menu,
+    MenuContext,
     MenuOptions,
     MenuOption,
     MenuTrigger,
@@ -62,8 +64,6 @@ import { G } from 'react-native-svg';
 
 import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
-
-
 // *************************************************************
 
 const TopicSettings = ({ navigation, route }) => {
@@ -72,7 +72,7 @@ const TopicSettings = ({ navigation, route }) => {
 
     const goBackward = () => navigation.navigate("Chat",
         {
-            color: topicObjectForPassing.color,
+            color: groupColor,
             groupId: topicObjectForPassing.groupId,
             groupName: topicObjectForPassing.groupName,
             groupOwner: topicObjectForPassing.groupOwner,
@@ -162,189 +162,182 @@ const TopicSettings = ({ navigation, route }) => {
         });
     }, [navigation]);
 
-    const [groupMembersList, setGroupMembersList] = useState([]);
+    const [groupColor, setGroupColor] = useState('');
+    const [groupMembers, setGroupMembers] = useState([]);
+    const [topicMembers, setTopicMembers] = useState([]);
+    const [isGeneral, setIsGeneral] = useState(true);
+    const [isOwner, setIsOwner] = useState(true);
+    const [topicData, setTopicData] = useState({})
 
-    const getGroupMembers = async () => {
-        let isOwner = false;
+    const getMemberData = async (memberUID, destination) => {
 
-        try {
-            const snapshot = await db
-                .collection('groups')
-                .doc(topicObjectForPassing.groupId)
-                .get()
+        const userSnapshot = await db
+            .collection('users')
+            .doc(memberUID)
+            .get()
+            .catch((error) => console.log(error));
 
-            const membersArray = snapshot.data().members;
+        const userSnapshotData = userSnapshot.data();
 
-            membersArray.forEach(async (memberUID) => {
-                const memberQuery = await db
-                    .collection('users')
-                    .doc(memberUID)
-                    .get()
-
-                const snapshot = memberQuery.data();
-
-                if (snapshot.uid === topicObjectForPassing.topicOwner) isOwner = true;
-                else isOwner = false;
-
-                const searchedMember = {
+        switch (destination) {
+            case 'group': {
+                setGroupMembers((previous) => [...previous, {
+                    name: `${userSnapshotData.firstName} ${userSnapshotData.lastName}`,
+                    pfp: userSnapshotData.pfp,
                     uid: memberUID,
-                    name: `${snapshot.firstName} ${snapshot.lastName}`,
-                    pfp: snapshot.pfp,
-                    topicOwner: isOwner,
-                }
-
-                setGroupMembersList((previous) => [...previous, searchedMember])
-            })
-        } catch (error) { console.log(error) };
+                }]);
+                break;
+            }
+            case 'topic': {
+                setTopicMembers((previous) => [...previous, {
+                    name: `${userSnapshotData.firstName} ${userSnapshotData.lastName}`,
+                    pfp: userSnapshotData.pfp,
+                    uid: memberUID,
+                }]);
+                break;
+            }
+            default: {
+                return;
+            }
+        }
     }
 
     useEffect(() => {
-        getGroupMembers();
+        const unsubscribe = db
+            .collection("groups")
+            .doc(topicObjectForPassing.groupId)
+            .onSnapshot(async (groupSnapshot) => {
+                const groupSnapshotData = groupSnapshot.data();
+
+                if (!groupSnapshotData.members.includes(auth.currentUser.uid)) {
+                    alert(
+                        `Woops! It seems that you're no longer a member of this group, so we've sent you back to the "Groups" tab.`,
+                        "My Alert Msg",
+                        [{ text: "OK" }]
+                    );
+                    navigation.navigate('GroupsTab');
+                }
+
+                setGroupColor(groupSnapshotData.color);
+
+                try {
+                    const topicSnapshot = await db
+                        .collection('groups')
+                        .doc(groupSnapshot.id)
+                        .collection('topics')
+                        .doc(topicObjectForPassing.topicId)
+                        .get()
+                        .catch((error) => console.log(error));
+
+                    const topicSnapshotData = topicSnapshot.data();
+                    const topicMembers = topicSnapshotData.members;
+
+                    if (!topicMembers.includes(auth.currentUser.uid)) {
+                        alert(
+                            `Woops! It seems that you're no longer a member of this topic, so we've sent you back to the "General" topic.`,
+                            "My Alert Msg",
+                            [{ text: "OK" }]
+                        );
+
+                        const generalTopicSnapshot = await db
+                            .collection("groups")
+                            .doc(groupSnapshot.id)
+                            .collection("topics")
+                            .where("topicName", '==', 'General')
+                            .get()
+                            .catch((error) => console.log(error));
+
+                        const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
+
+                        navigation.navigate('Chat',
+                            {
+                                color: groupSnapshotData.color,
+                                coverImageNumber: groupSnapshotData.coverImageNumber,
+                                topicId: generalTopicSnapshot.docs[0].id,
+                                topicName: 'General',
+                                groupId: groupSnapshot.id,
+                                groupName: groupSnapshotData.groupName,
+                                groupOwner: groupSnapshotData.groupOwner,
+                            }
+                        );
+                    }
+
+                    topicSnapshotData.members.map((memberUID, index) => {
+                        getMemberData(memberUID, 'topic');
+                    })
+
+                    if (topicSnapshotData.topicName === 'General') setIsGeneral(true);
+                    if (topicSnapshotData.topicOwner === auth.currentUser.uid) setIsOwner(true);
+
+                    await setTopicData({
+                        topicId: topicSnapshotData.id,
+                        topicName: topicSnapshotData.topicName,
+                        topicOwner: topicSnapshotData.topicOwner,
+                    })
+
+                    groupSnapshotData.members.map((memberUID, index) => {
+                        getMemberData(memberUID, 'group');
+                    })
+
+                } catch (error) { console.log(error) };
+            });
 
         return () => {
-            setGroupMembersList();
+            setGroupColor();
+            setGroupMembers([]);
+            setTopicMembers([]);
+            setTopicData({});
+            unsubscribe;
         }
-    }, [])
+    }, []);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingGroupSettings, setIsLoadingGroupSettings] = useState(false);
+    const [isLoadingEditButton, setIsLoadingEditButton] = useState(false);
+    const [isLoadingSaveButton, setIsLoadingSaveButton] = useState(false);
+
     const isFocused = useIsFocused();
 
     useEffect(() => {
-        setIsLoading(false);
+        setIsLoadingGroupSettings(false);
+        setIsLoadingEditButton(false);
+        setIsLoadingSaveButton(false);
 
         return () => {
-            setIsLoading();
+            setIsLoadingGroupSettings();
+            setIsLoadingEditButton();
+            setIsLoadingSaveButton();
         };
     }, [isFocused]);
 
-    // let isOwner = false;
+    const [isEditing, setIsEditing] = useState(false);
 
-    // const [topicOwnerUID, setTopicOwnerUID] = useState({});
-    // const [topicOwner, setTopicOwner] = useState({});
-    // const [topicData, setTopicData] = useState({});
-    // const [topicMembers, setTopicMembers] = useState([]);
-    // const [checked, setChecked] = useState([auth.currentUser.uid])
-
-    // const getTopicData = async () => {
-    //     if (topicName === "General") {
-    //         const groupQuery = await db
-    //             .collection('groups')
-    //             .doc(groupId)
-    //             .get()
-    //             .then(async (groupQueryResult) => {
-    //                 if (!groupQueryResult.empty) {
-    //                     const groupData = groupQueryResult.data();
-    //                     console.log('groupData:', groupData)
-    //                     setTopicData(groupData)
-    //                     console.log('MEMBER UID', topicOwner)
-
-    //                     const groupMembers = groupData.members;
-
-    //                     groupMembers.map((memberUID, index) => {
-    //                         const query = db
-    //                             .collection('users')
-    //                             .doc(memberUID)
-    //                             .get()
-    //                             .then((userQueryResult) => {
-    //                                 if (!userQueryResult.empty) {
-    //                                     const snapshot = userQueryResult.data();
-
-    //                                     console.log('TOPIC DATA', topicData)
-    //                                     console.log('MEMBER UID', memberUID)
-    //                                     console.log('MEMBER UID', topicOwner)
-
-    //                                     if (memberUID === topicData.topicOwner) isOwner = true;
-    //                                     else isOwner = false;
-
-    //                                     const searchedMember = {
-    //                                         uid: memberUID,
-    //                                         name: `${snapshot.firstName} ${snapshot.lastName}`,
-    //                                         pfp: snapshot.pfp,
-    //                                         owner: isOwner,
-    //                                     }
-
-    //                                     if (isOwner) setTopicOwner(searchedUser)
-    //                                     setTopicMembers((previous) => [...previous, searchedMember])
-    //                                 }
-    //                             })
-    //                     })
-    //                 }
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error)
-    //             })
-    //     }
-    //     else {
-    //         const topicQuery = await db
-    //             .collection('groups')
-    //             .doc(groupId)
-    //             .collection('topics')
-    //             .doc(topicId)
-    //             .get()
-    //             .then((topicQueryResult) => {
-    //                 if (!topicQueryResult.empty) {
-    //                     const resultData = topicQueryResult.data();
-    //                     console.log('topicData:', resultData)
-    //                     setTopicData(resultData)
-
-    //                     const topicMembers = resultData.members;
-    //                     topicMembers.map((memberUID, index) => {
-    //                         console.log (topicData)
-    //                         const query = db
-    //                             .collection('users')
-    //                             .doc(memberUID)
-    //                             .get()
-    //                             .then((userQueryResult) => {
-    //                                 if (!userQueryResult.empty) {
-    //                                     const snapshot = userQueryResult.data();
-
-    //                                     console.log('TOPIC DATA', topicData)
-    //                                     console.log('MEMBER UID', memberUID)
-
-
-    //                                     if (memberUID === topicData.topicOwner) isOwner = true;
-    //                                     else isOwner = false;
-
-    //                                     const searchedMember = {
-    //                                         uid: memberUID,
-    //                                         name: `${snapshot.firstName} ${snapshot.lastName}`,
-    //                                         pfp: snapshot.pfp,
-    //                                         owner: isOwner,
-    //                                     }
-
-    //                                     if (isOwner) setTopicOwner(searchedUser)
-    //                                     setTopicMembers((previous) => [...previous, searchedMember])
-    //                                 }
-    //                             })
-    //                     })
-    //                 }
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error)
-    //             })
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     getTopicData();
-    //     // if (topicName === "General") getTopicOwner(groupOwner)
-    //     // else {
-    //     //     console.log('this?', topicData)
-    //     //     getTopicOwner(topicData.topicOwner)
-    //     // }
-
-    //     return () => {
-    //         setTopicOwner();
-    //         setTopicData();
-    //         setTopicMembers();
-    //     };
-    // }, []);
-
-    const triggerMenuOptions = () => {
-        console.log('triggerMenuOptions()')
+    const leaveTopic = () => {
+        console.log('leave')
     }
 
-    const [isEditing, setIsEditing] = useState(false);
+    const transferTopicOwnership = () => {
+        console.log('transfer')
+    }
+
+    const deleteTopic = () => {
+        console.log('delete')
+    }
+
+    const addTopicMembers = () => {
+
+        db.collection('chats').doc(topicId).collection('banners').doc(alert.id).update({
+            viewedBy: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid),
+        })
+    }
+
+    const [checkedList, setCheckedList] = useState([]);
+
+    const getCheckedList = () => {
+        setCheckedList([])
+        topicMembers.map((topicMember, index) => {
+            setCheckedList((previous) => [...previous, topicMember.uid]);
+        })
+    }
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -358,19 +351,19 @@ const TopicSettings = ({ navigation, route }) => {
                 <TouchableOpacity
                     activeOpacity={0.75}
                     onPress={() => {
-                        setIsLoading(true);
+                        setIsLoadingGroupSettings(true);
                         goForward();
                     }}
                     style={styles.groupListItemComponent}
                 >
                     <View style={styles.groupSettingsContainer}>
-                        <View style={styles.leftHalf}>
+                        <View style={styles.groupSettingsLeftHalf}>
                             <Icon
-                                name='cog-box'
-                                type='material-community'
+                                name='folder-shared'
+                                type='material'
                                 color='#363732'
-                                size={40}
-                                style={{ marginRight: 10 }}
+                                size={35}
+                                style={{ marginRight: 6 }}
                             />
                             <Text style={styles.overviewText}>
                                 View Group Settings
@@ -378,7 +371,7 @@ const TopicSettings = ({ navigation, route }) => {
 
                         </View>
 
-                        {isLoading
+                        {(isLoadingGroupSettings)
                             ? <ActivityIndicator
                                 size="small"
                                 color="#363732"
@@ -396,203 +389,335 @@ const TopicSettings = ({ navigation, route }) => {
                 </TouchableOpacity>
 
                 <View style={styles.innerContainer}>
-                    <View style={[styles.settingsBar, { backgroundColor: getHexValue(topicObjectForPassing.color), }]}>
+                    <View style={[styles.settingsBar, { backgroundColor: getHexValue(groupColor), }]}>
                         <View style={styles.topicSettingsBlock}>
                             <Text style={styles.topicSettingsText}>
                                 Topic Settings:
                             </Text>
                         </View>
-                        <TouchableOpacity activeOpacity={0.5} onPress={() => triggerMenuOptions()}>
-                            <Icon
-                                name='dots-three-horizontal'
-                                type='entypo'
-                                color='black'
-                                size={30}
-                                style={{ marginRight: 10 }}
-                            />
-                        </TouchableOpacity>
+                        {isGeneral
+                            ? null
+                            : <View>
+                                <Menu>
+                                    <MenuTrigger>
+                                        <Icon
+                                            name='dots-three-horizontal'
+                                            type='entypo'
+                                            color='black'
+                                            size={30}
+                                        />
+                                    </MenuTrigger>
+                                    {(topicObjectForPassing.topicOwner === auth.currentUser.uid)
+                                        ? <MenuOptions
+                                            style={{
+                                                borderRadius: 12, backgroundColor: "#fff",
+                                            }}
+                                            customStyles={{
+                                                optionsContainer: {
+                                                    borderRadius: 15, backgroundColor: "#666",
+                                                },
+                                            }}>
+                                            <View style={{
+                                                borderBottomWidth: 7,
+                                                borderColor: "#dedede",
+                                            }}>
+                                                <MenuOption
+                                                    onSelect={() => transferTopicOwnership()}
+                                                    style={{
+                                                        margin: 10,
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                        width: '100%',
+                                                        alignSelf: 'center',
+                                                    }}>
+                                                    <Icon
+                                                        name='crown'
+                                                        type='material-community'
+                                                        color='#363732'
+                                                        size={16}
+                                                        style={{ marginLeft: 10, }}
+                                                    />
+                                                    <Text style={{
+                                                        fontSize: 14, color: 'black', marginLeft: 10,
+                                                    }}>
+                                                        Transfer Ownership
+                                                    </Text>
+                                                </MenuOption>
+                                            </View>
+                                            <MenuOption
+                                                onSelect={() => deleteTopic()}
+                                                style={{ marginBottom: 10, marginTop: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                                <Icon
+                                                    name='trash'
+                                                    type='feather'
+                                                    color='red'
+                                                    size={16}
+                                                    style={{ marginLeft: 10, }}
+                                                />
+                                                <Text style={{ fontSize: 14, color: 'red', marginLeft: 11 }}>
+                                                    Delete Topic
+                                                </Text>
+                                            </MenuOption>
+                                        </MenuOptions>
+                                        : <MenuOptions
+                                            style={{
+                                                borderRadius: 12, backgroundColor: "#fff",
+                                            }}
+                                            customStyles={{
+                                                optionsContainer: {
+                                                    borderRadius: 15, backgroundColor: "#666",
+                                                },
+                                            }}>
+                                            <MenuOption
+                                                onSelect={() => leaveTopic()}
+                                                style={{ margin: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                                <Icon
+                                                    name='user-x'
+                                                    type='feather'
+                                                    color='red'
+                                                    size={16}
+                                                />
+                                                <Text style={{ fontSize: 14, color: 'red', marginLeft: 10 }}>
+                                                    Leave Topic
+                                                </Text>
+                                            </MenuOption>
+                                        </MenuOptions>
+                                    }
+                                </Menu>
+                            </View>
+                        }
                     </View>
 
                     <View style={styles.topicContext}>
-                        <View style={styles.leftHalf}>
+                        <View style={styles.topicContextLeftHalf}>
                             <Icon
                                 name="chatbubble-ellipses-outline"
                                 type="ionicon"
-                                size={24}
                                 color="#363732"
+                                size={30}
+                                style={{ marginRight: 12, alignItems: 'center', alignSelf: 'center', }}
                             />
                             <Text style={styles.topicText}>
                                 {topicObjectForPassing.topicName}
                             </Text>
                         </View>
-                        {(topicObjectForPassing.topicOwner === auth.currentUser.uid)
+                        {isOwner
                             ? <View style={styles.ownerBadge}>
                                 <Icon
                                     name='crown'
                                     type='material-community'
                                     color='#363732'
                                     size={16}
-                                // style={{ marginRight: 10 }}
                                 />
                             </View>
                             : null
                         }
                     </View>
 
-                    <View style={styles.topicUsersInvolved}>
-                        <View style={styles.topicOwnerContainer}>
-                            <View style={styles.topicOwnerHeader}>
-                                <Icon
-                                    name='crown'
-                                    type='material-community'
-                                    color='#363732'
-                                    size={16}
-                                // style={{ marginRight: 10 }}
-                                />
-                                <Text style={styles.topicOwnerTitle}>
-                                    Topic Owner:
-                                </Text>
-                            </View>
+                    {isEditing
+                        ? <View style={styles.topicUsersInvolved}>
+                            <View style={styles.topicMembersContainer}>
+                                <View style={styles.topicMembersHeader}>
+                                    <Icon
+                                        name='groups'
+                                        type='material'
+                                        color='#363732'
+                                        size={24}
+                                    />
+                                    <Text style={styles.topicMembersTitle}>
+                                        Topic Members:
+                                    </Text>
+                                </View>
 
-                            <View style={styles.topicOwnerValueField}>
-                                <Text style={styles.topicOwnerNameText}>
-                                    {topicObjectForPassing.topicOwner}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.topicMembersContainer}>
-                            <View style={styles.topicMembersHeader}>
-                                <Icon
-                                    name='groups'
-                                    type='material'
-                                    color='#363732'
-                                    size={16}
-                                // style={{ marginRight: 10 }}
-                                />
-                                <Text style={styles.topicMembersTitle}>
-                                    Topic Members:
-                                </Text>
-                            </View>
-
-                            {/* <View style={styles.topicMembersContainer}> */}
-                            {/* <ScrollView contentContainerStyle={{ width: "100%", paddingLeft: 20, height: 200, backgroundColor: 'lightgrey' }}> */}
-                            {groupMembersList == undefined
-                                ? <View> <Text> UNDEFINED </Text> </View>
-                                :
-                                <View style={styles.topicMembersContainer}>
-
-                                    {
-                                        groupMembersList.filter((groupMember) => topicObjectForPassing.topicMembers.includes(groupMember.uid)).map((topicMember, index) => (
+                                <View style={styles.memberEditContainer}>
+                                    <ScrollView containerStyle={{ paddingTop: 10 }}>
+                                        {groupMembers.map((topicMember, index) => (
                                             <View style={styles.memberEditRow} key={index} id={index}>
                                                 <View style={styles.member}>
-                                                    <Image
-                                                        source={imageSelection(topicMember.pfp)}
-                                                        style={{ width: 30, height: 30, borderRadius: 5 }}
-                                                    />
-                                                    <Text style={styles.memberName}>
-                                                        {topicMember.name}
-                                                    </Text>
+                                                    <View style={styles.memberLeftPortion}>
+                                                        <Image
+                                                            source={imageSelection(topicMember.pfp)}
+                                                            style={{ width: 26, height: 26, borderRadius: 5, }}
+                                                        />
+                                                        <Text style={styles.memberName}>
+                                                            {topicMember.name}
+                                                        </Text>
+                                                    </View>
+                                                    <View style={styles.memberRightPortion}>
+                                                        {(topicMember.uid === topicData.topicOwner)
+                                                            ? <View style={styles.ownerBadge}>
+                                                                <Icon
+                                                                    name='crown'
+                                                                    type='material-community'
+                                                                    color='#363732'
+                                                                    size={16}
+                                                                />
+                                                            </View>
+                                                            : <View style={{ alignSelf: 'center', justifyContent: 'flex-start' }}>
+                                                                
+                                                                <CheckBox />
+
+                                                                <CheckBox
+                                                                    center
+                                                                    checked={checkedList.includes(topicMember.uid)}
+                                                                    onPress={() => {
+                                                                        if (checkedList.includes(topicMember.uid)) {
+                                                                            setCheckedList((previous) => {
+                                                                                return previous.filter((memberToKeep) => { return memberToKeep != topicMember.uid })
+                                                                            })
+                                                                        } else setCheckedList((previous) => { return [...previous, topicMember.uid] });
+                                                                    }}
+                                                                />
+                                                            </View>
+
+                                                        }
+                                                    </View>
                                                 </View>
-                                                {topicMember.topicOwner
-                                                    ? <View> <Text> YES </Text> </View>
-                                                    // <View style={styles.ownerBadge}>
-                                                    //     <Icon
-                                                    //         name='crown'
-                                                    //         type='material-community'
-                                                    //         color='#363732'
-                                                    //         size={16}
-                                                    //     // style={{ marginRight: 10 }}
-                                                    //     />
-                                                    // </View>
-                                                    : null
-                                                }
                                             </View>
                                         ))
-                                    }
+                                        }
+                                    </ScrollView>
                                 </View>
-                            }
-
-                            {/* {topicMembers.map((individualMember, index) => {
-                                        <View style={styles.memberEditRow} key={index} id={index}>
-                                            <View style={styles.member}>
-                                                <Image
-                                                    source={imageSelection(individualMember.pfp)}
-                                                    style={{ width: 30, height: 30, borderRadius: 5 }}
-                                                />
-                                                <Text style={styles.memberName}>
-                                                    {individualMember}
-                                                </Text>
-                                            </View>
-                                        </View>
-
-                                    })} */}
-                            {/* <View>
-
-                                    {topicMembers.map((data, index) => {
-                                        <Text>
-                                            {data}
-                                        </Text>
-                                    })}
-                                </View> */}
-
-                            {/* </ScrollView> */}
-                            {/* </View> */}
-
-                            <View>
                                 <TouchableOpacity
                                     activeOpacity={0.75}
                                     onPress={() => {
-                                        console.log('OWNER:', topicOwner)
-                                        console.log('MEMBERS:', topicMembers)
-
+                                        console.log(groupMembers)
+                                        setIsLoadingEditButton(false);
+                                        setIsLoadingSaveButton(true);
+                                        console.log(checkedList)
+                                        setIsEditing(false);
                                     }}
-                                >
-                                    <Text style={{ fontSize: 30, color: 'red' }}>
-                                        CHECK MEMBERS
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                            {isEditing
-                                ? <TouchableOpacity
-                                    activeOpacity={0.75}
-                                    onPress={() => setIsEditing(false)}
                                 >
                                     <View style={styles.buttonSpacing}>
                                         <View style={[styles.buttonSave, { borderColor: '#363732', }]}>
                                             <Text style={styles.buttonSaveText}>
                                                 SAVE
                                             </Text>
-                                            <Icon
-                                                name="check-bold"
-                                                type="material-community"
-                                                size={20}
-                                                color="white"
-                                            />
+
+                                            {(isLoadingSaveButton)
+                                                ? <ActivityIndicator
+                                                    size="small"
+                                                    color="white"
+                                                />
+                                                : <Icon
+                                                    name="check-bold"
+                                                    type="material-community"
+                                                    size={20}
+                                                    color="white"
+                                                />
+                                            }
                                         </View>
                                     </View>
                                 </TouchableOpacity>
-                                : <TouchableOpacity
+                            </View>
+                        </View>
+                        : <View style={styles.topicUsersInvolved}>
+                            <View style={styles.topicOwnerContainer}>
+                                <View style={styles.topicOwnerHeader}>
+                                    <Icon
+                                        name='crown'
+                                        type='material-community'
+                                        color='#363732'
+                                        size={20}
+                                    />
+                                    <Text style={styles.topicOwnerTitle}>
+                                        Topic Owner:
+                                    </Text>
+                                </View>
+
+                                <View style={styles.topicOwnerValueField}>
+                                    {topicMembers
+                                        .filter(memberObject => (memberObject.uid === topicData.topicOwner))
+                                        .map((topicOwnerData, index) => (
+                                            <Text style={styles.topicOwnerNameText} key={index} id={index}>
+                                                {topicOwnerData.name}
+                                            </Text>
+                                        ))}
+                                </View>
+                            </View>
+
+                            <View style={styles.topicMembersContainer}>
+                                <View style={styles.topicMembersHeader}>
+                                    <Icon
+                                        name='groups'
+                                        type='material'
+                                        color='#363732'
+                                        size={24}
+                                    />
+                                    <Text style={styles.topicMembersTitle}>
+                                        Topic Members:
+                                    </Text>
+                                </View>
+
+                                <View style={styles.memberEditContainer}>
+                                    <ScrollView containerStyle={{ paddingTop: 10 }}>
+                                        {topicMembers.map((topicMember, index) => (
+                                            <View style={styles.memberEditRow} key={index} id={index}>
+                                                <View style={styles.member}>
+                                                    <View style={styles.memberLeftPortion}>
+                                                        <Image
+                                                            source={imageSelection(topicMember.pfp)}
+                                                            style={{ width: 26, height: 26, borderRadius: 5, }}
+
+                                                        />
+                                                        <Text style={styles.memberName}>
+                                                            {topicMember.name}
+                                                        </Text>
+                                                    </View>
+
+                                                    <View style={styles.memberRightPortion}>
+                                                        {(topicMember.uid === topicData.topicOwner)
+                                                            ?
+                                                            <View style={styles.ownerBadge}>
+                                                                <Icon
+                                                                    name='crown'
+                                                                    type='material-community'
+                                                                    color='#363732'
+                                                                    size={16}
+                                                                />
+                                                            </View>
+                                                            : null
+                                                        }
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        ))
+                                        }
+                                    </ScrollView>
+                                </View>
+                                <TouchableOpacity
                                     activeOpacity={0.75}
-                                    onPress={() => setIsEditing(true)}
+                                    onPress={() => {
+                                        setIsLoadingSaveButton(false);
+                                        setIsLoadingEditButton(true);
+                                        getCheckedList();
+                                        console.log(checkedList.length)
+                                        setIsEditing(true);
+                                    }}
                                 >
                                     <View style={styles.buttonSpacing}>
                                         <View style={[styles.buttonEdit, { borderColor: '#363732', }]}>
                                             <Text style={styles.buttonEditText}>
                                                 EDIT
                                             </Text>
-                                            <Icon
-                                                name="edit"
-                                                type="material"
-                                                size={20}
-                                                color="#363732"
-                                            />
+                                            {(isLoadingEditButton)
+                                                ? <ActivityIndicator
+                                                    size="small"
+                                                    color="#363732"
+                                                />
+                                                : <Icon
+                                                    name="edit"
+                                                    type="material"
+                                                    size={20}
+                                                    color="#363732"
+                                                />
+                                            }
                                         </View>
                                     </View>
                                 </TouchableOpacity>
-                            }
+                            </View>
                         </View>
-                    </View>
+                    }
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -628,7 +753,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
 
-    leftHalf: {
+    groupSettingsLeftHalf: {
         marginLeft: 15,
         flexDirection: "row",
         alignItems: 'center',
@@ -638,6 +763,200 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontSize: 16,
         fontWeight: '700'
+    },
+
+    innerContainer: {
+        marginLeft: 20,
+        marginRight: 20,
+        marginTop: 25,
+        marginBottom: 30,
+        backgroundColor: 'white',
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: 10 },
+        shadowRadius: 5,
+        shadowOpacity: .2,
+    },
+
+    settingsBar: {
+        width: '100%',
+        height: 58,
+        alignSelf: 'center',
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: "space-between",
+        borderWidth: 1,
+        borderColor: '#363732',
+        paddingRight: 15,
+    },
+
+    topicSettingsBlock: {
+        backgroundColor: 'white',
+        opacity: .85,
+        borderRadius: 5,
+        marginLeft: 15,
+    },
+
+    topicSettingsText: {
+        paddingTop: 7,
+        paddingBottom: 7,
+        paddingLeft: 10,
+        paddingRight: 10,
+        color: 'black',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+
+    topicContext: {
+        width: '100%',
+        height: 58,
+        borderWidth: 1,
+        borderTopWidth: 0,
+        borderColor: '#363732',
+        alignSelf: 'center',
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: "space-between",
+    },
+
+    topicContextLeftHalf: {
+        alignSelf: 'center',
+        flexDirection: "row",
+        alignItems: 'center',
+        marginLeft: 15,
+    },
+
+    topicText: {
+        color: 'black',
+        fontSize: 18,
+        fontWeight: '800',
+    },
+
+    ownerBadge: {
+        width: 26,
+        height: 26,
+        marginRight: 15,
+        backgroundColor: "#F8D353",
+        borderWidth: 2,
+        borderColor: "black",
+        borderRadius: 15,
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+    },
+
+    topicUsersInvolved: {
+        width: '100%',
+        borderWidth: 1,
+        borderTopWidth: 0,
+        borderColor: '#363732',
+        alignSelf: 'center',
+        padding: 15,
+    },
+
+    topicOwnerContainer: {
+        marginTop: 5,
+        justifyContent: "center",
+        marginBottom: 22,
+    },
+
+    topicOwnerHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+
+    topicOwnerTitle: {
+        color: 'black',
+        fontSize: 16,
+        fontWeight: '600',
+        marginLeft: 8,
+    },
+
+    topicOwnerValueField: {
+        height: 40,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: '#9D9D9D',
+        borderRadius: 3,
+        fontSize: 16,
+        textAlign: 'left',
+        padding: 10,
+        backgroundColor: '#F8F8F8',
+        marginTop: 8,
+    },
+
+    topicOwnerNameText: {
+        fontSize: 16,
+        color: '#363732',
+    },
+
+    topicMembersContainer: {
+        justifyContent: "center",
+    },
+
+    topicMembersHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+
+    topicMembersTitle: {
+        color: 'black',
+        fontSize: 16,
+        fontWeight: '600',
+        marginLeft: 8,
+    },
+
+    memberEditContainer: {
+        marginTop: 8,
+        width: '100%',
+        maxHeight: 210,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: '#9D9D9D',
+        borderRadius: 3,
+        fontSize: 16,
+        textAlign: 'left',
+        backgroundColor: '#F8F8F8',
+        marginBottom: 23,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        padding: 10,
+        paddingTop: 13,
+        paddingBottom: 13,
+    },
+
+    memberEditRow: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        display: 'flex',
+        alignItems: 'center',
+        marginLeft: 6,
+        marginBottom: 10,
+        marginTop: 10,
+    },
+
+    member: {
+        height: 20,
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        // justifyContent: 'space-between',
+    },
+
+    memberName: {
+        fontSize: 14,
+        fontWeight: '700',
+        marginLeft: 10
+    },
+
+    memberLeftPortion: {
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+    },
+
+    memberRightPortion: {
+        alignSelf: 'center'
     },
 
     buttonSpacing: {
@@ -684,19 +1003,6 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         marginRight: 5,
     },
-
-    ownerBadge: {
-        width: 26,
-        height: 26,
-        marginRight: 15,
-        backgroundColor: "#F8D353",
-        borderWidth: 2,
-        borderColor: "black",
-        borderRadius: 15,
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
-    }
 
 })
 

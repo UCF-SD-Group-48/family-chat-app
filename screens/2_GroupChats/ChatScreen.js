@@ -677,6 +677,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         fontWeight: '700',
                                         color: '#777',
                                         textAlign: "left",
+                                        marginTop: 6,
                                     }}>
                                         In Progress Features
                                     </Text>
