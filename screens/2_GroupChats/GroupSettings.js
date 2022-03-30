@@ -86,9 +86,6 @@ const GroupSettings = ({ navigation, route }) => {
     const topicObjectForPassing = route.params.topicObjectForPassing;
 
     const goBackward = () => {
-        console.log('COLOR', topicObjectForPassing?.color)
-        console.log(topicObjectForPassing)
-
         navigation.navigate("TopicSettings", {
             topicObjectForPassing: {
                 color: topicObjectForPassing.color,
@@ -97,9 +94,12 @@ const GroupSettings = ({ navigation, route }) => {
                 groupOwner: topicObjectForPassing.groupOwner,
                 topicId: topicObjectForPassing.topicId,
                 topicName: topicObjectForPassing.topicName,
+                topicOwner: topicObjectForPassing.topicOwner,
+                topicMembers: topicObjectForPassing.topicMembers,
             }
         })
     }
+    
     useLayoutEffect(() => {
         navigation.setOptions({
             title: 'Group Settings',
