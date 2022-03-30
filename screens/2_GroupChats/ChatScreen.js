@@ -184,68 +184,16 @@ const ChatScreen = ({ navigation, route }) => {
                 .then((result) => {
 
                     senders[uid] = result.data();
-
-                    // messageSendersHelper(i+1);
-                    // return (result.data());
+                    
                 });
         }
         setMessageSenders(senders);
 
-        // if(i > messageSenderUIDs.length) {
-        //     return;
-        // }
-        // else {
-        //     const ref = db.collection('users').doc(messageSenderUIDs[i]);
-        //     const doc = await ref.get()
-        //     .then((result) => {
-        //         const updated = {...messageSenders};
-        //         updated[messageSenderUIDs[i]] = result.data();
-        //         setMessageSenders({...updated});
-
-        //         messageSendersHelper(i+1);
-        //         // return (result.data());
-        //     });
-        // }
-
-        // db.collection("users").doc(messageID).get()
-        //     .then(snapshot => {
-        //         snapshot.forEach(doc => {
-        //             return doc.data();
-        //         });
-        //     })
-        //     .catch(err => {
-        //         console.log('Error getting documents', err);
-        //     });
-
-        // const snapshot = await db.collection("users").doc(messageID).get();
-        // if (!snapshot.empty) {
-        //     // console.log(snapshot.data());
-        //     // setMessageSenders([...messageSenders, snapshot.data()]);
-        //     return (snapshot.data());
-        // }
-        // else {
-        //     return {};
-        // }
+        flatList.current.scrollToEnd({animated: true});
     };
-    // const resetMessageSenders = () => {
-    //     let senders = {};
-    //     let returnVal = null;
-    //     messageSenderUIDs.forEach((senderUID) => {
-    //         returnVal = messageSendersHelper(senderUID);
-    //         if(returnVal != null){
-    //             senders[senderUID] = returnVal;
-    //         }
-    //         // senders.push(messageSendersHelper(senderUID));
-    //         // console.log(senderUID);
-    //     })
-    //     // setMessageSenders(senders);
-    // };
+    
     useEffect(() => {
-        //resetMessageSenders();
         messageSendersHelper();
-        // return () => {
-        //     setMessageSenders([]);
-        // }
     }, [messageSenderUIDs]);
 
     useEffect(() => {
@@ -766,7 +714,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 justifyContent: "flex-start", alignItems: 'center', flexDirection: 'row',
                                 borderColor: "#777",
                                 borderBottomWidth: 0.5, borderTopWidth: 1,
-                                paddingVertical: 10,
+                                paddingVertical: 6,
                             }}>
                             <View style={{
                                 marginHorizontal: 15, paddingLeft: 15,
@@ -1329,7 +1277,7 @@ const ChatScreen = ({ navigation, route }) => {
                             
                             <View style={{
                                 width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                                marginTop: 2, marginHorizontal: 0, paddingLeft: 15,
+                                paddingLeft: 15,
                                 justifyContent: "flex-start", alignItems: "flex-end",
                                 borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
                                 borderBottomRightRadius: 20, borderTopRightRadius: 20,
@@ -1368,25 +1316,6 @@ const ChatScreen = ({ navigation, route }) => {
                             </View>
                                 
                         </View>
-                        {/* <View style={styles.footer}>
-                            <TextInput
-                                value={input}
-                                onChangeText={(text) => setInput(text)}
-                                onSubmitEditing={sendMessage}
-                                placeholder='Type a message...'
-                                style={styles.textInput}
-                            />
-                            <TouchableOpacity
-                                onPress={sendMessage}
-                                activeOpacity={0.5}
-                            >
-                                <Icon
-                                    name='send'
-                                    type='ionicon'
-                                    color='#2B68E6'
-                                />
-                            </TouchableOpacity>
-                        </View> */}
                     </>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
@@ -1583,7 +1512,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        padding: 12, marginTop: 3,
+        paddingHorizontal: 5, paddingVertical: 7, marginTop: 3,
         backgroundColor: "#bbb",
     },
     textInput: {
