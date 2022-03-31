@@ -334,9 +334,18 @@ const ChatScreen = ({ navigation, route }) => {
         setTopicSelection(!topicSelectionEnabled);
     };
 
-    const enterTopic = (id, name) => {
+    const [mapUpdate, setMapUpdate] = useState({});
+
+    const enterTopic = async (id, name) => {
         // if (name != "General") {
             navigation.navigate("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber });
+            // update the topicMap of the current user here
+            mapUpdate[`topicMap.${id}`] = firebase.firestore.FieldValue.serverTimestamp()
+            await db.collection('users').doc(auth.currentUser.uid).update(mapUpdate)
+            
+            console.log("topic entered and topicMap updated for: ", id)
+                // find the topic in the topic map
+
         // }
         toggleTopicSelection();
     };

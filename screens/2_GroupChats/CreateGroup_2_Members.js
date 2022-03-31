@@ -192,8 +192,10 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 						members: membersArray,
 					})
 					.then((newlyCreatedTopic) => {
+						let mapTopics = {}
 						topicID = newlyCreatedTopic.id
-						mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
+						mapTopics[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
+						setMapUpdate(mapTopics)
 						membersArray.map(async (memberUID) => {
 							await db.collection('users').doc(memberUID).update(mapUpdate);
 						})
