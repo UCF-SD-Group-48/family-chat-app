@@ -57,8 +57,11 @@ import GroupListItem from '../../components/GroupListItem'
 import { collection } from 'firebase/firestore';
 import { set } from 'react-native-reanimated';
 
-// *************************************************************
+import SkeletonContent from 'react-native-skeleton-content';
+import { useIsFocused } from '@react-navigation/native';
 
+
+// *************************************************************
 
 const GroupsTab = ({ navigation }) => {
 	const [groups, setGroups] = useState([]);
@@ -82,7 +85,7 @@ const GroupsTab = ({ navigation }) => {
 		navigation.setOptions({
 			title: 'Groups',
 			headerStyle: { backgroundColor: 'white' },
-			headerTitleStyle: { color: 'black'},
+			headerTitleStyle: { color: 'black' },
 			headerTintColor: 'black',
 			headerLeft: '',
 			headerRight: () => (
@@ -131,6 +134,29 @@ const GroupsTab = ({ navigation }) => {
 			});
 	};
 
+	const isFocused = useIsFocused();
+	const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+	const [groupsCount, setGroupsCount] = useState(1);
+
+	useEffect(async () => {
+		// const userSnapshot = await db
+		// 	.collection('users')
+		// 	.doc(auth.currentUser.uid)
+		// 	.get()
+		// 	.catch((error) => console.log(error));
+		
+		// console.log(userSnapshot.data())
+
+		// await setGroupsCount(userSnapshot.data().groups.length);
+
+		setTimeout(() => setIsLoadingGroups(false), 350);
+
+		return () => {
+			setIsLoadingGroups();
+			// setGroupsCount();
+		};
+	}, [isFocused]);
+
 	return (
 		<SafeAreaView style={styles.mainContainer}>
 			<ScrollView
@@ -140,21 +166,130 @@ const GroupsTab = ({ navigation }) => {
 					flexDirection: 'column',
 				}}
 			>
-				<View>
-					{groups.map(({ id, data: { groupName, groupOwner, color, coverImageNumber, members } }) => (
-						<GroupListItem
-							key={id}
-							id={id}
-							groupName={groupName}
-							groupOwner={groupOwner}
-							enterGroup={enterGroup}
-							color={color}
-							coverImageNumber={coverImageNumber}
-							groupMemberCount={members.length}
+				{isLoadingGroups
+					? <View>
+						<SkeletonContent
+							containerStyle={{
+								marginTop: 30,
+								flex: 1,
+								width: '100%',
+								shadowColor: 'black',
+								shadowOffset: { width: 0, height: 2 },
+								shadowRadius: 1,
+								shadowOpacity: .25,
 
+							}}
+							animationDirection="horizontalRight"
+							layout={[{
+								width: '95%',
+								height: 80,
+								alignSelf: 'flex-end',
+								borderBottomLeftRadius: 500,
+								borderTopLeftRadius: 500,
+
+							},]}
 						/>
-					))}
-				</View>
+						<SkeletonContent
+							containerStyle={{
+								marginTop: 30,
+								flex: 1,
+								width: '100%',
+								shadowColor: 'black',
+								shadowOffset: { width: 0, height: 2 },
+								shadowRadius: 1,
+								shadowOpacity: .25,
+
+							}}
+							animationDirection="horizontalRight"
+							layout={[{
+								width: '95%',
+								height: 80,
+								alignSelf: 'flex-end',
+								borderBottomLeftRadius: 500,
+								borderTopLeftRadius: 500,
+
+							},]}
+						/>
+						<SkeletonContent
+							containerStyle={{
+								marginTop: 30,
+								flex: 1,
+								width: '100%',
+								shadowColor: 'black',
+								shadowOffset: { width: 0, height: 2 },
+								shadowRadius: 1,
+								shadowOpacity: .25,
+
+							}}
+							animationDirection="horizontalRight"
+							layout={[{
+								width: '95%',
+								height: 80,
+								alignSelf: 'flex-end',
+								borderBottomLeftRadius: 500,
+								borderTopLeftRadius: 500,
+
+							},]}
+						/>
+						<SkeletonContent
+							containerStyle={{
+								marginTop: 30,
+								flex: 1,
+								width: '100%',
+								shadowColor: 'black',
+								shadowOffset: { width: 0, height: 2 },
+								shadowRadius: 1,
+								shadowOpacity: .25,
+
+							}}
+							animationDirection="horizontalRight"
+							layout={[{
+								width: '95%',
+								height: 80,
+								alignSelf: 'flex-end',
+								borderBottomLeftRadius: 500,
+								borderTopLeftRadius: 500,
+
+							},]}
+						/>
+						<SkeletonContent
+							containerStyle={{
+								marginTop: 30,
+								flex: 1,
+								width: '100%',
+								shadowColor: 'black',
+								shadowOffset: { width: 0, height: 2 },
+								shadowRadius: 1,
+								shadowOpacity: .25,
+
+							}}
+							animationDirection="horizontalRight"
+							layout={[{
+								width: '95%',
+								height: 80,
+								alignSelf: 'flex-end',
+								borderBottomLeftRadius: 500,
+								borderTopLeftRadius: 500,
+
+							},]}
+						/>
+
+					</View>
+					: <View>
+						{groups.map(({ id, data: { groupName, groupOwner, color, coverImageNumber, members } }) => (
+							<GroupListItem
+								key={id}
+								id={id}
+								groupName={groupName}
+								groupOwner={groupOwner}
+								enterGroup={enterGroup}
+								color={color}
+								coverImageNumber={coverImageNumber}
+								groupMemberCount={members.length}
+							/>
+						))}
+					</View>
+				}
 
 				<View style={{ width: '100%', alignItems: 'center' }}>
 					<TouchableOpacity
@@ -179,7 +314,7 @@ const GroupsTab = ({ navigation }) => {
 				</View>
 
 			</ScrollView>
-		</SafeAreaView>
+		</SafeAreaView >
 	)
 }
 
