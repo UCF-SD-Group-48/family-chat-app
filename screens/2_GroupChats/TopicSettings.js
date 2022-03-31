@@ -64,6 +64,8 @@ import { G } from 'react-native-svg';
 
 import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
+import SkeletonContent from 'react-native-skeleton-content';
+
 // *************************************************************
 
 const TopicSettings = ({ navigation, route }) => {
@@ -73,6 +75,7 @@ const TopicSettings = ({ navigation, route }) => {
     const goBackward = () => navigation.navigate("Chat",
         {
             color: groupColor,
+            coverImageNumber: topicObjectForPassing.coverImageNumber,
             groupId: topicObjectForPassing.groupId,
             groupName: topicObjectForPassing.groupName,
             groupOwner: topicObjectForPassing.groupOwner,
@@ -124,11 +127,16 @@ const TopicSettings = ({ navigation, route }) => {
                             containerStyle={styles.toolTipBlock}
                             popover={
                                 <View style={{ margin: 15 }}>
-                                    <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                    {/* <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                                         Nunc quis orci quam. Donec sed posuere eros.
                                         Sed ut nulla quis elit egestas faucibus vel mollis justo.
                                         Donec eu varius mauris. Aliquam non felis risus.
                                         Ut auctor id felis vitae hendrerit. Aliquam erat.
+                                    </Text> */}
+
+                                    <Text style={{ fontSize: 18 }}>
+                                        This screen allows you to see both the Topic Settings & Group Settings.
+                                        Within each Topic or Group, you can view the members and the owner.
                                     </Text>
 
                                     <View style={{ flexDirection: "row", marginTop: 10, alignItems: 'center' }}>
@@ -141,7 +149,7 @@ const TopicSettings = ({ navigation, route }) => {
                                         <Text style={{ fontWeight: '600', marginLeft: 5, marginRight: 5, }}>Still have questions?</Text>
                                         <Text
                                             style={{ color: 'blue', fontWeight: '600' }}
-                                            onPress={() => Linking.openURL('https://www.familychat.app/FAQ')}
+                                            onPress={() => Linking.openURL('https://www.familychat.app/')}
                                         >
                                             Visit our FAQ.
                                         </Text>
@@ -165,11 +173,11 @@ const TopicSettings = ({ navigation, route }) => {
     const [groupColor, setGroupColor] = useState('');
     const [groupMembers, setGroupMembers] = useState([]);
     const [topicMembers, setTopicMembers] = useState([]);
-    const [isGeneral, setIsGeneral] = useState(true);
-    const [isOwner, setIsOwner] = useState(true);
+    const [isGeneral, setIsGeneral] = useState(false);
+    const [isOwner, setIsOwner] = useState(false);
     const [topicData, setTopicData] = useState({})
 
-    const getMemberData = async (memberUID, destination) => {
+    const getGroupMemberData = async (memberUID) => {
 
         const userSnapshot = await db
             .collection('users')
@@ -179,27 +187,11 @@ const TopicSettings = ({ navigation, route }) => {
 
         const userSnapshotData = userSnapshot.data();
 
-        switch (destination) {
-            case 'group': {
-                setGroupMembers((previous) => [...previous, {
-                    name: `${userSnapshotData.firstName} ${userSnapshotData.lastName}`,
-                    pfp: userSnapshotData.pfp,
-                    uid: memberUID,
-                }]);
-                break;
-            }
-            case 'topic': {
-                setTopicMembers((previous) => [...previous, {
-                    name: `${userSnapshotData.firstName} ${userSnapshotData.lastName}`,
-                    pfp: userSnapshotData.pfp,
-                    uid: memberUID,
-                }]);
-                break;
-            }
-            default: {
-                return;
-            }
-        }
+        setGroupMembers((previous) => [...previous, {
+            name: `${userSnapshotData.firstName} ${userSnapshotData.lastName}`,
+            pfp: userSnapshotData.pfp,
+            uid: memberUID,
+        }]);
     }
 
     useEffect(() => {
@@ -230,9 +222,9 @@ const TopicSettings = ({ navigation, route }) => {
                         .catch((error) => console.log(error));
 
                     const topicSnapshotData = topicSnapshot.data();
-                    const topicMembers = topicSnapshotData.members;
+                    const topicSnapshotMembers = topicSnapshotData.members;
 
-                    if (!topicMembers.includes(auth.currentUser.uid)) {
+                    if (!topicSnapshotMembers.includes(auth.currentUser.uid)) {
                         alert(
                             `Woops! It seems that you're no longer a member of this topic, so we've sent you back to the "General" topic.`,
                             "My Alert Msg",
@@ -262,22 +254,22 @@ const TopicSettings = ({ navigation, route }) => {
                         );
                     }
 
-                    topicSnapshotData.members.map((memberUID, index) => {
-                        getMemberData(memberUID, 'topic');
+                    setTopicMembers(topicSnapshotMembers)
+
+                    groupSnapshotData.members.map((memberUID, index) => {
+                        getGroupMemberData(memberUID);
                     })
 
                     if (topicSnapshotData.topicName === 'General') setIsGeneral(true);
                     if (topicSnapshotData.topicOwner === auth.currentUser.uid) setIsOwner(true);
 
                     await setTopicData({
-                        topicId: topicSnapshotData.id,
+                        topicId: topicSnapshot.id,
                         topicName: topicSnapshotData.topicName,
                         topicOwner: topicSnapshotData.topicOwner,
                     })
 
-                    groupSnapshotData.members.map((memberUID, index) => {
-                        getMemberData(memberUID, 'group');
-                    })
+                    setIsLoadingEditContent(false)
 
                 } catch (error) { console.log(error) };
             });
@@ -291,25 +283,29 @@ const TopicSettings = ({ navigation, route }) => {
         }
     }, []);
 
+    const [isEditing, setIsEditing] = useState(false);
+
     const [isLoadingGroupSettings, setIsLoadingGroupSettings] = useState(false);
+    const [isLoadingEditContent, setIsLoadingEditContent] = useState(true);
     const [isLoadingEditButton, setIsLoadingEditButton] = useState(false);
     const [isLoadingSaveButton, setIsLoadingSaveButton] = useState(false);
-
     const isFocused = useIsFocused();
 
     useEffect(() => {
         setIsLoadingGroupSettings(false);
+        setIsLoadingEditContent(true);
         setIsLoadingEditButton(false);
         setIsLoadingSaveButton(false);
 
+        setTimeout(() => setIsLoadingEditContent(false), 1500);
+
         return () => {
             setIsLoadingGroupSettings();
+            setIsLoadingEditContent();
             setIsLoadingEditButton();
             setIsLoadingSaveButton();
         };
     }, [isFocused]);
-
-    const [isEditing, setIsEditing] = useState(false);
 
     const leaveTopic = () => {
         console.log('leave')
@@ -323,20 +319,83 @@ const TopicSettings = ({ navigation, route }) => {
         console.log('delete')
     }
 
-    const addTopicMembers = () => {
+    const [checkBoom, setCheckBoom] = useState([]);
+    const [membersToAdd, setMembersToAdd] = useState([]);
+    const [membersToRemove, setMembersToRemove] = useState([]);
 
-        db.collection('chats').doc(topicId).collection('banners').doc(alert.id).update({
-            viewedBy: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid),
+    const addNewTopicMembersToDatabase = async () => {
+
+        const topicID = topicData.topicId;
+
+        const topicSnapshot = await db
+            .collection('groups')
+            .doc(topicObjectForPassing.groupId)
+            .collection('topics')
+            .doc(topicID)
+            .get();
+
+        const databaseListOfMembers = topicSnapshot.data().members;
+
+        let membersToRemoveArray = [];
+        const checkForMembersToRemove = await databaseListOfMembers.map((memberUID, index) => {
+            if (!topicMembers.includes(memberUID)) membersToRemoveArray.push(memberUID);
         })
-    }
 
-    const [checkedList, setCheckedList] = useState([]);
-
-    const getCheckedList = () => {
-        setCheckedList([])
-        topicMembers.map((topicMember, index) => {
-            setCheckedList((previous) => [...previous, topicMember.uid]);
+        let membersToAddArray = [];
+        const checkForMembersToAdd = await topicMembers.map((memberUID, index) => {
+            if (!databaseListOfMembers.includes(memberUID)) membersToAddArray.push(memberUID);
         })
+
+        if (membersToRemoveArray.length > 0) {
+            membersToRemoveArray.map(async (memberUIDToRemove, index) => {
+                await db
+                    .collection('groups')
+                    .doc(topicObjectForPassing.groupId)
+                    .collection('topics')
+                    .doc(topicID)
+                    .update({
+                        members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
+                    });
+
+                const removeTopicMapValue = await db
+                    .collection('users')
+                    .doc(memberUIDToRemove)
+                    .set(
+                        {
+                            topicMap: {
+                                [topicID]: firebase.firestore.FieldValue.delete(),
+                            },
+                        },
+                        { merge: true }
+                    );
+            })
+        }
+
+        if (membersToAddArray.length > 0) {
+            membersToAddArray.map(async (memberUIDToAdd, index) => {
+                await db
+                    .collection('groups')
+                    .doc(topicObjectForPassing.groupId)
+                    .collection('topics')
+                    .doc(topicData.topicId)
+                    .update({
+                        members: firebase.firestore.FieldValue.arrayUnion(memberUIDToAdd)
+                    });
+
+                const addTopicMapValue = await db
+                    .collection('users')
+                    .doc(memberUIDToAdd)
+                    .update(
+                        {
+                            topicMap: {
+                                [topicID]: firebase.firestore.FieldValue.serverTimestamp()
+                            },
+                        },
+                    );
+            })
+        }
+
+        setIsEditing(false);
     }
 
     return (
@@ -545,30 +604,28 @@ const TopicSettings = ({ navigation, route }) => {
                                                     </View>
                                                     <View style={styles.memberRightPortion}>
                                                         {(topicMember.uid === topicData.topicOwner)
-                                                            ? <View style={styles.ownerBadge}>
+                                                            ? <View style={{ marginRight: 25 }}>
                                                                 <Icon
                                                                     name='crown'
                                                                     type='material-community'
                                                                     color='#363732'
-                                                                    size={16}
+                                                                    size={20}
                                                                 />
                                                             </View>
-                                                            : <View style={{ alignSelf: 'center', justifyContent: 'flex-start' }}>
-                                                                
-                                                                <CheckBox />
-
+                                                            : <View style={{ height: 55 }}>
                                                                 <CheckBox
                                                                     center
-                                                                    checked={checkedList.includes(topicMember.uid)}
+                                                                    checked={topicMembers.includes(topicMember.uid)}
                                                                     onPress={() => {
-                                                                        if (checkedList.includes(topicMember.uid)) {
-                                                                            setCheckedList((previous) => {
+                                                                        if (topicMembers.includes(topicMember.uid)) {
+                                                                            setTopicMembers((previous) => {
                                                                                 return previous.filter((memberToKeep) => { return memberToKeep != topicMember.uid })
                                                                             })
-                                                                        } else setCheckedList((previous) => { return [...previous, topicMember.uid] });
+                                                                        } else setTopicMembers((previous) => { return [...previous, topicMember.uid] });
                                                                     }}
                                                                 />
                                                             </View>
+
 
                                                         }
                                                     </View>
@@ -578,37 +635,38 @@ const TopicSettings = ({ navigation, route }) => {
                                         }
                                     </ScrollView>
                                 </View>
-                                <TouchableOpacity
-                                    activeOpacity={0.75}
-                                    onPress={() => {
-                                        console.log(groupMembers)
-                                        setIsLoadingEditButton(false);
-                                        setIsLoadingSaveButton(true);
-                                        console.log(checkedList)
-                                        setIsEditing(false);
-                                    }}
-                                >
-                                    <View style={styles.buttonSpacing}>
-                                        <View style={[styles.buttonSave, { borderColor: '#363732', }]}>
-                                            <Text style={styles.buttonSaveText}>
-                                                SAVE
-                                            </Text>
+                                {isGeneral
+                                    ? null
+                                    : <TouchableOpacity
+                                        activeOpacity={0.75}
+                                        onPress={() => {
+                                            setIsLoadingSaveButton(true);
+                                            setIsLoadingEditButton(false);
+                                            addNewTopicMembersToDatabase();
+                                        }}
+                                    >
+                                        <View style={styles.buttonSpacing}>
+                                            <View style={[styles.buttonSave, { borderColor: '#363732', }]}>
+                                                <Text style={styles.buttonSaveText}>
+                                                    SAVE
+                                                </Text>
 
-                                            {(isLoadingSaveButton)
-                                                ? <ActivityIndicator
-                                                    size="small"
-                                                    color="white"
-                                                />
-                                                : <Icon
-                                                    name="check-bold"
-                                                    type="material-community"
-                                                    size={20}
-                                                    color="white"
-                                                />
-                                            }
+                                                {(isLoadingSaveButton)
+                                                    ? <ActivityIndicator
+                                                        size="small"
+                                                        color="white"
+                                                    />
+                                                    : <Icon
+                                                        name="check-bold"
+                                                        type="material-community"
+                                                        size={20}
+                                                        color="white"
+                                                    />
+                                                }
+                                            </View>
                                         </View>
-                                    </View>
-                                </TouchableOpacity>
+                                    </TouchableOpacity>
+                                }
                             </View>
                         </View>
                         : <View style={styles.topicUsersInvolved}>
@@ -626,15 +684,27 @@ const TopicSettings = ({ navigation, route }) => {
                                 </View>
 
                                 <View style={styles.topicOwnerValueField}>
-                                    {topicMembers
-                                        .filter(memberObject => (memberObject.uid === topicData.topicOwner))
-                                        .map((topicOwnerData, index) => (
-                                            <Text style={styles.topicOwnerNameText} key={index} id={index}>
-                                                {topicOwnerData.name}
-                                            </Text>
-                                        ))}
+                                    {isLoadingEditContent
+                                        ? <View>
+                                            <SkeletonContent
+                                                containerStyle={{ flex: 1, width: '100%', }}
+                                                animationDirection="horizontalRight"
+                                                layout={[{ width: '50%', height: 16, marginTop: 2 },]}
+                                            />
+                                        </View>
+                                        : <View>
+                                            {groupMembers
+                                                .filter(memberObject => (memberObject.uid === topicData.topicOwner))
+                                                .map((topicOwnerData, index) => (
+                                                    <Text style={styles.topicOwnerNameText} key={index} id={index}>
+                                                        {topicOwnerData.name}
+                                                    </Text>
+                                                ))}
+                                        </View>
+                                    }
                                 </View>
                             </View>
+
 
                             <View style={styles.topicMembersContainer}>
                                 <View style={styles.topicMembersHeader}>
@@ -651,70 +721,107 @@ const TopicSettings = ({ navigation, route }) => {
 
                                 <View style={styles.memberEditContainer}>
                                     <ScrollView containerStyle={{ paddingTop: 10 }}>
-                                        {topicMembers.map((topicMember, index) => (
-                                            <View style={styles.memberEditRow} key={index} id={index}>
-                                                <View style={styles.member}>
-                                                    <View style={styles.memberLeftPortion}>
-                                                        <Image
-                                                            source={imageSelection(topicMember.pfp)}
-                                                            style={{ width: 26, height: 26, borderRadius: 5, }}
-
-                                                        />
-                                                        <Text style={styles.memberName}>
-                                                            {topicMember.name}
-                                                        </Text>
-                                                    </View>
-
-                                                    <View style={styles.memberRightPortion}>
-                                                        {(topicMember.uid === topicData.topicOwner)
-                                                            ?
-                                                            <View style={styles.ownerBadge}>
-                                                                <Icon
-                                                                    name='crown'
-                                                                    type='material-community'
-                                                                    color='#363732'
-                                                                    size={16}
-                                                                />
-                                                            </View>
-                                                            : null
-                                                        }
-                                                    </View>
-                                                </View>
+                                        {isLoadingEditContent
+                                            ? <View style={{ display: 'flex', width: '100%', paddingRight: 25, }}>
+                                                <SkeletonContent
+                                                    containerStyle={{ flex: 1, width: '100%', justifyContent: 'row' }}
+                                                    animationDirection="horizontalRight"
+                                                    layout={[
+                                                        { width: '100%', height: 26, marginTop: 15, marginLeft: 6, display: 'flex', }
+                                                    ]}
+                                                />
+                                                <SkeletonContent
+                                                    containerStyle={{ flex: 1, width: '100%', justifyContent: 'row' }}
+                                                    animationDirection="horizontalRight"
+                                                    layout={[
+                                                        { width: '100%', height: 26, marginTop: 35, marginLeft: 6, display: 'flex', }
+                                                    ]}
+                                                />
+                                                <SkeletonContent
+                                                    containerStyle={{ flex: 1, width: '100%', justifyContent: 'row' }}
+                                                    animationDirection="horizontalRight"
+                                                    layout={[
+                                                        { width: '100%', height: 26, marginTop: 35, marginLeft: 6, display: 'flex', }
+                                                    ]}
+                                                />
+                                                <SkeletonContent
+                                                    containerStyle={{ flex: 1, width: '100%', justifyContent: 'row' }}
+                                                    animationDirection="horizontalRight"
+                                                    layout={[
+                                                        { width: '100%', height: 26, marginTop: 35, marginLeft: 6, display: 'flex', }
+                                                    ]}
+                                                />
                                             </View>
-                                        ))
+                                            : <View>
+                                                {groupMembers
+                                                    .filter(memberObject => topicMembers.includes(memberObject.uid))
+                                                    .map((topicMember, index) => (
+                                                        <View style={styles.memberEditRow} key={index} id={index}>
+                                                            <View style={styles.member}>
+                                                                <View style={styles.memberLeftPortion}>
+                                                                    <Image
+                                                                        source={imageSelection(topicMember.pfp)}
+                                                                        style={{ width: 26, height: 26, borderRadius: 5, }}
+
+                                                                    />
+                                                                    <Text style={styles.memberName}>
+                                                                        {topicMember.name}
+                                                                    </Text>
+                                                                </View>
+
+                                                                <View style={styles.memberRightPortion}>
+                                                                    {(topicMember.uid === topicData.topicOwner)
+                                                                        ? <View style={{ marginRight: 25 }}>
+                                                                            <Icon
+                                                                                name='crown'
+                                                                                type='material-community'
+                                                                                color='#363732'
+                                                                                size={20}
+                                                                            />
+                                                                        </View>
+                                                                        : null
+                                                                    }
+                                                                </View>
+                                                            </View>
+                                                        </View>
+                                                    ))}
+                                            </View>
                                         }
                                     </ScrollView>
                                 </View>
-                                <TouchableOpacity
-                                    activeOpacity={0.75}
-                                    onPress={() => {
-                                        setIsLoadingSaveButton(false);
-                                        setIsLoadingEditButton(true);
-                                        getCheckedList();
-                                        console.log(checkedList.length)
-                                        setIsEditing(true);
-                                    }}
-                                >
-                                    <View style={styles.buttonSpacing}>
-                                        <View style={[styles.buttonEdit, { borderColor: '#363732', }]}>
-                                            <Text style={styles.buttonEditText}>
-                                                EDIT
-                                            </Text>
-                                            {(isLoadingEditButton)
-                                                ? <ActivityIndicator
-                                                    size="small"
-                                                    color="#363732"
-                                                />
-                                                : <Icon
-                                                    name="edit"
-                                                    type="material"
-                                                    size={20}
-                                                    color="#363732"
-                                                />
-                                            }
+                                {isGeneral
+                                    ? null
+                                    : <TouchableOpacity
+                                        activeOpacity={0.75}
+                                        onPress={() => {
+                                            console.log(topicData)
+                                            console.log(checkBoom)
+                                            setIsLoadingSaveButton(false);
+                                            setIsLoadingEditButton(true);
+                                            setIsEditing(true);
+                                        }}
+                                    >
+                                        <View style={styles.buttonSpacing}>
+                                            <View style={[styles.buttonEdit, { borderColor: '#363732', }]}>
+                                                <Text style={styles.buttonEditText}>
+                                                    EDIT
+                                                </Text>
+                                                {(isLoadingEditButton)
+                                                    ? <ActivityIndicator
+                                                        size="small"
+                                                        color="#363732"
+                                                    />
+                                                    : <Icon
+                                                        name="edit"
+                                                        type="material"
+                                                        size={20}
+                                                        color="#363732"
+                                                    />
+                                                }
+                                            </View>
                                         </View>
-                                    </View>
-                                </TouchableOpacity>
+                                    </TouchableOpacity>
+                                }
                             </View>
                         </View>
                     }
@@ -908,7 +1015,7 @@ const styles = StyleSheet.create({
     memberEditContainer: {
         marginTop: 8,
         width: '100%',
-        maxHeight: 210,
+        height: 240,
         borderWidth: 1,
         borderStyle: 'solid',
         borderColor: '#9D9D9D',
@@ -936,11 +1043,12 @@ const styles = StyleSheet.create({
     },
 
     member: {
-        height: 20,
+        height: 40,
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        // justifyContent: 'space-between',
+        alignSelf: 'center',
+        justifyContent: 'space-between',
     },
 
     memberName: {
@@ -953,10 +1061,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
+        alignSelf: 'center',
     },
 
     memberRightPortion: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
     },
 
     buttonSpacing: {

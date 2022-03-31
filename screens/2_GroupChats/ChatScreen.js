@@ -7,6 +7,7 @@ import React, {
     useState,
 } from 'react';
 import {
+    Linking,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
@@ -140,6 +141,9 @@ const ChatScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         pinMapFunction();
+                // return () => {
+        //     setPinMap();
+        // }
     }, [messages, isFocused]);
 
     const messageMapFunction = () => {
@@ -488,6 +492,11 @@ const ChatScreen = ({ navigation, route }) => {
         });
     };
 
+    const openTextMessage = () => {
+		const textMessageText = `Hey, have you ever head of the FamilyChat app? Join in on the conversation by clicking this download link: https://www.familychat.app/`
+		Linking.openURL(`sms://''&body=${textMessageText}`)
+	}
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
@@ -547,7 +556,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         {/* Topic text view */}
                                         <View style={{
                                             paddingVertical: 3, paddingLeft: 10, paddingRight: 20,
-                                            justifyContent: "flex-end", alignItems: "center", flexDirection: "row",
+                                            alignItems: "center", flexDirection: "row",
                                             borderWidth: 1.5, borderColor: "#1174EC", borderRadius: 3,
                                         }}>
                                             <Ionicons name="ios-chatbubble-ellipses-outline" size={20} color="black" />
@@ -595,6 +604,7 @@ const ChatScreen = ({ navigation, route }) => {
 
                                                 const topicObjectForPassing = {
                                                     color: color,
+                                                    coverImageNumber: coverImageNumber,
                                                     groupId: groupId,
                                                     groupName: groupName,
                                                     groupOwner: groupOwner,
@@ -620,7 +630,10 @@ const ChatScreen = ({ navigation, route }) => {
                                     
                                 </TouchableOpacity>
                                 {/* Invite! */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Invite") }}
+                                <TouchableOpacity
+                                activeOpacity={0.7}
+                                // onPress={() => { navigateTo("Invite") }}
+                                onPress={() => openTextMessage()}
                                     style={{
                                         flex: 1, flexGrow: 1,
                                         paddingVertical: 5,
@@ -629,7 +642,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     }}>
                                     <MaterialIcons name="person-add" size={20} color="black" style={{marginRight: 10}}/>
                                     <Text style={styles.groupDetailsText}>
-                                        {"Invite to group"}
+                                        {"Invite to Group"}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
