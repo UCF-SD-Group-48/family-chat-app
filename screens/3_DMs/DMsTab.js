@@ -199,12 +199,24 @@ const DirectMessagesTab = ({ navigation }) => {
     
     setShownPhoneText("");
 
-    await db.collection('chats').add({
-      members: [searchedUser.uid, auth.currentUser.uid],
-    })
-    .then((newChat) => {
-      navigation.navigate("Chat", { topicId: newChat.id, topicName: "DM", isDM: true });
-    });
+    //if dm already exists, route to dm
+    const snapshot = await db.collection("chats")
+      .where('members', 'array-contains', searchedUser.uid).get();
+    if(!snapshot.empty) {
+      for(const doc of snapshot.docs) {
+        if(doc.data().members.some(u => (u == auth.currentUser.uid))) {
+          navigation.push("Chat", { topicId: doc.id, topicName: "DM", isDM: true });
+          return;
+        }
+      }
+    }
+      
+      await db.collection('chats').add({
+        members: [searchedUser.uid, auth.currentUser.uid],
+      })
+      .then((newChat) => {
+        navigation.navigate("Chat", { topicId: newChat.id, topicName: "DM", isDM: true });
+      });
   }
 
   return (
