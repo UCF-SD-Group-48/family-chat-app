@@ -118,29 +118,25 @@ const HomeTab = ({ navigation, route }) => {
 
     // for loop through user's topic  Map
     for (let x in values) {
-      
+
     }
     console.log("values array: ", values);
   }, [])
 
-  const getPinOwners = async () => {
-    // owners == missed messages array
-    let topics = {};
-    // for each message within chat
-    for (const pin of pins) {
-      await db.collection('users').doc(pin.data.ownerUID).get()
-        .then((result) => {
-          owners[pin.data.ownerUID] = result.data();
-        });
-    }
-    setPinOwners(owners);
-  }
+  // const getPinOwners = async () => {
+  //   // owners == missed messages array
+  //   let topics = {};
+  //   // for each message within chat
+  //   for (const pin of pins) {
+  //     await db.collection('users').doc(pin.data.ownerUID).get()
+  //       .then((result) => {
+  //         owners[pin.data.ownerUID] = result.data();
+  //       });
+  //   }
+  //   setPinOwners(owners);
+  // }
 
 // collecting all messages.id from topics currentUser is part of. 
-
-
-
-
 
 
   return (
