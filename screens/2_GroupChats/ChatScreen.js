@@ -824,7 +824,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 contentContainerStyle={{
                                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                                 }}>
-                                <TouchableOpacity onPress={() => {navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner })}} activeOpacity={0.2} //toggleTopicSelection
+                                <TouchableOpacity onPress={() => {navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber })}} activeOpacity={0.2} //toggleTopicSelection
                                     style={{
                                         height: 40, maxWidth: 220, backgroundColor: "#3D8D04",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 20,
