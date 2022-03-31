@@ -167,7 +167,6 @@ const ViewPin = ({ navigation, route }) => {
             <ScrollView width={"100%"}
                 contentContainerStyle={{
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-                    flex: 1, flexGrow: 1,
                 }}>
                 
                 {/* Viewing Pin data (not editing) */}
@@ -175,9 +174,10 @@ const ViewPin = ({ navigation, route }) => {
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",}}>
                     <View style={[
                         {
-                            width: "95%",
+                            width: "90%",
                             justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                            backgroundColor: "#DFD7CE"
+                            backgroundColor: "#DFD7CE",
+                            marginTop: 20,
                         },
                         {
                             shadowColor: "#000", shadowOffset: {width: 0, height: 3},
@@ -218,9 +218,10 @@ const ViewPin = ({ navigation, route }) => {
                     </View>
                     <View style={[
                             {
-                                width: "95%",
+                                width: "90%",
                                 justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                                 backgroundColor: "#fff", borderTopWidth: 0, borderColor: "#DFD7CE",
+                                marginBottom: 50,
                             },
                             {
                                 shadowColor: "#000", shadowOffset: {width: 0, height: 3},
@@ -586,9 +587,7 @@ const ViewPin = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: "100%", height: "100%",
-        paddingVertical: 20,
-        paddingHorizontal: 10,
+        height: "100%",
         alignItems: 'center',
         backgroundColor: "#EFEAE2"
     },

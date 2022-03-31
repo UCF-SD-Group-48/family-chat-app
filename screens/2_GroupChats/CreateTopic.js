@@ -52,6 +52,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
+import MyView from '../../components/MyView';
 
 const CreateTopic = ({ navigation, route }) => {
 
@@ -82,7 +83,7 @@ const CreateTopic = ({ navigation, route }) => {
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => {navigation.goBack();}}>
                         <Icon
                             name='arrow-back'
                             type='ionicon'
@@ -143,7 +144,7 @@ const CreateTopic = ({ navigation, route }) => {
         }
     }, [])
 
-    const goBackward = () => navigation.push("Chat",
+    const goBackward = () => navigation.navigate("Chat",
         {
             topicId: oldTopicId.id,
             topicName: oldTopicName,
@@ -290,8 +291,31 @@ const CreateTopic = ({ navigation, route }) => {
                             onChangeText={(textChange) => {
                                 setNewTopicName(textChange);
                             }}
+                            maxLength={20}
                             style={styles.textInputField}
                         />
+                        {/* How many Characters newTopicName.length >= 15*/}
+                        <MyView hide={newTopicName.length < 15}
+                            style={{
+                                width: "100%",
+                                paddingHorizontal: 0,
+                                justifyContent: "flex-end", alignItems: "flex-start",
+                                flexDirection: "row", direction: "ltr",
+                                borderWidth: 2,
+                                borderColor: "#0000",
+                            }}>
+                            <Text style={{
+                                paddingLeft: 0,
+                                textAlign: 'right',
+                                fontSize: 14,
+                                fontWeight: '500',
+                                color: "#222",
+                                }}>
+                                {"Characters "+newTopicName.length+"/20"}
+                            </Text>
+                        </MyView>
+                        <View style={{marginBottom: 22,}}/>
+
                         <View style={styles.textInput}>
                             <Icon
                                 name="person-search"
@@ -469,7 +493,6 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         padding: 10,
         backgroundColor: '#F8F8F8',
-        marginBottom: 22,
         flexDirection: "row",
         justifyContent: "space-between"
 

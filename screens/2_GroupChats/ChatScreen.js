@@ -351,14 +351,18 @@ const ChatScreen = ({ navigation, route }) => {
     const sendMessage = () => {
         Keyboard.dismiss();
 
-        db.collection('chats').doc(topicId).collection('messages').add({
-            editedTime: null,
-            membersWhoReacted: [],
-            message: input,
-            ownerUID: auth.currentUser.uid,
-            phoneNumber: auth.currentUser.phoneNumber,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-        }); // id passed in when we entered the chatroom
+        const trimmedInput = input.trim();
+        if(trimmedInput.length > 0) {
+
+            db.collection('chats').doc(topicId).collection('messages').add({
+                editedTime: null,
+                membersWhoReacted: [],
+                message: trimmedInput,
+                ownerUID: auth.currentUser.uid,
+                phoneNumber: auth.currentUser.phoneNumber,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
+            }); // id passed in when we entered the chatroom
+        }
 
         setInput(''); // clears messaging box
     };
@@ -774,13 +778,14 @@ const ChatScreen = ({ navigation, route }) => {
                                 backgroundColor: "#fff", borderRadius: 3, borderWidth: 1, borderColor: "#777",
                             }}>
                                 <Fontisto name="play" size={15} color="black" />
-                                <Text style={{
+                                <Text numberOfLines={1} style={{
                                     fontSize: 16,
                                     fontWeight: '700',
                                     color: 'black',
                                     textAlign: "left",
-                                    paddingLeft: 15,
+                                    paddingLeft: 15, paddingRight: 15,
                                     marginVertical: 7,
+                                    flex: 1,
                                 }}>
                                     {topicName}
                                 </Text>
@@ -923,12 +928,13 @@ const ChatScreen = ({ navigation, route }) => {
                                                             borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
                                                             justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                                         }}>
-                                                        <Text style={{
+                                                        <Text numberOfLines={1} style={{
                                                             fontSize: 16,
                                                             fontWeight: '600',
                                                             color: '#333',
-                                                            textAlign: "center",
+                                                            textAlign: "left",
                                                             paddingLeft: 12,
+                                                            flex: 1,
                                                         }}>
                                                             {data.topicName}
                                                         </Text>
@@ -943,12 +949,13 @@ const ChatScreen = ({ navigation, route }) => {
                                                             borderLeftWidth: 50, marginLeft: -50,
                                                         }}>
                                                         <Fontisto name="play" size={15} color="white" style={{marginLeft: -30,}}/>
-                                                        <Text style={{
+                                                        <Text numberOfLines={1} style={{
                                                             fontSize: 16,
                                                             fontWeight: '800',
                                                             color: 'black',
-                                                            textAlign: "center",
+                                                            textAlign: "left",
                                                             paddingLeft: 28,
+                                                            flex: 1,
                                                         }}>
                                                             {data.topicName}
                                                         </Text>
@@ -1331,7 +1338,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 paddingLeft: 15,
                                 justifyContent: "flex-start", alignItems: "flex-end",
                                 borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
-                                borderBottomRightRadius: 20, borderTopRightRadius: 20,
+                                borderBottomRightRadius: 21, borderTopRightRadius: 21,
                             }}>
                                 <View style={{
                                     width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end",
@@ -1351,7 +1358,8 @@ const ChatScreen = ({ navigation, route }) => {
                                 <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
                                     style={{
                                         height: 42, width: "25%",
-                                        backgroundColor: "#1174EC", borderRadius: 21,
+                                        backgroundColor: (input.length > 0) ? ("#1174EC") : ("#98B0D4"),
+                                        borderRadius: 21,
                                         justifyContent: "center", alignItems: "center",
                                     }}>
                                     <Text style={{
