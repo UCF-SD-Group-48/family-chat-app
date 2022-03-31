@@ -74,7 +74,7 @@ const TopicSettings = ({ navigation, route }) => {
 
     const goBackward = () => navigation.navigate("Chat",
         {
-            color: groupColor,
+            color: topicObjectForPassing.color,
             coverImageNumber: topicObjectForPassing.coverImageNumber,
             groupId: topicObjectForPassing.groupId,
             groupName: topicObjectForPassing.groupName,
@@ -435,6 +435,8 @@ const TopicSettings = ({ navigation, route }) => {
                 await db.collection('chats').doc(topicID).delete();
                 await db.collection('groups').doc(groupID).collection('topics').doc(topicID).delete();
 
+                // Have GeneralID passed over from ChatScreen
+
                 const generalTopicSnapshot = await db
                     .collection("groups")
                     .doc(groupID)
@@ -537,6 +539,7 @@ const TopicSettings = ({ navigation, route }) => {
                                 [topicID]: firebase.firestore.FieldValue.serverTimestamp()
                             },
                         },
+                        { merge: true }
                     );
             })
         }

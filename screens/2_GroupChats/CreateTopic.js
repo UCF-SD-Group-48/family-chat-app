@@ -117,7 +117,13 @@ const CreateTopic = ({ navigation, route }) => {
 
                 if (snapshot.phoneNumber === currentUserPhoneNumber) includeInTopic = true;
                 else includeInTopic = false;
-                const searchedMember = { uid: memberID, name: `${snapshot.firstName} ${snapshot.lastName}`, pfp: snapshot.pfp, owner: includeInTopic, checked: includeInTopic }
+                const searchedMember = {
+                    uid: memberID,
+                    name: `${snapshot.firstName} ${snapshot.lastName}`,
+                    pfp: snapshot.pfp,
+                    owner: includeInTopic,
+                    checked: includeInTopic
+                }
                 setGroupMembers((previous) => [...previous, searchedMember])
             })
         } catch (error) {
