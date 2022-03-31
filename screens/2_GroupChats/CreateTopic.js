@@ -62,7 +62,7 @@ const CreateTopic = ({ navigation, route }) => {
     const oldTopicId = route.params.topicId;
     const oldTopicName = route.params.topicName;
     const groupId = route.params.groupId;
-	const originalMessageUID = route.params.originalMessageUID;
+    const originalMessageUID = route.params.originalMessageUID;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
     const currentUserPhoneNumber = (auth.currentUser.phoneNumber).slice(2);
@@ -137,7 +137,17 @@ const CreateTopic = ({ navigation, route }) => {
         }
     }, [])
 
-    const goBackward = () => navigation.navigate("Chat", { topicId: oldTopicId, topicName: oldTopicName, groupId, groupName, groupOwner });
+    const goBackward = () => navigation.push("Chat",
+        {
+            topicId: oldTopicId.id,
+            topicName: oldTopicName,
+            groupId,
+            groupName,
+            groupOwner,
+            color: route.params.color,
+            coverImageNumber: route.params.coverImageNumber
+        }
+    );
 
     const getHexValue = () => {
         const query = db
@@ -179,7 +189,6 @@ const CreateTopic = ({ navigation, route }) => {
         else return `${checked.length}`
     }
 
-    const [buttonText, setButtonText] = useState('CREATE')
     let [membersList, setMembersList] = useState([])
 
     const createTopic = async () => {
@@ -197,7 +206,7 @@ const CreateTopic = ({ navigation, route }) => {
                 topicOwner: auth.currentUser.uid,
                 topicName: newTopicName,
                 members: checked,
-				originalMessageUID: originalMessageUID || "",
+                originalMessageUID: originalMessageUID || "",
             })
             .then(async (newlyCreatedTopic) => {
                 let topicID = newlyCreatedTopic.id
@@ -205,8 +214,18 @@ const CreateTopic = ({ navigation, route }) => {
                 membersArray.map(async (memberUID) => {
                     await db.collection('users').doc(memberUID).update(mapUpdate);
                 })
-                setButtonText('CREATED');
-                navigation.push("Chat", { topicId: newlyCreatedTopic.id, topicName: newTopicName, groupId, groupName, groupOwner });
+
+                navigation.push("Chat",
+                    {
+                        topicId: newlyCreatedTopic.id,
+                        topicName: newTopicName,
+                        groupId,
+                        groupName,
+                        groupOwner,
+                        color: route.params.color,
+                        coverImageNumber: route.params.coverImageNumber
+                    }
+                );
             })
             // .then((result) => {
             //  setButtonText('CREATED');
@@ -309,7 +328,7 @@ const CreateTopic = ({ navigation, route }) => {
                                             </Text>
                                         </View>
                                         {member.owner
-                                            ? <View style={[styles.ownerBadge, { marginRight: 21}]}>
+                                            ? <View style={[styles.ownerBadge, { marginRight: 21 }]}>
                                                 <Icon
                                                     name='crown'
                                                     type='material-community'
@@ -339,37 +358,47 @@ const CreateTopic = ({ navigation, route }) => {
                         <View style={styles.footer}>
                             <View style={styles.leftHalf}>
                                 <Text style={styles.leftHalfText}>
-                                    ({getMemberCount()} MEMBERS SELECTED)
+                                    ({getMemberCount()} MEMBER{getMemberCount() > 1 ? <Text>S</Text> : null} SELECTED)
                                 </Text>
+
                             </View>
                             <View style={styles.rightHalf}>
-                                <TouchableOpacity
-                                    activeOpacity={0.75}
-                                    onPressIn={() => setButtonText('CREATE')}
-                                    onPressOut={() => setIsLoading(true)}
-                                    onPress={() => createTopic()}
-                                >
-                                    <View style={styles.buttonSpacing}>
-                                        <View style={[styles.buttonCreate, { borderColor: '#363732', }]}>
-                                            <Text style={styles.buttonCreateEnabled}>
-                                                {buttonText}
+                                {(newTopicName.length === 0)
+                                    ? <View style={styles.buttonSpacing}>
+                                        <View style={[styles.buttonCreate, { borderColor: '#9D9D9D', }]}>
+                                            <Text style={styles.buttonCreateDisabledText}>
+                                                CREATE
                                             </Text>
-                                            {(isLoading)
-                                                ? <ActivityIndicator
-                                                    size="small"
-                                                    color="white"
-                                                    // style={{ marginRight: 10 }}
-                                                />
-                                                : <Icon
-                                                    name="chatbubble-ellipses"
-                                                    type="ionicon"
-                                                    size={20}
-                                                    color="white"
-                                                />
-                                            }
                                         </View>
                                     </View>
-                                </TouchableOpacity>
+                                    : <TouchableOpacity
+                                        activeOpacity={0.75}
+                                        onPressOut={() => setIsLoading(true)}
+                                        onPress={() => createTopic()}
+                                    >
+
+                                        <View style={styles.buttonSpacing}>
+                                            <View style={[styles.buttonCreate, { backgroundColor: '#3D8D04', borderColor: '#363732', }]}>
+                                                <Text style={styles.buttonCreateEnabledText}>
+                                                    CREATE
+                                                </Text>
+                                                {(isLoading)
+                                                    ? <ActivityIndicator
+                                                        size="small"
+                                                        color="white"
+                                                    // style={{ marginRight: 10 }}
+                                                    />
+                                                    : <Icon
+                                                        name="chatbubble-ellipses"
+                                                        type="ionicon"
+                                                        size={20}
+                                                        color="white"
+                                                    />
+                                                }
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                }
                             </View>
                         </View>
                     </View>
@@ -556,6 +585,7 @@ const styles = StyleSheet.create({
         fontWeight: '800',
     },
 
+
     buttonTextEnabled: {
         color: '#363732',
         fontSize: 16,
@@ -573,16 +603,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: '#3D8D04'
     },
 
-    buttonCreateDisabled: {
-        color: 'white',
+    buttonCreateDisabledText: {
+        color: '#9D9D9D',
         fontSize: 16,
         fontWeight: '800',
     },
 
-    buttonCreateEnabled: {
+    buttonCreateEnabledText: {
         color: 'white',
         fontSize: 16,
         fontWeight: '800',
