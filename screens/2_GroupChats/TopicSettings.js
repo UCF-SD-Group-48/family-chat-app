@@ -170,6 +170,7 @@ const TopicSettings = ({ navigation, route }) => {
         });
     }, [navigation]);
 
+    const [useEffectGroupSnapshotData, setUseEffectGroupSnapshotData] = useState({});
     const [groupColor, setGroupColor] = useState('');
     const [groupMembers, setGroupMembers] = useState([]);
     const [topicMembers, setTopicMembers] = useState([]);
@@ -200,6 +201,8 @@ const TopicSettings = ({ navigation, route }) => {
             .doc(topicObjectForPassing.groupId)
             .onSnapshot(async (groupSnapshot) => {
                 const groupSnapshotData = groupSnapshot.data();
+
+                setUseEffectGroupSnapshotData({ ...groupSnapshotData, groupId: groupSnapshot.id })
 
                 if (!groupSnapshotData.members.includes(auth.currentUser.uid)) {
                     alert(
@@ -307,21 +310,164 @@ const TopicSettings = ({ navigation, route }) => {
         };
     }, [isFocused]);
 
-    const leaveTopic = () => {
-        console.log('leave')
+    const leaveTopic = async () => {
+
+        const groupID = useEffectGroupSnapshotData.groupId;
+        const topicID = topicObjectForPassing.topicId;
+
+        const removeUserFromTopicMembers = await db
+            .collection('groups')
+            .doc(groupID)
+            .collection('topics')
+            .doc(topicID)
+            .update({
+                members: firebase.firestore.FieldValue.arrayRemove(auth.currentUser.uid)
+            })
+            .catch((error) => console.log(error));
+
+        const removeTopicMapValueFromUser = await db
+            .collection('users')
+            .doc(auth.currentUser.uid)
+            .set(
+                {
+                    topicMap: {
+                        [topicID]: firebase.firestore.FieldValue.delete(),
+                    },
+                },
+                { merge: true }
+            )
+            .catch((error) => console.log(error));
+
+        const generalTopicSnapshot = await db
+            .collection("groups")
+            .doc(groupID)
+            .collection("topics")
+            .where("topicName", '==', 'General')
+            .get()
+            .catch((error) => console.log(error));
+
+        const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
+
+        alert(
+            `You successfully left the topic.`,
+            "Alert Message",
+            [{ text: "OK" }]
+        );
+
+        console.log('[User Leaves Topic] Alert sent + Navigating to General')
+
+        navigation.navigate('Chat',
+            {
+                color: useEffectGroupSnapshotData.color,
+                coverImageNumber: useEffectGroupSnapshotData.coverImageNumber,
+                topicId: topicID,
+                topicName: 'General',
+                groupId: groupID,
+                groupName: useEffectGroupSnapshotData.groupName,
+                groupOwner: useEffectGroupSnapshotData.groupOwner,
+            }
+        );
     }
 
-    const transferTopicOwnership = () => {
-        console.log('transfer')
+    const transferTopicOwnership = async () => {
+
+        // Trigger an Overlay, for the user to choose new Owner
+
+        const groupID = useEffectGroupSnapshotData.groupId;
+        const topicID = topicObjectForPassing.topicId;
+
+        const newOwner = auth.currentUser.uid;
+
+        await db
+            .collection('groups')
+            .doc(groupID)
+            .collection('topics')
+            .doc(topicID)
+            .update({
+                topicOwner: newOwner
+            });
+
     }
 
-    const deleteTopic = () => {
-        console.log('delete')
-    }
+    const deleteTopic = async () => {
 
-    const [checkBoom, setCheckBoom] = useState([]);
-    const [membersToAdd, setMembersToAdd] = useState([]);
-    const [membersToRemove, setMembersToRemove] = useState([]);
+        const groupID = useEffectGroupSnapshotData.groupId;
+        const topicID = topicObjectForPassing.topicId;
+
+        const topicSnapshot = await db
+            .collection('groups')
+            .doc(groupID)
+            .collection('topics')
+            .doc(topicID)
+            .get();
+
+        const databaseListOfTopicMembers = topicSnapshot.data().members;
+
+        databaseListOfTopicMembers.map(async (memberUID, index) => {
+            const removeTopicMapValueFromUser = await db
+                .collection('users')
+                .doc(memberUID)
+                .set(
+                    {
+                        topicMap: {
+                            [topicID]: firebase.firestore.FieldValue.delete(),
+                        },
+                    },
+                    { merge: true }
+                )
+                .catch((error) => console.log(error));
+        })
+
+        try {
+            const chatRef = await db.collection('chats').doc(topicID).collection('messages').get()
+
+            if (chatRef) {
+                chatRef.docs.map((topicMessage) => {
+                    db.collection('chats').doc(topicID).collection('messages').doc(topicMessage.id).delete()
+                })
+            }
+
+
+        } catch (error) {
+            alert(error)
+        } finally {
+            try {
+                await db.collection('chats').doc(topicID).delete();
+                await db.collection('groups').doc(groupID).collection('topics').doc(topicID).delete();
+
+                const generalTopicSnapshot = await db
+                    .collection("groups")
+                    .doc(groupID)
+                    .collection("topics")
+                    .where("topicName", '==', 'General')
+                    .get()
+                    .catch((error) => console.log(error));
+
+                const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
+
+                alert(
+                    `You successfully deleted the topic.`,
+                    "Alert Message",
+                    [{ text: "OK" }]
+                );
+
+                console.log('[Owner Deletes Topic] Alert sent + Navigating to General')
+
+                navigation.navigate('Chat',
+                    {
+                        color: useEffectGroupSnapshotData.color,
+                        coverImageNumber: useEffectGroupSnapshotData.coverImageNumber,
+                        topicId: topicID,
+                        topicName: 'General',
+                        groupId: groupID,
+                        groupName: useEffectGroupSnapshotData.groupName,
+                        groupOwner: useEffectGroupSnapshotData.groupOwner,
+                    }
+                );
+
+            } catch (error) { console.log(error) };
+        }
+    }
 
     const addNewTopicMembersToDatabase = async () => {
 
@@ -334,16 +480,16 @@ const TopicSettings = ({ navigation, route }) => {
             .doc(topicID)
             .get();
 
-        const databaseListOfMembers = topicSnapshot.data().members;
+        const databaseListOfTopicMembers = topicSnapshot.data().members;
 
         let membersToRemoveArray = [];
-        const checkForMembersToRemove = await databaseListOfMembers.map((memberUID, index) => {
+        const checkForMembersToRemove = await databaseListOfTopicMembers.map((memberUID, index) => {
             if (!topicMembers.includes(memberUID)) membersToRemoveArray.push(memberUID);
         })
 
         let membersToAddArray = [];
         const checkForMembersToAdd = await topicMembers.map((memberUID, index) => {
-            if (!databaseListOfMembers.includes(memberUID)) membersToAddArray.push(memberUID);
+            if (!databaseListOfTopicMembers.includes(memberUID)) membersToAddArray.push(memberUID);
         })
 
         if (membersToRemoveArray.length > 0) {
@@ -481,7 +627,7 @@ const TopicSettings = ({ navigation, route }) => {
                                                 borderColor: "#dedede",
                                             }}>
                                                 <MenuOption
-                                                    onSelect={() => transferTopicOwnership()}
+                                                    // onSelect={() => transferTopicOwnership()}
                                                     style={{
                                                         margin: 10,
                                                         flexDirection: 'row',
@@ -492,12 +638,12 @@ const TopicSettings = ({ navigation, route }) => {
                                                     <Icon
                                                         name='crown'
                                                         type='material-community'
-                                                        color='#363732'
+                                                        color='#9D9D9D'
                                                         size={16}
                                                         style={{ marginLeft: 10, }}
                                                     />
                                                     <Text style={{
-                                                        fontSize: 14, color: 'black', marginLeft: 10,
+                                                        fontSize: 14, color: '#9D9D9D', marginLeft: 10, textDecorationLine: 'line-through'
                                                     }}>
                                                         Transfer Ownership
                                                     </Text>
@@ -635,9 +781,8 @@ const TopicSettings = ({ navigation, route }) => {
                                         }
                                     </ScrollView>
                                 </View>
-                                {isGeneral
-                                    ? null
-                                    : <TouchableOpacity
+                                {(!isGeneral && isOwner)
+                                    ? <TouchableOpacity
                                         activeOpacity={0.75}
                                         onPress={() => {
                                             setIsLoadingSaveButton(true);
@@ -666,6 +811,7 @@ const TopicSettings = ({ navigation, route }) => {
                                             </View>
                                         </View>
                                     </TouchableOpacity>
+                                    : null
                                 }
                             </View>
                         </View>
@@ -789,13 +935,11 @@ const TopicSettings = ({ navigation, route }) => {
                                         }
                                     </ScrollView>
                                 </View>
-                                {isGeneral
-                                    ? null
-                                    : <TouchableOpacity
+                                {(!isGeneral && isOwner)
+                                    ? <TouchableOpacity
                                         activeOpacity={0.75}
                                         onPress={() => {
                                             console.log(topicData)
-                                            console.log(checkBoom)
                                             setIsLoadingSaveButton(false);
                                             setIsLoadingEditButton(true);
                                             setIsEditing(true);
@@ -821,6 +965,7 @@ const TopicSettings = ({ navigation, route }) => {
                                             </View>
                                         </View>
                                     </TouchableOpacity>
+                                    : null
                                 }
                             </View>
                         </View>
