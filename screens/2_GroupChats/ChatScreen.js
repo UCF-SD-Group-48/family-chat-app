@@ -81,6 +81,7 @@ const ChatScreen = ({ navigation, route }) => {
     const groupOwner = route.params.groupOwner;
     const color = route.params.color;
     const coverImageNumber = route.params.coverImageNumber;
+    const isDM = route.params.isDM;
     const [generalId, setgeneralId] = useState('');
 
     const [input, setInput] = useState('');
@@ -246,13 +247,13 @@ const ChatScreen = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: groupName,
+            title: groupName || "DM",
             headerStyle: '',
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => {(isDM) ? (navigation.goBack()) : goBackward()}}>
                         <Icon
                             name='arrow-back'
                             type='ionicon'
@@ -263,6 +264,33 @@ const ChatScreen = ({ navigation, route }) => {
                 </View>
             ),
             headerRight: () => (
+                (isDM) ? (
+                <View style={{
+                        flexDirection: "row",
+                        marginRight: 20,
+                    }}>
+                    {/* <MyView hide={false}>
+                        <Menu>
+                            <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
+                                <Entypo name="dots-three-horizontal" size={30} color="black" />
+                            </MenuTrigger>
+                            <MenuOptions style={{
+                                borderRadius: 12, backgroundColor: "#fff",
+                            }}
+                            customStyles={{
+                                optionsContainer: {
+                                    borderRadius: 15, backgroundColor: "#666",
+                                },
+                            }}>
+                                <IconOption value={1} isLast={true} isDestructive={false} iconName='bookmark' text='View Pins'
+                                    selectFunction={() => {
+                                        navigation.navigate("Pins", { topicId, topicName });
+                                    }}/>
+                            </MenuOptions>
+                        </Menu>
+                    </MyView> */}
+                </View>
+                ) : (
                 <View
                     style={{
                         flexDirection: "row",
@@ -275,6 +303,7 @@ const ChatScreen = ({ navigation, route }) => {
                         <Entypo name="dots-three-horizontal" size={30} color="black" />
                     </TouchableOpacity>
                 </View>
+                )
             ),
         });
 
@@ -708,7 +737,7 @@ const ChatScreen = ({ navigation, route }) => {
                         </Overlay>
 
                         {/* Topic Navigator */}
-                        <MyView hide={false} //topicName != "General"
+                        <MyView hide={isDM} //topicName != "General"
                             style={{
                                 backgroundColor: "#EFEAE2",
                                 justifyContent: "flex-start", alignItems: 'center', flexDirection: 'row',
@@ -1069,7 +1098,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                         <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
                                                             isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
                                                             selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                        <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                        <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
                                                             selectFunction={() => { addPinFromMessage(data, id) }} />
                                                         <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic'
                                                             hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
@@ -1201,7 +1230,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                             <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
                                                                 isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
                                                                 selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
                                                                 selectFunction={() => { addPinFromMessage(data, id) }} />
                                                             <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
                                                                 hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
