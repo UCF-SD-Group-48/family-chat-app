@@ -130,6 +130,18 @@ const ViewBanner = ({ navigation, route }) => {
                     </MyView>
 				</View>
 			),
+            headerLeft: () => (
+                <View style={{ marginLeft: 12 }}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => {navigation.goBack();}}>
+                        <Icon
+                            name='arrow-back'
+                            type='ionicon'
+                            color='#363732'
+                            size={28}
+                        />
+                    </TouchableOpacity>
+                </View>
+            ),
         });
 
         getBannerOwner();

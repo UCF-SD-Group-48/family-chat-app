@@ -133,6 +133,18 @@ const ViewPin = ({ navigation, route }) => {
                     </MyView>
                 </View>
             ),
+            headerLeft: () => (
+                <View style={{ marginLeft: 12 }}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => {navigation.goBack();}}>
+                        <Icon
+                            name='arrow-back'
+                            type='ionicon'
+                            color='#363732'
+                            size={28}
+                        />
+                    </TouchableOpacity>
+                </View>
+            ),
         });
 
         getPinOwner();
@@ -401,6 +413,7 @@ const ViewPin = ({ navigation, route }) => {
                                 width: "95%",
                                 justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                                 backgroundColor: "#fff", borderTopWidth: 18, borderColor: "#DFD7CE",
+                                marginTop: 20, marginBottom: 50,
                             },
                             {
                                 shadowColor: "#000", shadowOffset: {width: 0, height: 3},
