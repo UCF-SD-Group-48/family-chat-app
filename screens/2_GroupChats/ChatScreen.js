@@ -7,6 +7,7 @@ import React, {
     useState,
 } from 'react';
 import {
+    Linking,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
@@ -81,6 +82,7 @@ const ChatScreen = ({ navigation, route }) => {
     const groupOwner = route.params.groupOwner;
     const color = route.params.color;
     const coverImageNumber = route.params.coverImageNumber;
+    const isDM = route.params.isDM;
     const [generalId, setgeneralId] = useState('');
 
     const [input, setInput] = useState('');
@@ -139,6 +141,9 @@ const ChatScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         pinMapFunction();
+                // return () => {
+        //     setPinMap();
+        // }
     }, [messages, isFocused]);
 
     const messageMapFunction = () => {
@@ -246,13 +251,13 @@ const ChatScreen = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: groupName,
+            title: groupName || "DM",
             headerStyle: '',
             headerTitleStyle: { color: 'black' },
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => {(isDM) ? (navigation.goBack()) : goBackward()}}>
                         <Icon
                             name='arrow-back'
                             type='ionicon'
@@ -263,6 +268,33 @@ const ChatScreen = ({ navigation, route }) => {
                 </View>
             ),
             headerRight: () => (
+                (isDM) ? (
+                <View style={{
+                        flexDirection: "row",
+                        marginRight: 20,
+                    }}>
+                    {/* <MyView hide={false}>
+                        <Menu>
+                            <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
+                                <Entypo name="dots-three-horizontal" size={30} color="black" />
+                            </MenuTrigger>
+                            <MenuOptions style={{
+                                borderRadius: 12, backgroundColor: "#fff",
+                            }}
+                            customStyles={{
+                                optionsContainer: {
+                                    borderRadius: 15, backgroundColor: "#666",
+                                },
+                            }}>
+                                <IconOption value={1} isLast={true} isDestructive={false} iconName='bookmark' text='View Pins'
+                                    selectFunction={() => {
+                                        navigation.navigate("Pins", { topicId, topicName });
+                                    }}/>
+                            </MenuOptions>
+                        </Menu>
+                    </MyView> */}
+                </View>
+                ) : (
                 <View
                     style={{
                         flexDirection: "row",
@@ -275,6 +307,7 @@ const ChatScreen = ({ navigation, route }) => {
                         <Entypo name="dots-three-horizontal" size={30} color="black" />
                     </TouchableOpacity>
                 </View>
+                )
             ),
         });
 
@@ -318,14 +351,18 @@ const ChatScreen = ({ navigation, route }) => {
     const sendMessage = () => {
         Keyboard.dismiss();
 
-        db.collection('chats').doc(topicId).collection('messages').add({
-            editedTime: null,
-            membersWhoReacted: [],
-            message: input,
-            ownerUID: auth.currentUser.uid,
-            phoneNumber: auth.currentUser.phoneNumber,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-        }); // id passed in when we entered the chatroom
+        const trimmedInput = input.trim();
+        if(trimmedInput.length > 0) {
+
+            db.collection('chats').doc(topicId).collection('messages').add({
+                editedTime: null,
+                membersWhoReacted: [],
+                message: trimmedInput,
+                ownerUID: auth.currentUser.uid,
+                phoneNumber: auth.currentUser.phoneNumber,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
+            }); // id passed in when we entered the chatroom
+        }
 
         setInput(''); // clears messaging box
     };
@@ -459,6 +496,11 @@ const ChatScreen = ({ navigation, route }) => {
         });
     };
 
+    const openTextMessage = () => {
+		const textMessageText = `Hey, have you ever head of the FamilyChat app? Join in on the conversation by clicking this download link: https://www.familychat.app/`
+		Linking.openURL(`sms://''&body=${textMessageText}`)
+	}
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
@@ -518,7 +560,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         {/* Topic text view */}
                                         <View style={{
                                             paddingVertical: 3, paddingLeft: 10, paddingRight: 20,
-                                            justifyContent: "flex-end", alignItems: "center", flexDirection: "row",
+                                            alignItems: "center", flexDirection: "row",
                                             borderWidth: 1.5, borderColor: "#1174EC", borderRadius: 3,
                                         }}>
                                             <Ionicons name="ios-chatbubble-ellipses-outline" size={20} color="black" />
@@ -566,6 +608,7 @@ const ChatScreen = ({ navigation, route }) => {
 
                                                 const topicObjectForPassing = {
                                                     color: color,
+                                                    coverImageNumber: coverImageNumber,
                                                     groupId: groupId,
                                                     groupName: groupName,
                                                     groupOwner: groupOwner,
@@ -591,7 +634,10 @@ const ChatScreen = ({ navigation, route }) => {
                                     
                                 </TouchableOpacity>
                                 {/* Invite! */}
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Invite") }}
+                                <TouchableOpacity
+                                activeOpacity={0.7}
+                                // onPress={() => { navigateTo("Invite") }}
+                                onPress={() => openTextMessage()}
                                     style={{
                                         flex: 1, flexGrow: 1,
                                         paddingVertical: 5,
@@ -600,7 +646,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     }}>
                                     <MaterialIcons name="person-add" size={20} color="black" style={{marginRight: 10}}/>
                                     <Text style={styles.groupDetailsText}>
-                                        {"Invite to group"}
+                                        {"Invite to Group"}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -717,7 +763,7 @@ const ChatScreen = ({ navigation, route }) => {
                         </Overlay>
 
                         {/* Topic Navigator */}
-                        <MyView hide={false} //topicName != "General"
+                        <MyView hide={isDM} //topicName != "General"
                             style={{
                                 backgroundColor: "#EFEAE2",
                                 justifyContent: "flex-start", alignItems: 'center', flexDirection: 'row',
@@ -732,13 +778,14 @@ const ChatScreen = ({ navigation, route }) => {
                                 backgroundColor: "#fff", borderRadius: 3, borderWidth: 1, borderColor: "#777",
                             }}>
                                 <Fontisto name="play" size={15} color="black" />
-                                <Text style={{
+                                <Text numberOfLines={1} style={{
                                     fontSize: 16,
                                     fontWeight: '700',
                                     color: 'black',
                                     textAlign: "left",
-                                    paddingLeft: 15,
+                                    paddingLeft: 15, paddingRight: 15,
                                     marginVertical: 7,
+                                    flex: 1,
                                 }}>
                                     {topicName}
                                 </Text>
@@ -782,7 +829,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 contentContainerStyle={{
                                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                                 }}>
-                                <TouchableOpacity onPress={() => {navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner })}} activeOpacity={0.2} //toggleTopicSelection
+                                <TouchableOpacity onPress={() => {navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber })}} activeOpacity={0.2} //toggleTopicSelection
                                     style={{
                                         height: 40, maxWidth: 220, backgroundColor: "#3D8D04",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 20,
@@ -881,12 +928,13 @@ const ChatScreen = ({ navigation, route }) => {
                                                             borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
                                                             justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                                         }}>
-                                                        <Text style={{
+                                                        <Text numberOfLines={1} style={{
                                                             fontSize: 16,
                                                             fontWeight: '600',
                                                             color: '#333',
-                                                            textAlign: "center",
+                                                            textAlign: "left",
                                                             paddingLeft: 12,
+                                                            flex: 1,
                                                         }}>
                                                             {data.topicName}
                                                         </Text>
@@ -901,12 +949,13 @@ const ChatScreen = ({ navigation, route }) => {
                                                             borderLeftWidth: 50, marginLeft: -50,
                                                         }}>
                                                         <Fontisto name="play" size={15} color="white" style={{marginLeft: -30,}}/>
-                                                        <Text style={{
+                                                        <Text numberOfLines={1} style={{
                                                             fontSize: 16,
                                                             fontWeight: '800',
                                                             color: 'black',
-                                                            textAlign: "center",
+                                                            textAlign: "left",
                                                             paddingLeft: 28,
+                                                            flex: 1,
                                                         }}>
                                                             {data.topicName}
                                                         </Text>
@@ -1078,7 +1127,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                         <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
                                                             isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
                                                             selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                        <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                        <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
                                                             selectFunction={() => { addPinFromMessage(data, id) }} />
                                                         <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic'
                                                             hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
@@ -1210,7 +1259,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                             <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
                                                                 isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
                                                                 selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid}
+                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
                                                                 selectFunction={() => { addPinFromMessage(data, id) }} />
                                                             <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
                                                                 hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
@@ -1289,7 +1338,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 paddingLeft: 15,
                                 justifyContent: "flex-start", alignItems: "flex-end",
                                 borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
-                                borderBottomRightRadius: 20, borderTopRightRadius: 20,
+                                borderBottomRightRadius: 21, borderTopRightRadius: 21,
                             }}>
                                 <View style={{
                                     width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end",
@@ -1309,7 +1358,8 @@ const ChatScreen = ({ navigation, route }) => {
                                 <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
                                     style={{
                                         height: 42, width: "25%",
-                                        backgroundColor: "#1174EC", borderRadius: 21,
+                                        backgroundColor: (input.length > 0) ? ("#1174EC") : ("#98B0D4"),
+                                        borderRadius: 21,
                                         justifyContent: "center", alignItems: "center",
                                     }}>
                                     <Text style={{

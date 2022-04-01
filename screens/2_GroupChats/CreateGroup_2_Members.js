@@ -1,4 +1,5 @@
 import {
+	ActivityIndicator,
 	Keyboard,
 	KeyboardAvoidingView,
 	Linking,
@@ -29,6 +30,8 @@ import firebase from 'firebase/compat/app';
 
 import * as SMS from 'expo-sms';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
+
+import { useIsFocused } from '@react-navigation/native';
 
 const CreateGroup_2_Members = ({ navigation, route }) => {
 
@@ -94,6 +97,10 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		const data = snapshot.data();
 		const searchedUserFullName = `${data.firstName} ${data.lastName}`
 		setMembersList([...membersList, { uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: true }])
+
+		return () => {
+			setMembersList([])
+		}
 	}, [])
 
 	useEffect(() => {
@@ -102,6 +109,11 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 				searchForUser();
 			}
 		}
+
+		// return () => {
+		//  setSearchResults();
+		//  setSearchedUser({});
+		// }
 	}, searchedUserPhoneNumber);
 
 	const checkTheMembersList = (searchedUserPhoneNumber) => {
@@ -111,8 +123,8 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 	const [searchedUserPhoneNumber, setSearchedUserPhoneNumber] = useState('');
 
 	const openTextMessage = () => {
-		const searchedUserPhoneNumber = '+16505551234'
-		const textMessageText = `I just created a group in the FamilyChat app. Join in on the conversation by clicking this download link: https://apps.apple.com/us/app/coloring-match/id1586980403`
+		// const searchedUserPhoneNumber = '+16505551234'
+		const textMessageText = `I just created a group within the FamilyChat app. Join in on the conversation by clicking this download link: https://www.familychat.app/`
 		Linking.openURL(`sms://+1${searchedUserPhoneNumber}&body=${textMessageText}`)
 	}
 
@@ -132,7 +144,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			const data = snapshot.data();
 			const searchedUserFullName = `${data.firstName} ${data.lastName}`;
 			setSearchedUser({ uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: false })
-			return;
 		} else { setSearchResults('nonexistent') }
 	};
 
@@ -226,16 +237,16 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			.catch((error) => console.log(error));
 	};
 
+	// const [isLoading, setIsLoading] = useState(false);
+	// const isFocused = useIsFocused();
 
-	const buttonFunction = () => {
-		let membersArray = [];
+	// useEffect(() => {
+	//     setIsLoading(false);
 
-		membersList.map((member) => {
-			membersArray.push(member.uid)
-		})
-
-		createGroup();
-	}
+	//     return () => {
+	//         setIsLoading();
+	//     };
+	// }, [isFocused]);
 
 	return (
 		<SafeAreaView style={styles.mainContainer}>
@@ -317,18 +328,16 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 												activeOpacity={0.75}
 												onPress={() => { setMembersList([...membersList, searchedUser]) }}
 											>
-												<View style={styles.buttonSpacing}>
-													<View style={[styles.searchResultsButtonAdd, { orderColor: '#2352DF', }]}>
-														<Text style={styles.searchResultsButtonAddText}>
-															ADD
-														</Text>
-														<Icon
-															name="person-add"
-															type="material"
-															size={18}
-															color="#2352DF"
-														/>
-													</View>
+												<View style={[styles.searchResultsButtonAdd, { orderColor: '#2352DF', }]}>
+													<Text style={styles.searchResultsButtonAddText}>
+														ADD
+													</Text>
+													<Icon
+														name="person-add"
+														type="material"
+														size={18}
+														color="#2352DF"
+													/>
 												</View>
 											</TouchableOpacity>
 										}
@@ -341,18 +350,16 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 											activeOpacity={0.75}
 											onPress={() => openTextMessage()}
 										>
-											<View style={styles.buttonSpacing}>
-												<View style={[styles.searchResultsButtonInvite, { orderColor: '#363732', }]}>
-													<Text style={styles.searchResultsButtonInviteText}>
-														Invite to App
-													</Text>
-													<Icon
-														name="email-outline"
-														type="material-community"
-														size={18}
-														color="#363732"
-													/>
-												</View>
+											<View style={[styles.searchResultsButtonInvite, { orderColor: '#363732', }]}>
+												<Text style={styles.searchResultsButtonInviteText}>
+													App Invite
+												</Text>
+												<Icon
+													name="email-outline"
+													type="material-community"
+													size={18}
+													color="#363732"
+												/>
 											</View>
 										</TouchableOpacity>
 									</View>
@@ -395,16 +402,16 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 												type="material-community"
 												size={18}
 												color="#363732"
-												style={{ marginRight: 3 }}
+												style={{ marginRight: 4 }}
 											/>
 										</TouchableOpacity>
 										:
-										<View style={styles.ownershipBadge}>
+										<View style={styles.ownerBadge}>
 											<Icon
-												name="local-police"
-												type="material"
-												size={15}
-												color="#363732"
+												name='crown'
+												type='material-community'
+												color='#363732'
+												size={16}
 											/>
 										</View>
 									}
@@ -427,6 +434,19 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 										size={24}
 										color="white"
 									/>
+									{/* {(isLoading)
+										? <ActivityIndicator
+											size="small"
+											color="white"
+										/>
+										: <Icon
+											name="folder-plus"
+											type="material-community"
+											size={24}
+											color="white"
+										/>
+									} */}
+
 								</View>
 							</View>
 						</TouchableOpacity>
@@ -547,11 +567,12 @@ const styles = StyleSheet.create({
 		height: '100%',
 		backgroundColor: '#F8F8F8',
 		flexDirection: 'row',
-		justifyContent: 'center',
+		justifyContent: 'space-between',
 		display: 'flex',
 		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: '#9D9D9D',
+		padding: 15
 	},
 
 	completedSearchResultText: {
@@ -597,7 +618,7 @@ const styles = StyleSheet.create({
 	},
 
 	searchResultsButtonInvite: {
-		width: 135,
+		width: 120,
 		height: 35,
 		borderWidth: 3,
 		borderStyle: 'solid',
@@ -658,6 +679,18 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		alignItems: 'center',
 	},
+
+    ownerBadge: {
+        width: 26,
+        height: 26,
+        backgroundColor: "#F8D353",
+        borderWidth: 2,
+        borderColor: "black",
+        borderRadius: 15,
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+    },
 
 	buttonCreate: {
 		width: 125,

@@ -185,9 +185,8 @@ const GroupListItem = ({ id, groupName, enterGroup, groupOwner, color, coverImag
         style={styles.groupListItemComponent}
       >
         
-        <View style={styles.notificationBadge}>
-
-        </View>
+        {/* <View style={styles.notificationBadge} /> */}
+        
         <View style={styles.groupContent}>
           <Image
             source={getGroupCoverImage(color, coverImageNumber)}

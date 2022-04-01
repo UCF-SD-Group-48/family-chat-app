@@ -26,6 +26,8 @@ import { db, auth } from '../../firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 import firebase from 'firebase/compat/app';
 
+import MyView from '../../components/MyView';
+
 const CreateGroup_1_NameImage = ({ navigation }) => {
 
 	const [groupName, setGroupName] = useState('');
@@ -276,8 +278,30 @@ const CreateGroup_1_NameImage = ({ navigation }) => {
 							onChangeText={(textChange) => {
 								setGroupName(textChange);
 							}}
+                            maxLength={25}
 							style={styles.textInputField}
 						/>
+						{/* How many Characters groupName.length >= 20*/}
+                        <MyView hide={groupName.length < 20}
+                            style={{
+                                width: "100%",
+                                paddingHorizontal: 0,
+                                justifyContent: "flex-end", alignItems: "flex-start",
+                                flexDirection: "row", direction: "ltr",
+                                borderWidth: 2,
+                                borderColor: "#0000",
+                            }}>
+                            <Text style={{
+                                paddingLeft: 0,
+                                textAlign: 'right',
+                                fontSize: 14,
+                                fontWeight: '500',
+                                color: "#222",
+                                }}>
+                                {"Characters "+groupName.length+"/25"}
+                            </Text>
+                        </MyView>
+                        <View style={{marginBottom: 22,}}/>
 
 						<View style={styles.textInput}>
 							<Icon
@@ -633,7 +657,6 @@ const styles = StyleSheet.create({
 		textAlign: 'left',
 		padding: 10,
 		backgroundColor: '#F8F8F8',
-		marginBottom: 22,
 	},
 
 	imagesGridContainer: {

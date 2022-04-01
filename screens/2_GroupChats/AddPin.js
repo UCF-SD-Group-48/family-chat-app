@@ -77,6 +77,18 @@ const AddPin = ({ navigation, route }) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Add Pin",
+            headerLeft: () => (
+                <View style={{ marginLeft: 12 }}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => {navigation.goBack();}}>
+                        <Icon
+                            name='arrow-back'
+                            type='ionicon'
+                            color='#363732'
+                            size={28}
+                        />
+                    </TouchableOpacity>
+                </View>
+            ),
         });
 
         getPinOwner();
@@ -110,13 +122,13 @@ const AddPin = ({ navigation, route }) => {
             <ScrollView width={"100%"}
                 contentContainerStyle={{
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-                    flex: 1, flexGrow: 1,
                 }}>
                 <View style={[
                         {
-                            width: "95%",
+                            width: "90%",
                             justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                             backgroundColor: "#fff", borderTopWidth: 18, borderColor: "#DFD7CE",
+                            marginTop: 20, marginBottom: 50,
                         },
                         {
                             shadowColor: "#000", shadowOffset: {width: 0, height: 3},
@@ -302,9 +314,7 @@ const AddPin = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: "100%", height: "100%",
-        paddingVertical: 20,
-        paddingHorizontal: 10,
+        height: "100%",
         alignItems: 'center',
         backgroundColor: "#EFEAE2"
     },
