@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -18,38 +19,55 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Dimensions,
   Linking,
-  TextInputComponent,
 } from 'react-native';
 import {
   Alert,
   Avatar,
   Button,
+  CheckBox,
   Divider,
   Icon,
   Image,
-  Overlay,
   Input,
   Tooltip,
-  Switch,
+  Overlay,
+  Switch
 } from 'react-native-elements';
-
-import { AntDesign, Entypo, Feather, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { HoldItem } from 'react-native-hold-menu';
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
+import Constants from 'expo-constants';
 import ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+import {
+  Menu,
+  MenuContext,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
+import FeatherIcon from 'react-native-vector-icons/Feather';
+import { AntDesign, Feather, Entypo, Ionicons, FontAwesome5, Fontisto } from "@expo/vector-icons";
 
 // Imports for: Firebase
 import {
   apps,
   auth,
   db,
-  deleteUser,
   firebaseConfig
 } from '../../firebase';
 import firebase from 'firebase/compat/app';
+import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
+
+import { useIsFocused } from '@react-navigation/native';
+import { G } from 'react-native-svg';
+
+import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
+
+import SkeletonContent from 'react-native-skeleton-content';
 
 // Imports for: Components
 import CustomListItem from '../../components/CustomListItem';
@@ -59,7 +77,6 @@ import LineDivider from '../../components/LineDivider';
 import LoginInput from '../../components/LoginInput';
 import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
-import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 import { set } from 'react-native-reanimated';
 
 // *************************************************************
@@ -67,124 +84,39 @@ import { set } from 'react-native-reanimated';
 // Fourth tab of the application: PROFILE of currently logged in user.
 const ProfileTab = ({ navigation }) => {
 
-  const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(2));
-  const [uid, setUID] = useState(auth.currentUser.uid);
-
-  const [userDocument, setUserDocument] = useState(async () => {
-    const initialState = await db
-      .collection('users')
-      .doc(uid)
-      .get()
-      .then((documentSnapshot) => {
-        if (documentSnapshot.exists) {
-          setUserDocument(documentSnapshot.data())
-
-          setFirstName(documentSnapshot.data().firstName)
-          setLastName(documentSnapshot.data().lastName)
-          setStatus(documentSnapshot.data().statusText)
-          setEmail(documentSnapshot.data().email)
-          setPushNotification(documentSnapshot.data().pushNotificationEnabled)
-          setDiscoverable(documentSnapshot.data().discoverableEnabled)
-
-        }
-      });
-    return initialState;
+  const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
+    const windowWidth = Dimensions.get('window').width;
+    return (windowWidth * .93);
   });
 
-
-  const [editMode, setEditMode] = useState(false);
-  const [visible, setVisible] = useState(false);
-
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [status, setStatus] = useState('');
-  const [email, setEmail] = useState('');
-
-  const [pushNotification, setPushNotification] = useState();
-  const [discoverable, setDiscoverable] = useState();
-
-
-
-
-
-  const updateProfile = async () => {
-
-    // console.log(`Variables | Database\nfirstName: ${firstName} | ${userDocument.firstName}  \nlastName: ${lastName} | ${userDocument.lastName}\nstatus: ${status} | ${userDocument.statusText}\nemail: ${email} | ${userDocument.email}\n`);
-
-    try {
-      await db.collection('users').doc(auth.currentUser.uid).update({
-        firstName: firstName,
-        lastName: lastName,
-        statusText: status,
-        email: email
-
-      })
-
-    }
-    catch (error) {
-      console.log(`Error: ${error}`)
-    }
-
-    setEditMode(false)
-  }
-
-  const togglePush = () => {
-    setPushNotification(prevState => !prevState)
-  }
-
-  useEffect(async () => {
-    try {
-      await db.collection('users').doc(auth.currentUser.uid).update({
-        pushNotificationEnabled: pushNotification
-      })
-        .then(
-          console.log(`Push Notification set to: ${pushNotification}`)
-        )
-    }
-    catch (err) {
-      console.log(`Error: ${err}`)
-    }
-  }, [pushNotification])
-
-  const toggleDisc = () => {
-    setDiscoverable(prevState => !prevState)
-  }
-
-  useEffect(async () => {
-    // console.log(`[BEFORE] Push: ${pushNotification} | ${userDocument.pushNotificationEnabled}`)
-    try {
-      await db.collection('users').doc(auth.currentUser.uid).update({
-        discoverableEnabled: discoverable
-      })
-        .then(
-          console.log(`Discoverable set to: ${discoverable}`)
-        )
-    }
-    catch (err) {
-      console.log(`Error: ${err}`)
-    }
-  }, [discoverable])
-
-  let currentSwitchState = (switchCase) => {
-    switch (switchCase) {
-      case 'pushNotifications':
-        return ((pushNotification === true) ? 'enabled' : 'disabled');
-
-      case 'discoverable':
-        return ((discoverable === true) ? 'enabled' : 'disabled');
-    }
-  };
-
-  const openWebsite = () => {
-    Linking.openURL('https://www.familychat.app/FAQ')
-  }
-
-  const openGuidedTutorial = () => {
-    console.log(userDocument)
-  }
-
-  const reportProblem = () => {
-  }
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: 'Profile',
+      headerStyle: '',
+      headerTitleStyle: { color: 'black' },
+      headerTintColor: 'black',
+      headerLeft: '',
+      headerRight: () => (
+        <View
+          style={{
+            flexDirection: "row",
+            marginRight: 12,
+          }}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => signOutUser()}
+          >
+            <Icon
+              name='logout'
+              type='material'
+              size={24}
+              color='#363732'
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation]);
 
   const signOutUser = () => {
     auth.signOut().then(() => {
@@ -192,391 +124,632 @@ const ProfileTab = ({ navigation }) => {
     });
   };
 
-  const toggleOverlay = () => {
-    setVisible(prev => !prev)
+  const [discoverable, setDiscoverable] = useState();
+
+  const toggleDiscoverable = () => {
+    const newBooleanValue = !discoverable;
+    setPushNotifications(newBooleanValue);
+
+    const discoverableQuery = db
+      .collection('users')
+      .doc(auth.currentUser.uid)
+      .update({
+        discoverableEnabled: newBooleanValue
+      })
+      .catch((error) => console.log(error));
   }
 
+  const [pushNotifications, setPushNotifications] = useState();
 
-  const deleteAcc = () => {
-    deleteUser(auth.currentUser.uid).then(() => {
-      navigation.replace('UserAuth');
-    }).catch((error) => {
-      // An error ocurred
-      // ...
-    });
+  const togglePushNotifications = () => {
+    const newBooleanValue = !pushNotifications;
+    setPushNotifications(newBooleanValue);
+
+    const pushNotificationsQuery = db
+      .collection('users')
+      .doc(auth.currentUser.uid)
+      .update({
+        pushNotificationEnabled: newBooleanValue
+      })
+      .catch((error) => console.log(error));
   }
 
+  const [userSnapshotData, setUserSnapshotData] = useState({});
+  const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('')
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: "Profile",
-      headerLeft: '',
-    });
-  }, [navigation]);
+  useEffect(() => {
+    const unsubscribe = db
+      .collection("users")
+      .doc(auth.currentUser.uid)
+      .onSnapshot(async (userSnapshot) => {
+        // console.log(userSnapshot.data())
+        setUserSnapshotData(userSnapshot.data())
+        setPushNotifications(userSnapshot.data().pushNotificationEnabled)
+        setDiscoverable(userSnapshot.data().discoverableEnabled)
+        setFormattedPhoneNumber(`(${userSnapshot.data().phoneNumber.slice(0, 3)}) ${userSnapshot.data().phoneNumber.slice(3, 6)}-${userSnapshot.data().phoneNumber.slice(6, 10)}`)
+
+      });
+
+    return () => {
+      setUserSnapshotData({});
+      setPushNotifications();
+      setDiscoverable();
+      setFormattedPhoneNumber()
+      unsubscribe;
+    }
+  }, []);
+
+  const viewAppTutorial = () => {
+    navigate.replace('AppTutorial');
+  }
+
+  const visitFAQ = () => {
+    Linking.openURL('https://www.familychat.app/');
+  }
+
+  const contactDeveloper = () => {
+    // Linking.openURL('mailto:familychatapp@gmail.com?subject=Inquiry&body=Hey,')
+    // Linking.openURL('message://familychatapp@gmail.com?subject=Inquiry&body=Hey,')
+  }
 
   return (
+    <SafeAreaView style={styles.mainContainer}>
+      <ScrollView
+        width={'100%'}
+        contentContainerStyle={{
+          justifyContent: "flex-start",
+          flexDirection: "column",
+        }}
+      >
 
-    <SafeAreaView>
-      <ScrollView style={styles.container}>
+        <View style={styles.innerContainer}>
 
-        {
-          editMode
-            ?
+          <View style={styles.headerBar} />
 
-            <View style={styles.page}>
-              <Image source={imageSelection(userDocument.pfp)} style={{ width: 100, height: 100, borderRadius: 5, marginRight: 10 }} />
-
-              <View style={{ width: '80%', height: 550, backgroundColor: 'white' }}>
-
-                <View style={{ width: '100%', height: 30, backgroundColor: '#CFC5BA', marginBottom: 20 }} />
-
-                <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-                  <View style={{ marginRight: 5 }}>
-                    <Text style={{ fontSize: 18 }}>
-                      First:
-                    </Text>
-                    <TextInput
-                      style={{ borderWidth: 2, width: 120, height: 32 }}
-                      value={firstName}
-                      onChangeText={text => setFirstName(text)}
-                    />
-                  </View>
-                  <View>
-                    <Text style={{ fontSize: 18 }}>
-                      Last:
-                    </Text>
-                    <TextInput
-                      style={{ borderWidth: 2, width: 120, height: 32 }}
-                      value={lastName}
-                      onChangeText={text => setLastName(text)}
-                    />
-                  </View>
-
-                </View>
-
-                <View style={{ marginBottom: 20 }}>
-                  <Text style={{ fontSize: 18, textAlign: 'justify', paddingTop: 20, paddingBottom: 5, fontWeight: '500' }}>
-                    Status:
-                  </Text>
-                  <View style={{ flexDirection: 'row' }}>
-
-                    <Image source={imageSelection(userDocument.statusEmoji)} style={{ width: 32, height: 32, borderRadius: 3, marginRight: 5 }} />
-
-                    <TextInput
-                      style={{ fontSize: 16, borderStyle: 'solid', borderWidth: 2, width: '80%' }}
-                      onChangeText={(val) => setStatus(val)}
-                      value={status}
-                    />
-                  </View>
-                </View>
-
-                <View style={{ marginBottom: 20 }}>
-                  <Text style={{ fontSize: 18 }}>
-                    Email:
-                  </Text>
-                  <TextInput style={{ borderWidth: 2, width: '80%', height: 32 }}
-                    onChangeText={(text) => setEmail(text)}
-                    value={email}
-                  />
-
-                </View>
-
-                <View style={{ marginBottom: 20 }}>
-                  <Text style={{ fontSize: 18 }}>
-                    Phone Number:
-                  </Text>
-                  <TextInput
-                    style={{ borderWidth: 2, width: '80%', height: 32, backgroundColor: '#D3D3D3', color: '#616161' }}
-                    editable={false}
-                    value={phoneNumber}
-                  />
-                </View>
-
-                <Button
-                  title={'Save'}
-                  style={{ right: 0, width: 80, height: 50, backgroundColor: 'blue', borderRadius: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end' }}
-                  onPress={updateProfile}
-                />
-
-              </View>
-
+          <View style={styles.publicInformation}>
+            <View style={styles.userProfilePicture}>
+              <Image
+                source={imageSelection(userSnapshotData.pfp)}
+                style={{ width: 80, height: 80, borderRadius: 5, }}
+              />
             </View>
-            :
-            <View style={styles.page}>
+            <View style={styles.userText}>
+              <Text style={styles.userName}>
+                {userSnapshotData.firstName}
+              </Text>
+              <Text style={styles.userName}>
+                {userSnapshotData.lastName}
+              </Text>
+              <Text style={styles.userStatus}>
+                {userSnapshotData.statusEmoji}  {userSnapshotData.statusText}
+              </Text>
+            </View>
+          </View>
 
-              <Image source={imageSelection(userDocument.pfp)} style={{ width: 100, height: 100, borderRadius: 5, marginRight: 10 }} />
-
-              <View
-                style={{ width: '80%', height: 450, backgroundColor: 'white' }}
+          <View style={styles.privateInformation}>
+            <View style={styles.privateInformationHeader}>
+              <Text style={{ fontSize: 16, fontWeight: '700'}}>
+                Private Information:
+              </Text>
+              {/* <TouchableOpacity
+                activeOpacity={0.75}
               >
-
-                <View
-                  style={{ width: '100%', height: '45%', backgroundColor: 'white', alignItems: 'center' }}
-                >
-
-                  <View style={{ width: '100%', height: 30, backgroundColor: '#CFC5BA', marginBottom: 30 }} />
-
-                  <Text
-                    style={{ fontSize: 32, marginBottom: 10 }}
-                  >
-                    {firstName} {lastName}
-                  </Text>
-
-                  <View
-                    style={{ flexDirection: 'row' }}>
-                    <Image source={imageSelection(userDocument.statusEmoji)} style={{ width: 20, height: 20, borderRadius: 5, marginRight: 10 }} />
-                    <Text
-                      style={{ fontSize: 20 }}>
-                      {userDocument.statusText}
-                    </Text>
-                  </View>
-
-                </View>
-
-                <View style={{ backgroundColor: 'gray', width: '100%', height: '55%', padding: 30 }}>
-
-                  <View style={{ backgroundColor: 'white', width: '90%', height: '55%', borderRadius: 10, flexDirection: 'column', justifyContent: 'space-between', alignSelf: 'center', padding: 10 }}>
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={{ fontSize: 20, marginBottom: 5 }}>
-                        Private Information:
-                      </Text>
-                      <Ionicons name="information-circle" size={24} color="black" />
-                    </View>
-
-                    <View style={{ flexDirection: 'row' }}>
-
-                      <Entypo name="email" size={24} color="black" />
-                      <Text style={{ fontSize: 18, marginBottom: 5, marginLeft: 5 }}>
-                        {userDocument.email}
+                <Tooltip
+                  width={toggleWindowWidth}
+                  backgroundColor={'#DFD7CE'}
+                  containerStyle={styles.toolTipBlock}
+                  popover={
+                    <View style={{ margin: 15 }}>
+                      <Text style={{ fontSize: 18, textAlign: 'center' }}>
+                        The "Edit Account Details" function has been disabled for STEM Day.
                       </Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row' }}>
-                      <Feather name="phone" size={24} color="black" />
-                      <Text style={{ fontSize: 18, marginLeft: 5 }}>
-                        {userDocument.phoneNumber}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Button
-                    title={'Edit'}
-                    style={{ width: 80, height: 50, bottom: 0, backgroundColor: 'blue', borderRadius: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end' }}
-                    onPress={() => setEditMode(true)}
+                  }>
+                  <Icon
+                    name="info"
+                    type="material"
+                    size={20}
+                    color="#363732"
                   />
-                </View>
+                </Tooltip>
+              </TouchableOpacity> */}
+            </View>
 
+            <View style={styles.privateInformationEmail}>
+              <Icon
+                name="email"
+                type="material"
+                size={20}
+                color="#363732"
+              />
+              <Text style={styles.privateInformationEmailText}>
+                {userSnapshotData.email}
+              </Text>
+            </View>
+            <View style={styles.privateInformationPhone}>
+              <Icon
+                name="phone"
+                type="material"
+                size={20}
+                color="#363732"
+              />
+              <Text style={styles.privateInformationPhoneText}>
+                {formattedPhoneNumber}
+              </Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => {
+              alert(
+                `The "Edit Account Details" function has been disabled for STEM Day.`,
+                "My Alert Msg",
+                [{ text: "OK" }]
+              );
+            }}
+          >
+            <View style={styles.buttonSpacing}>
+              <View style={[styles.buttonEdit, { borderColor: '#363732', }]}>
+                <Text style={styles.buttonEditText}>
+                  EDIT
+                </Text>
+                <Icon
+                  name="edit"
+                  type="material"
+                  size={20}
+                  color="#363732"
+                />
               </View>
-           </View>
-        }
-              <View style={styles.page}>
-                <View style={{
-                  marginTop: 30,
-                  flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                }}>
-                  <Divider width={2} color={"#777"}
-                    style={{
-                      minWidth: "10%",
-                      flexGrow: 1, flex: 1,
-                    }} />
-                  <Text style={{
-                    textAlign: "center",
-                    fontSize: 22,
-                    fontWeight: '700',
-                    color: 'black', marginHorizontal: 10
-                  }}>
-                    Application Settings
-                  </Text>
-                  <Divider width={2} color={"#777"}
-                    style={{
-                      minWidth: "10%",
-                      flexGrow: 1, flex: 1,
-                    }} />
-                </View>
+            </View>
+          </TouchableOpacity>
+        </View>
 
 
+        <View style={styles.applicationSettingsBreaker}>
+          <Divider
+            width={2}
+            color={"#9D9D9D"}
+            style={{ flex: 1, flexGrow: 1, alignSelf: 'center' }}
+          />
 
-                <View
-                  style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
-                >
-                  <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Push Notifications</Text>
-                  <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('pushNotifications')})</Text>
-                  <Switch
-                    value={pushNotification}
-                    onValueChange={togglePush}
-                    style={{ marginLeft: 'auto', marginRight: 0 }}
-                  />
-                </View>
+          <Text style={styles.applicationSettingsText}>
+            Application Settings:
+          </Text>
 
+          <Divider
+            width={2}
+            color={"#9D9D9D"}
+            style={{ flex: 1, flexGrow: 1, alignSelf: 'center' }}
+          />
+        </View>
 
-                <View
-                  style={{ flexDirection: "row", alignContent: 'center', alignItems: 'center', width: '90%' }}
-                >
-                  <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Discoverable</Text>
-                  <Text style={{ fontStyle: 'italic', color: 'grey' }}> (Currently {currentSwitchState('discoverable')})</Text>
-                  <Switch
-                    value={discoverable}
-                    onValueChange={toggleDisc}
-                    style={{ marginLeft: 'auto', marginRight: 0 }}
-                  />
-                </View>
+        <View style={[styles.toggleBox, { borderBottomWidth: 1, borderColor: '#C4C4C4' }]}>
+          <Text style={pushNotifications ? styles.toggleBoxTextEnabled : styles.toggleBoxTextDisabled}>
+            Push Notifications
+          </Text>
+          <Switch
+            value={pushNotifications}
+            onValueChange={() => togglePushNotifications()}
+          />
+        </View>
+        <View style={styles.toggleBox}>
+          <View style={styles.toggleBoxLeftHalf}>
+            <Text style={pushNotifications ? styles.toggleBoxTextEnabled : styles.toggleBoxTextDisabled}>
+              Discoverable
+            </Text>
+            <Icon
+              name="info"
+              type="material"
+              size={20}
+              color="#363732"
+              style={{ marginLeft: 10 }}
+            />
+          </View>
+          <Switch
+            value={discoverable}
+            onValueChange={() => toggleDiscoverable()}
+          />
+        </View>
 
-
-                <TouchableOpacity
-                  activeOpacity={0.5}
-                  onPress={openGuidedTutorial}
-                  style={{
-                    width: 280, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 15, justifyContent: 'center',
-                    alignItems: 'center', flexDirection: "row", backgroundColor: 'lightgray', marginTop: 20
-                  }}
-                >
-                  <Text
-                    style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-                  >
-                    View our App Tutorial
-                  </Text>
-
-                  <FontAwesome name="play-circle" size={24} color="black" />
-
-                </TouchableOpacity>
-
-
-                <TouchableOpacity
-                  activeOpacity={0.5}
-                  onPress={openWebsite}
-                  style={styles.resources}
-                >
-
-                  <Text
-                    style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-                  >
-                    Questions? Visit the FAQ
-                  </Text>
-
-                  <AntDesign name="questioncircle" size={24} color="black" />
-                </TouchableOpacity>
-
-
-                <TouchableOpacity
-                  activeOpacity={0.5}
-                  onPress={reportProblem}
-                  style={styles.resources}
-                >
-
-                  <Text
-                    style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-                  >
-                    Contact Developer
-                  </Text>
-
-                  <AntDesign name="exclamationcircle" size={24} color="black" />
-                </TouchableOpacity>
-
-                <LineDivider />
-
-
-                <View>
-                  <TouchableOpacity
-                    activeOpacity={0.5}
-                    onPress={signOutUser}
-                    style={styles.delete}
-                  >
-                    <Icon
-                      name='logout'
-                      type='simple-line-icon'
-                      color='black'
-                    />
-                    <Text
-                      style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-                    >
-                      Logout
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View>
-                  <TouchableOpacity
-                    activeOpacity={0.5}
-                    onPress={toggleOverlay}
-                    style={styles.delete}
-                  >
-                    <Icon
-                      name='logout'
-                      type='simple-line-icon'
-                      color='black'
-                    />
-                    <Text
-                      style={{ fontSize: 18, paddingLeft: 15, paddingRight: 10 }}
-                    >
-                      Delete Account
-                    </Text>
-                  </TouchableOpacity>
-
-
-
-                  <Overlay
-                    isVisible={visible}
-                    onBackdropPress={toggleOverlay}
-                    style={{ borderStyle: 'solid', position: 'absolute', width: 500, height: 500 }}
-                  >
-                    <Text>
-                      Are you sure you want to delete your account?
-                    </Text>
-
-                    <Button style={{ position: 'relative', width: 100, height: 40, borderWidth: 2, borderStyle: 'solid', backgroundColor: 'red', borderRadius: 10, justifyContent: 'center', alignItems: 'center', margin: 10 }}
-                      onPress={toggleOverlay}
-                      title='Delete'
-                    />
-
-                  </Overlay>
-
-                </View>
-
+        <View style={styles.buttonExternalsContainer}>
+          <TouchableOpacity
+            activeOpacity={0.75}
+          // onPress={() => viewAppTutorial()}
+          >
+            <View style={styles.buttonExternalsSpacing}>
+              <View style={[styles.buttonExternalsDisabled, {}]}>
+                <Text style={styles.buttonExternalsTextDisabled}>
+                  View App Tutorial
+                </Text>
+                <Icon
+                  name="play-circle"
+                  type="material-community"
+                  size={24}
+                  color="#9D9D9D"
+                />
               </View>
+            </View>
+          </TouchableOpacity>
 
-            </ScrollView >
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => visitFAQ()}
+          >
+            <View style={styles.buttonExternalsSpacing}>
+              <View style={[styles.buttonExternalsEnabled, {}]}>
+                <Text style={styles.buttonExternalsTextEnabled}>
+                  Visit our FAQ
+                </Text>
+                <Icon
+                  name="help"
+                  type="material"
+                  size={24}
+                  color="#363732"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.75}
+          // onPress={() => contactDeveloper()}
+          >
+            <View style={styles.buttonExternalsSpacing}>
+              <View style={[styles.buttonExternalsDisabled, {}]}>
+                <Text style={styles.buttonExternalsTextDisabled}>
+                  Contact Developer
+                </Text>
+                <Icon
+                  name="report"
+                  type="material"
+                  size={24}
+                  color="#9D9D9D"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+        </View>
+
+        <Divider
+          width={2}
+          color={"#9D9D9D"}
+          style={{ width: '90%', alignSelf: 'center' }}
+        />
+
+        <TouchableOpacity
+          activeOpacity={0.75}
+          onPress={() => {
+            alert(
+              `The "Delete User Account" function has been disabled for STEM Day.`,
+              "My Alert Msg",
+              [{ text: "OK" }]
+            );
+          }}
+        >
+          <View style={styles.buttonDeleteSpacing}>
+            <View style={[styles.buttonDeleteAccount, {}]}>
+              <Text style={styles.buttonDeleteAccountText}>
+                DELETE ACCOUNT
+              </Text>
+              <Icon
+                name="delete"
+                type="material"
+                size={24}
+                color="#DF3D23"
+              />
+            </View>
+          </View>
+        </TouchableOpacity>
+
+      </ScrollView>
     </SafeAreaView >
   );
 };
 
 const styles = StyleSheet.create({
 
-
-  page: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center'
+  mainContainer: {
+    backgroundColor: '#EFEAE2',
+    height: '100%',
   },
 
-  resources: {
-    width: 280,
-    height: 60,
-    backgroundColor: 'lightgray',
-    borderColor: 'black',
-    borderStyle: 'solid',
-    borderWidth: 2,
-    borderRadius: 15,
-    flexDirection: "row",
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20
+  contentContainer: {
+    width: '100%',
+    padding: 20,
+
   },
 
-  delete: {
-    width: 300,
-    height: 60,
-    backgroundColor: '#F3889C',
-    borderStyle: 'solid',
-    borderColor: 'black',
-    borderWidth: 2,
-    borderRadius: 15,
-    flexDirection: "row",
-    justifyContent: 'center',
+  toolTipBlock: {
+    height: 115,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 2,
+    shadowOpacity: .25,
+  },
+
+  innerContainer: {
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 30,
+    marginTop: 25,
+    backgroundColor: '#E4E6E8',
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 5,
+    shadowOpacity: .2,
+  },
+
+  headerBar: {
+    width: '100%',
+    height: 20,
+    backgroundColor: '#CFC5BA'
+  },
+
+  publicInformation: {
+    textAlign: 'center',
+    flexDirection: 'row',
+    padding: 20,
+    alignContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 30
-  }
+    marginBottom: 10,
+    backgroundColor: 'white'
+  },
+
+  userProfilePicture: {
+    marginRight: 20,
+  },
+
+  userText: {
+  },
+
+  userName: {
+    fontSize: 25,
+    fontWeight: '700',
+
+  },
+
+  userStatus: {
+    marginTop: 8,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+
+  privateInformation: {
+    height: 115,
+    width: '90%',
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: 'grey',
+    marginTop: 15,
+    marginBottom: 22,
+    padding: 15,
+  },
+
+  privateInformationHeader: {
+  },
+
+  privateInformationEmail: {
+    flexDirection: 'row',
+    margin: 10,
+  },
+
+  privateInformationEmailText: {
+    marginLeft: 15
+  },
+
+  privateInformationPhone: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+
+  privateInformationPhoneText: {
+    marginLeft: 15
+
+  },
+
+  buttonSpacing: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: 22,
+  },
+
+  buttonEdit: {
+    width: 115,
+    height: 45,
+    borderWidth: 3,
+    borderStyle: 'solid',
+    borderRadius: 200,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    marginRight: 15,
+  },
+
+  buttonEditText: {
+    color: '#363732',
+    fontSize: 16,
+    fontWeight: '800',
+    marginRight: 7,
+  },
+
+
+  applicationSettingsBreaker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 30
+  },
+
+  applicationSettingsText: {
+    fontSize: 17,
+    color: 'black',
+    fontWeight: '700',
+    marginLeft: 20,
+    marginRight: 20,
+  },
+
+  toggleBox: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    paddingLeft: 20,
+    paddingRight: 20,
+    width: '90%',
+    height: 55,
+    backgroundColor: 'white',
+    justifyContent: 'space-between',
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 2,
+    shadowOpacity: .25,
+  },
+
+  toggleBoxLeftHalf: {
+    flexDirection: 'row',
+  },
+
+  toggleBoxTextEnabled: {
+    fontSize: 15,
+    color: 'black',
+    fontWeight: '700'
+  },
+
+  toggleBoxTextDisabled: {
+    fontSize: 15,
+    color: '#777777',
+    fontWeight: '700'
+  },
+
+  buttonExternalsContainer: {
+    marginTop: 40,
+    marginBottom: 30,
+  },
+
+  buttonDeleteSpacing: {
+    flexDirection: "row",
+    alignSelf: 'center',
+    marginTop: 25,
+    marginBottom: 25,
+  },
+
+  buttonExternalsSpacing: {
+    flexDirection: "row",
+    alignSelf: 'center',
+    marginBottom: 15,
+  },
+
+  buttonExternalsDisabled: {
+    width: '75%',
+    height: 55,
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    borderColor: '#9D9D9D',
+    // backgroundColor: 'white',
+  },
+
+  buttonExternalsTextDisabled: {
+    color: '#9D9D9D',
+    fontSize: 16,
+    fontWeight: '800',
+    marginRight: 10,
+  },
+
+  buttonExternalsEnabled: {
+    width: '75%',
+    height: 55,
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    borderColor: '#777777',
+    backgroundColor: 'white',
+  },
+
+  buttonExternalsTextEnabled: {
+    color: '#363732',
+    fontSize: 16,
+    fontWeight: '800',
+    marginRight: 10,
+  },
+
+  buttonDeleteSpacing: {
+    flexDirection: "row",
+    alignSelf: 'center',
+    marginTop: 25,
+    marginBottom: 25,
+  },
+
+  buttonDeleteAccount: {
+    width: 225,
+    height: 45,
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderRadius: 200,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    borderColor: '#DF3D23'
+  },
+
+  buttonDeleteAccountText: {
+    color: '#DF3D23',
+    fontSize: 16,
+    fontWeight: '800',
+    marginRight: 5,
+  },
+
+
+
+  // page: {
+  //   flexDirection: 'column',
+  //   justifyContent: 'flex-start',
+  //   alignItems: 'center'
+  // },
+
+  // resources: {
+  //   width: 280,
+  //   height: 60,
+  //   backgroundColor: 'lightgray',
+  //   borderColor: 'black',
+  //   borderStyle: 'solid',
+  //   borderWidth: 2,
+  //   borderRadius: 15,
+  //   flexDirection: "row",
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   marginTop: 20
+  // },
+
+  // delete: {
+  //   width: 300,
+  //   height: 60,
+  //   backgroundColor: '#F3889C',
+  //   borderStyle: 'solid',
+  //   borderColor: 'black',
+  //   borderWidth: 2,
+  //   borderRadius: 15,
+  //   flexDirection: "row",
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   marginBottom: 20,
+  //   marginTop: 30
+  // }
 });
 
 export default ProfileTab;

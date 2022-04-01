@@ -232,7 +232,15 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 			.then(() => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
-				navigation.push("Chat", { topicId, topicName, groupId, groupName, groupOwner });
+				navigation.push("Chat", {
+					topicId,
+					topicName,
+					groupId,
+					groupName,
+					groupOwner,
+					coverImageNumber: route.params.coverImage.imageNumber,
+					color: route.params.coverImage.color, 
+			});
 			})
 			.catch((error) => console.log(error));
 	};

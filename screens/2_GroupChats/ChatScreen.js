@@ -60,7 +60,6 @@ import {
 import firebase from 'firebase/compat/app';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 
-
 // Imports for: Components
 import MyView from '../../components/MyView';
 import LineDivider from '../../components/LineDivider';
@@ -103,6 +102,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
+        setCopiedText(false)
     };
 
     const IconOption = ({ iconName, text, value, isLast, isSpacer, isDestructive, hide, selectFunction }) => (
@@ -407,6 +407,7 @@ const ChatScreen = ({ navigation, route }) => {
             navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
         }
         setOverlay(false);
+        setCopiedText(false)
     };
 
     const viewBanner = (bannerId, bannerData) => {
@@ -500,6 +501,8 @@ const ChatScreen = ({ navigation, route }) => {
 		const textMessageText = `Hey, have you ever head of the FamilyChat app? Join in on the conversation by clicking this download link: https://www.familychat.app/`
 		Linking.openURL(`sms://''&body=${textMessageText}`)
 	}
+
+    const [copiedText, setCopiedText] = useState(false)
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -622,8 +625,8 @@ const ChatScreen = ({ navigation, route }) => {
                                             });
                                     }}
                                     style={{
-                                        flex: 1, flexGrow: 1,
-                                        paddingVertical: 5, marginRight: 25,
+                                        flex: 1, flexGrow: .75,
+                                        paddingVertical: 5, marginRight: 0,
                                         backgroundColor: "#fff", borderWidth: 1, borderColor: "#333", borderRadius: 3,
                                         justifyContent: "center", alignItems: "center", flexDirection: "row",
                                     }}>
@@ -635,19 +638,37 @@ const ChatScreen = ({ navigation, route }) => {
                                 </TouchableOpacity>
                                 {/* Invite! */}
                                 <TouchableOpacity
-                                activeOpacity={0.7}
-                                // onPress={() => { navigateTo("Invite") }}
-                                onPress={() => openTextMessage()}
-                                    style={{
-                                        flex: 1, flexGrow: 1,
-                                        paddingVertical: 5,
-                                        backgroundColor: "#fff", borderWidth: 1, borderColor: "#333", borderRadius: 3,
-                                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                                    }}>
-                                    <MaterialIcons name="person-add" size={20} color="black" style={{marginRight: 10}}/>
-                                    <Text style={styles.groupDetailsText}>
-                                        {"Invite to Group"}
-                                    </Text>
+                                    activeOpacity={0.7}
+                                    // onPress={() => { navigateTo("Invite") }}
+                                    onPress={() => openTextMessage()}
+                                    style={copiedText
+                                        ? {
+                                            flex: 1, flexGrow: 1.25,
+                                            paddingVertical: 5, marginLeft: 10, borderColor: '#3D8D04',
+                                            backgroundColor: "#fff", borderWidth: 1, borderRadius: 3,
+                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                        }
+                                        : {
+                                            flex: 1, flexGrow: 1.25,
+                                            paddingVertical: 5, marginLeft: 10, borderColor: 'black',
+                                            backgroundColor: "#fff", borderWidth: 1, borderRadius: 3,
+                                            justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                        }
+                                    }>
+                                    {copiedText
+                                        ? <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
+                                            <MaterialIcons name="thumb-up-alt" size={20} color="#3D8D04" style={{ marginRight: 10 }} />
+                                            <Text style={[styles.groupDetailsText, { color: '#3D8D04' }]}>
+                                                {"Copied to Clipboard"}
+                                            </Text>
+                                        </View>
+                                        : <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                            <MaterialIcons name="mail-outline" size={20} color="black" style={{ marginRight: 10 }} />
+                                            <Text style={styles.groupDetailsText}>
+                                                {"Invite to Group"}
+                                            </Text>
+                                        </View>
+                                    }
                                 </TouchableOpacity>
                             </View>
                             

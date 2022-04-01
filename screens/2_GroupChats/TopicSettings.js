@@ -72,6 +72,18 @@ const TopicSettings = ({ navigation, route }) => {
 
     const topicObjectForPassing = route.params.topicObjectForPassing;
 
+    // const topicObjectForPassing = {
+    //     color: color,
+    //     coverImageNumber: coverImageNumber,
+    //     groupId: groupId,
+    //     groupName: groupName,
+    //     groupOwner: groupOwner,
+    //     topicId: currentTopic.id,
+    //     topicName: data.topicName,
+    //     topicOwner: data.topicOwner,
+    //     topicMembers: data.members,
+    // }
+
     const goBackward = () => navigation.navigate("Chat",
         {
             color: topicObjectForPassing.color,
@@ -87,7 +99,7 @@ const TopicSettings = ({ navigation, route }) => {
     )
 
     const goForward = () => {
-        console.log(topicObjectForPassing)
+        console.log('------- TOPIC', topicObjectForPassing)
         navigation.push("GroupSettings", { topicObjectForPassing })
     }
 
@@ -911,7 +923,6 @@ const TopicSettings = ({ navigation, route }) => {
                                                                     <Image
                                                                         source={imageSelection(topicMember.pfp)}
                                                                         style={{ width: 26, height: 26, borderRadius: 5, }}
-
                                                                     />
                                                                     <Text style={styles.memberName}>
                                                                         {topicMember.name}

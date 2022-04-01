@@ -198,7 +198,7 @@ const UserAuth = ({ navigation }) => {
                                 value={shownPhoneText}
                                 keyboardType={'phone-pad'}
                                 maxLength={14}
-                                autoFocus={true}
+                                autoFocus={false}
                                 style={{ fontSize: 18, marginLeft: 3, marginRight: 15 }}
                             />
                         </View>
@@ -239,12 +239,24 @@ const UserAuth = ({ navigation }) => {
                         <Text style={{ fontSize: 15 }}>New to FamilyChat? <Text style={{ fontWeight: 'bold' }}>Sign Up</Text></Text>
                     </TouchableOpacity>
                 </View>
+                <View style={
+                    {
+                        width: '100%',
+                        alignItems: 'center', 
+                        // position: 'absolute',
+                        // bottom: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        marginTop: 20
+                        }}>
                 <Image
-                    source={require('../../assets/illustration_layDown_colors.png')}
-                    style={{ width: 375, height: 230, right: 0, left: 23, position: 'relative', marginTop: 20 }}
+                    source={require('../../assets/userAuthPicture.png')}
+                    style={{ width: 400, height: 250, alignSelf: 'center'}}
                 />
+                </View>
             </ScrollView>
         </SafeAreaView>
+        
     );
 };
 
