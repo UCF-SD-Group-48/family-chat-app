@@ -59,18 +59,18 @@ const Events = ({ navigation, route }) => {
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
 
-    const [banners, setBanners] = useState([]);
-    const [bannerOwners, setBannerOwners] = useState({});
-    const [phoneNumbers, setPhoneNumbers] = useState([]);
+    const [events, setEvents] = useState([]);
+    // const [bannerOwners, setBannerOwners] = useState({});
+    // const [phoneNumbers, setPhoneNumbers] = useState([]);
 
     useLayoutEffect(() => {
         const unsubscribe = db
             .collection('chats')
             .doc(topicId)
-            .collection('banners')
+            .collection('events')
             .orderBy('timestamp', 'desc')
             .onSnapshot((snapshot) =>
-                setBanners(
+                setEvents(
                     snapshot.docs.map(doc => ({
                         id: doc.id,
                         data: doc.data(),
@@ -80,20 +80,20 @@ const Events = ({ navigation, route }) => {
         return unsubscribe;
     }, [route]);
 
-    const getPhoneNumbers = () => {
-		setPhoneNumbers(
-            Array.from(banners, ({ data: { ownerPhoneNumber } }) => {
-                return ownerPhoneNumber.substring(2)
-            })
-        );
-	};
+    // const getPhoneNumbers = () => {
+	// 	setPhoneNumbers(
+    //         Array.from(banners, ({ data: { ownerPhoneNumber } }) => {
+    //             return ownerPhoneNumber.substring(2)
+    //         })
+    //     );
+	// };
 
-    useEffect(() => {
-        getPhoneNumbers();
-        return () => {
-            setPhoneNumbers([]);
-        }
-    }, [banners]);
+    // useEffect(() => {
+    //     getPhoneNumbers();
+    //     return () => {
+    //         setPhoneNumbers([]);
+    //     }
+    // }, [banners]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -128,41 +128,41 @@ const Events = ({ navigation, route }) => {
         });
     }, [navigation]);
 
-    useEffect(() => {
-        getBannerOwners();
-        return () => {
-            setBannerOwners({});
-        }
-    }, [phoneNumbers]);
+    // useEffect(() => {
+    //     getBannerOwners();
+    //     return () => {
+    //         setBannerOwners({});
+    //     }
+    // }, [phoneNumbers]);
 
-    const getBannerOwners = async () => {
-        if(phoneNumbers.length > 0) {
-            let bannerMap = {};
+    // const getBannerOwners = async () => {
+    //     if(phoneNumbers.length > 0) {
+    //         let bannerMap = {};
 
-            const snapshot = await db.collection("users").where('phoneNumber', 'in', phoneNumbers).get();
-            snapshot.docs.map((doc) => {
-                bannerMap[doc.id] = doc.data();
-                console.log("doc.id = "+doc.id);
-            });
+    //         const snapshot = await db.collection("users").where('phoneNumber', 'in', phoneNumbers).get();
+    //         snapshot.docs.map((doc) => {
+    //             bannerMap[doc.id] = doc.data();
+    //             console.log("doc.id = "+doc.id);
+    //         });
 
-            setBannerOwners(bannerMap);
-        }
-	};
+    //         setBannerOwners(bannerMap);
+    //     }
+	// };
     
     const addEvent = () => {
         navigation.push("AddEvent", { topicId, topicName, groupId, groupName, groupOwner });
     };
 
-    const viewBanner = (bannerId, bannerData) => {
-        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
+    const viewEvent = (eventId, eventData) => {
+        navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId, eventData });
     };
 
-    const getString = (uid) => {
-        if(bannerOwners != undefined && uid != undefined && bannerOwners[uid.toString()] != undefined) {
-            return (bannerOwners[uid.toString()].firstName+" "+bannerOwners[uid.toString()].lastName);
-        }
-        else return "";
-    }
+    // const getString = (uid) => {
+    //     if(bannerOwners != undefined && uid != undefined && bannerOwners[uid.toString()] != undefined) {
+    //         return (bannerOwners[uid.toString()].firstName+" "+bannerOwners[uid.toString()].lastName);
+    //     }
+    //     else return "";
+    // }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -172,7 +172,7 @@ const Events = ({ navigation, route }) => {
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 1, flexGrow: 1,
                 }}>
-                {/* Add Banner Button */}
+                {/* Add Event Button */}
                 <TouchableOpacity onPress={addEvent} activeOpacity={0.7}
                     style={[
                         {
@@ -214,7 +214,7 @@ const Events = ({ navigation, route }) => {
                     fontWeight: '700',
                     color: 'black', marginHorizontal: 10
                 }}>
-                    {"History: Past Events ("+banners.length+")"}
+                    {"History: All Events ("+events.length+")"}
                 </Text>
                 <Divider width={2} color={"#777"}
                     style={{
@@ -223,14 +223,14 @@ const Events = ({ navigation, route }) => {
                     }}/>
                 </View>
 
-                {/* All Banners */}
+                {/* All Events */}
                 <View style={{
                     marginTop: 30, marginBottom: 0, width: "100%",
                     flexDirection: "column", flexShrink: 1,
                     justifyContent: "flex-start", alignItems: "center",
                 }}>
-                    {/* Prompt for no Events (when Banner.length == 0) */}
-                    <MyView hide={banners.length != 0}
+                    {/* Prompt for no Events (when Events.length == 0) */}
+                    <MyView hide={events.length != 0}
                         style={{
                             width: "100%", minHeight: 300, paddingTop: 10,
                             justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
@@ -260,8 +260,8 @@ const Events = ({ navigation, route }) => {
                         <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
                     </MyView>
                     <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
-                        {banners.map(({ id, data }) => (
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(id, data)}} key={id}
+                        {events.map(({ id, data }) => (
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewEvent(id, data)}} key={id}
                                 style={[
                                     {
                                         width: "100%", marginTop: 1,
@@ -304,7 +304,7 @@ const Events = ({ navigation, route }) => {
                                                         flex: 1,
                                                 }}>
                                                 <Text style={{fontWeight: '600'}}>"</Text>
-                                                    {data.description}
+                                                    {data.title}
                                                 <Text style={{fontWeight: '600'}}>"</Text>
                                             </Text>
                                         </View>
@@ -313,7 +313,7 @@ const Events = ({ navigation, route }) => {
                                             borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
                                             flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                         }}>
-                                            <Ionicons name="flag-outline" size={18} color="#777" /> {/*flag-sharp*/}
+                                            <Ionicons name="flag-outline" size={18} color="#777" />
                                             <Text numberOfLines={1}
                                                 style={{
                                                     fontSize: 16,
@@ -323,7 +323,10 @@ const Events = ({ navigation, route }) => {
                                                     color: "#777",
                                                     flex: 1,
                                             }}>
-                                                { getString(data.ownerUID) || ""}
+                                                {(data.startTime != null) ? (data.startTime.toDate().toLocaleDateString("en-US", {
+                                                month: "short", day: "2-digit", year: "numeric", })
+                                                +" @ "+data.startTime.toDate().toLocaleTimeString("en-US", 
+                                                {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
                                             </Text>
                                         </View>
                                     </View>

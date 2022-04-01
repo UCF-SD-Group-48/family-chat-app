@@ -63,6 +63,7 @@ import Banners from './screens/2_GroupChats/Banners';
 import ViewBanner from './screens/2_GroupChats/ViewBanner';
 import Events from './screens/2_GroupChats/Events';
 import AddEvent from './screens/2_GroupChats/AddEvent';
+import ViewEvent from './screens/2_GroupChats/ViewEvent';
 import GroupInvite from './screens/2_GroupChats/GroupInvite';
 import GroupMembers from './screens/2_GroupChats/GroupMembers';
 import GroupSettings from './screens/2_GroupChats/GroupSettings';
@@ -207,6 +208,7 @@ const GroupChatsStackScreen = () => (
     <Stack.Screen name='ViewBanner' component={ViewBanner} />
     <Stack.Screen name='Events' component={Events} />
     <Stack.Screen name='AddEvent' component={AddEvent} />
+    <Stack.Screen name='ViewEvent' component={ViewEvent} />
     <Stack.Screen name='GroupInvite' component={GroupInvite} />
     <Stack.Screen name='GroupMembers' component={GroupMembers} />
     <Stack.Screen name='GroupSettings' component={GroupSettings} />
