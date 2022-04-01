@@ -157,7 +157,11 @@ const HomeTab = ({ navigation, route }) => {
 
       }
 
-      setCount(totalMessages)
+      if (totalMessages >= 99) {
+        setCount(99)
+      } else {
+        setCount(totalMessages)
+      }
    
   }  
 
