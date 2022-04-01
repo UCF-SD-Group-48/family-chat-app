@@ -55,6 +55,7 @@ import NewNotificationsBlock from '../../components/NewNotificationsBlock';
 import DismissButton from '../../components/DismissButton';
 import MyView from '../../components/MyView';
 import { PinchGestureHandler } from 'react-native-gesture-handler';
+import { Timestamp } from 'firebase/firestore';
 
 // *************************************************************
 
@@ -85,8 +86,8 @@ const HomeTab = ({ navigation, route }) => {
 	}, [navigation]);
   
   
-  const [pinOwners, setPinOwners] = useState([])
   const [missed, setMissed] = useState([])
+  const [missedID, setMissedID] = useState([])
 
   // Sets date to check against for missed messages
   useEffect(async() => {
@@ -103,25 +104,78 @@ const HomeTab = ({ navigation, route }) => {
   
 
   // Collect missed messages ids
-  useEffect(async() => {
-    let topicArray = await db.collection('users').doc(auth.currentUser.uid).get()
-    // const userTopicMap = topicArray.data()
-    const topicMap = topicArray.data().topicMap
+  const missedMsg = async () => {
+
+    let currentUser = await db.collection('users').doc(auth.currentUser.uid).get()
+    const topicMap = currentUser.data().topicMap
     console.log("topicArray: ", (JSON.stringify(topicMap)));
 
     let values = []
-    let i = 0;
     for (let key in topicMap) {
       values.push(key)
     }
-    //values = ["TIOOb8T7FFsm3W0bC8V7"]
+    // console.log("values array: ", values);
 
+    let lastTimeUserOn = currentUser.data().prevOn
+    console.log("last time: ", lastTimeUserOn["seconds"])
     // for loop through user's topic  Map
-    for (let x in values) {
 
-    }
-    console.log("values array: ", values);
-  }, [])
+
+    for (let topicIdFromMap of values) {
+      console.log("current: " + topicIdFromMap + "  " + topicMap[topicIdFromMap])
+      // if(topicMap[topicIdFromMap] > lastTimeUserOn){
+      //   console.log("True man")
+      // }
+      // else {
+      //   console.log("Idk")
+      //   console.log(lastTimeUserOn - topicMap[topicIdFromMap])
+      // }
+          const getMessage = db
+          .collection('chats')
+          .doc(topicIdFromMap) // do it this way because of batching
+          .collection('messages')
+          .where('timestamp', ">", lastTimeUserOn["seconds"])
+          .get()
+
+          // const getMessageSnapshot = getMessage.docs[0].data();
+
+          console.log("Get Message: ", getMessage)
+
+
+          // .orderBy('timestamp', 'desc')
+          // .onSnapshot((snapshot) => {
+          //   console.log("Here: ", JSON.stringify(snapshot., null, "\t"))
+          // }
+            // setMissed(snapshot.docs.map((doc) => doc.data()))
+            // setMissedID(snapshot.docs.map((doc) => doc.id))
+            // snapshot.docs.map((doc) => setMissedID(msgArr.push(doc.id)))
+
+            
+          // );
+
+          
+
+          return getMessage;
+          
+          
+        }
+
+        setMissedID(msgArr)
+        // console.log("missedMessages: ", missed)
+        // console.log("missedMessages: ", missedID)
+        console.log("msgArr: ", msgArr)
+        console.log("setMissed: ", missedID)
+  }  
+
+  // const generalTopicSnapshot = await db
+  //                           .collection("groups")
+  //                           .doc(groupSnapshot.id)
+  //                           .collection("topics")
+  //                           .where("topicName", '==', 'General')
+  //                           .get()
+  //                           .catch((error) => console.log(error));
+
+  //                       const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
 
   // const getPinOwners = async () => {
   //   // owners == missed messages array
@@ -184,6 +238,7 @@ const HomeTab = ({ navigation, route }) => {
           }}
           onPress={() => {
             setBlockHidden(true)
+            missedMsg()
           }}
         >
           <DismissButton />
@@ -218,7 +273,11 @@ const HomeTab = ({ navigation, route }) => {
           <View style={{justifyContent: 'center',
             alignItems: 'center'}}>
             <TouchableOpacity
-              onPress={navigateToAddGroup}
+              onPress={() => {
+                missedMsg()
+                navigateToAddGroup()
+              }}
+              // onPress={navigateToAddGroup}
               style={{
                 width: 300, height: 60, borderWidth: 2, borderStyle: 'solid', borderColor: 'black', borderRadius: 100, justifyContent: 'center',
                 alignItems: 'center', marginBottom: 20, flexDirection: "row", backgroundColor: '#7DBF7F'
