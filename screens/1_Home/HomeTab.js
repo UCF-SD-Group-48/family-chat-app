@@ -29,6 +29,9 @@ import {
   Tooltip,
 } from 'react-native-elements';
 
+import { useIsFocused } from '@react-navigation/native';
+
+
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
 import ImagePicker from 'expo-image-picker';
@@ -62,7 +65,9 @@ import { Timestamp } from 'firebase/firestore';
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
 
-  const navigateToAddGroup = async () => {
+  const[count, setCount] = useState(0);
+
+  const navigateToAddGroup = () => {
     navigation.navigate('CreateGroup_1_NameImage')
   }
 
@@ -83,8 +88,19 @@ const HomeTab = ({ navigation, route }) => {
       title: "Home",
 			headerLeft: '',
 		});
+
 	}, [navigation]);
-  
+
+
+  const isFocused = useIsFocused();
+
+    useEffect(() => {
+       
+      const unsubscribe = missedMsg()
+      return unsubscribe;
+
+    }, [isFocused]);
+
   
   const [missed, setMissed] = useState([])
   const [missedID, setMissedID] = useState([])
@@ -116,82 +132,36 @@ const HomeTab = ({ navigation, route }) => {
     }
     // console.log("values array: ", values);
 
-    let lastTimeUserOn = currentUser.data().prevOn
+    let lastTimeUserOn = currentUser.data().lastOn
     console.log("last time: ", lastTimeUserOn["seconds"])
     // for loop through user's topic  Map
 
+    let totalMessages = 0;
 
     for (let topicIdFromMap of values) {
       console.log("current: " + topicIdFromMap + "  " + topicMap[topicIdFromMap])
-      // if(topicMap[topicIdFromMap] > lastTimeUserOn){
-      //   console.log("True man")
-      // }
-      // else {
-      //   console.log("Idk")
-      //   console.log(lastTimeUserOn - topicMap[topicIdFromMap])
-      // }
-          const getMessage = db
-          .collection('chats')
-          .doc(topicIdFromMap) // do it this way because of batching
-          .collection('messages')
-          .where('timestamp', ">", lastTimeUserOn["seconds"])
-          .get()
-
-          // const getMessageSnapshot = getMessage.docs[0].data();
-
-          console.log("Get Message: ", getMessage)
-
-
-          // .orderBy('timestamp', 'desc')
-          // .onSnapshot((snapshot) => {
-          //   console.log("Here: ", JSON.stringify(snapshot., null, "\t"))
-          // }
-            // setMissed(snapshot.docs.map((doc) => doc.data()))
-            // setMissedID(snapshot.docs.map((doc) => doc.id))
-            // snapshot.docs.map((doc) => setMissedID(msgArr.push(doc.id)))
-
-            
-          // );
-
-          
-
-          return getMessage;
-          
-          
+ 
+      await db
+      .collection('chats')
+      .doc(topicIdFromMap) // do it this way because of batching
+      .collection('messages')
+      .where('timestamp', ">", topicMap[topicIdFromMap])
+      .get()
+      .then((getMessage) => {
+        if(getMessage.docs.length > 0) {
+          console.log("getMessageLength: ", getMessage.docs.length)
+          totalMessages = getMessage.docs.length + totalMessages
         }
+      })
+      .catch((err) => console.log("Error: " + err))
 
-        setMissedID(msgArr)
-        // console.log("missedMessages: ", missed)
-        // console.log("missedMessages: ", missedID)
-        console.log("msgArr: ", msgArr)
-        console.log("setMissed: ", missedID)
+      }
+
+      setCount(totalMessages)
+   
   }  
 
-  // const generalTopicSnapshot = await db
-  //                           .collection("groups")
-  //                           .doc(groupSnapshot.id)
-  //                           .collection("topics")
-  //                           .where("topicName", '==', 'General')
-  //                           .get()
-  //                           .catch((error) => console.log(error));
-
-  //                       const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
-
-  // const getPinOwners = async () => {
-  //   // owners == missed messages array
-  //   let topics = {};
-  //   // for each message within chat
-  //   for (const pin of pins) {
-  //     await db.collection('users').doc(pin.data.ownerUID).get()
-  //       .then((result) => {
-  //         owners[pin.data.ownerUID] = result.data();
-  //       });
-  //   }
-  //   setPinOwners(owners);
-  // }
-
-// collecting all messages.id from topics currentUser is part of. 
-
+ 
 
   return (
     <SafeAreaView>
@@ -238,7 +208,7 @@ const HomeTab = ({ navigation, route }) => {
           }}
           onPress={() => {
             setBlockHidden(true)
-            missedMsg()
+            // missedMsg()
           }}
         >
           <DismissButton />
@@ -274,7 +244,7 @@ const HomeTab = ({ navigation, route }) => {
             alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => {
-                missedMsg()
+                // missedMsg()
                 navigateToAddGroup()
               }}
               // onPress={navigateToAddGroup}
@@ -292,6 +262,9 @@ const HomeTab = ({ navigation, route }) => {
                 style={{ fontSize: 18, paddingLeft: 15 }}
               >
                 Start a new conversation
+              </Text>
+              <Text>
+               Count is {count}
               </Text>
             </TouchableOpacity>
           </View>
