@@ -690,16 +690,17 @@ const ChatScreen = ({ navigation, route }) => {
                                     </TouchableOpacity>
 
                                     {/* Events */}
-                                    <View style={[styles.featuresOuterView,
-                                        {
-                                            shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                            shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Events")}
+                                        style={[styles.featuresOuterView,
+                                            {
+                                                shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                                shadowRadius: 3, shadowOpacity: 0.25,
+                                            }]}>
                                         <Entypo name="calendar" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
                                             Events
                                         </Text>
-                                    </View>
+                                    </TouchableOpacity>
                                 </View>
 
                                 <Divider width={1} color={"#777"} style={{width: screenWidth - 25, marginTop: 10,}}/>

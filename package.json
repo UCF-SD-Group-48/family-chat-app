@@ -10,6 +10,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "4.0.0",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/bottom-tabs": "^6.2.0",
     "@react-navigation/native": "^6.0.6",
@@ -39,6 +40,7 @@
     "react-native-enhanced-popup-menu": "^0.7.0",
     "react-native-gesture-handler": "~2.1.0",
     "react-native-hold-menu": "^0.1.2",
+    "react-native-modal-datetime-picker": "^13.1.2",
     "react-native-popup-menu": "^0.15.12",
     "react-native-reanimated": "~2.3.1",
     "react-native-safe-area-context": "3.3.2",

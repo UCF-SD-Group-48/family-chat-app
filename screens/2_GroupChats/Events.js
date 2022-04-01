@@ -107,7 +107,7 @@ const Events = ({ navigation, route }) => {
 					}}>
 					<TouchableOpacity
 						activeOpacity={0.5}
-						onPress={addBanner}
+						onPress={addEvent}
 					>
 						<Feather name="plus" size={30} color="black" />
 					</TouchableOpacity>
@@ -149,8 +149,8 @@ const Events = ({ navigation, route }) => {
         }
 	};
     
-    const addBanner = () => {
-        navigation.push("AddBanner", { topicId, topicName, groupId, groupName, groupOwner });
+    const addEvent = () => {
+        navigation.push("AddEvent", { topicId, topicName, groupId, groupName, groupOwner });
     };
 
     const viewBanner = (bannerId, bannerData) => {
@@ -173,7 +173,7 @@ const Events = ({ navigation, route }) => {
                     flex: 1, flexGrow: 1,
                 }}>
                 {/* Add Banner Button */}
-                <TouchableOpacity onPress={addBanner} activeOpacity={0.7}
+                <TouchableOpacity onPress={addEvent} activeOpacity={0.7}
                     style={[
                         {
                             minWidth: 200, minHeight: 60,
@@ -193,7 +193,7 @@ const Events = ({ navigation, route }) => {
 						fontWeight: '700',
 						color: 'white', marginRight: 20
 					}}>
-						{"Create New Alert"}
+						{"Create New Event"}
 					</Text>
                     <Entypo name="plus" size={30} color="white" />
                 </TouchableOpacity>
@@ -214,7 +214,7 @@ const Events = ({ navigation, route }) => {
                     fontWeight: '700',
                     color: 'black', marginHorizontal: 10
                 }}>
-                    {"History: Previous Alerts ("+banners.length+")"}
+                    {"History: Past Events ("+banners.length+")"}
                 </Text>
                 <Divider width={2} color={"#777"}
                     style={{
@@ -243,7 +243,7 @@ const Events = ({ navigation, route }) => {
                                     marginTop: 15,
                                     color: "#555",
                             }}>
-                                {"No alerts found."}
+                                {"No events found."}
                         </Text>
                         <Text style={{
                                     fontSize: 20,
@@ -254,7 +254,7 @@ const Events = ({ navigation, route }) => {
                                     marginTop: 15,
                                     color: "#555",
                             }}>
-                                {"Looks like there haven't been any announced alerts within this Topic."+
+                                {"Looks like there haven't been any announced events within this Topic."+
                                     "\nClick the button above to create one."}
                         </Text>
                         <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />

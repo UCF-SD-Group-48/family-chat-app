@@ -16,6 +16,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.parizeauinnovations.familychat",
