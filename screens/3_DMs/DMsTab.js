@@ -242,6 +242,7 @@ const DirectMessagesTab = ({ navigation }) => {
             style={{
               fontSize: 16,
               textAlign: 'left',
+              width: "80%", borderWidth: 0, height: "100%",
             }}
           />
           { (shownPhoneText.length == 0) ? (
