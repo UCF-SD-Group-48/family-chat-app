@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -57,6 +58,7 @@ import UserPrompt from '../../components/UserPrompt';
 import MyView from '../../components/MyView';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
+import SkeletonContent from 'react-native-skeleton-content';
 // *************************************************************
 
 // Third tab of the application: DIRECT MESSAGES.
@@ -73,155 +75,165 @@ const DirectMessagesTab = ({ navigation }) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-		const unsubscribe = db.collection("chats")
+    const unsubscribe = db.collection("chats")
       .where('members', 'array-contains', auth.currentUser.uid)
       .onSnapshot((snapshot) =>
-			setChats(
-				snapshot.docs.map((doc) => ({
-					id: doc.id,
-					data: doc.data(),
-				}))
-			)
-		);
-		return unsubscribe;
-	}, []);
+        setChats(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            data: doc.data(),
+          }))
+        )
+      );
+    return unsubscribe;
+  }, []);
 
   const messageSendersHelper = async () => {
-      let senders = {};
-      let messages = {};
-      let currentTime = new Date();
-      for (const chat of chats) {
-          for(const user of chat.data.members) {
-            if(user == auth.currentUser.uid) {
-              console.log("it's me!");
-            }
-            else {
-              await db.collection('users').doc(user).get()
-                  .then((result) => {
-                    senders[chat.id] = {
-                      id: result.id,
-                      data: result.data(),
-                    }
-                  });
-            }
-          }
-
-          await db.collection('chats').doc(chat.id).collection("messages")
-            .where("timestamp", "<", currentTime).orderBy('timestamp', 'desc').limit(1).get()
-            .then((snapshot) => {
-              if (!snapshot.empty) {
-                let doc = snapshot.docs[0];
-                messages[chat.id] = {
-                  id: doc.id,
-                  data: doc.data(),
-                }
+    let senders = {};
+    let messages = {};
+    let currentTime = new Date();
+    for (const chat of chats) {
+      for (const user of chat.data.members) {
+        if (user == auth.currentUser.uid) {
+          console.log("it's me!");
+        }
+        else {
+          await db.collection('users').doc(user).get()
+            .then((result) => {
+              senders[chat.id] = {
+                id: result.id,
+                data: result.data(),
               }
             });
+        }
       }
-      setMessageSenders(senders);
-      setMessageContents(messages);
+
+      await db.collection('chats').doc(chat.id).collection("messages")
+        .where("timestamp", "<", currentTime).orderBy('timestamp', 'desc').limit(1).get()
+        .then((snapshot) => {
+          if (!snapshot.empty) {
+            let doc = snapshot.docs[0];
+            messages[chat.id] = {
+              id: doc.id,
+              data: doc.data(),
+            }
+          }
+        });
+    }
+    setMessageSenders(senders);
+    setMessageContents(messages);
   };
   useEffect(() => {
-      messageSendersHelper();
+    messageSendersHelper();
   }, [chats, isFocused]);
   const getSenderName = (id) => {
     if (messageSenders != undefined && id != undefined && messageSenders[id.toString()] != undefined) {
-        return (messageSenders[id.toString()].data.firstName + " " + messageSenders[id.toString()].data.lastName);
+      return (messageSenders[id.toString()].data.firstName + " " + messageSenders[id.toString()].data.lastName);
     }
     else return "";
   }
   const getSenderPFP = (id) => {
     if (messageSenders != undefined && id != undefined && messageSenders[id.toString()] != undefined) {
-        return (messageSenders[id.toString()].data.pfp);
+      return (messageSenders[id.toString()].data.pfp);
     }
     else return 0;
   }
   const getMessage = (id) => {
     if (messageContents != undefined && id != undefined && messageContents[id.toString()] != undefined) {
-        return (messageContents[id.toString()].data.message);
+      return (messageContents[id.toString()].data.message);
     }
     else return "";
   }
 
   useLayoutEffect(() => {
-		navigation.setOptions({
-			title: "Direct Messages (DMs)",
-			headerLeft: '',
-		});
-	}, [navigation]);
+    navigation.setOptions({
+      title: "Direct Messages (DMs)",
+      headerLeft: '',
+    });
+  }, [navigation]);
 
   useEffect(() => {
-		if (searchedUserPhoneNumber.length === 10) {
-			if (searchResults != ('exists' || 'nonexistent')) {
-				searchForUser();
-			}
-		}
-	}, [searchedUserPhoneNumber]);
+    if (searchedUserPhoneNumber.length === 10) {
+      if (searchResults != ('exists' || 'nonexistent')) {
+        searchForUser();
+      }
+    }
+  }, [searchedUserPhoneNumber]);
 
   const searchForUser = async () => {
-		const query = await db
-			.collection('users')
-			.where('phoneNumber', '==', searchedUserPhoneNumber)
-			.get();
+    const query = await db
+      .collection('users')
+      .where('phoneNumber', '==', searchedUserPhoneNumber)
+      .get();
 
-		if (!query.empty) {
-			setSearchResults('exists')
-			const snapshot = query.docs[0];
-			const data = snapshot.data();
-			const searchedUserFullName = `${data.firstName} ${data.lastName}`;
-			setSearchedUser({ uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: false })
-			return;
-		} else { setSearchResults('nonexistent') }
-	};
+    if (!query.empty) {
+      setSearchResults('exists')
+      const snapshot = query.docs[0];
+      const data = snapshot.data();
+      const searchedUserFullName = `${data.firstName} ${data.lastName}`;
+      setSearchedUser({ uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: false })
+      return;
+    } else { setSearchResults('nonexistent') }
+  };
 
   function formatPhoneInput(value) {
-		if (!value) {
-			if (searchedUserPhoneNumber.length === 1) setSearchedUserPhoneNumber('');
-			return value;
-		};
-		const phoneEntry = value.replace(/[^\d]/g, '');
-		setSearchedUserPhoneNumber(phoneEntry);
-		const phoneEntryLength = phoneEntry.length;
-		if (phoneEntryLength < 4) return phoneEntry;
-		if (phoneEntryLength < 7) return `(${phoneEntry.slice(0, 3)}) ${phoneEntry.slice(3)}`;
-		return `(${phoneEntry.slice(0, 3)}) ${phoneEntry.slice(3, 6)}-${phoneEntry.slice(6, 10)}`;
-	}
+    if (!value) {
+      if (searchedUserPhoneNumber.length === 1) setSearchedUserPhoneNumber('');
+      return value;
+    };
+    const phoneEntry = value.replace(/[^\d]/g, '');
+    setSearchedUserPhoneNumber(phoneEntry);
+    const phoneEntryLength = phoneEntry.length;
+    if (phoneEntryLength < 4) return phoneEntry;
+    if (phoneEntryLength < 7) return `(${phoneEntry.slice(0, 3)}) ${phoneEntry.slice(3)}`;
+    return `(${phoneEntry.slice(0, 3)}) ${phoneEntry.slice(3, 6)}-${phoneEntry.slice(6, 10)}`;
+  }
 
   const handlePhoneInput = (textChange) => {
-		const phoneInputFormatted = formatPhoneInput(textChange);
-		setShownPhoneText(phoneInputFormatted);
-		if (searchedUserPhoneNumber.length != 10) {
-			setSearchResults('incomplete')
-		}
-	};
+    const phoneInputFormatted = formatPhoneInput(textChange);
+    setShownPhoneText(phoneInputFormatted);
+    if (searchedUserPhoneNumber.length != 10) {
+      setSearchResults('incomplete')
+    }
+  };
 
   const createDM = async () => {
-    
+
     setShownPhoneText("");
 
     //if dm already exists, route to dm
     const snapshot = await db.collection("chats")
       .where('members', 'array-contains', searchedUser.uid).get();
-    if(!snapshot.empty) {
-      for(const doc of snapshot.docs) {
-        if(doc.data().members.some(u => (u == auth.currentUser.uid))) {
+    if (!snapshot.empty) {
+      for (const doc of snapshot.docs) {
+        if (doc.data().members.some(u => (u == auth.currentUser.uid))) {
           navigation.push("Chat", { topicId: doc.id, topicName: "DM", isDM: true });
           return;
         }
       }
     }
-      
-      await db.collection('chats').add({
-        members: [searchedUser.uid, auth.currentUser.uid],
-      })
+
+    await db.collection('chats').add({
+      members: [searchedUser.uid, auth.currentUser.uid],
+    })
       .then((newChat) => {
         navigation.navigate("Chat", { topicId: newChat.id, topicName: "DM", isDM: true });
       });
   }
 
+	const [isLoadingDMs, setIsLoadingDMs] = useState(false);
+
+	useEffect(async () => {
+    setIsLoadingDMs(false);
+
+		return () => {
+			setIsLoadingDMs();
+		};
+	}, [isFocused]);
+
   return (
-		<SafeAreaView style={{backgroundColor: "#EFEAE2"}}>
-			<View style={{
+    <SafeAreaView style={{ backgroundColor: "#EFEAE2" }}>
+      <View style={{
         width: "100%", backgroundColor: "#CFC5BA", // BFBFBF
         borderBottomWidth: 1, borderColor: "#777",
         justifyContent: "center", alignItems: 'center', flexDirection: "column",
@@ -245,24 +257,24 @@ const DirectMessagesTab = ({ navigation }) => {
               width: "80%", borderWidth: 0, height: "100%",
             }}
           />
-          { (shownPhoneText.length == 0) ? (
+          {(shownPhoneText.length == 0) ? (
             <View style={{
-                justifyContent: "center", alignItems: 'center', flexDirection: "row",
-                paddingHorizontal: 5, paddingVertical: 5,
-                borderWidth: 0, borderColor: '#9D9D9D', borderRadius: 3,
+              justifyContent: "center", alignItems: 'center', flexDirection: "row",
+              paddingHorizontal: 5, paddingVertical: 5,
+              borderWidth: 0, borderColor: '#9D9D9D', borderRadius: 3,
             }}>
               <Ionicons name="search" size={24} color="#363732" />
             </View>
-            ) : (
-              <TouchableOpacity activeOpacity={0.7} onPress={() => {setShownPhoneText("")}}
-                style={{
-                  justifyContent: "center", alignItems: 'center', flexDirection: "row",
-                  paddingHorizontal: 5, paddingVertical: 5,
-                  borderWidth: 0, borderColor: '#9D9D9D', borderRadius: 3,
+          ) : (
+            <TouchableOpacity activeOpacity={0.7} onPress={() => { setShownPhoneText("") }}
+              style={{
+                justifyContent: "center", alignItems: 'center', flexDirection: "row",
+                paddingHorizontal: 5, paddingVertical: 5,
+                borderWidth: 0, borderColor: '#9D9D9D', borderRadius: 3,
               }}>
-                <Ionicons name="close-circle" size={24} color="#363732" />
-              </TouchableOpacity>
-            )
+              <Ionicons name="close-circle" size={24} color="#363732" />
+            </TouchableOpacity>
+          )
           }
         </View>
         <MyView hide={shownPhoneText.length == 0} style={{
@@ -273,13 +285,13 @@ const DirectMessagesTab = ({ navigation }) => {
           justifyContent: 'center', alignItems: 'center', flexDirection: "row",
         }}>
           <View style={{
-              width: "90%", height: 50,
-              paddingHorizontal: 15, backgroundColor: "#F8F8F8",
-              justifyContent: 'center', alignItems: 'center', flexDirection: "row",
-              borderRadius: 5, borderWidth: 1.5, borderColor: "#777",
-            }}>
-          {(searchResults == 'incomplete') ?
-            
+            width: "90%", height: 50,
+            paddingHorizontal: 15, backgroundColor: "#F8F8F8",
+            justifyContent: 'center', alignItems: 'center', flexDirection: "row",
+            borderRadius: 5, borderWidth: 1.5, borderColor: "#777",
+          }}>
+            {(searchResults == 'incomplete') ?
+
               <Text style={{
                 fontSize: 18,
                 fontWeight: '500',
@@ -288,72 +300,72 @@ const DirectMessagesTab = ({ navigation }) => {
               }}>
                 {"No results"}
               </Text>
-            : ( (searchResults == 'exists') ? (
-              <View style={{
-                width: "100%", backgroundColor: "#F8F8F800",
-                justifyContent: 'space-between', alignItems: 'center', flexDirection: "row",
-              }}>
+              : ((searchResults == 'exists') ? (
                 <View style={{
-                  backgroundColor: "#F8F8F800",
-                  justifyContent: 'center', alignItems: 'center', flexDirection: "row",
+                  width: "100%", backgroundColor: "#F8F8F800",
+                  justifyContent: 'space-between', alignItems: 'center', flexDirection: "row",
                 }}>
-                  <Image source={imageSelection(searchedUser.pfp)}
+                  <View style={{
+                    backgroundColor: "#F8F8F800",
+                    justifyContent: 'center', alignItems: 'center', flexDirection: "row",
+                  }}>
+                    <Image source={imageSelection(searchedUser.pfp)}
                       style={{
-                          width: 30, height: 30,
-                          borderRadius: 4, borderWidth: 0, borderColor: "#333",
-                      }}/>
-                  <Text style={{
+                        width: 30, height: 30,
+                        borderRadius: 4, borderWidth: 0, borderColor: "#333",
+                      }} />
+                    <Text style={{
                       paddingLeft: 12,
                       textAlign: 'left',
                       fontSize: 18,
                       fontWeight: '600',
                       color: "#222",
-                      }}>
+                    }}>
                       {searchedUser.name}
-                  </Text>
-                </View>
-                {(searchedUser.uid == auth.currentUser.uid) ? (
-                  <Text style={{
+                    </Text>
+                  </View>
+                  {(searchedUser.uid == auth.currentUser.uid) ? (
+                    <Text style={{
                       paddingRight: 5,
                       textAlign: 'center',
                       fontSize: 15,
                       fontWeight: '700',
                       color: "#1174EC",
-                      }}>
+                    }}>
                       {"YOU"}
-                  </Text>
-                ) : (
-                <TouchableOpacity activeOpacity={0.7} onPress={createDM}
-                  style={{
-                    backgroundColor: "#F8F8F800", paddingLeft: 12, paddingRight: 7, paddingVertical: 3,
-                    justifyContent: 'center', alignItems: 'center', flexDirection: "row",
-                    borderRadius: 50, borderWidth: 2, borderColor: "#3D8D04",
-                }}>
-                  <Text style={{
-                      paddingRight: 5,
-                      textAlign: 'left',
-                      fontSize: 15,
-                      fontWeight: '700',
-                      color: "#3D8D04",
+                    </Text>
+                  ) : (
+                    <TouchableOpacity activeOpacity={0.7} onPress={createDM}
+                      style={{
+                        backgroundColor: "#F8F8F800", paddingLeft: 12, paddingRight: 7, paddingVertical: 3,
+                        justifyContent: 'center', alignItems: 'center', flexDirection: "row",
+                        borderRadius: 50, borderWidth: 2, borderColor: "#3D8D04",
                       }}>
-                      {"CHAT"}
-                  </Text>
-                  <Ionicons name="chatbubble-ellipses-outline" size={20} color="#3D8D04" />
-                </TouchableOpacity>
-                )}
-              </View>
-            ) : (
-              <Text style={{
-                fontSize: 18,
-                fontWeight: '500',
-                color: 'black',
-                textAlign: "center",
-              }}>
-                Phone number not found
-              </Text>
-            )
-            )
-          }
+                      <Text style={{
+                        paddingRight: 5,
+                        textAlign: 'left',
+                        fontSize: 15,
+                        fontWeight: '700',
+                        color: "#3D8D04",
+                      }}>
+                        {"CHAT"}
+                      </Text>
+                      <Ionicons name="chatbubble-ellipses-outline" size={20} color="#3D8D04" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ) : (
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '500',
+                  color: 'black',
+                  textAlign: "center",
+                }}>
+                  Phone number not found
+                </Text>
+              )
+              )
+            }
           </View>
         </MyView>
       </View>
@@ -363,69 +375,84 @@ const DirectMessagesTab = ({ navigation }) => {
         paddingVertical: 0, paddingHorizontal: 0, marginTop: 15,
         justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
       }}>
-				{chats.map(({ id, data }) => (
-					<TouchableOpacity key={id} activeOpacity={0.7} onPress={() => {
-              navigation.push("Chat", { topicId: id, topicName: "DM", isDM: true });
-            }}
+        {chats.map(({ id, data }) => (
+          <TouchableOpacity key={id} activeOpacity={0.7} onPress={() => {
+            setIsLoadingDMs(true);
+            const otherUserFullName = getSenderName(id)
+            setTimeout(() => navigation.push("Chat", { topicId: id, topicName: "DM", isDM: true, otherUserFullName }));
+          }}
             style={[{
-              width: "90%", height: 70,
-              marginLeft: "10%", paddingLeft: 20, paddingRight: 0, marginBottom: 20,
+              width: "95%", height: 70,
+              marginLeft: "5%", paddingLeft: 20, paddingRight: 0, marginBottom: 20,
               backgroundColor: "#fff",
               justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
-              borderWidth: 0, borderRadius: 5,
+              borderWidth: 0, borderTopLeftRadius: 5, borderBottomLeftRadius: 5,
             },
             {
-                shadowColor: "#000", shadowOffset: {width: 0, height: 2},
-                shadowRadius: 1, shadowOpacity: 0.3,
+              shadowColor: "#000", shadowOffset: { width: 0, height: 2 },
+              shadowRadius: 1, shadowOpacity: 0.3,
             }]}>
+            <View style={{
+              width: "100%", borderWidth: 0,
+              justifyContent: "space-between", alignItems: 'center', flexDirection: "row",
+            }}>
               <View style={{
-                width: "100%", borderWidth: 0,
-                justifyContent: "space-between", alignItems: 'center', flexDirection: "row",
+                borderWidth: 0,
+                justifyContent: "center", alignItems: 'center', flexDirection: "row",
               }}>
+                <Image source={imageSelection(getSenderPFP(id))}
+                  style={{
+                    width: 40, height: 40,
+                    borderRadius: 4, borderWidth: 0, borderColor: "#333",
+                  }} />
                 <View style={{
-                  borderWidth: 0,
-                  justifyContent: "center", alignItems: 'center', flexDirection: "row",
+                  height: 44, marginLeft: 20, borderWidth: 0,
+                  justifyContent: "flex-start", alignItems: 'flex-start', flexDirection: "column",
                 }}>
-                  <Image source={imageSelection(getSenderPFP(id))}
-                    style={{
-                        width: 40, height: 40,
-                        borderRadius: 4, borderWidth: 0, borderColor: "#333",
-                    }}/>
-                  <View style={{
-                    height: 44, marginLeft: 20, borderWidth: 0,
-                    justifyContent: "flex-start", alignItems: 'flex-start', flexDirection: "column",
+                  <Text style={{
+                    marginBottom: 3,
+                    fontSize: 18,
+                    fontWeight: '700',
+                    color: 'black',
+                    textAlign: "left",
                   }}>
-                    <Text style={{
-                      marginBottom: 3,
-                      fontSize: 18,
-                      fontWeight: '700',
-                      color: 'black',
-                      textAlign: "left",
-                    }}>
-                      {getSenderName(id)}
-                    </Text>
-                    <Text style={{
-                      fontSize: 14,
-                      fontWeight: '500',
-                      color: '#777',
-                      textAlign: "left",
-                    }}>
-                      {getMessage(id)}
-                    </Text>
-                  </View>
-                </View>
-                <View style={{
-                  width: 50, height: 50, borderWidth: 0,
-                  justifyContent: "center", alignItems: 'center', flexDirection: "row",
-                }}>
-                  <Ionicons name="chevron-forward" size={30} color="#333" />
+                    {getSenderName(id)}
+                  </Text>
+                  <Text style={{
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: '#777',
+                    textAlign: "left",
+                  }}>
+                    {getMessage(id)}
+                  </Text>
                 </View>
               </View>
+              <View style={{
+                width: 50, height: 50, borderWidth: 0,
+                justifyContent: "center", alignItems: 'center', flexDirection: "row",
+              }}>
+                {isLoadingDMs
+                  ? <ActivityIndicator
+                    size="small"
+                    color="#363732"
+                    style={{ marginRight: 10 }}
+                  />
+                  : <Icon
+                    name='chevron-right'
+                    type='entypo'
+                    color='#363732'
+                    size={30}
+                    style={{ marginRight: 10 }}
+                  />
+                }
+              </View>
+            </View>
           </TouchableOpacity>
-				))}
-			</ScrollView>
-		</SafeAreaView>
-	);
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({

@@ -7,6 +7,7 @@ import React, {
     useState,
 } from 'react';
 import {
+    ActivityIndicator,
     Linking,
     Keyboard,
     KeyboardAvoidingView,
@@ -66,6 +67,8 @@ import LineDivider from '../../components/LineDivider';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 import helpers from '../../helperFunctions/helpers';
 
+import SkeletonContent from 'react-native-skeleton-content';
+
 // *************************************************************
 
 const screenHeight = Dimensions.get('screen').height;
@@ -82,6 +85,7 @@ const ChatScreen = ({ navigation, route }) => {
     const color = route.params.color;
     const coverImageNumber = route.params.coverImageNumber;
     const isDM = route.params.isDM;
+    const otherUserFullName = route.params.otherUserFullName;
     const [generalId, setgeneralId] = useState('');
 
     const [input, setInput] = useState('');
@@ -141,7 +145,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         pinMapFunction();
-                // return () => {
+        // return () => {
         //     setPinMap();
         // }
     }, [messages, isFocused]);
@@ -189,14 +193,14 @@ const ChatScreen = ({ navigation, route }) => {
                 .then((result) => {
 
                     senders[uid] = result.data();
-                    
+
                 });
         }
         setMessageSenders(senders);
 
-        flatList.current.scrollToEnd({animated: true});
+        flatList.current.scrollToEnd({ animated: true });
     };
-    
+
     useEffect(() => {
         messageSendersHelper();
     }, [messageSenderUIDs]);
@@ -220,7 +224,7 @@ const ChatScreen = ({ navigation, route }) => {
     const resetTopicMap = () => {
         let values = {};
         for (const topic of topics) {
-            if(topic.data.originalMessageUID != undefined) {
+            if (topic.data.originalMessageUID != undefined) {
                 values[topic.data.originalMessageUID] = {
                     id: topic.id,
                     data: topic.data,
@@ -251,14 +255,14 @@ const ChatScreen = ({ navigation, route }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: groupName || "DM",
+            title: groupName || `DMs: ${otherUserFullName}`,
             headerStyle: '',
             headerTitleStyle: { color: 'black' },
-            headerTitleContainerStyle: { alignItems: 'center', width: 250},
+            headerTitleContainerStyle: { alignItems: 'center', width: 250 },
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={() => {(isDM) ? (navigation.goBack()) : goBackward()}}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => { (isDM) ? (navigation.goBack()) : goBackward() }}>
                         <Icon
                             name='arrow-back'
                             type='ionicon'
@@ -269,46 +273,22 @@ const ChatScreen = ({ navigation, route }) => {
                 </View>
             ),
             headerRight: () => (
-                (isDM) ? (
-                <View style={{
-                        flexDirection: "row",
-                        marginRight: 20,
-                    }}>
-                    {/* <MyView hide={false}>
-                        <Menu>
-                            <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
-                                <Entypo name="dots-three-horizontal" size={30} color="black" />
-                            </MenuTrigger>
-                            <MenuOptions style={{
-                                borderRadius: 12, backgroundColor: "#fff",
-                            }}
-                            customStyles={{
-                                optionsContainer: {
-                                    borderRadius: 15, backgroundColor: "#666",
-                                },
+                (isDM)
+                    ? null
+                    : (
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                marginRight: 12,
                             }}>
-                                <IconOption value={1} isLast={true} isDestructive={false} iconName='bookmark' text='View Pins'
-                                    selectFunction={() => {
-                                        navigation.navigate("Pins", { topicId, topicName });
-                                    }}/>
-                            </MenuOptions>
-                        </Menu>
-                    </MyView> */}
-                </View>
-                ) : (
-                <View
-                    style={{
-                        flexDirection: "row",
-                        marginRight: 12,
-                    }}>
-                    <TouchableOpacity
-                        activeOpacity={0.5}
-                        onPress={toggleOverlay}
-                    >
-                        <Entypo name="dots-three-horizontal" size={30} color="black" />
-                    </TouchableOpacity>
-                </View>
-                )
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={toggleOverlay}
+                            >
+                                <Entypo name="dots-three-horizontal" size={30} color="black" />
+                            </TouchableOpacity>
+                        </View>
+                    )
             ),
         });
 
@@ -353,7 +333,7 @@ const ChatScreen = ({ navigation, route }) => {
         Keyboard.dismiss();
 
         const trimmedInput = input.trim();
-        if(trimmedInput.length > 0) {
+        if (trimmedInput.length > 0) {
 
             db.collection('chats').doc(topicId).collection('messages').add({
                 editedTime: null,
@@ -376,13 +356,13 @@ const ChatScreen = ({ navigation, route }) => {
 
     const enterTopic = async (id, name) => {
         // if (name != "General") {
-            navigation.navigate("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber });
-            // update the topicMap of the current user here
-            mapUpdate[`topicMap.${id}`] = firebase.firestore.FieldValue.serverTimestamp()
-            await db.collection('users').doc(auth.currentUser.uid).update(mapUpdate)
-            
-            console.log("topic entered and topicMap updated for: ", id)
-                // find the topic in the topic map
+        navigation.navigate("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber });
+        // update the topicMap of the current user here
+        mapUpdate[`topicMap.${id}`] = firebase.firestore.FieldValue.serverTimestamp()
+        await db.collection('users').doc(auth.currentUser.uid).update(mapUpdate)
+
+        console.log("topic entered and topicMap updated for: ", id)
+        // find the topic in the topic map
 
         // }
         toggleTopicSelection();
@@ -390,7 +370,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     const enterTopicFromMessage = (id) => {
         const topic = getTopicData(id);
-        if(topic != null) {
+        if (topic != null) {
             navigation.navigate("Chat", { topicId: topic.id, topicName: topic.data.topicName, groupId, groupName, groupOwner, color, coverImageNumber });
         }
     };
@@ -449,21 +429,21 @@ const ChatScreen = ({ navigation, route }) => {
 
     const viewPin = (id, data) => {
         const pin = getPinData(id);
-        if(pin != null) {
+        if (pin != null) {
             navigation.push("ViewPin", { topicId, topicName, groupId, groupName, pinId: pin.id, pinData: pin.data, message: data });
         }
     };
 
     const getPinData = (uid) => {
         //pinMap != undefined && pinMap[id.toString()] != undefined
-        if(pinMap != undefined && uid != undefined && pinMap[uid.toString()] != undefined) {
+        if (pinMap != undefined && uid != undefined && pinMap[uid.toString()] != undefined) {
             return (pinMap[uid.toString()]);
         }
         else return null;
     };
 
     const getTopicData = (uid) => {
-        if(topicMap != undefined && uid != undefined && topicMap[uid.toString()] != undefined) {
+        if (topicMap != undefined && uid != undefined && topicMap[uid.toString()] != undefined) {
             return (topicMap[uid.toString()]);
         }
         else return null;
@@ -472,7 +452,7 @@ const ChatScreen = ({ navigation, route }) => {
     const deleteMessage = (id) => {
         //delete pin(if applicable), then message
         const pinData = getPinData(id);
-        if(pinData != null) { //then delete pin before deleting message
+        if (pinData != null) { //then delete pin before deleting message
             db.collection("chats").doc(topicId).collection("pins").doc(pinData.id).delete();
         }
 
@@ -480,7 +460,7 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const likeMessage = (id, membersWhoReacted) => {
-        if((membersWhoReacted.some(u => (u == auth.currentUser.uid)))) {
+        if ((membersWhoReacted.some(u => (u == auth.currentUser.uid)))) {
             removeUserLike(id);
         }
         else {
@@ -499,9 +479,9 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const openTextMessage = () => {
-		const textMessageText = `Hey, have you ever head of the FamilyChat app? Join in on the conversation by clicking this download link: https://www.familychat.app/`
-		Linking.openURL(`sms://''&body=${textMessageText}`)
-	}
+        const textMessageText = `Hey, have you ever head of the FamilyChat app? Join in on the conversation by clicking this download link: https://www.familychat.app/`
+        Linking.openURL(`sms://''&body=${textMessageText}`)
+    }
 
     const [copiedText, setCopiedText] = useState(false)
 
@@ -517,7 +497,7 @@ const ChatScreen = ({ navigation, route }) => {
                     <>
                         {/* Overlay */}
                         <Overlay isVisible={overlayIsVisible} onBackdropPress={toggleOverlay}
-                            containerStyle={{padding: 0,}}
+                            containerStyle={{ padding: 0, }}
                             overlayStyle={{
                                 width: screenWidth - 25,
                                 borderRadius: 20,
@@ -539,9 +519,11 @@ const ChatScreen = ({ navigation, route }) => {
                                     {/* Group Icon -top left, height change Top section's height */}
                                     <Image
                                         source={helpers.getGroupCoverImage(color, coverImageNumber)}
-                                        style={{ width: 85, height: 85,
+                                        style={{
+                                            width: 85, height: 85,
                                             marginLeft: 10, marginTop: 10,
-                                            borderRadius: 5, }}
+                                            borderRadius: 5,
+                                        }}
                                     />
                                     {/* Left section aligned next to Group Icon */}
                                     <View style={{
@@ -631,11 +613,11 @@ const ChatScreen = ({ navigation, route }) => {
                                         backgroundColor: "#fff", borderWidth: 1, borderColor: "#333", borderRadius: 3,
                                         justifyContent: "center", alignItems: "center", flexDirection: "row",
                                     }}>
-                                    <MaterialIcons name="settings" size={20} color="black" style={{marginRight: 10}}/>
+                                    <MaterialIcons name="settings" size={20} color="black" style={{ marginRight: 10 }} />
                                     <Text style={styles.groupDetailsText}>
                                         {"Settings"}
                                     </Text>
-                                    
+
                                 </TouchableOpacity>
                                 {/* Invite! */}
                                 <TouchableOpacity
@@ -672,7 +654,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     }
                                 </TouchableOpacity>
                             </View>
-                            
+
                             <View style={{
                                 width: screenWidth - 25, borderBottomLeftRadius: 20, borderBottomRightRadius: 20,
                                 marginBottom: -10, paddingHorizontal: 20, paddingVertical: 20,
@@ -688,10 +670,10 @@ const ChatScreen = ({ navigation, route }) => {
                                     {/* Pins */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Pins") }}
                                         style={[styles.featuresOuterView,
-                                            {
-                                                shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                                shadowRadius: 3, shadowOpacity: 0.25,
-                                            }]}>
+                                        {
+                                            shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
                                         <Entypo name="pin" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
                                             Pins
@@ -701,10 +683,10 @@ const ChatScreen = ({ navigation, route }) => {
                                     {/* Banners */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Banners")}
                                         style={[styles.featuresOuterView,
-                                            {
-                                                shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                                shadowRadius: 3, shadowOpacity: 0.25,
-                                            }]}>
+                                        {
+                                            shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
                                         <Entypo name="megaphone" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
                                             Alerts
@@ -714,10 +696,10 @@ const ChatScreen = ({ navigation, route }) => {
                                     {/* Events */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Events")}
                                         style={[styles.featuresOuterView,
-                                            {
-                                                shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                                shadowRadius: 3, shadowOpacity: 0.25,
-                                            }]}>
+                                        {
+                                            shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
                                         <Entypo name="calendar" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
                                             Events
@@ -725,7 +707,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     </TouchableOpacity>
                                 </View>
 
-                                <Divider width={1} color={"#777"} style={{width: screenWidth - 25, marginTop: 10,}}/>
+                                <Divider width={1} color={"#777"} style={{ width: screenWidth - 25, marginTop: 10, }} />
                                 <View style={{
                                     width: "100%", marginBottom: 10, marginTop: 10,
                                     justifyContent: "felx-start", alignItems: "center", flexDirection: "row",
@@ -748,10 +730,10 @@ const ChatScreen = ({ navigation, route }) => {
                                 }}>
                                     {/* Polls */}
                                     <View style={[styles.featuresOuterViewDisabled,
-                                        {
-                                            // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                            // shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
+                                    {
+                                        // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                        // shadowRadius: 3, shadowOpacity: 0.25,
+                                    }]}>
                                         <Entypo name="bar-graph" size={30} color="#777" />
                                         <Text style={styles.featuresTextDisabled}>
                                             Polls
@@ -760,10 +742,10 @@ const ChatScreen = ({ navigation, route }) => {
 
                                     {/* Images */}
                                     <View style={[styles.featuresOuterViewDisabled,
-                                        {
-                                            // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                            // shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
+                                    {
+                                        // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                        // shadowRadius: 3, shadowOpacity: 0.25,
+                                    }]}>
                                         <Entypo name="images" size={30} color="#777" />
                                         <Text style={styles.featuresTextDisabled}>
                                             Images
@@ -772,10 +754,10 @@ const ChatScreen = ({ navigation, route }) => {
 
                                     {/* Lists */}
                                     <View style={[styles.featuresOuterViewDisabled,
-                                        {
-                                            // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                            // shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
+                                    {
+                                        // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                        // shadowRadius: 3, shadowOpacity: 0.25,
+                                    }]}>
                                         <Ionicons name="list" size={30} color="#777" />
                                         <Text style={styles.featuresTextDisabled}>
                                             Lists
@@ -828,7 +810,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 }}>
                                     {"TOPICS"}
                                 </Text>
-                                { (topicSelectionEnabled) ? (
+                                {(topicSelectionEnabled) ? (
                                     <Entypo name="chevron-down" size={25} color="white" />
                                 ) : (
                                     <Entypo name="chevron-up" size={25} color="white" />
@@ -852,7 +834,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 contentContainerStyle={{
                                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                                 }}>
-                                <TouchableOpacity onPress={() => {navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber })}} activeOpacity={0.2} //toggleTopicSelection
+                                <TouchableOpacity onPress={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber }) }} activeOpacity={0.2} //toggleTopicSelection
                                     style={{
                                         height: 40, maxWidth: 220, backgroundColor: "#3D8D04",
                                         borderWidth: 2, borderColor: "#000", borderRadius: 20,
@@ -871,49 +853,49 @@ const ChatScreen = ({ navigation, route }) => {
                                     <Ionicons name="chatbubble-ellipses-outline" size={20} color="white" />
                                 </TouchableOpacity>
 
-                                <Divider width={1} style={{width: "90%",}}/>
+                                <Divider width={1} style={{ width: "90%", }} />
 
                                 <View style={{
                                     justifyContent: "flex-start", alignItems: "center", flex: 0,
                                     marginBottom: 0, marginTop: 15, backgroundColor: "#ccf0", width: "100%",
                                 }}>
-                                    { (topicName!="General") ? (
-                                    <TouchableOpacity onPress={() => {enterTopic(generalId, "General")}} activeOpacity={0.7}
-                                        style={{
-                                            width: 250, height: 45, backgroundColor: "#E5E5E5",
-                                            borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
-                                            justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                                        }}>
-                                        <Text style={{
-                                            fontSize: 16,
-                                            fontWeight: '600',
-                                            color: '#333',
-                                            textAlign: "center",
-                                            paddingLeft: 12,
-                                        }}>
-                                            General
-                                        </Text>
-                                        <Entypo name="chevron-right" size={25} color="black" />
-                                    </TouchableOpacity>
+                                    {(topicName != "General") ? (
+                                        <TouchableOpacity onPress={() => { enterTopic(generalId, "General") }} activeOpacity={0.7}
+                                            style={{
+                                                width: 250, height: 45, backgroundColor: "#E5E5E5",
+                                                borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15,
+                                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                            }}>
+                                            <Text style={{
+                                                fontSize: 16,
+                                                fontWeight: '600',
+                                                color: '#333',
+                                                textAlign: "center",
+                                                paddingLeft: 12,
+                                            }}>
+                                                General
+                                            </Text>
+                                            <Entypo name="chevron-right" size={25} color="black" />
+                                        </TouchableOpacity>
                                     ) : (
-                                    <TouchableOpacity onPress={() => {}} activeOpacity={1}
-                                        style={{
-                                            width: 300, height: 45, backgroundColor: "#fff",
-                                            borderWidth: 2, borderColor: "#3D8D04", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
-                                            justifyContent: "justify-start", alignItems: "center", flexDirection: "row",
-                                            borderLeftWidth: 50, marginLeft: -50,
-                                        }}>
-                                        <Fontisto name="play" size={15} color="white" style={{marginLeft: -30,}}/>
-                                        <Text style={{
-                                            fontSize: 16,
-                                            fontWeight: '800',
-                                            color: 'black',
-                                            textAlign: "center",
-                                            paddingLeft: 28,
-                                        }}>
-                                            General
-                                        </Text>
-                                    </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => { }} activeOpacity={1}
+                                            style={{
+                                                width: 300, height: 45, backgroundColor: "#fff",
+                                                borderWidth: 2, borderColor: "#3D8D04", borderRadius: 5, paddingRight: 5, marginBottom: 15,
+                                                justifyContent: "justify-start", alignItems: "center", flexDirection: "row",
+                                                borderLeftWidth: 50, marginLeft: -50,
+                                            }}>
+                                            <Fontisto name="play" size={15} color="white" style={{ marginLeft: -30, }} />
+                                            <Text style={{
+                                                fontSize: 16,
+                                                fontWeight: '800',
+                                                color: 'black',
+                                                textAlign: "center",
+                                                paddingLeft: 28,
+                                            }}>
+                                                General
+                                            </Text>
+                                        </TouchableOpacity>
                                     )}
                                     {/* <View style={{ height: 30, width: 10, backgroundColor: "#6660" }} /> */}
                                     <MyView hide={topics.length <= 1}
@@ -925,8 +907,8 @@ const ChatScreen = ({ navigation, route }) => {
                                         }}>
                                         {/* The topics as a map */}
                                         <View style={{
-                                                maxHeight: `${topics.length - 1}` * 45, width: "100%",
-                                            }}>
+                                            maxHeight: `${topics.length - 1}` * 45, width: "100%",
+                                        }}>
                                             {topics.filter((topic) => topic.data.topicName != "General").map(({ id, data }) => (
                                                 <MyView hide={data.topicName == "General"} key={id}
                                                     style={{
@@ -944,45 +926,45 @@ const ChatScreen = ({ navigation, route }) => {
                                                         </Text>
                                                     </TouchableOpacity> */}
 
-                                                    { (topicName != data.topicName) ? (
-                                                    <TouchableOpacity onPress={() => enterTopic(id, data.topicName)} activeOpacity={0.7}
-                                                        style={{
-                                                            width: 250, height: 45, backgroundColor: "#E5E5E5",
-                                                            borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
-                                                            justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                                                        }}>
-                                                        <Text numberOfLines={1} style={{
-                                                            fontSize: 16,
-                                                            fontWeight: '600',
-                                                            color: '#333',
-                                                            textAlign: "left",
-                                                            paddingLeft: 12,
-                                                            flex: 1,
-                                                        }}>
-                                                            {data.topicName}
-                                                        </Text>
-                                                        <Entypo name="chevron-right" size={25} color="black" />
-                                                    </TouchableOpacity>
+                                                    {(topicName != data.topicName) ? (
+                                                        <TouchableOpacity onPress={() => enterTopic(id, data.topicName)} activeOpacity={0.7}
+                                                            style={{
+                                                                width: 250, height: 45, backgroundColor: "#E5E5E5",
+                                                                borderWidth: 1, borderColor: "#777", borderRadius: 5, paddingRight: 5, marginBottom: 15,
+                                                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                                            }}>
+                                                            <Text numberOfLines={1} style={{
+                                                                fontSize: 16,
+                                                                fontWeight: '600',
+                                                                color: '#333',
+                                                                textAlign: "left",
+                                                                paddingLeft: 12,
+                                                                flex: 1,
+                                                            }}>
+                                                                {data.topicName}
+                                                            </Text>
+                                                            <Entypo name="chevron-right" size={25} color="black" />
+                                                        </TouchableOpacity>
                                                     ) : (
-                                                    <TouchableOpacity onPress={() => {}} activeOpacity={1}
-                                                        style={{
-                                                            width: 300, height: 45, backgroundColor: "#fff",
-                                                            borderWidth: 2, borderColor: "#3D8D04", borderRadius: 5, paddingRight: 5, marginBottom: 15, 
-                                                            justifyContent: "justify-start", alignItems: "center", flexDirection: "row",
-                                                            borderLeftWidth: 50, marginLeft: -50,
-                                                        }}>
-                                                        <Fontisto name="play" size={15} color="white" style={{marginLeft: -30,}}/>
-                                                        <Text numberOfLines={1} style={{
-                                                            fontSize: 16,
-                                                            fontWeight: '800',
-                                                            color: 'black',
-                                                            textAlign: "left",
-                                                            paddingLeft: 28,
-                                                            flex: 1,
-                                                        }}>
-                                                            {data.topicName}
-                                                        </Text>
-                                                    </TouchableOpacity>
+                                                        <TouchableOpacity onPress={() => { }} activeOpacity={1}
+                                                            style={{
+                                                                width: 300, height: 45, backgroundColor: "#fff",
+                                                                borderWidth: 2, borderColor: "#3D8D04", borderRadius: 5, paddingRight: 5, marginBottom: 15,
+                                                                justifyContent: "justify-start", alignItems: "center", flexDirection: "row",
+                                                                borderLeftWidth: 50, marginLeft: -50,
+                                                            }}>
+                                                            <Fontisto name="play" size={15} color="white" style={{ marginLeft: -30, }} />
+                                                            <Text numberOfLines={1} style={{
+                                                                fontSize: 16,
+                                                                fontWeight: '800',
+                                                                color: 'black',
+                                                                textAlign: "left",
+                                                                paddingLeft: 28,
+                                                                flex: 1,
+                                                            }}>
+                                                                {data.topicName}
+                                                            </Text>
+                                                        </TouchableOpacity>
                                                     )}
                                                 </MyView>
                                             ))}
@@ -1092,173 +1074,41 @@ const ChatScreen = ({ navigation, route }) => {
                             data={messages} keyExtractor={item => item.id}
                             initialNumToRender={20}
                             // onContentSizeChange= {()=> {}} flatList.current.scrollToEnd()
-                            onEndReachedThreshold={0.5} onEndReached={() => {console.log("End reached!")}}
-                            renderItem={({ item: { id, data} }) => {
-                            return (
+                            onEndReachedThreshold={0.5} onEndReached={() => { console.log("End reached!") }}
+                            renderItem={({ item: { id, data } }) => {
+                                return (
 
-                                messageMap[id] != undefined && messageMap[id].previousMessage != undefined
-                                    && messageMap[id].previousMessage.data != undefined
-                                    && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber ? (
-                                    //message without profile picture
-                                    <View key={id} style={{
-                                        width: "100%",
-                                        justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
-                                        paddingTop: 7,
-                                        paddingHorizontal: 10,
-                                        backgroundColor: "#6660",
-                                    }}>
-                                        <View style={{
-                                            flex: 1,
+                                    messageMap[id] != undefined && messageMap[id].previousMessage != undefined
+                                        && messageMap[id].previousMessage.data != undefined
+                                        && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber ? (
+                                        //message without profile picture
+                                        <View key={id} style={{
                                             width: "100%",
-                                            alignItems: 'flex-start',
-                                            flexDirection: "row",
-                                            // paddingTop: 7,
-                                            // paddingHorizontal: 10,
+                                            justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
+                                            paddingTop: 7,
+                                            paddingHorizontal: 10,
                                             backgroundColor: "#6660",
                                         }}>
                                             <View style={{
-                                                width: 50,
-
-                                                backgroundColor: '#0cc0',
-                                                borderWidth: 2,
-                                                borderColor: '#5550',
-                                                borderRadius: 10,
-                                            }} />
-                                            <View style={styles.textContainer}>
-
-                                                <Menu>
-                                                    <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
-                                                        <View style={{
-                                                            minHeight: 30, marginLeft: 5,
-                                                            flex: 1, flexGrow: 1, justifyContent: "center",
-                                                            backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                            borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                                        }}>
-                                                            <Text style={styles.text}>
-                                                                {data.message}
-                                                            </Text>
-                                                        </View>
-                                                    </MenuTrigger>
-                                                    <MenuOptions style={{
-                                                        borderRadius: 12, backgroundColor: "#fff",
-                                                    }}
-                                                        customStyles={{
-                                                            optionsContainer: {
-                                                                borderRadius: 15, backgroundColor: "#666",
-                                                            },
-                                                        }}>
-                                                        <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
-                                                            isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
-                                                            selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                        <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
-                                                            selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                        <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic'
-                                                            hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
-                                                            selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, originalMessageUID: id }) }} />
-                                                        <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
-                                                        <IconOption value={5} iconName='edit' text='Edit' hide={true} />
-                                                        <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
-                                                            selectFunction={() => {deleteMessage(id)}}/>
-                                                    </MenuOptions>
-                                                </Menu>
-                                            </View>
-
-                                            {/* PIN */}
-                                            { (getPinData(id) != null) ? (
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
-                                                style={{
-                                                    padding: 5, marginLeft: 5,
-                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                                }}>
-                                                <Entypo name="pin" size={25} color="#555" />
-                                            </TouchableOpacity>
-                                            ) : (<View style={{width: 0, height: 0,}} />)}
-
-                                            {/* TOPIC */}
-                                            { (getTopicData(id) != null
-                                                && getTopicData(id).data.members.some(u => (u == auth.currentUser.uid))) ? (
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {enterTopicFromMessage(id)}}
-                                                style={{
-                                                    padding: 5, marginLeft: 5,
-                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                                }}>
-                                                <Ionicons name="chatbubble-ellipses-outline" size={25} color="#555" />
-                                            </TouchableOpacity>
-                                            ) : (<View style={{width: 0, height: 0,}} />)}
-
-                                        </View>
-                                        <MyView hide={data.membersWhoReacted.length == 0} style={{
-                                            width: "100%",
-                                            justifyContent: "flex-end", alignItems: 'flex-start', flexDirection: "row",
-                                            paddingTop: 3, backgroundColor: "#abc0",
-                                        }}>
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {likeMessage(id, data.membersWhoReacted)}}
-                                                style={{
-                                                    paddingLeft: 5, paddingRight: 7, paddingVertical: 2.5,
-                                                    justifyContent: "center", alignItems: 'center', flexDirection: "row",
-                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                    borderWidth: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 2.3 : 1.3,
-                                                    borderColor: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? '#226EDA' : '#9D9D9D',
-                                                    borderRadius: 5,
-                                                }}>
-                                                <Entypo name="heart" size={20} color="#f66" />
-                                                <Text style={{
-                                                    fontSize: 14,
-                                                    fontWeight: '600',
-                                                    textAlign: "left",
-                                                    marginLeft: 5,
-                                                    color: "black",
-                                                }}>
-                                                    {data.membersWhoReacted.length}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </MyView>
-                                    </View>
-                                ) : (
-                                    //Message with profile picture and display name
-                                    <View key={id} style={{
-                                        width: "100%",
-                                        justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
-                                        paddingTop: 20,
-                                        paddingHorizontal: 10,
-                                        backgroundColor: "#6660",
-                                    }}>
-                                        <View style={styles.message}>
-                                            <View style={styles.userContainer}>
-                                                <Image source={imageSelection(getPfp(data.ownerUID))}
-                                                    style={{
-                                                        width: "100%", height: "100%",
-                                                        borderRadius: 7, borderWidth: 1, borderColor: "#777",
-                                                    }} />
-                                            </View>
-                                            <View style={styles.textContainer}>
+                                                flex: 1,
+                                                width: "100%",
+                                                alignItems: 'flex-start',
+                                                flexDirection: "row",
+                                                // paddingTop: 7,
+                                                // paddingHorizontal: 10,
+                                                backgroundColor: "#6660",
+                                            }}>
                                                 <View style={{
-                                                    flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start",
-                                                    flex: 1, flexGrow: 1, backgroundColor: "#3330",
-                                                }}>
-                                                    <Text style={styles.userName}>
-                                                        {getString(data.ownerUID) || "Display Name"}
-                                                    </Text>
-                                                    <Text style={{
-                                                        fontSize: 14,
-                                                        fontWeight: '500',
-                                                        textAlign: "center",
-                                                        marginHorizontal: 0,
-                                                        color: "#555",
-                                                    }}>
-                                                        {(data.timestamp != null) ? (data.timestamp.toDate().toLocaleTimeString("en-US", {
-                                                            hour: "numeric", minute: "2-digit"
-                                                        })) : ("")}
-                                                    </Text>
-                                                </View>
+                                                    width: 50,
 
-                                                <View style={{
-                                                    flexDirection: "row", alignItems: "flex-start",
-                                                    flex: 1, flexGrow: 1, backgroundColor: "#3330",
-                                                }}>
-                                                    <Menu style={{flex: 1,}}>
+                                                    backgroundColor: '#0cc0',
+                                                    borderWidth: 2,
+                                                    borderColor: '#5550',
+                                                    borderRadius: 10,
+                                                }} />
+                                                <View style={styles.textContainer}>
+
+                                                    <Menu>
                                                         <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
                                                             <View style={{
                                                                 minHeight: 30, marginLeft: 5,
@@ -1284,19 +1134,20 @@ const ChatScreen = ({ navigation, route }) => {
                                                                 selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
                                                             <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
                                                                 selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                            <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
+                                                            <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic'
                                                                 hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
                                                                 selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, originalMessageUID: id }) }} />
                                                             <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
                                                             <IconOption value={5} iconName='edit' text='Edit' hide={true} />
                                                             <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
-                                                                selectFunction={() => {deleteMessage(id)}}/>
+                                                                selectFunction={() => { deleteMessage(id) }} />
                                                         </MenuOptions>
                                                     </Menu>
+                                                </View>
 
-                                                    {/* PIN */}
-                                                    { (getPinData(id) != null) ? (
-                                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data)}}
+                                                {/* PIN */}
+                                                {(getPinData(id) != null) ? (
+                                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { viewPin(id, data) }}
                                                         style={{
                                                             padding: 5, marginLeft: 5,
                                                             backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
@@ -1304,12 +1155,12 @@ const ChatScreen = ({ navigation, route }) => {
                                                         }}>
                                                         <Entypo name="pin" size={25} color="#555" />
                                                     </TouchableOpacity>
-                                                    ) : (<View style={{width: 0, height: 0,}} />)}
+                                                ) : (<View style={{ width: 0, height: 0, }} />)}
 
-                                                    {/* TOPIC */}
-                                                    { (getTopicData(id) != null
-                                                        && getTopicData(id).data.members.some(u => (u == auth.currentUser.uid))) ? (
-                                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {enterTopicFromMessage(id)}}
+                                                {/* TOPIC */}
+                                                {(getTopicData(id) != null
+                                                    && getTopicData(id).data.members.some(u => (u == auth.currentUser.uid))) ? (
+                                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { enterTopicFromMessage(id) }}
                                                         style={{
                                                             padding: 5, marginLeft: 5,
                                                             backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
@@ -1317,45 +1168,177 @@ const ChatScreen = ({ navigation, route }) => {
                                                         }}>
                                                         <Ionicons name="chatbubble-ellipses-outline" size={25} color="#555" />
                                                     </TouchableOpacity>
-                                                    ) : (<View style={{width: 0, height: 0,}} />)}
+                                                ) : (<View style={{ width: 0, height: 0, }} />)}
 
+                                            </View>
+                                            <MyView hide={data.membersWhoReacted.length == 0} style={{
+                                                width: "100%",
+                                                justifyContent: "flex-end", alignItems: 'flex-start', flexDirection: "row",
+                                                paddingTop: 3, backgroundColor: "#abc0",
+                                            }}>
+                                                <TouchableOpacity activeOpacity={0.7} onPress={() => { likeMessage(id, data.membersWhoReacted) }}
+                                                    style={{
+                                                        paddingLeft: 5, paddingRight: 7, paddingVertical: 2.5,
+                                                        justifyContent: "center", alignItems: 'center', flexDirection: "row",
+                                                        backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                        borderWidth: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 2.3 : 1.3,
+                                                        borderColor: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? '#226EDA' : '#9D9D9D',
+                                                        borderRadius: 5,
+                                                    }}>
+                                                    <Entypo name="heart" size={20} color="#f66" />
+                                                    <Text style={{
+                                                        fontSize: 14,
+                                                        fontWeight: '600',
+                                                        textAlign: "left",
+                                                        marginLeft: 5,
+                                                        color: "black",
+                                                    }}>
+                                                        {data.membersWhoReacted.length}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </MyView>
+                                        </View>
+                                    ) : (
+                                        //Message with profile picture and display name
+                                        <View key={id} style={{
+                                            width: "100%",
+                                            justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
+                                            paddingTop: 20,
+                                            paddingHorizontal: 10,
+                                            backgroundColor: "#6660",
+                                        }}>
+                                            <View style={styles.message}>
+                                                <View style={styles.userContainer}>
+                                                    <Image source={imageSelection(getPfp(data.ownerUID))}
+                                                        style={{
+                                                            width: "100%", height: "100%",
+                                                            borderRadius: 7, borderWidth: 1, borderColor: "#777",
+                                                        }} />
+                                                </View>
+                                                <View style={styles.textContainer}>
+                                                    <View style={{
+                                                        flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start",
+                                                        flex: 1, flexGrow: 1, backgroundColor: "#3330",
+                                                    }}>
+                                                        <Text style={styles.userName}>
+                                                            {getString(data.ownerUID) || "Display Name"}
+                                                        </Text>
+                                                        <Text style={{
+                                                            fontSize: 14,
+                                                            fontWeight: '500',
+                                                            textAlign: "center",
+                                                            marginHorizontal: 0,
+                                                            color: "#555",
+                                                        }}>
+                                                            {(data.timestamp != null) ? (data.timestamp.toDate().toLocaleTimeString("en-US", {
+                                                                hour: "numeric", minute: "2-digit"
+                                                            })) : ("")}
+                                                        </Text>
+                                                    </View>
+
+                                                    <View style={{
+                                                        flexDirection: "row", alignItems: "flex-start",
+                                                        flex: 1, flexGrow: 1, backgroundColor: "#3330",
+                                                    }}>
+                                                        <Menu style={{ flex: 1, }}>
+                                                            <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                                <View style={{
+                                                                    minHeight: 30, marginLeft: 5,
+                                                                    flex: 1, flexGrow: 1, justifyContent: "center",
+                                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                                }}>
+                                                                    <Text style={styles.text}>
+                                                                        {data.message}
+                                                                    </Text>
+                                                                </View>
+                                                            </MenuTrigger>
+                                                            <MenuOptions style={{
+                                                                borderRadius: 12, backgroundColor: "#fff",
+                                                            }}
+                                                                customStyles={{
+                                                                    optionsContainer: {
+                                                                        borderRadius: 15, backgroundColor: "#666",
+                                                                    },
+                                                                }}>
+                                                                <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
+                                                                    isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
+                                                                    selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
+                                                                <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
+                                                                    selectFunction={() => { addPinFromMessage(data, id) }} />
+                                                                <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
+                                                                    hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
+                                                                    selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, originalMessageUID: id }) }} />
+                                                                <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
+                                                                <IconOption value={5} iconName='edit' text='Edit' hide={true} />
+                                                                <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
+                                                                    selectFunction={() => { deleteMessage(id) }} />
+                                                            </MenuOptions>
+                                                        </Menu>
+
+                                                        {/* PIN */}
+                                                        {(getPinData(id) != null) ? (
+                                                            <TouchableOpacity activeOpacity={0.7} onPress={() => { viewPin(id, data) }}
+                                                                style={{
+                                                                    padding: 5, marginLeft: 5,
+                                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                                }}>
+                                                                <Entypo name="pin" size={25} color="#555" />
+                                                            </TouchableOpacity>
+                                                        ) : (<View style={{ width: 0, height: 0, }} />)}
+
+                                                        {/* TOPIC */}
+                                                        {(getTopicData(id) != null
+                                                            && getTopicData(id).data.members.some(u => (u == auth.currentUser.uid))) ? (
+                                                            <TouchableOpacity activeOpacity={0.7} onPress={() => { enterTopicFromMessage(id) }}
+                                                                style={{
+                                                                    padding: 5, marginLeft: 5,
+                                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                                    borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                                }}>
+                                                                <Ionicons name="chatbubble-ellipses-outline" size={25} color="#555" />
+                                                            </TouchableOpacity>
+                                                        ) : (<View style={{ width: 0, height: 0, }} />)}
+
+                                                    </View>
                                                 </View>
                                             </View>
+                                            <MyView hide={data.membersWhoReacted.length == 0} style={{
+                                                width: "100%",
+                                                justifyContent: "flex-end", alignItems: 'flex-start', flexDirection: "row",
+                                                paddingTop: 3, backgroundColor: "#abc0",
+                                            }}>
+                                                <TouchableOpacity activeOpacity={0.7} onPress={() => { likeMessage(id, data.membersWhoReacted) }}
+                                                    style={{
+                                                        paddingLeft: 5, paddingRight: 7, paddingVertical: 2.5,
+                                                        justifyContent: "center", alignItems: 'center', flexDirection: "row",
+                                                        backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                        borderWidth: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 2.3 : 1.3,
+                                                        borderColor: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? '#226EDA' : '#9D9D9D',
+                                                        borderRadius: 5,
+                                                    }}>
+                                                    <Entypo name="heart" size={20} color="#f66" />
+                                                    <Text style={{
+                                                        fontSize: 14,
+                                                        fontWeight: '600',
+                                                        textAlign: "left",
+                                                        marginLeft: 5,
+                                                        color: "black",
+                                                    }}>
+                                                        {data.membersWhoReacted.length}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </MyView>
                                         </View>
-                                        <MyView hide={data.membersWhoReacted.length == 0} style={{
-                                            width: "100%",
-                                            justifyContent: "flex-end", alignItems: 'flex-start', flexDirection: "row",
-                                            paddingTop: 3, backgroundColor: "#abc0",
-                                        }}>
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {likeMessage(id, data.membersWhoReacted)}}
-                                                style={{
-                                                    paddingLeft: 5, paddingRight: 7, paddingVertical: 2.5,
-                                                    justifyContent: "center", alignItems: 'center', flexDirection: "row",
-                                                    backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                    borderWidth: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 2.3 : 1.3,
-                                                    borderColor: (data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? '#226EDA' : '#9D9D9D',
-                                                    borderRadius: 5,
-                                                }}>
-                                                <Entypo name="heart" size={20} color="#f66" />
-                                                <Text style={{
-                                                    fontSize: 14,
-                                                    fontWeight: '600',
-                                                    textAlign: "left",
-                                                    marginLeft: 5,
-                                                    color: "black",
-                                                }}>
-                                                    {data.membersWhoReacted.length}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </MyView>
-                                    </View>
+                                    )
+
                                 )
-                            
-                        )}}/>
+                            }} />
 
                         {/* Footer */}
                         <View style={styles.footer}>
-                            
+
                             <View style={{
                                 width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
                                 paddingLeft: 15,
@@ -1366,37 +1349,37 @@ const ChatScreen = ({ navigation, route }) => {
                                 <View style={{
                                     width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end",
                                 }}>
-                                <TextInput placeholder={"Type a message..."} onChangeText={(text) => setInput(text)} value={input}
-                                    multiline={true} maxLength={200} //onSubmitEditing={sendMessage}
-                                    style={{
-                                        minHeight: 20, maxWidth: "70%",
-                                        marginBottom: 12, marginTop: 5,
-                                        backgroundColor: "#fff",
-                                        textAlign: 'left',
-                                        fontSize: 16,
-                                        fontWeight: '500',
-                                        color: '#222',
-                                    }}
-                                />
-                                <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
-                                    style={{
-                                        height: 42, width: "25%",
-                                        backgroundColor: (input.length > 0) ? ("#1174EC") : ("#98B0D4"),
-                                        borderRadius: 21,
-                                        justifyContent: "center", alignItems: "center",
-                                    }}>
-                                    <Text style={{
-                                        fontSize: 16,
-                                        fontWeight: '700',
-                                        textAlign: "center",
-                                        color: "white",
-                                    }}>
-                                        {"SEND"}
-                                    </Text>
-                                </TouchableOpacity>
+                                    <TextInput placeholder={"Type a message..."} onChangeText={(text) => setInput(text)} value={input}
+                                        multiline={true} maxLength={200} //onSubmitEditing={sendMessage}
+                                        style={{
+                                            minHeight: 20, maxWidth: "70%",
+                                            marginBottom: 12, marginTop: 5,
+                                            backgroundColor: "#fff",
+                                            textAlign: 'left',
+                                            fontSize: 16,
+                                            fontWeight: '500',
+                                            color: '#222',
+                                        }}
+                                    />
+                                    <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
+                                        style={{
+                                            height: 42, width: "25%",
+                                            backgroundColor: (input.length > 0) ? ("#1174EC") : ("#98B0D4"),
+                                            borderRadius: 21,
+                                            justifyContent: "center", alignItems: "center",
+                                        }}>
+                                        <Text style={{
+                                            fontSize: 16,
+                                            fontWeight: '700',
+                                            textAlign: "center",
+                                            color: "white",
+                                        }}>
+                                            {"SEND"}
+                                        </Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
-                                
+
                         </View>
                     </>
                 </TouchableWithoutFeedback>
@@ -1465,7 +1448,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
     },
     topicNavigator: {
-        
+
     },
     topicSpacer: {
         flex: 1,
