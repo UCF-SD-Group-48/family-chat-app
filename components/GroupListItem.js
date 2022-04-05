@@ -194,7 +194,7 @@ const GroupListItem = ({ id, groupName, enterGroup, groupOwner, color, coverImag
           />
 
           <View style={styles.groupText}>
-            <Text style={styles.cheese}>
+            <Text numberOfLines={1} style={styles.groupNameText}>
               {groupName || 'Group Name'}
             </Text>
             <View style={styles.groupSubtitle}>
@@ -261,9 +261,10 @@ const styles = StyleSheet.create({
 
   groupText: {
     marginLeft: 20,
+    width: 200,
   },
 
-  cheese: {
+  groupNameText: {
     fontSize: 18,
     fontWeight: '700',
     color: 'black',

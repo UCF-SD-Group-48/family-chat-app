@@ -254,6 +254,7 @@ const ChatScreen = ({ navigation, route }) => {
             title: groupName || "DM",
             headerStyle: '',
             headerTitleStyle: { color: 'black' },
+            headerTitleContainerStyle: { alignItems: 'center', width: 250},
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>

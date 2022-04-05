@@ -619,7 +619,8 @@ const styles = StyleSheet.create({
   },
 
   callToActionFooterText: {
-    margin: 15
+    margin: 15,
+    marginBottom: 20
   },
 
 
@@ -630,7 +631,7 @@ const styles = StyleSheet.create({
 
   buttonGroups: {
     width: 210,
-    height: 45,
+    height: 48,
     borderWidth: 2,
     borderStyle: 'solid',
     borderRadius: 200,

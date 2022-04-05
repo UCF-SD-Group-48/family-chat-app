@@ -167,7 +167,6 @@ const ProfileTab = ({ navigation }) => {
         setPushNotifications(userSnapshot.data().pushNotificationEnabled)
         setDiscoverable(userSnapshot.data().discoverableEnabled)
         setFormattedPhoneNumber(`(${userSnapshot.data().phoneNumber.slice(0, 3)}) ${userSnapshot.data().phoneNumber.slice(3, 6)}-${userSnapshot.data().phoneNumber.slice(6, 10)}`)
-
       });
 
     return () => {

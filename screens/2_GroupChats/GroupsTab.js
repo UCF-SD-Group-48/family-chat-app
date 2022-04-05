@@ -304,8 +304,8 @@ const GroupsTab = ({ navigation }) => {
 								<Icon
 									name='folder-plus'
 									type='material-community'
-									size={30}
-									color='#777777'
+									size={25}
+									color='#363732'
 									style={{ marginLeft: 5 }}
 								/>
 							</View>
@@ -331,10 +331,10 @@ const styles = StyleSheet.create({
 	},
 
 	buttonCreateGroup: {
-		width: 240,
-		height: 55,
-		borderColor: '#777777',
-		borderWidth: 3,
+		width: 225,
+		height: 50,
+		borderColor: '#363732',
+		borderWidth: 2,
 		borderStyle: 'solid',
 		borderRadius: 200,
 		flexDirection: 'row',
@@ -344,8 +344,8 @@ const styles = StyleSheet.create({
 	},
 
 	buttonCreateGroupText: {
-		color: '#777777',
-		fontSize: 18,
+		color: '#363732',
+		fontSize: 16,
 		fontWeight: '800',
 		marginRight: 5,
 	}
