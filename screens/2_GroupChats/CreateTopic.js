@@ -214,6 +214,7 @@ const CreateTopic = ({ navigation, route }) => {
                 topicName: newTopicName,
                 members: checked,
                 originalMessageUID: originalMessageUID || "",
+                // parentGroup: groupId
             })
             .then(async (newlyCreatedTopic) => {
                 let topicID = newlyCreatedTopic.id

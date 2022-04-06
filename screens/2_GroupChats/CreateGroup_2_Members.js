@@ -201,6 +201,7 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 						topicOwner: currentUserID,
 						topicName: "General",
 						members: membersArray,
+						// parentGroup: groupID
 					})
 					.then((newlyCreatedTopic) => {
 						let mapTopics = {}

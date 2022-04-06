@@ -100,6 +100,7 @@ const HomeTab = ({ navigation, route }) => {
   // const [blockHidden, setBlockHidden] = useState(false);
   // const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
   const [uid, setUID] = useState(auth.currentUser.uid);
+ 
 
   const [userData, setUserData] = useState(async () => {
     const initialState = await db
@@ -192,6 +193,73 @@ const HomeTab = ({ navigation, route }) => {
   //     setCount(totalMessages)
   //   }
 
+  // }
+
+  // const [groupBlock, setGroupBlock] = useState({})
+  
+
+  // const [groups, setGroups] = useState([{}]);
+  // const [topics, setTopics] = useState([]);
+    
+  // const groupMissed = async () => {
+  //   const thisUser = db.collection('users').doc(auth.currentUser.uid).get();
+  //   const groupArray = thisUser.data().groups;
+
+  //   // Get the group, save the group info.
+  //   for (let group of groupArray) {
+  //     let groupUsers = db
+  //       .collection('groups')
+  //       .doc(group)
+  //       .get()
+  //       .data()
+      
+
+  //     const updategroups = [
+  //       ...groups,
+      
+  //     { 
+  //         groupId: group,
+  //         groupName: groupUsers.groupName,
+  //         groupColor: groupUsers.color,
+  //         groupImage: groupUsers.coverImageNumber
+  //     }
+  //   ];
+
+  //   setGroups(updateGroups);
+
+  //   let currentUser = await db.collection('users').doc(auth.currentUser.uid).get()
+  //   const topicMap = currentUser.data().topicMap
+  //   console.log("topicArray: ", (JSON.stringify(topicMap)));
+
+  //   let topicMapArray = []
+  //   for (let key in topicMap) {
+  //     topicMapArray.push(key)
+  //   }
+
+  //   let topic = db
+  //     .collection('groups')
+  //     .doc(group)
+  //     .collection(topic)
+  //     .where(firebase.firestore.FieldPath.documentId(), 'in', topicMapArray)
+  //     .get().then()
+      
+
+  //     // if topics of group exists as a key of topicMap
+  //     // group == groupID
+
+
+
+
+
+
+  //     // Get the messages, save the message info.
+
+  //     db.collection('books')
+  //     .where(firebase.firestore.FieldPath.documentId(), '==', 'fK3ddutEpD2qQqRMXNW5').get()
+
+      
+      
+  //   }
   // }
 
 
