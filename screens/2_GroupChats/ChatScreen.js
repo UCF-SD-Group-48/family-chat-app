@@ -109,6 +109,35 @@ const ChatScreen = ({ navigation, route }) => {
         setCopiedText(false)
     };
 
+    const deleteDMsConversation = async () => {
+        try {
+            const DMQuery = await db
+                .collection('chats')
+                .doc(topicId)
+                .collection('messages')
+                .get()
+
+            DMQuery.docs.map(async (messageDocument, index) => {
+                console.log(messageDocument.id);
+
+                const messagesDeleteQuery = await db
+                    .collection('chats')
+                    .doc(topicId)
+                    .collection('messages')
+                    .doc(messageDocument.id)
+                    .delete()
+            })
+
+            const chatDocumentDeleteQuery = await db
+                .collection('chats')
+                .doc(topicId)
+                .delete()
+
+            navigation.navigate('DMsTab');
+            
+        } catch (error) { console.log(error) };
+    }
+
     const IconOption = ({ iconName, text, value, isLast, isSpacer, isDestructive, hide, selectFunction }) => (
         (!hide) ? (
             <MenuOption value={value} onSelect={selectFunction}
@@ -274,7 +303,44 @@ const ChatScreen = ({ navigation, route }) => {
             ),
             headerRight: () => (
                 (isDM)
-                    ? null
+                    ? (
+                        <View style={{ marginRight: 12, }}>
+                            <Menu>
+                                <MenuTrigger>
+                                    <Icon
+                                        name='dots-three-horizontal'
+                                        type='entypo'
+                                        color='black'
+                                        size={30}
+                                    />
+                                </MenuTrigger>
+                                <MenuOptions
+                                    style={{
+                                        borderRadius: 12, backgroundColor: "#fff",
+                                    }}
+                                    customStyles={{
+                                        optionsContainer: {
+                                            borderRadius: 15, backgroundColor: "#666",
+                                        },
+                                    }}>
+                                    <MenuOption
+                                        onSelect={() => deleteDMsConversation()}
+                                        style={{ marginBottom: 10, marginTop: 10, flexDirection: 'row', alignItems: 'center' }}>
+                                        <Icon
+                                            name='trash'
+                                            type='feather'
+                                            color='red'
+                                            size={16}
+                                            style={{ marginLeft: 10, }}
+                                        />
+                                        <Text style={{ fontSize: 14, color: 'red', marginLeft: 11 }}>
+                                            Delete Direct Messages
+                                        </Text>
+                                    </MenuOption>
+                                </MenuOptions>
+                            </Menu>
+                        </View>
+                    )
                     : (
                         <View
                             style={{
@@ -328,6 +394,7 @@ const ChatScreen = ({ navigation, route }) => {
                 ));
         return unsubscribe;
     }, [route]);
+
 
     const sendMessage = () => {
         Keyboard.dismiss();

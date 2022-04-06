@@ -94,10 +94,7 @@ const DirectMessagesTab = ({ navigation }) => {
     let currentTime = new Date();
     for (const chat of chats) {
       for (const user of chat.data.members) {
-        if (user == auth.currentUser.uid) {
-          console.log("it's me!");
-        }
-        else {
+        if (user != auth.currentUser.uid) {
           await db.collection('users').doc(user).get()
             .then((result) => {
               senders[chat.id] = {
@@ -123,21 +120,25 @@ const DirectMessagesTab = ({ navigation }) => {
     setMessageSenders(senders);
     setMessageContents(messages);
   };
+
   useEffect(() => {
     messageSendersHelper();
   }, [chats, isFocused]);
+
   const getSenderName = (id) => {
     if (messageSenders != undefined && id != undefined && messageSenders[id.toString()] != undefined) {
       return (messageSenders[id.toString()].data.firstName + " " + messageSenders[id.toString()].data.lastName);
     }
     else return "";
   }
+
   const getSenderPFP = (id) => {
     if (messageSenders != undefined && id != undefined && messageSenders[id.toString()] != undefined) {
       return (messageSenders[id.toString()].data.pfp);
     }
     else return 0;
   }
+
   const getMessage = (id) => {
     if (messageContents != undefined && id != undefined && messageContents[id.toString()] != undefined) {
       return (messageContents[id.toString()].data.message);
@@ -207,7 +208,7 @@ const DirectMessagesTab = ({ navigation }) => {
     if (!snapshot.empty) {
       for (const doc of snapshot.docs) {
         if (doc.data().members.some(u => (u == auth.currentUser.uid))) {
-          navigation.push("Chat", { topicId: doc.id, topicName: "DM", isDM: true });
+          navigation.push("Chat", { topicId: doc.id, topicName: "DM", isDM: true, otherUserFullName: searchedUser.name });
           return;
         }
       }
@@ -217,19 +218,19 @@ const DirectMessagesTab = ({ navigation }) => {
       members: [searchedUser.uid, auth.currentUser.uid],
     })
       .then((newChat) => {
-        navigation.navigate("Chat", { topicId: newChat.id, topicName: "DM", isDM: true });
+        navigation.push("Chat", { topicId: newChat.id, topicName: "DM", isDM: true, otherUserFullName: searchedUser.name });
       });
   }
 
-	const [isLoadingDMs, setIsLoadingDMs] = useState(false);
+  const [isLoadingDMs, setIsLoadingDMs] = useState(false);
 
-	useEffect(async () => {
+  useEffect(async () => {
     setIsLoadingDMs(false);
 
-		return () => {
-			setIsLoadingDMs();
-		};
-	}, [isFocused]);
+    return () => {
+      setIsLoadingDMs();
+    };
+  }, [isFocused]);
 
   return (
     <SafeAreaView style={{ backgroundColor: "#EFEAE2" }}>
@@ -379,6 +380,7 @@ const DirectMessagesTab = ({ navigation }) => {
           <TouchableOpacity key={id} activeOpacity={0.7} onPress={() => {
             setIsLoadingDMs(true);
             const otherUserFullName = getSenderName(id)
+            console.log(id)
             setTimeout(() => navigation.push("Chat", { topicId: id, topicName: "DM", isDM: true, otherUserFullName }));
           }}
             style={[{

@@ -292,7 +292,7 @@ const CreateTopic = ({ navigation, route }) => {
                             onChangeText={(textChange) => {
                                 setNewTopicName(textChange);
                             }}
-                            maxLength={20}
+                            maxLength={18}
                             style={styles.textInputField}
                         />
                         {/* How many Characters newTopicName.length >= 15*/}
@@ -422,7 +422,7 @@ const CreateTopic = ({ navigation, route }) => {
                                                     : <Icon
                                                         name="chatbubble-ellipses"
                                                         type="ionicon"
-                                                        size={20}
+                                                        size={18}
                                                         color="white"
                                                     />
                                                 }
