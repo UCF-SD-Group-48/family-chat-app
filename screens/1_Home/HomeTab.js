@@ -186,41 +186,34 @@ const HomeTab = ({ navigation, route }) => {
   //   }
 
   // }
-
-  // const [groupBlock, setGroupBlock] = useState({})
-
+  
   const isFocused = useIsFocused();
 
   const getMissedMessages = async () => {
 
-    console.log('Entered the getMissedMessages')
 
-    // Hey... When the user goes to this page... Get their current uid
+    // Set 'currentUserUID' from the currently logged in user
     const currentUserUID = auth.currentUser.uid;
-    console.log('Currently logged in as:', currentUserUID)
 
     try {
-      console.log('Enter the TRY, and attempt the get userDocument');
 
-      // Now that you know who is logged in, get the user document.
+      // Get the document of the currently logged in user
       const userQuery = await db
         .collection('users')
         .doc(currentUserUID)
         .get()
         .catch((error) => console.log(error));
 
+      // Set the data from the user document as 'userQueryData' for easy parsing
       const userQueryData = userQuery.data();
-      console.log(userQueryData)
 
-      // now sort through the data, and only grab the fields that you need
-      // get the groups field (ARRAY)
-      // DATA for groups field looks like this: [asdfasdfasd, 2fasjfasd0fsf, asl2jjjj22j]
+      // Set the groups array for referencing, from the user document data
       const userGroupArray = userQueryData.groups;
 
-      // get the topicMap field (MAP)
+      // Set the topicMap map field for referencing, from the user document data
       const userTopicMap = userQueryData.topicMap;
 
-      // set the array for easy comparison with includes
+      // Create new array, comprised only of the topicID (keys) from the userTopicMap
       let userTopicArray = [];
       for (let topicID in userTopicMap) {
         userTopicArray.push(topicID);
@@ -228,55 +221,37 @@ const HomeTab = ({ navigation, route }) => {
 
       console.log('*********************')
 
+      // Map through the user's groups from 'userGroupArray'
       userGroupArray.map(async (groupID, index) => {
 
+        // Get the document of the user's group
         const groupQuery = await db
           .collection('groups')
           .doc(groupID)
           .get()
 
-        // okay you have the group document, now save the data, to have the relevant group information for the block
-        // Data looks like this: { color: yellow, groupName: Cheese, }
+        // Set the data from the group document as 'groupQueryData' for easy parsing
         const groupQueryData = groupQuery.data();
 
-        // now list out all of the topics
+        // Get all of the topics, from the current group
         const groupTopicsQuery = await db
           .collection('groups')
           .doc(groupID)
           .collection('topics')
           .get()
 
-
-        // you have the query of all of the topics
-        // sort through all of the topic documents
-        // print out the data for each topic (in relation to it's group)
+        // Map through the group's topics from 'groupTopicsQuery'
         groupTopicsQuery.docs.map(async (topicObject, index) => {
 
-          // console.log('--------------------')
-          // console.log('groupID', groupID)
-          // console.log('groupName', groupQueryData.groupName)
-          // console.log('topicID', topicObject.id)
-          // console.log('topicName', topicObject.data().topicName)
-          // console.log('--------------------')
-          // console.log(' ')
+          // Check to see if the topic in question, is a part of the user's topicMapArray
+          // We only want to do an additional database call, to find the missed messages, for only the relevant topics
+          if (userTopicArray.includes(topicObject.id)) {
 
-          if (userTopicArray.includes(topicObject.id) === true) {
-
+            // Defining the 'topicID' for ease of referencing
             const topicID = topicObject.id;
 
-            // console.log('groupID', groupID)
-            // console.log('groupName', groupQueryData.groupName)
-
-            // console.log('PING --- YES', topicID)
-            // IN HERE is where you do extra logic, if the user is a part of the topic
-
-            // yes, we have a topic, that the user is a part of
-            // now we want to get the chats shit with that specific topic
-
-            // first console the pair value from the topicID key
-            // console.log('key -> value pair result:', userTopicMap[topicID]);
-
-            // getting the missed messages according the group + topic
+            // Query the database, in the 'chats' collection, for this current relevant topic
+            // Get the "missed messages" (AKA, the messages where the timeStamp > the user's topicMap pair value)
             const chatsQuery = await db
               .collection('chats')
               .doc(topicID)
@@ -285,22 +260,26 @@ const HomeTab = ({ navigation, route }) => {
               .get()
               .catch((error) => console.log(error));
 
+            // Map through the missed messages
             chatsQuery.docs.map(async (message, index) => {
 
+              // Set the data from the missedMessage document as 'messageData' for easy parsing
               const messageData = message.data();
 
-              // just getting the message sender information
+              // Query the database, in the 'users' collection, for the message sender's pfp, and name
               const messageSenderQuery = await db
                 .collection('users')
                 .doc(messageData.ownerUID)
                 .get()
 
+              // Set the data from the messageSenderQuery document as 'messageSenderQueryData' for easy parsing
               const messageSenderQueryData = messageSenderQuery.data();
 
-
+              // Printing out the all of the values, for confirmation of program working
               console.log('groupID:', groupID)
               console.log('groupName:', groupQueryData.groupName)
               console.log('')
+
               console.log('____')
               console.log('topicID:', topicID)
               console.log('topicName:', topicObject.data().topicName)
@@ -317,13 +296,8 @@ const HomeTab = ({ navigation, route }) => {
               const messageTimeSent = messageData.timestamp.toDate().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
               console.log(`[time that the message was sent]`, messageTimeSent);
               console.log('____')
-              console.log('*********************')
 
-              //TONIGHT:
-              // - clean up the comments
-              // - have Pedro relay the structure, and logic back to Evan
-              // - find example of array of objects building
-              // - plan of attack for later
+              console.log('*********************')
 
               //LATER:
               // - get with Tu
@@ -332,6 +306,7 @@ const HomeTab = ({ navigation, route }) => {
               // - fiddle with isFocused logic, so homeTab doesn't run twice (try to fix, or use better solution than isFocused)
               // - store data into package for front-end component displaying/mapping (array of objects, each object is group)
               // - data to be stored, as array of objects
+              // userNotificationGroups.maps(...)
               // [
               //   {
               //     groupID:
@@ -390,49 +365,19 @@ const HomeTab = ({ navigation, route }) => {
               //     ]
               //   },
               // ]
-              
             })
-
-            // const userQueryData = userQuery.data();
-            // console.log(userQueryData)
           }
-
-          // console.log('____')
-
         })
-
-        // console.log('*********************')
-
       })
-
-
-
-      // console.log('print once, what is the flat array of topicIDs', userTopicArray);
-
-
-      // console.log(userTopicMap);
-      // console.log(userTopicMap.map((topicID, index) => {
-
-      // }))
     } catch (error) { console.log(error) };
-
   }
+
 
   useEffect(() => {
 
     getMissedMessages();
-    console.log('RUN THIS');
-
 
   }, [isFocused]);
-
-
-  const [valueChangeAsExample, setValueChangeAsExample] = useState(false);
-
-  useEffect(()=> {
-    console.log('----------------------------------------------------------  Button Clicked')
-
-  }, [valueChangeAsExample]);
 
 
   // const [groups, setGroups] = useState([{}]);
@@ -606,8 +551,8 @@ const HomeTab = ({ navigation, route }) => {
           <View style={styles.interactFeaturesContainer}>
             <TouchableOpacity
               activeOpacity={0.75}
-              onPress={()=>setValueChangeAsExample(!valueChangeAsExample)}
-              >
+              onPress={() => setValueChangeAsExample(!valueChangeAsExample)}
+            >
               <View style={[styles.interactiveFeatureButtonDisabled, { marginRight: 7 }]}>
                 <View style={styles.interactiveFeatureLeftHalfDisabled}>
                   <View style={styles.interactiveFeatureIconBackgroundDisabled}>
