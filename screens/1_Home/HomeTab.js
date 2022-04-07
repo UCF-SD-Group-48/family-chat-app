@@ -60,7 +60,7 @@ import {
 import firebase from 'firebase/compat/app';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused, useScrollToTop } from '@react-navigation/native';
 import { G } from 'react-native-svg';
 
 import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
@@ -121,7 +121,6 @@ const HomeTab = ({ navigation, route }) => {
       headerRight: '',
     });
   }, [navigation]);
-
 
 
   // const [missed, setMissed] = useState([])
@@ -186,11 +185,12 @@ const HomeTab = ({ navigation, route }) => {
   //   }
 
   // }
+
   
   const isFocused = useIsFocused();
+  const [userNotificationGroups, setUserNotificationGroups] = useState([])
 
   const getMissedMessages = async () => {
-
 
     // Set 'currentUserUID' from the currently logged in user
     const currentUserUID = auth.currentUser.uid;
@@ -233,6 +233,10 @@ const HomeTab = ({ navigation, route }) => {
         // Set the data from the group document as 'groupQueryData' for easy parsing
         const groupQueryData = groupQuery.data();
 
+        console.log('^^^^^^^^^^^^^^^^^^^')
+        console.log(groupQueryData.groupName);
+        console.log('^^^^^^^^^^^^^^^^^^^')
+
         // Get all of the topics, from the current group
         const groupTopicsQuery = await db
           .collection('groups')
@@ -240,12 +244,18 @@ const HomeTab = ({ navigation, route }) => {
           .collection('topics')
           .get()
 
+        
+        //Add group information to first object in object array
+
+
         // Map through the group's topics from 'groupTopicsQuery'
         groupTopicsQuery.docs.map(async (topicObject, index) => {
 
           // Check to see if the topic in question, is a part of the user's topicMapArray
           // We only want to do an additional database call, to find the missed messages, for only the relevant topics
           if (userTopicArray.includes(topicObject.id)) {
+
+            //Add all relevent topics to object in object array
 
             // Defining the 'topicID' for ease of referencing
             const topicID = topicObject.id;
@@ -262,6 +272,8 @@ const HomeTab = ({ navigation, route }) => {
 
             // Map through the missed messages
             chatsQuery.docs.map(async (message, index) => {
+
+              //Add the missed messages to the object in the object array
 
               // Set the data from the missedMessage document as 'messageData' for easy parsing
               const messageData = message.data();
@@ -299,6 +311,95 @@ const HomeTab = ({ navigation, route }) => {
 
               console.log('*********************')
 
+
+              //----------------------------------------------------------------------------------------------//
+  
+              // declare groupObj (package), gonna be empty on first run
+              // if group doesn't exist => add group object to groupObj
+              // if
+
+              if (!userNotificationGroups.some(x => x.groupID === groupID)) { // If group exists
+
+                let groupObjtest = [
+            
+                  ...userNotificationGroups,
+                  {
+                    groupID: groupID,
+                    groupName: groupQueryData.groupName,
+                    groupColor: groupQueryData.color,
+                    groupImageNumber: groupQueryData.coverImageNumber,
+                  // groupMissedMessagesCount: (sum of all of the: topicMissedMessagesCount's)
+                    topics : []
+                  }
+                ]
+            
+                setUserNotificationGroups(groupObjtest)
+            
+                //                If Topic Doesn't Exist:
+                //                     Add Topic information to that object
+                let topicRef = groupObjtest.topics
+                const found = topicRef.some(doc => doc.topicID === topicID);
+            
+                if (!found) {
+                  topicRef.push({ topicID: topicID,
+                    topicName: topicObject.data().topicName,
+                    topicMissedMessagesCount: missedMessages.length,
+                    missedMessages : [
+                      {
+                        senderPFP: messageSenderPFP,
+                        senderFullName: messageSenderFullName,
+                        messageText: messageText,
+                        messageTime: messageTimeSent
+                      }]
+                   });
+                } else {
+                  // Add the missed message currently in iteration
+                  topicRef.missedMessages.push({
+                        senderPFP: messageSenderPFP,
+                        senderFullName: messageSenderFullName,
+                        messageText: messageText,
+                        messageTime: messageTimeSent
+                  })
+                } 
+            
+              } else { // else if group doesn't exist
+                // find the index
+                userNotificationGroups.indexOf()
+                const index = userNotificationGroups.findIndex(object => {
+                  return object.id === groupID;
+                });
+            
+                let topicRef = userNotificationGroups[index].groupObjtest.topics
+                const found = topicRef.some(doc => doc.topicID === topicID);
+                if (!found) {
+                  topicRef.push({ topicID: topicID,
+                    topicName: topicObject.data().topicName,
+                    topicMissedMessagesCount: missedMessages.length,
+                    missedMessages : [
+                      {
+                        senderPFP: messageSenderPFP,
+                        senderFullName: messageSenderFullName,
+                        messageText: messageText,
+                        messageTime: messageTimeSent
+                      }]
+                   });
+                } else {
+                  // Add the missed message currently in iteration
+                    topicRef.missedMessages.push({
+                          senderPFP: messageSenderPFP,
+                          senderFullName: messageSenderFullName,
+                          messageText: messageText,
+                          messageTime: messageTimeSent
+                    })
+                  }
+                }
+              // if group doesn't exist
+              
+            }) // chats query
+          }
+        })
+
+
               //LATER:
               // - get with Tu
               // - relay logic to Tu
@@ -307,6 +408,7 @@ const HomeTab = ({ navigation, route }) => {
               // - store data into package for front-end component displaying/mapping (array of objects, each object is group)
               // - data to be stored, as array of objects
               // userNotificationGroups.maps(...)
+              // 
               // [
               //   {
               //     groupID:
@@ -314,7 +416,7 @@ const HomeTab = ({ navigation, route }) => {
               //     groupColor:
               //     groupImageNumber:
               //     groupMissedMessagesCount: (sum of all of the: topicMissedMessagesCount's)
-              //     topics: [
+              //     topics: [ 
               //       {
               //         topicID:
               //         topicName:
@@ -365,17 +467,26 @@ const HomeTab = ({ navigation, route }) => {
               //     ]
               //   },
               // ]
-            })
-          }
-        })
+        // const updateNotifications = [
+        //   ...userNotificationGroups,
+        //   {
+        //     groupID: groupID,
+        //     groupName: groupQuery.groupName,
+        //     groupColor: groupQuery.groupColor,
+        //     groupImageNumber: groupQuery.groupImageNumber
+        //     // groupMissedMessagesCount: (sum of all of the: topicMissedMessagesCount's)
+        //   }
+        // ]
+        // setUserNotificationGroups(updateNotifications)
       })
-    } catch (error) { console.log(error) };
+    } catch (error) { console.log(error) }
   }
 
 
   useEffect(() => {
 
     getMissedMessages();
+    
 
   }, [isFocused]);
 
