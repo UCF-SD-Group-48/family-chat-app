@@ -186,161 +186,214 @@ const Events = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View
-                style={{
+            <ScrollView
+                contentContainerStyle={{
                     width: "100%",
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-                    flex: 1, flexGrow: 1,
+                    flex: 0, flexGrow: 1, borderWidth: 0, paddingBottom: 75,
                 }}>
 
-                <View style={{width: "100%", marginTop: 20,
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "column",}}>
-                {activeEvents.map(({ id, data }) => (
-                    <View key={id} style={{width: "100%",
-                        justifyContent: "flex-start", alignItems: "center", flexDirection: "column",}}>
-                        <View style={[
-                            {
-                                width: "90%",
-                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                                backgroundColor: "#F8D353"
-                            },
-                            {
-                                shadowColor: "#000", shadowOffset: {width: 0, height: 3},
-                                shadowRadius: 3, shadowOpacity: 0.4,
-                            }]}>
-                            <View style={{
-                                justifyContent: "space-between", alignItems: "center", flexDirection: "row",
-                                backgroundColor: "#FDF4D4", borderRadius: 7, marginVertical: 12, marginLeft: 15,
-                                paddingVertical: 7, paddingHorizontal: 12,
-                            }}>
-                                <Entypo name="calendar" size={20} color="#333" style={{
-                                }}/>
-                                <Text style={{
-                                    paddingLeft: 10,
-                                    textAlign: 'left',
-                                    fontSize: 16,
-                                    fontWeight: '700',
-                                    color: "#222",
-                                    }}>
-                                    {"Active Event"}
-                                </Text>
-                            </View>
-                            {(data.ownerUID === auth.currentUser.uid) ? (
-                                <View style={{
-                                    width: 26, height: 26,
-                                    marginRight: 15,
-                                    justifyContent: "center", alignItems: "center", flexDirection: "row",
-                                    backgroundColor: "#F8D353", borderWidth: 2, borderColor: "black", borderRadius: 15,
-                                }}>
-                                    <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} />
-                                </View>
-                            ) : (
-                                <View style={{
-                                    width: 26, height: 26,
-                                    marginRight: 15,
-                                    justifyContent: "center", alignItems: "center", flexDirection: "row",
-                                }}></View>
-                            )}
-                        </View>
-                        <View style={[
-                                {
-                                    width: "90%",
-                                    justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-                                    backgroundColor: "#fff",
-                                },
-                                {
-                                    shadowColor: "#000", shadowOffset: {width: 0, height: 3},
-                                    shadowRadius: 3, shadowOpacity: 0.4,
-                                }
-                            ]}>
-                            
-
-                            {/* Middle section */}
-                            <View style={{
-                                width: "100%", backgroundColor: "#afc0", marginTop: 20,
-                                paddingVertical: 2, paddingHorizontal: 30,
-                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                            }}>
-                                <MaterialIcons name="stars" size={20} color="#333" />
-                                <Text style={{
-                                    paddingLeft: 12,
-                                    textAlign: 'left',
-                                    fontSize: 16,
-                                    fontWeight: '800',
-                                    color: "#222",
-                                    }}>
-                                    {data.title || ""}
-                                </Text>
-                            </View>
-                            <View style={{
-                                width: "100%", backgroundColor: "#afc0", marginTop: 0,
-                                paddingVertical: 2, paddingHorizontal: 30,
-                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                            }}>
-                                <Ionicons name="flag-outline" size={20} color="#333" />
-                                <Text style={{
-                                    paddingLeft: 12,
-                                    textAlign: 'left',
-                                    fontSize: 16,
-                                    fontWeight: '500',
-                                    color: "#222",
-                                    }}>
-                                    {(data.startTime != null) ? (data.startTime.toDate().toLocaleDateString("en-US", {
-                                        month: "short", day: "2-digit", year: "numeric", })
-                                        +" @ "+data.startTime.toDate().toLocaleTimeString("en-US", 
-                                        {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
-                                </Text>
-                            </View>
-                            <View style={{
-                                width: "100%", backgroundColor: "#afc0", marginBottom: 20,
-                                paddingVertical: 2, paddingHorizontal: 30,
-                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                            }}>
-                                <Feather name="file-text" size={18} color="#333" />
-                                <Text numberOfLines={1}
-                                    style={{
-                                        paddingLeft: 12, paddingRight: 12,
-                                        textAlign: 'left',
-                                        fontSize: 16,
-                                        fontWeight: '500',
-                                        color: "#222",
-                                    }}>
-                                    "{data.description}"
-                                </Text>
-                            </View>
-
-
-                            {/* Action */}
-                            <View style={{
-                                minHeight: 0, width: "100%",
-                                marginTop: 5, marginBottom: 15,
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
+                {/* Active Events */}
+                <View style={{
+                    marginTop: 30, marginBottom: 0, width: "100%",
+                    flexDirection: "column", flexShrink: 0,
+                    justifyContent: "flex-start", alignItems: "center",
+                }}>
+                    <View style={{ paddingTop: 0, width: "90%", }}>
+                        {activeEvents.map(({ id, data }) => (
+                        <View key={id} style={{
+                                width: "100%",
+                                backgroundColor: "#fff0", borderWidth: 0,
                                 flex: 0, flexGrow: 0,
                                 flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                                borderRadius: 1,
                             }}>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => { viewEvent(id, data) }}
-                                    style={{
-                                        height: 40, paddingHorizontal: 10,
-                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                        backgroundColor: "#fffb",
-                                        borderColor: "#666", borderWidth: 4, borderRadius: 20,
-                                    }}>
-                                    <Text style={{
-                                        fontSize: 15,
-                                        fontWeight: '700',
-                                        textAlign: "center",
-                                        marginHorizontal: 15,
-                                        color: "black",
-                                    }}>
-                                        {"View Event"}
-                                    </Text>
-                                    <Entypo name="chevron-right" size={24} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
 
-                    ))}
+                            {/* Top Container */}
+                            <View
+                                style={[
+                                    {
+                                        width: "100%", marginTop: 1,
+                                        backgroundColor: "#F8D353", borderWidth: 0,
+                                        flex: 0, flexGrow: 0, flexDirection: "row",
+                                        justifyContent: "flex-start", alignItems: "center",
+                                        borderRadius: 1,
+                                    },
+                                    {
+                                        shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                                        shadowRadius: 3, shadowOpacity: 0.4,
+                                    }
+                                ]} >
+                                {/* Active Event */}
+                                <View style={{
+                                    // minWidth: "10%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flex: 1, flexGrow: 1, flexDirection: "row",
+                                    justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <View style={{
+                                        width: "100%", height: 60,
+                                        paddingHorizontal: 15, paddingVertical: 10,
+                                        backgroundColor: "#F8D353", borderRadius: 0, borderWidth: 0,
+                                        flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                    }}>
+                                        <View style={{
+                                            width: 190, height: 35, paddingHorizontal: 15, borderRadius: 7,
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#FDF4D4",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <Entypo name="calendar" size={20} color="#333" />
+                                            <Text style={{
+                                                        fontSize: 18,
+                                                        fontWeight: '800',
+                                                        textAlign: "left",
+                                                        marginLeft: 15, marginRight: 10,
+                                                        color: "#333",
+                                                        flex: 1,
+                                                }}>
+                                                    {"Active Event"}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+                                {/* Moderator */}
+                                {(data.ownerUID === auth.currentUser.uid) ? (
+                                    <View style={{
+                                        minWidth: 26, minHeight: 26,
+                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
+                                        flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
+                                    }}>
+                                        <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} />
+                                    </View>
+                                ) : (
+                                    <View style={{
+                                        minWidth: 26, minHeight: 26,
+                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
+                                        flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
+                                    }}>
+                                        {/* <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} /> */}
+                                    </View>
+                                )}
+                            </View>
+
+                            {/* Middle Container */}
+                            <View style={[
+                                    {
+                                        width: "100%", marginTop: 0, marginBottom: 30,
+                                        backgroundColor: "#fff", borderWidth: 0,
+                                        flex: 0, flexGrow: 0, flexDirection: "row",
+                                        justifyContent: "flex-start", alignItems: "center",
+                                        borderRadius: 1,
+                                    },
+                                    {
+                                        shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+                                        shadowRadius: 3, shadowOpacity: 0.4,
+                                    }
+                                ]} >
+                                {/* Left Content */}
+                                <View style={{
+                                    minWidth: "10%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flex: 1, flexGrow: 1, flexDirection: "row",
+                                    justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <View style={{
+                                        width: "100%", //height: 90,
+                                        paddingHorizontal: 15, paddingVertical: 10,
+                                        backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
+                                        flexDirection: "column", justifyContent: "space-between", alignItems: "center",
+                                    }}>
+                                        <View style={{
+                                            width: "90%", marginTop: 10, marginBottom: 2,
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <MaterialIcons name="stars" size={20} color="#333" />
+                                            <Text numberOfLines={1}
+                                                    style={{
+                                                        fontSize: 18,
+                                                        fontWeight: '800',
+                                                        textAlign: "left",
+                                                        marginLeft: 15, marginRight: 10,
+                                                        color: "#333",
+                                                        flex: 1,
+                                                }}>
+                                                    {data.title}
+                                            </Text>
+                                        </View>
+                                        <View style={{
+                                            width: "90%",marginBottom: 2,
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <Ionicons name="flag-outline" size={20} color="#333" />
+                                            <Text numberOfLines={1}
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontWeight: '400',
+                                                    textAlign: "left",
+                                                    marginLeft: 15, marginRight: 10,
+                                                    color: "#333",
+                                                    flex: 1,
+                                            }}>
+                                                {(data.startTime != null) ? (data.startTime.toDate().toLocaleDateString("en-US", {
+                                                month: "short", day: "2-digit", year: "numeric", })
+                                                +" @ "+data.startTime.toDate().toLocaleTimeString("en-US", 
+                                                {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
+                                            </Text>
+                                        </View>
+                                        <View style={{
+                                            width: "90%",
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        }}>
+                                            <Feather name="file-text" size={18} color="#333" />
+                                            <Text numberOfLines={1}
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontWeight: '400',
+                                                    textAlign: "left",
+                                                    marginLeft: 15, marginRight: 10,
+                                                    color: "#333",
+                                                    flex: 1,
+                                            }}>
+                                                {data.description}
+                                            </Text>
+                                        </View>
+                                        <View style={{
+                                            width: "90%", height: 50, marginTop: 20, marginBottom: 15,
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                        }}>
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => { viewEvent(id, data) }}
+                                            style={{
+                                                minWidth: 200, height: 45, paddingHorizontal: 20,
+                                                borderColor: "#777", borderWidth: 4, borderRadius: 25,
+                                                backgroundColor: "#fac0",
+                                                flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                            }}>
+                                                <Text style={{
+                                                    fontSize: 18,
+                                                    fontWeight: '800',
+                                                    textAlign: "left",
+                                                    marginLeft: 15, marginRight: 0,
+                                                    color: "#333",
+                                                    flex: 1,
+                                                }}>
+                                                    {"View Event"}
+                                                </Text>
+                                                <Entypo name="chevron-right" size={24} color="#333" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                            
+                        </View>
+                        ))}
+                    </View>
                 </View>
 
                 {/* Add Event Button */}
@@ -348,7 +401,7 @@ const Events = ({ navigation, route }) => {
                     style={[
                         {
                             minWidth: 200, minHeight: 60,
-                            marginTop: 25, paddingHorizontal: 40,
+                            marginTop: 5, paddingHorizontal: 40,
                             justifyContent: "center", alignItems: "center", flexDirection: "row",
                             backgroundColor: "#3D8D04",
                             borderColor: "#000", borderWidth: 2, borderRadius: 30,
@@ -371,7 +424,7 @@ const Events = ({ navigation, route }) => {
 
                 {/* History Text */}
                 <View style={{
-                    marginTop: 30,
+                    marginTop: 50,
                     flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                 }}>
                 <Divider width={2} color={"#777"}
@@ -430,7 +483,7 @@ const Events = ({ navigation, route }) => {
                         </Text>
                         <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
                     </MyView>
-                    <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
+                    <View style={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
                         {pastEvents.map(({ id, data }) => (
                             <TouchableOpacity activeOpacity={0.7} onPress={() => {viewEvent(id, data)}} key={id}
                                 style={[
@@ -513,40 +566,9 @@ const Events = ({ navigation, route }) => {
                                 </View>
                             </TouchableOpacity>
                         ))}
-                    </ScrollView>
+                    </View>
                 </View>
-            </View>
-            {/* <View style={{
-                width: "100%", minHeight: 100,
-                borderTopWidth: 2, backgroundColor: "#ffc0",
-                flex: 1, flexGrow: 0, flexDirection: "row", justifyContent: "center", alignItems:  "center",
-            }}>
-                <TouchableOpacity onPress={addBanner} activeOpacity={0.7}
-                    style={{
-                        width: 200, height: 75,
-                        marginTop: 0,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#afc",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginRight: 0
-					}}>
-						{"Create Alert"}
-					</Text>
-                    <Icon
-						name='plus'
-                        type='antdesign'
-                        color='#000'
-						style={{
-							width: 25, height: 25, marginLeft: 7, justifyContent: "center"
-						}}
-					/>
-                </TouchableOpacity>
-            </View> */}
+            </ScrollView>
         </SafeAreaView>
     )
 }
