@@ -428,7 +428,7 @@ const HomeTab = ({ navigation, route }) => {
             }
 
             topicArray.push(topicObj)
-            console.log("Line 431 (Test for topicArray): ", topicArray)
+            // console.log("Line 431 (Test for topicArray): ", topicArray)
 
           } // if statement
 
@@ -437,9 +437,8 @@ const HomeTab = ({ navigation, route }) => {
 
         setTArray(topicArray)
 
-
         // if the topic exists then build
-        if (topicArray.length !== 0) {
+        if (tArray.length !== 0) {
           let groupObj = {
             groupID: groupID,
             groupName: groupQueryData.groupName,
@@ -447,9 +446,14 @@ const HomeTab = ({ navigation, route }) => {
             groupImageNumber: groupQueryData.coverImageNumber,
             topics: tArray
           }
+
+          groupArray.push(groupObj)
+        // console.log("Unicorn: ", groupArray)
+
         }
-        console.log("Unicorn: ", groupObj)
-        groupArray.push(groupObj)
+
+        // console.log("Unicorn: ", groupArray)
+        
       })
 
       setGArray(groupArray)
@@ -725,7 +729,7 @@ const HomeTab = ({ navigation, route }) => {
           <View style={styles.interactFeaturesContainer}>
             <TouchableOpacity
               activeOpacity={0.75}
-              onPress={() => console.log("Test for users Notifications: ", cArray.length)}
+              onPress={() => console.log("Test for users Notifications: ", gArray.length)}
             >
               <View style={[styles.interactiveFeatureButtonDisabled, { marginRight: 7 }]}>
                 <View style={styles.interactiveFeatureLeftHalfDisabled}>
