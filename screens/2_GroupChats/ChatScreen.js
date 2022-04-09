@@ -40,7 +40,7 @@ import { HoldItem } from 'react-native-hold-menu';
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
-import ImagePicker from 'expo-image-picker';
+import ImagePicker, { getPendingResultAsync } from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import {
     Menu,
@@ -97,7 +97,19 @@ const ChatScreen = ({ navigation, route }) => {
     const [messageSenders, setMessageSenders] = useState({})
     const [overlayIsVisible, setOverlay] = useState(false);
     const [alertExists, setAlertExists] = useState(false);
-    const [alert, setAlert] = useState({});
+    const [alert, setAlert] = useState({
+        data: {
+            description: "",
+            ownerPhoneNumber: "",
+            ownerUID: "",
+            referenceUID: "",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            type: "",
+            viewedBy: [],
+        },
+        id: "",
+    });
+    const [alertEvent, setAlertEvent] = useState({});
     const [pinMap, setPinMap] = useState({});
     const [topicMap, setTopicMap] = useState({});
 
@@ -375,6 +387,17 @@ const ChatScreen = ({ navigation, route }) => {
                     data: doc.data(),
                 });
                 setAlertExists(true);
+
+                // get the event the alert is referencing to if event
+                if(`${data.type}` == "Event") {
+                    await db.collection('chats').doc(topicId).collection('events').doc(`${data.referenceUID}`).get()
+                    .then((result) => {
+                        setAlertEvent({
+                            id: result.id,
+                            data: result.data(),
+                        });
+                    });
+                }
             }
         }
     };
@@ -459,7 +482,14 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const viewBanner = (bannerId, bannerData) => {
-        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
+        if(bannerData.type == "Banner") {
+            // console.log("Banner");
+            navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
+        }
+        else if(bannerData.type == "Event") {
+            // console.log("Event");
+            navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId: alertEvent.id, eventData: alertEvent.data });
+        }
     };
 
     const dismissBanner = () => {
@@ -1043,6 +1073,177 @@ const ChatScreen = ({ navigation, route }) => {
                         {/* Banner (if applicable) */}
                         {/* Calendar for later <FontAwesome5 name="calendar-alt" size={24} color="black" /> */}
                         <MyView hide={!alertExists}
+                            style={{
+                                    width: "100%",
+                                    flex: 0, flexGrow: 0, flexDirection: "column",
+                                    justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                        <MyView hide={(alert.data.type || "") != "Event"}
+                            style={[
+                                {
+                                    width: "100%",
+                                    backgroundColor: "#F8D353", borderWidth: 0,
+                                    flex: 0, flexGrow: 0, flexDirection: "column",
+                                    justifyContent: "flex-start", alignItems: "center",
+                                    borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
+                                },
+                                {
+                                    shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
+                                    shadowRadius: 2, shadowOpacity: 0.5,
+                                }
+                            ]} >
+                            {/* Title */}
+                            <View style={{
+                                width: "100%",
+                                paddingHorizontal: 10, paddingVertical: 10,
+                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                flex: 0, flexGrow: 0, flexDirection: "row",
+                                justifyContent: "space-between", alignItems: "center",
+                            }}>
+                                <View style={{
+                                    paddingHorizontal: 15, paddingVertical: 5,
+                                    backgroundColor: "#fffb", borderRadius: 7, borderWidth: 0,
+                                    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+                                }}>
+                                    <Entypo name="calendar" size={22} color="black" />
+                                    <Text style={{
+                                        fontSize: 18,
+                                        fontWeight: '800',
+                                        textAlign: "center",
+                                        marginLeft: 15, marginRight: 5,
+                                    }}>
+                                        Event
+                                    </Text>
+                                </View>
+                                <TouchableOpacity activeOpacity={0.7} onPress={dismissBanner}
+                                    style={{
+                                        paddingHorizontal: 5, paddingVertical: 5,
+                                        backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
+                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                    }}>
+                                    <Fontisto name="close-a" size={18} color="black" />
+                                </TouchableOpacity>
+                            </View>
+                            {/* Content */}
+                            <View style={{
+                                width: "100%",
+                                borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                paddingVertical: 5, paddingHorizontal: 15, marginBottom: 5,
+                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                            }}>
+                                <View activeOpacity={0.7} onPress={() => {  }}
+                                    style={[
+                                        {
+                                            width: "100%", marginTop: 0,
+                                            backgroundColor: "#fff0", borderWidth: 0,
+                                            flex: 0, flexGrow: 0, flexDirection: "row",
+                                            justifyContent: "flex-start", alignItems: "center",
+                                            borderRadius: 1,
+                                        },
+                                    ]} >
+                                    {/* Left Content */}
+                                    <View style={{
+                                        minWidth: "10%",
+                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                        flex: 1, flexGrow: 1, flexDirection: "row",
+                                        justifyContent: "flex-start", alignItems: "center",
+                                    }}>
+                                        <View style={{
+                                            width: "100%", height: 68,
+                                            paddingHorizontal: 15, paddingVertical: 0,
+                                            backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
+                                            flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
+                                        }}>
+                                            <View style={{
+                                                width: "100%",
+                                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                            }}>
+                                                <MaterialIcons name="stars" size={18} color="black" />
+                                                <Text numberOfLines={1}
+                                                        style={{
+                                                            fontSize: 18,
+                                                            fontWeight: '800',
+                                                            textAlign: "left",
+                                                            marginLeft: 15, marginRight: 10,
+                                                            color: "black",
+                                                            flex: 1,
+                                                    }}>
+                                                        {alertEvent.data.title}
+                                                </Text>
+                                            </View>
+                                            <View style={{
+                                                width: "100%",
+                                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                            }}>
+                                                <Ionicons name="flag-outline" size={18} color="black" />
+                                                <Text numberOfLines={1}
+                                                    style={{
+                                                        fontSize: 16,
+                                                        fontWeight: '400',
+                                                        textAlign: "left",
+                                                        marginLeft: 15, marginRight: 10,
+                                                        color: "black",
+                                                        flex: 1,
+                                                }}>
+                                                    {(alertEvent.data.startTime != null) ? (alertEvent.data.startTime.toDate().toLocaleDateString("en-US", {
+                                                    month: "short", day: "2-digit", year: "numeric", })
+                                                    +" @ "+alertEvent.data.startTime.toDate().toLocaleTimeString("en-US", 
+                                                    {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
+                                                </Text>
+                                            </View>
+                                            <View style={{
+                                                width: "100%",
+                                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                            }}>
+                                                <Feather name="file-text" size={18} color="black" />
+                                                <Text numberOfLines={1}
+                                                        style={{
+                                                            fontSize: 18,
+                                                            fontWeight: '400',
+                                                            textAlign: "left",
+                                                            marginLeft: 15, marginRight: 10,
+                                                            color: "black",
+                                                            flex: 1,
+                                                    }}>
+                                                        {alertEvent.data.description}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                            {/* Action */}
+                            <View style={{
+                                minHeight: 0, width: "100%",
+                                marginTop: 5, marginBottom: 15,
+                                borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
+                                flex: 0, flexGrow: 0,
+                                flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                            }}>
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(alert.id, alert.data) }}
+                                    style={{
+                                        height: 40, paddingHorizontal: 10,
+                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                        backgroundColor: "#fffb",
+                                        borderColor: "#7C6A29", borderWidth: 4, borderRadius: 20,
+                                    }}>
+                                    <Text style={{
+                                        fontSize: 15,
+                                        fontWeight: '700',
+                                        textAlign: "center",
+                                        marginHorizontal: 15,
+                                        color: "black",
+                                    }}>
+                                        {"View Event"}
+                                    </Text>
+                                    <Entypo name="chevron-right" size={24} color="black" />
+                                </TouchableOpacity>
+                            </View>
+                        </MyView>
+                        <MyView hide={(alert.data.type || "") != "Banner"}
                             style={[
                                 {
                                     width: "100%",
@@ -1085,7 +1286,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
                                         flexDirection: "row", justifyContent: "center", alignItems: "center",
                                     }}>
-                                    <Fontisto name="close-a" size={20} color="black" />
+                                    <Fontisto name="close-a" size={18} color="black" />
                                 </TouchableOpacity>
                             </View>
                             {/* Content */}
@@ -1103,7 +1304,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     color: "black",
                                 }}>
                                     <Text style={{ fontWeight: '600' }}>"</Text>
-                                    {(alert != null && alert.data != undefined) ? (alert.data.description) : ("")}
+                                        {(alert.data.description) || ("")}
                                     <Text style={{ fontWeight: '600' }}>"</Text>
                                 </Text>
                             </View>
@@ -1134,6 +1335,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     <Entypo name="chevron-right" size={24} color="black" />
                                 </TouchableOpacity>
                             </View>
+                        </MyView>
                         </MyView>
 
                         {/* Messages */}

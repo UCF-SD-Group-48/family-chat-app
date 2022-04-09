@@ -163,13 +163,13 @@ const AddEvent = ({ navigation, route }) => {
         });
     }, [navigation]);
 
-    const addEvent = () => {
+    const addEvent = async () => {
         Keyboard.dismiss();
 
         const finalStartTime = combineDateTime(startDate, startTime);
         const finalEndTime = combineDateTime(endDate, endTime);
 
-        db.collection('chats').doc(topicId).collection('events').add({
+        const result = await db.collection('chats').doc(topicId).collection('events').add({
             title: title,
             location: location,
             description: description,
@@ -178,6 +178,16 @@ const AddEvent = ({ navigation, route }) => {
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             startTime: firebase.firestore.Timestamp.fromDate(finalStartTime),
             endTime: firebase.firestore.Timestamp.fromDate(finalEndTime),
+        });
+
+        db.collection('chats').doc(topicId).collection('banners').add({
+            description: "",
+            ownerPhoneNumber: auth.currentUser.phoneNumber,
+            ownerUID: auth.currentUser.uid,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            type: "Event",
+            referenceUID: result.id,
+            viewedBy: [],
         });
 
         // clears input
