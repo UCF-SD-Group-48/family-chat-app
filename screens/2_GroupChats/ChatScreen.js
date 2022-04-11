@@ -109,7 +109,19 @@ const ChatScreen = ({ navigation, route }) => {
         },
         id: "",
     });
-    const [alertEvent, setAlertEvent] = useState({});
+    const [alertEvent, setAlertEvent] = useState({
+        data: {
+            ownerPhoneNumber: "",
+            ownerUID: "",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            startTime: firebase.firestore.Timestamp.fromDate(new Date()),
+            endTime: firebase.firestore.Timestamp.fromDate(new Date()),
+            description: "",
+            location: "",
+            title: "",
+        },
+        id: "",
+    });
     const [pinMap, setPinMap] = useState({});
     const [topicMap, setTopicMap] = useState({});
 
@@ -370,37 +382,43 @@ const ChatScreen = ({ navigation, route }) => {
             ),
         });
 
-        resetAlert();
-
     }, [navigation, messages]);
 
-    const resetAlert = async () => {
-        const snapshot = await db.collection('chats').doc(topicId).collection('banners')
-            .orderBy('timestamp', 'desc').limit(1).get();
-        if (!snapshot.empty) {
-            let doc = snapshot.docs[0];
-            let data = doc.data();
-            let viewedBy = `${data.viewedBy}`;
-            if (!viewedBy.includes(auth.currentUser.uid)) {
-                setAlert({
-                    id: doc.id,
-                    data: doc.data(),
-                });
-                setAlertExists(true);
-
-                // get the event the alert is referencing to if event
-                if(`${data.type}` == "Event") {
-                    await db.collection('chats').doc(topicId).collection('events').doc(`${data.referenceUID}`).get()
-                    .then((result) => {
-                        setAlertEvent({
-                            id: result.id,
-                            data: result.data(),
+    useLayoutEffect(() => {
+        const unsubscribe = db
+            .collection('chats').doc(topicId).collection('banners')
+            .orderBy('timestamp', 'desc').limit(1)
+            .onSnapshot((snapshot) => {
+                
+                if (!snapshot.empty) {
+                    // console.log("snapshot = "+JSON.stringify(snapshot));
+                    let doc = snapshot.docs[0];
+                    console.log("doc = "+JSON.stringify(doc));
+                    let data = doc.data();
+                    let viewedBy = `${data.viewedBy}`;
+                    if (!viewedBy.includes(auth.currentUser.uid)) {
+                        setAlert({
+                            id: doc.id,
+                            data: doc.data(),
                         });
-                    });
+                        setAlertExists(true);
+        
+                        // get the event the alert is referencing to if event
+                        if(`${data.type}` == "Event") {
+                            db.collection('chats').doc(topicId).collection('events').doc(`${data.referenceUID}`).get()
+                            .then((result) => {
+                                setAlertEvent({
+                                    id: result.id,
+                                    data: result.data(),
+                                });
+                            });
+                        }
+                    }
                 }
-            }
-        }
-    };
+
+            });
+        return unsubscribe;
+    }, [route]);
 
     useLayoutEffect(() => {
         const unsubscribe = db
