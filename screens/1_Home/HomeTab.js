@@ -308,7 +308,7 @@ const HomeTab = ({ navigation, route }) => {
         userTopicArray.push(topicID);
       }
 
-      console.log('*********************')
+      //console.log('*********************')
 
       // Map through the user's groups from 'userGroupArray'
       let groupArray = []
@@ -380,29 +380,30 @@ const HomeTab = ({ navigation, route }) => {
               const messageSenderQueryData = messageSenderQuery.data();
 
               // Printing out the all of the values, for confirmation of program working
-              console.log('groupID:', groupID)
-              console.log('groupName:', groupQueryData.groupName)
-              console.log('')
+              
+              // console.log('groupID:', groupID)
+              // console.log('groupName:', groupQueryData.groupName)
+              // console.log('')
 
-              console.log('____')
-              console.log('topicID:', topicID)
-              console.log('topicName:', topicObject.data().topicName)
+              // console.log('____')
+              // console.log('topicID:', topicID)
+              // console.log('topicName:', topicObject.data().topicName)
 
               const messageSenderPFP = messageSenderQueryData.pfp;
-              console.log(`[sender pfp number]`, messageSenderPFP)
+              // console.log(`[sender pfp number]`, messageSenderPFP)
 
               const messageSenderFullName = `${messageSenderQueryData.firstName} ${messageSenderQueryData.lastName}`
-              console.log(`[sender full name]`, messageSenderFullName)
+              // console.log(`[sender full name]`, messageSenderFullName)
 
               const messageText = messageData.message;
-              console.log(`[the actual message text]`, messageText)
+              //console.log(`[the actual message text]`, messageText)
 
               const messageTimeSent = messageData.timestamp.toDate().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
-              console.log(`[time that the message was sent]`, messageTimeSent);
-              console.log('____')
+              // console.log(`[time that the message was sent]`, messageTimeSent);
+              // console.log('____')
 
-              console.log('*********************')
-
+              // console.log('*********************')
+              
               // BUILD CHAT OBJECT HERE
               let chatObj = {
                 senderPFP: messageSenderPFP,
@@ -442,7 +443,7 @@ const HomeTab = ({ navigation, route }) => {
           let groupObj = {
             groupID: groupID,
             groupName: groupQueryData.groupName,
-            groupColor: groupQueryData.groupColor,
+            groupColor: groupQueryData.color,
             groupImageNumber: groupQueryData.coverImageNumber,
             topics: tArray
           }
