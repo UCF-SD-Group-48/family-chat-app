@@ -185,13 +185,13 @@ const HomeTab = ({ navigation, route }) => {
   //   }
 
   // }
-  
+
   // Nested If Statements
   {
     // if (!userNotificationGroups.some(x => x.groupID === groupID)) { // If group doesn't exists
 
     //   let groupObjtest = [
-  
+
     //     ...userNotificationGroups,
     //     {
     //       groupID: groupID,
@@ -202,15 +202,15 @@ const HomeTab = ({ navigation, route }) => {
     //       topics : []
     //     }
     //   ]
-      
+
     //   // console.log("groupObjTest: ", JSON.stringify(groupObjtest, null, "\t"))
     //   // setUserNotificationGroups(groupObjtest)
-  
+
     //   //                If Topic Doesn't Exist:
     //   //                     Add Topic information to that object
     //   let topicRef = groupObjtest.topics
     //   const found = topicRef.some(doc => doc.topicID === topicID);
-  
+
     //   if (!found) {
     //     topicRef.push({ topicID: topicID,
     //       topicName: topicObject.data().topicName,
@@ -233,14 +233,14 @@ const HomeTab = ({ navigation, route }) => {
     //     })
     //   } 
     //   setUserNotificationGroups(groupObjtest)
-  
+
     // } else { // else if group doesn't exist
     //   // find the index
     //   userNotificationGroups.indexOf()
     //   const index = userNotificationGroups.findIndex(object => {
     //     return object.id === groupID;
     //   });
-  
+
     //   let topicRef = userNotificationGroups[index].groupObjtest.topics
     //   const found = topicRef.some(doc => doc.topicID === topicID);
     //   if (!found) {
@@ -270,7 +270,7 @@ const HomeTab = ({ navigation, route }) => {
     // }
   }
 
-  
+
   const isFocused = useIsFocused();
   const [userNotificationGroups, setUserNotificationGroups] = useState([])
   const [gArray, setGArray] = useState([])
@@ -308,8 +308,6 @@ const HomeTab = ({ navigation, route }) => {
         userTopicArray.push(topicID);
       }
 
-      //console.log('*********************')
-
       // Map through the user's groups from 'userGroupArray'
       let groupArray = []
       userGroupArray.map(async (groupID, index) => {
@@ -322,10 +320,6 @@ const HomeTab = ({ navigation, route }) => {
 
         // Set the data from the group document as 'groupQueryData' for easy parsing
         const groupQueryData = groupQuery.data();
-
-        // console.log('^^^^^^^^^^^^^^^^^^^')
-        // console.log(groupQueryData.groupName);
-        // console.log('^^^^^^^^^^^^^^^^^^^')
 
         // Get all of the topics, from the current group
         const groupTopicsQuery = await db
@@ -344,12 +338,11 @@ const HomeTab = ({ navigation, route }) => {
           // Check to see if the topic in question, is a part of the user's topicMapArray
           // We only want to do an additional database call, to find the missed messages, for only the relevant topics
           if (userTopicArray.includes(topicObject.id)) {
-            
+
             //Add all relevent topics to object in object array
 
             // Defining the 'topicID' for ease of referencing
             const topicID = topicObject.id;
-            // console.log("current TopicID: " + topicID + " " + topicObject.data().topicName + "group: " + groupID + " " + groupQueryData.groupName)
             // Query the database, in the 'chats' collection, for this current relevant topic
             // Get the "missed messages" (AKA, the messages where the timeStamp > the user's topicMap pair value)
             const chatsQuery = await db
@@ -379,31 +372,14 @@ const HomeTab = ({ navigation, route }) => {
               // Set the data from the messageSenderQuery document as 'messageSenderQueryData' for easy parsing
               const messageSenderQueryData = messageSenderQuery.data();
 
-              // Printing out the all of the values, for confirmation of program working
-              
-              // console.log('groupID:', groupID)
-              // console.log('groupName:', groupQueryData.groupName)
-              // console.log('')
-
-              // console.log('____')
-              // console.log('topicID:', topicID)
-              // console.log('topicName:', topicObject.data().topicName)
-
               const messageSenderPFP = messageSenderQueryData.pfp;
-              // console.log(`[sender pfp number]`, messageSenderPFP)
 
               const messageSenderFullName = `${messageSenderQueryData.firstName} ${messageSenderQueryData.lastName}`
-              // console.log(`[sender full name]`, messageSenderFullName)
 
               const messageText = messageData.message;
-              //console.log(`[the actual message text]`, messageText)
 
               const messageTimeSent = messageData.timestamp.toDate().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
-              // console.log(`[time that the message was sent]`, messageTimeSent);
-              // console.log('____')
 
-              // console.log('*********************')
-              
               // BUILD CHAT OBJECT HERE
               let chatObj = {
                 senderPFP: messageSenderPFP,
@@ -412,11 +388,8 @@ const HomeTab = ({ navigation, route }) => {
                 messageTime: messageTimeSent,
               }
 
-              
+
               chatArray.push(chatObj)
-              //----------------------------------------------------------------------------------------------//
-  
-              
 
             }) // chats query
             setCArray(chatArray)
@@ -429,7 +402,6 @@ const HomeTab = ({ navigation, route }) => {
             }
 
             topicArray.push(topicObj)
-            // console.log("Line 431 (Test for topicArray): ", topicArray)
 
           } // if statement
 
@@ -449,183 +421,30 @@ const HomeTab = ({ navigation, route }) => {
           }
 
           groupArray.push(groupObj)
-        // console.log("Unicorn: ", groupArray)
 
         }
 
-        // console.log("Unicorn: ", groupArray)
-        
       })
 
       setGArray(groupArray)
 
     } catch (error) { console.log(error) }
 
-    
+
     console.log("Final userNotifcationGroups: ", userNotificationGroups)
 
     setUserNotificationGroups(gArray)
-  
+
 
   }
+  {
+  }
 
-  // Pseudo code for objects
-{
+  useEffect(async () => {
 
-              //LATER:
-              // - get with Tu
-              // - relay logic to Tu
-              // - try to optimize logic
-              // - fiddle with isFocused logic, so homeTab doesn't run twice (try to fix, or use better solution than isFocused)
-              // - store data into package for front-end component displaying/mapping (array of objects, each object is group)
-              // - data to be stored, as array of objects
-              // userNotificationGroups.maps(...)
-              // 
-              // [
-              //   {
-              //     groupID:
-              //     groupName:
-              //     groupColor:
-              //     groupImageNumber:
-              //     groupMissedMessagesCount: (sum of all of the: topicMissedMessagesCount's)
-              //     topics: [ 
-              //       {
-              //         topicID:
-              //         topicName:
-              //         topicMissedMessagesCount: missedMessages.length
-              //         missedMessages: [
-              //           {
-              //             senderPFP:
-              //             senderFullName:
-              //             messageText:
-              //             messageTime:
-              //           },
-              //           {
-              //             senderPFP:
-              //             senderFullName:
-              //             messageText:
-              //             messageTime:
-              //           },    
-              //         ]
-              //       }
-              //     ]
-              //   },
-              //   {
-              //     groupID:
-              //     groupName:
-              //     groupColor:
-              //     groupImageNumber:
-              //     groupMissedMessagesCount: (sum of all of the: topicMissedMessagesCount's)
-              //     topics: [
-              //       {
-              //         topicID:
-              //         topicName:
-              //         topicMissedMessagesCount: missedMessages.length
-              //         missedMessages: [
-              //           {
-              //             senderPFP:
-              //             senderFullName:
-              //             messageText:
-              //             messageTime:
-              //           },   
-              //           {
-              //             senderPFP:
-              //             senderFullName:
-              //             messageText:
-              //             messageTime:
-              //           },   
-              //         ]
-              //       }
-              //     ]
-              //   },
-              // ]
-        // const updateNotifications = [
-        //   ...userNotificationGroups,
-        //   {
-        //     groupID: groupID,
-        //     groupName: groupQuery.groupName,
-        //     groupColor: groupQuery.groupColor,
-        //     groupImageNumber: groupQuery.groupImageNumber
-        //     // groupMissedMessagesCount: (sum of all of the: topicMissedMessagesCount's)
-        //   }
-        // ]
-        // setUserNotificationGroups(updateNotifications)
-}
-
-  useEffect( async () => {
-
-    await getMissedMessages();    
+    await getMissedMessages();
 
   }, [isFocused]);
-
-
-  // const [groups, setGroups] = useState([{}]);
-  // const [topics, setTopics] = useState([]);
-
-  // const groupMissed = async () => {
-  //   const thisUser = db.collection('users')
-  //     .doc(currentUserUID)
-  //     .get();
-  //   const groupArray = thisUser.data().groups;
-
-  //   // Get the group, save the group info.
-  //   for (let group of groupArray) {
-  //     let groupUsers = db
-  //       .collection('groups')
-  //       .doc(group)
-  //       .get()
-  //       .data()
-
-
-  //     const updategroups = [
-  //       ...groups,
-
-  //       {
-  //         groupId: group,
-  //         groupName: groupUsers.groupName,
-  //         groupColor: groupUsers.color,
-  //         groupImage: groupUsers.coverImageNumber
-  //       }
-  //     ];
-
-  //     setGroups(updateGroups);
-
-  //     let currentUser = await db.collection('users').doc(auth.currentUser.uid).get()
-  //     const topicMap = currentUser.data().topicMap
-  //     console.log("topicArray: ", (JSON.stringify(topicMap)));
-
-  //     let topicMapArray = []
-  //     for (let key in topicMap) {
-  //       topicMapArray.push(key)
-  //     }
-
-  //     let topic = db
-  //       .collection('groups')
-  //       .doc(group)
-  //       .collection(topic)
-  //       .where(firebase.firestore.FieldPath.documentId(), 'in', topicMapArray)
-  //       .get().then()
-
-
-  //     // if topics of group exists as a key of topicMap
-  //     // group == groupID
-
-
-
-
-
-
-  //     // Get the messages, save the message info.
-
-  //     db.collection('books')
-  //       .where(firebase.firestore.FieldPath.documentId(), '==', 'fK3ddutEpD2qQqRMXNW5').get()
-
-
-
-  //   }
-  // }
-
-
 
   return (
     <SafeAreaView style={styles.mainContainer}>
