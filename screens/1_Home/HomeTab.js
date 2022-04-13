@@ -82,9 +82,69 @@ import { PinchGestureHandler } from 'react-native-gesture-handler';
 import { Timestamp } from 'firebase/firestore';
 
 // *************************************************************
+import helpers from '../../helperFunctions/helpers';
 
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
+
+  const [testData, setTestData] = useState([
+    {
+      groupColor: "red",
+      groupID: "fedcba",
+      groupImageNumber: 2,
+      groupName: "The boiis",
+      topics: [
+        {
+          missedMessages: [
+            {
+              messageText: "Are you okay?",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Jake Truemann",
+              senderPFP: 3,
+            },
+            {
+              messageText: "No I'm not :(",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Triabel Canderberry",
+              senderPFP: 2,
+            },
+            {
+              messageText: "bummer...",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Jake Truemann",
+              senderPFP: 3,
+            },
+            {
+              messageText: "umm, who is getting displayed??",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Triabel Canderberry",
+              senderPFP: 2,
+            },
+          ],
+          topicID: "abcdefg",
+          topicName: "General",
+        },
+        {
+          missedMessages: [
+            {
+              messageText: "Let's have an awesome usmmer",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Jake Truemann",
+              senderPFP: 3,
+            },
+            {
+              messageText: "yayaya",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Jake Truemann",
+              senderPFP: 3,
+            },
+          ],
+          topicID: "hfhfl",
+          topicName: "Summer time",
+        }
+      ],
+    }
+  ]);
 
   // const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
   //   const windowWidth = Dimensions.get('window').width;
@@ -546,6 +606,7 @@ const HomeTab = ({ navigation, route }) => {
           // }}
           />
 
+          {/* Events */}
           <View style={styles.interactFeaturesContainer}>
             <TouchableOpacity
               activeOpacity={0.75}
@@ -570,6 +631,7 @@ const HomeTab = ({ navigation, route }) => {
               </View>
             </TouchableOpacity>
 
+            {/* Polls */}
             <TouchableOpacity
               activeOpacity={0.75}>
               <View style={[styles.interactiveFeatureButtonDisabled, { marginLeft: 7 }]}>
@@ -593,6 +655,8 @@ const HomeTab = ({ navigation, route }) => {
 
           </View>
 
+          {/* You're all Caught Up Message */}
+          <MyView hide={true}>
           <View style={styles.allCaughtUpContainer}>
             <View style={styles.allCaughtUpContent}>
               <Text style={{ fontSize: 55 }}>
@@ -633,6 +697,223 @@ const HomeTab = ({ navigation, route }) => {
               </View>
             </View>
           </TouchableOpacity>
+          </MyView>
+
+          {testData.map((group) => (
+            <View key={group.groupID} style={[{
+              width: "100%", minHeight: 100, marginTop: 15, backgroundColor: "#fff",
+              flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+              borderRadius: 25, borderWidth: 1, borderColor: "#777",
+              paddingBottom: 15,
+            },
+            {
+              shadowColor: "#000", shadowOffset: {width: 0, height: 3},
+              shadowRadius: 3, shadowOpacity: 0.4,
+            }]}>
+              {/* Top Border */}
+              <View style={{
+                width: "100%", minHeight: 10, backgroundColor: "#CFC5BA",
+                flexDirection: "row", justifyContent: "flex-end", alignItems: "center",
+                borderTopLeftRadius: 25, borderTopRightRadius: 25,
+                paddingVertical: 7,
+              }}>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => {}} style={{
+                  backgroundColor: "#E3DFD9",
+                  marginRight: 15,
+                  flexDirection: "row", justifyContent: "flex-end", alignItems: "center",
+                  borderWidth: 2, borderColor: "#333", borderRadius: 50,
+                }}>
+                  <Text style={{
+                      fontSize: 14,
+                      fontWeight: '800',
+                      textAlign: "center",
+                      maxWidth: 350,
+                      paddingVertical: 5,
+                      paddingHorizontal: 15,
+                      color: "#555",
+                    }}>
+                    {"DISMISS"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Group Image & Title */}
+              <View style={{
+                width: "100%", minHeight: 10, backgroundColor: "#abe0",
+                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                borderBottomWidth: 1, borderBottomColor: "#777",
+              }}>
+                <Image
+                    source={helpers.getGroupCoverImage(group.groupColor, group.groupImageNumber)}
+                    style={{
+                        width: 70, height: 70,
+                        marginLeft: 15, marginVertical: 12,
+                        borderRadius: 5,
+                    }}
+                />
+                <View style={{
+                  flex: 1, flexGrow: 1, height: 70, marginVertical: 12, marginLeft: 15, backgroundColor: "#abe0",
+                  flexDirection: "column", justifyContent: "space-evenly", alignItems: "flex-start",
+                }}>
+                  <Text numberOfLines={1} style={{
+                      fontSize: 20,
+                      fontWeight: '800',
+                      textAlign: "center",
+                      maxWidth: 350,
+                      paddingVertical: 5,
+                      paddingRight: 15,
+                      color: "#000",
+                    }}>
+                    {group.groupName}
+                  </Text>
+                  <View style={{
+                    minHeight: 10, backgroundColor: "#abe0",
+                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                    borderWidth: 1, borderColor: "#DF3D23", borderRadius: 2,
+                  }}>
+                    <Text style={{
+                      fontSize: 12,
+                      fontWeight: '600',
+                      textAlign: "center",
+                      paddingVertical: 7,
+                      paddingHorizontal: 12,
+                      color: "#DF3D23",
+                    }}>
+                      <Text style={{ fontWeight: '800' }}>{"XX+ "}</Text>
+                      {"Missed Messages"}
+                  </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Missed Messages -Topics */}
+              {group.topics.map((topic) => (
+              <View key={topic.topicID} style={{
+                width: "100%", minHeight: 50, backgroundColor: "#CFC5BA00",
+                flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                // borderTopWidth: 1, borderTopColor: "#777",
+                borderBottomLeftRadius: 25, borderBottomRightRadius: 25,
+                paddingTop: 5, paddingBottom: 10,
+              }}>
+                
+                {/* Topic Name Title */}
+                <View style={{
+                    minHeight: 10, backgroundColor: "#abe0",
+                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                    paddingVertical: 3, paddingHorizontal: 15,
+                    marginBottom: 3,
+                  }}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={20} color="black" />
+                  <Text style={{
+                      fontSize: 14,
+                      fontWeight: '800',
+                      textAlign: "center",
+                      paddingVertical: 0,
+                      paddingLeft: 6, paddingRight: 15,
+                      color: "#000",
+                    }}>
+                      {topic.topicName}
+                  </Text>
+                  <Divider width={1} color={"#777"} style={{
+                    flex: 1, flexGrow: 1,
+                  }} />
+                  <View style={{borderWidth: 1, borderColor: "#777", borderRadius: 50, marginRight: 0,}}>
+                    <Text style={{
+                        fontSize: 12,
+                        fontWeight: '500',
+                        textAlign: "center",
+                        paddingVertical: 3,
+                        paddingHorizontal: 7,
+                        color: "#777",
+                      }}>
+                        {topic.missedMessages.length}
+                    </Text>
+                  </View>
+                </View>
+                
+                {/* Messages */}
+                {topic.missedMessages.map((message, index) => (
+                
+                (topic.missedMessages.length < 3 || index >= (topic.missedMessages.length - 3)) ? (
+                <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {}}
+                style={{
+                  maxWidth: "100%", minHeight: 10, backgroundColor: "#F8F8F8",
+                  flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                  borderWidth: 1, borderColor: "#777", borderRadius: 3,
+                  marginHorizontal: 15, marginTop: -1,
+                }}>
+                  <Image source={imageSelection(message.senderPFP)}
+                    style={{
+                        width: 35, height: 35,
+                        marginLeft: 10, marginVertical: 7,
+                        borderRadius: 4, borderWidth: 0, borderColor: "#333",
+                    }}/>
+                  <View style={{
+                    flex: 1, flexGrow: 1, height: 35, marginLeft: 10, backgroundColor: "#abe0",
+                    flexDirection: "column", justifyContent: "space-evenly", alignItems: "flex-start",
+                  }}>
+                    <Text style={{
+                        fontSize: 14,
+                        fontWeight: '700',
+                        textAlign: "center",
+                        maxWidth: 350,
+                        paddingVertical: 0,
+                        paddingHorizontal: 0,
+                        color: "#333",
+                      }}>
+                      {message.senderFullName}
+                    </Text>
+                    <Text numberOfLines={1} style={{
+                      fontSize: 14,
+                      fontWeight: '600',
+                      textAlign: "center",
+                      paddingRight: 15,
+                      paddingLeft: 1,
+                      color: "#777",
+                    }}>
+                      {message.messageText}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                ) : (null)
+                ))}
+
+                {/* See all messages */}
+                <MyView hide={topic.missedMessages.length < 3} style={{
+                  maxWidth: "100%", minHeight: 10, backgroundColor: "#E5E5E5",
+                  flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                  borderWidth: 1, borderColor: "#777", borderRadius: 3,
+                  marginHorizontal: 15, marginTop: -1,
+                }}>
+                  <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
+                    style={{
+                      flex: 1, flexGrow: 1,
+                      flexDirection: "row", justifyContent: "center", alignItems: "center",
+                    }}>
+                    <Text style={{
+                        fontSize: 14,
+                        fontWeight: '800',
+                        textAlign: "center",
+                        paddingVertical: 10,
+                        paddingHorizontal: 0,
+                        color: "#333", marginRight: 10,
+                      }}>
+                      {"See all Messages"}
+                    </Text>
+                    <Icon
+                        name='arrow-forward'
+                        type='ionicon'
+                        color='#363732'
+                        size={24}
+                    />
+                  </TouchableOpacity>
+                </MyView>
+
+              </View>
+              ))}
+
+            </View>
+          ))}
 
         </View>
       </ScrollView>
