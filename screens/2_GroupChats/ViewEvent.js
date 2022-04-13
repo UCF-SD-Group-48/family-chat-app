@@ -749,6 +749,7 @@ const ViewEvent = ({ navigation, route }) => {
                             </TouchableOpacity>
                             <DateTimePickerModal
                                 isVisible={isDatePickerVisible}
+                                isDarkModeEnabled={false}
                                 mode="date" display="inline"
                                 onConfirm={handleConfirmDate}
                                 onCancel={hideDatePicker}
@@ -792,6 +793,7 @@ const ViewEvent = ({ navigation, route }) => {
                             </TouchableOpacity>
                             <DateTimePickerModal
                                 isVisible={isTimePickerVisible}
+                                isDarkModeEnabled={false}
                                 mode="time"
                                 onConfirm={handleConfirmTime}
                                 onCancel={hideTimePicker}

@@ -125,6 +125,22 @@ const ChatScreen = ({ navigation, route }) => {
     const [pinMap, setPinMap] = useState({});
     const [topicMap, setTopicMap] = useState({});
 
+    const [currentUser, setCurrentUser] = useState({
+        color: "",
+        discoverableEnabled: false,
+        email: "",
+        firstName: "",
+        groups: [],
+        lastName: "",
+        lastOn: firebase.firestore.FieldValue.serverTimestamp(),
+        pfp: 0,
+        phoneNumber: "",
+        pushNotificationsEnabled: false,
+        statusEmoji: "",
+        statusText: "",
+        topicMap: [],
+    });
+
     const isFocused = useIsFocused();
     const flatList = useRef(null);
 
@@ -304,7 +320,16 @@ const ChatScreen = ({ navigation, route }) => {
         return unsubscribe;
     }, []);
 
-    const goBackward = () => navigation.navigate('GroupsTab');
+    const goBackward = async () => {
+
+        // const topicMapString = "topicMap."+topicId;
+
+        // await db.collection("users").doc(auth.currentUser.uid).update({
+        //     [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+        // });
+
+        navigation.navigate('GroupsTab')
+    };
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -382,7 +407,16 @@ const ChatScreen = ({ navigation, route }) => {
             ),
         });
 
+        resetCurrentUser();
+
     }, [navigation, messages]);
+
+    const resetCurrentUser = async () => {
+        const snapshot = await db.collection("users").doc(auth.currentUser.uid).get();
+        if (!snapshot.empty) {
+            setCurrentUser(snapshot.data());
+        }
+    };
 
     useLayoutEffect(() => {
         const unsubscribe = db
@@ -599,6 +633,14 @@ const ChatScreen = ({ navigation, route }) => {
     }
 
     const [copiedText, setCopiedText] = useState(false)
+
+    const reachEnd = async () => {
+        const topicMapString = "topicMap."+topicId;
+
+        await db.collection("users").doc(auth.currentUser.uid).update({
+            [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+    }
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -1361,13 +1403,18 @@ const ChatScreen = ({ navigation, route }) => {
                             data={messages} keyExtractor={item => item.id}
                             initialNumToRender={20}
                             // onContentSizeChange= {()=> {}} flatList.current.scrollToEnd()
-                            onEndReachedThreshold={0.5} onEndReached={() => { console.log("End reached!") }}
+                            onEndReachedThreshold={0.5} onEndReached={reachEnd}
                             renderItem={({ item: { id, data } }) => {
                                 return (
-
-                                    messageMap[id] != undefined && messageMap[id].previousMessage != undefined
+                                    
+                                    (messageMap[id] != undefined && messageMap[id].previousMessage != undefined
                                         && messageMap[id].previousMessage.data != undefined
-                                        && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber ? (
+                                        && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber
+                                        && data.timestamp != null && messageMap[id].previousMessage.data.timestamp != null
+                                        && (data.timestamp.seconds - messageMap[id].previousMessage.data.timestamp.seconds) < 300
+                                        && (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
+                                            || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)
+                                        ) ? (
                                         //message without profile picture
                                         <View key={id} style={{
                                             width: "100%",
@@ -1494,6 +1541,33 @@ const ChatScreen = ({ navigation, route }) => {
                                             paddingHorizontal: 10,
                                             backgroundColor: "#6660",
                                         }}>
+                                            <MyView hide={messageMap[id] == undefined || messageMap[id].previousMessage == undefined
+                                                            || messageMap[id].previousMessage.data == undefined
+                                                            || currentUser.topicMap.length <= 0
+                                                            || currentUser.topicMap[topicId] == undefined
+                                                            || (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
+                                                                || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)}
+                                                style={{height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
+                                                    justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",}}>
+                                                <Divider width={2} color={"#E2290B"}
+                                                    style={{
+                                                        minWidth: "10%",
+                                                        flexGrow: 1, flex: 1,
+                                                    }}/>
+                                                <Text style={{
+                                                    textAlign: "center",
+                                                    fontSize: 20,
+                                                    fontWeight: '700',
+                                                    color: '#E2290B', marginHorizontal: 10
+                                                }}>
+                                                    {"New Messages"}
+                                                </Text>
+                                                <Divider width={2} color={"#E2290B"}
+                                                    style={{
+                                                        minWidth: "10%",
+                                                        flexGrow: 1, flex: 1,
+                                                    }}/>
+                                            </MyView>
                                             <View style={styles.message}>
                                                 <View style={styles.userContainer}>
                                                     <Image source={imageSelection(getPfp(data.ownerUID))}
