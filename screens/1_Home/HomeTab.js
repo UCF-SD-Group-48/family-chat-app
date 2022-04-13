@@ -143,8 +143,42 @@ const HomeTab = ({ navigation, route }) => {
           topicName: "Summer time",
         }
       ],
-    }
+    },
+    {
+      groupColor: "blue",
+      groupID: "hfhfhfl",
+      groupImageNumber: 1,
+      groupName: "The gurls",
+      topics: [
+        {
+          missedMessages: [
+            {
+              messageText: "Why not the pink tho??",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Jill Truemann",
+              senderPFP: 4,
+            },
+            {
+              messageText: "Not here for it",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Trinity Canderberry",
+              senderPFP: 5,
+            },
+            {
+              messageText: "whatever",
+              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+              senderFullName: "Jill Truemann",
+              senderPFP: 4,
+            },
+          ],
+          topicID: "hhhh",
+          topicName: "General",
+        },
+      ],
+    },
   ]);
+
+  const [groupToActiveEvents, setGroupToActiveEvents] = useState({});
 
   // const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
   //   const windowWidth = Dimensions.get('window').width;
@@ -506,6 +540,55 @@ const HomeTab = ({ navigation, route }) => {
 
   }, [isFocused]);
 
+  useLayoutEffect(() => {
+    resetActiveEvents();
+  }, [route]);
+
+  const resetActiveEvents = async () => {
+    
+    let groups = [];
+    let groupToTopics = {};
+    await db.collection('users').doc(auth.currentUser.uid).get()
+    .then((result) => {
+      groups = [...result.data().groups];
+    });
+
+    for (const groupUID of groups) {
+      let topics = [];
+      const snapshot = await db.collection('groups').doc(groupUID).collection("topics").get();
+      
+            for (const topic of snapshot.docs) {
+              topics.push(topic.id);
+            }
+            groupToTopics[groupUID] = [...topics];
+    }
+
+    // console.log("groupToTopics = "+JSON.stringify(groupToTopics));
+    // console.log("\n");
+
+    let groupToActiveEvents = {};
+    for (const groupUID of groups) {
+
+      let events = [];
+      for (const topicUID of groupToTopics[groupUID]) {
+        const snapshot = await db.collection('chats').doc(topicUID).collection("events")
+          .where("endTime", ">", new Date()).orderBy('endTime', 'desc').get();
+        for (const event of snapshot.docs) {
+          events.push({
+            id: event.id,
+            data: event.data(),
+          });
+        }
+      }
+      groupToActiveEvents[groupUID] = [...events];
+    }
+    // console.log("groupToActiveEvents = "+JSON.stringify(groupToActiveEvents));
+    // console.log("\n");
+
+    setGroupToActiveEvents(groupToActiveEvents);
+
+  }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView
@@ -610,7 +693,10 @@ const HomeTab = ({ navigation, route }) => {
           <View style={styles.interactFeaturesContainer}>
             <TouchableOpacity
               activeOpacity={0.75}
-              onPress={() => console.log("Test for users Notifications: ", gArray.length)}
+              onPress={() => {
+                console.log("Test for users Notifications: ", gArray.length);
+                console.log("final groupToActiveEvents = "+JSON.stringify(groupToActiveEvents))
+              }}
             >
               <View style={[styles.interactiveFeatureButtonDisabled, { marginRight: 7 }]}>
                 <View style={styles.interactiveFeatureLeftHalfDisabled}>
@@ -656,7 +742,7 @@ const HomeTab = ({ navigation, route }) => {
           </View>
 
           {/* You're all Caught Up Message */}
-          <MyView hide={true}>
+          <MyView hide={false}>
           <View style={styles.allCaughtUpContainer}>
             <View style={styles.allCaughtUpContent}>
               <Text style={{ fontSize: 55 }}>
@@ -704,7 +790,7 @@ const HomeTab = ({ navigation, route }) => {
               width: "100%", minHeight: 100, marginTop: 15, backgroundColor: "#fff",
               flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
               borderRadius: 25, borderWidth: 1, borderColor: "#777",
-              paddingBottom: 15,
+              paddingBottom: 15, marginBottom: 25,
             },
             {
               shadowColor: "#000", shadowOffset: {width: 0, height: 3},
