@@ -31,7 +31,7 @@ import {
   Tooltip,
 } from 'react-native-elements';
 import { useIsFocused } from "@react-navigation/native";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, Entypo, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
@@ -376,6 +376,33 @@ const DirectMessagesTab = ({ navigation }) => {
         paddingVertical: 0, paddingHorizontal: 0, marginTop: 15,
         justifyContent: "flex-start", alignItems: 'center', flexDirection: "column",
       }}>
+        <MyView hide={chats.length > 0} style={{
+          width: "100%", minHeight: 300, paddingTop: 30,
+          justifyContent: "flex-start", alignItems: "center", flexDirection: "column", backgroundColor: "#abc0"}}>
+            <FontAwesome name="paper-plane" size={50} color="#555" />
+            <Text style={{
+                        fontSize: 20,
+                        fontWeight: '800',
+                        textAlign: "center",
+                        marginTop: 15,
+                        color: "#555",
+                }}>
+                    {"No DMs found."}
+            </Text>
+            <Text style={{
+                        fontSize: 20,
+                        fontWeight: '400',
+                        textAlign: "center",
+                        maxWidth: 350,
+                        lineHeight: 24,
+                        marginTop: 15,
+                        color: "#555",
+                }}>
+                    {" Looks like there aren't any direct messages yet."+
+                        "\nSearch for a user above to start a conversation."}
+            </Text>
+            <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
+        </MyView>
         {chats.map(({ id, data }) => (
           <TouchableOpacity key={id} activeOpacity={0.7} onPress={() => {
             setIsLoadingDMs(true);
