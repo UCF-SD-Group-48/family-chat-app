@@ -312,7 +312,7 @@ const CreateTopic = ({ navigation, route }) => {
                                 fontWeight: '500',
                                 color: "#222",
                                 }}>
-                                {"Characters "+newTopicName.length+"/20"}
+                                {"Characters "+newTopicName.length+"/18"}
                             </Text>
                         </MyView>
                         <View style={{marginBottom: 22,}}/>
@@ -346,7 +346,7 @@ const CreateTopic = ({ navigation, route }) => {
                         </View>
 
                         <View style={styles.groupMembersView}>
-                            <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
+                            <ScrollView contentContainerStyle={{ paddingTop: 0, paddingBottom: 10, width: "100%", paddingLeft: 20, }}>
                                 {groupMembers.filter((memberObject) => memberObject.name.toLowerCase().includes(shownText.toLowerCase())).map((member, index) => (
                                     <View style={styles.memberEditRow} key={index} id={index}>
                                         <View style={styles.member}>
@@ -417,7 +417,7 @@ const CreateTopic = ({ navigation, route }) => {
                                                     ? <ActivityIndicator
                                                         size="small"
                                                         color="white"
-                                                    // style={{ marginRight: 10 }}
+                                                        size={18}
                                                     />
                                                     : <Icon
                                                         name="chatbubble-ellipses"
@@ -529,8 +529,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         display: 'flex',
         alignItems: 'center',
-        marginBottom: 5,
-        marginTop: 5
+        marginBottom: 0,
+        marginTop: 10,
     },
 
     member: {
