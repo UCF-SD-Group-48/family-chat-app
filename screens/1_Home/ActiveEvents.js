@@ -50,91 +50,34 @@ import MyView from '../../components/MyView';
 // Imports for: Components
 
 // *************************************************************
+import helpers from '../../helperFunctions/helpers';
 
 
 const ActiveEvents = ({ navigation, route }) => {
-    const topicId = route.params.topicId;
-    const topicName = route.params.topicName;
-    const groupId = route.params.groupId;
-    const groupName = route.params.groupName;
-    const groupOwner = route.params.groupOwner;
+    
+    const numEvents = route.params.numEvents;
+    const groupToData = route.params.groupToData;
 
-    const groupToActiveEvents = route.params.groupToActiveEvents;
-
-    const [pastEvents, setPastEvents] = useState([]);
-    const [activeEvents, setActiveEvents] = useState([]);
-
-    //past events
-    useLayoutEffect(() => {
-        const unsubscribe = db
-            .collection('chats')
-            .doc(topicId)
-            .collection('events')
-            .where("endTime", "<", new Date())
-            .orderBy('endTime', 'desc')
-            .onSnapshot((snapshot) =>
-                setPastEvents(
-                    snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        data: doc.data(),
-                    }))
-                ));
-        
-        return unsubscribe;
-    }, [route]);
-
-    //Active Events
-    useLayoutEffect(() => {
-        const unsubscribe = db
-            .collection('chats')
-            .doc(topicId)
-            .collection('events')
-            .where("endTime", ">", new Date())
-            .orderBy('endTime', 'desc')
-            .onSnapshot((snapshot) =>
-                setActiveEvents(
-                    snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        data: doc.data(),
-                    }))
-                ));
-        
-        return unsubscribe;
-    }, [route]);
-
-    // const getPhoneNumbers = () => {
-	// 	setPhoneNumbers(
-    //         Array.from(banners, ({ data: { ownerPhoneNumber } }) => {
-    //             return ownerPhoneNumber.substring(2)
-    //         })
-    //     );
-	// };
-
-    // useEffect(() => {
-    //     getPhoneNumbers();
-    //     return () => {
-    //         setPhoneNumbers([]);
-    //     }
-    // }, [banners]);
+    const [currentTime, setCurrentTime] = useState();
 
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Active Events",
-            headerRight: () => (
-				<View
-					style={{
-						flexDirection: "row",
-						justifyContent: "space-between",
-						marginRight: 20,
-					}}>
-					<TouchableOpacity
-						activeOpacity={0.5}
-						onPress={addEvent}
-					>
-						<Feather name="plus" size={30} color="black" />
-					</TouchableOpacity>
-				</View>
-			),
+            // headerRight: () => (
+			// 	<View
+			// 		style={{
+			// 			flexDirection: "row",
+			// 			justifyContent: "space-between",
+			// 			marginRight: 20,
+			// 		}}>
+			// 		<TouchableOpacity
+			// 			activeOpacity={0.5}
+			// 			onPress={addEvent}
+			// 		>
+			// 			<Feather name="plus" size={30} color="black" />
+			// 		</TouchableOpacity>
+			// 	</View>
+			// ),
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
                     <TouchableOpacity activeOpacity={0.5} onPress={() => {navigation.goBack();}}>
@@ -148,43 +91,14 @@ const ActiveEvents = ({ navigation, route }) => {
                 </View>
             ),
         });
+
+        setCurrentTime(new Date());
+
     }, [navigation]);
 
-    // useEffect(() => {
-    //     getBannerOwners();
-    //     return () => {
-    //         setBannerOwners({});
-    //     }
-    // }, [phoneNumbers]);
-
-    // const getBannerOwners = async () => {
-    //     if(phoneNumbers.length > 0) {
-    //         let bannerMap = {};
-
-    //         const snapshot = await db.collection("users").where('phoneNumber', 'in', phoneNumbers).get();
-    //         snapshot.docs.map((doc) => {
-    //             bannerMap[doc.id] = doc.data();
-    //             console.log("doc.id = "+doc.id);
-    //         });
-
-    //         setBannerOwners(bannerMap);
-    //     }
-	// };
-    
-    const addEvent = () => {
-        navigation.push("AddEvent", { topicId, topicName, groupId, groupName, groupOwner });
-    };
-
-    const viewEvent = (eventId, eventData) => {
-        navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId, eventData });
-    };
-
-    // const getString = (uid) => {
-    //     if(bannerOwners != undefined && uid != undefined && bannerOwners[uid.toString()] != undefined) {
-    //         return (bannerOwners[uid.toString()].firstName+" "+bannerOwners[uid.toString()].lastName);
-    //     }
-    //     else return "";
-    // }
+    const getCurrentTime = () => {
+        return firebase.firestore.FieldValue.serverTimestamp();
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -197,379 +111,180 @@ const ActiveEvents = ({ navigation, route }) => {
 
                 {/* Active Events */}
                 <View style={{
-                    marginTop: 30, marginBottom: 0, width: "100%",
+                    marginTop: 0, marginBottom: 0, width: "100%",
                     flexDirection: "column", flexShrink: 0,
                     justifyContent: "flex-start", alignItems: "center",
                 }}>
                     <View style={{ paddingTop: 0, width: "90%", }}>
-                        {activeEvents.map(({ id, data }) => (
-                        <View key={id} style={{
-                                width: "100%",
-                                backgroundColor: "#fff0", borderWidth: 0,
-                                flex: 0, flexGrow: 0,
-                                flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
-                                borderRadius: 1,
+                    {groupToData.map((group, index) => (
+                        <MyView hide={group.activeEvents.length <= 0} key={group.groupID} style={[{
+                        width: "100%", minHeight: 100, marginTop: 15, backgroundColor: "#fff0",
+                        flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                        borderRadius: 25, borderWidth: 0, borderColor: "#777",
+                        paddingBottom: 0, marginBottom: 5, flex: 0, flexGrow: 0,
+                        },]}>
+
+                        {/* Group Image & Title */}
+                        <View style={{
+                            width: "100%", minHeight: 10, backgroundColor: "#abe0",
+                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                            flex: 0, flexGrow: 0,
+                        }}>
+                            <View style={{
+                                flex: 1, flexGrow: 1,
+                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                             }}>
-
-                            {/* Top Container */}
-                            <View
-                                style={[
-                                    {
-                                        width: "100%", marginTop: 1,
-                                        backgroundColor: "#F8D353", borderWidth: 0,
-                                        flex: 0, flexGrow: 0, flexDirection: "row",
-                                        justifyContent: "flex-start", alignItems: "center",
-                                        borderRadius: 1,
-                                    },
-                                    {
-                                        shadowColor: "#000", shadowOffset: {width: 0, height: 3},
-                                        shadowRadius: 3, shadowOpacity: 0.4,
-                                    }
-                                ]} >
-                                {/* Active Event */}
-                                <View style={{
-                                    // minWidth: "10%",
-                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                    flex: 1, flexGrow: 1, flexDirection: "row",
-                                    justifyContent: "flex-start", alignItems: "center",
+                            <Image
+                                source={helpers.getGroupCoverImage(group.groupColor, group.groupImageNumber)}
+                                style={{
+                                    width: 60, height: 60,
+                                    marginLeft: 0, marginRight: 20, marginVertical: 15,
+                                    borderRadius: 5,
+                                }}
+                            />
+                            <Text numberOfLines={1} style={{
+                                fontSize: 22,
+                                fontWeight: '800',
+                                textAlign: "center",
+                                maxWidth: 350,
+                                paddingVertical: 5,
+                                paddingRight: 15,
+                                color: "#000",
                                 }}>
-                                    <View style={{
-                                        width: "100%", height: 60,
-                                        paddingHorizontal: 15, paddingVertical: 10,
-                                        backgroundColor: "#F8D353", borderRadius: 0, borderWidth: 0,
-                                        flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                    }}>
-                                        <View style={{
-                                            width: 190, height: 35, paddingHorizontal: 15, borderRadius: 7,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#FDF4D4",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <Entypo name="calendar" size={20} color="#333" />
-                                            <Text style={{
-                                                        fontSize: 18,
-                                                        fontWeight: '800',
-                                                        textAlign: "left",
-                                                        marginLeft: 15, marginRight: 10,
-                                                        color: "#333",
-                                                        flex: 1,
-                                                }}>
-                                                    {"Active Event"}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </View>
-                                {/* Moderator */}
-                                {(data.ownerUID === auth.currentUser.uid) ? (
-                                    <View style={{
-                                        minWidth: 26, minHeight: 26,
-                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
-                                        flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
-                                    }}>
-                                        <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} />
-                                    </View>
-                                ) : (
-                                    <View style={{
-                                        minWidth: 26, minHeight: 26,
-                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
-                                        flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
-                                    }}>
-                                        {/* <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} /> */}
-                                    </View>
-                                )}
+                                {group.groupName}
+                            </Text>
                             </View>
-
-                            {/* Middle Container */}
-                            <View style={[
-                                    {
-                                        width: "100%", marginTop: 0, marginBottom: 30,
-                                        backgroundColor: "#fff", borderWidth: 0,
-                                        flex: 0, flexGrow: 0, flexDirection: "row",
-                                        justifyContent: "flex-start", alignItems: "center",
-                                        borderRadius: 1,
-                                    },
-                                    {
-                                        shadowColor: "#000", shadowOffset: {width: 0, height: 3},
-                                        shadowRadius: 3, shadowOpacity: 0.4,
-                                    }
-                                ]} >
-                                {/* Left Content */}
-                                <View style={{
-                                    minWidth: "10%",
-                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                    flex: 1, flexGrow: 1, flexDirection: "row",
-                                    justifyContent: "flex-start", alignItems: "center",
-                                }}>
-                                    <View style={{
-                                        width: "100%", //height: 90,
-                                        paddingHorizontal: 15, paddingVertical: 10,
-                                        backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
-                                        flexDirection: "column", justifyContent: "space-between", alignItems: "center",
-                                    }}>
-                                        <View style={{
-                                            width: "90%", marginTop: 10, marginBottom: 2,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <MaterialIcons name="stars" size={20} color="#333" />
-                                            <Text numberOfLines={1}
-                                                    style={{
-                                                        fontSize: 18,
-                                                        fontWeight: '800',
-                                                        textAlign: "left",
-                                                        marginLeft: 15, marginRight: 10,
-                                                        color: "#333",
-                                                        flex: 1,
-                                                }}>
-                                                    {data.title}
-                                            </Text>
-                                        </View>
-                                        <View style={{
-                                            width: "90%",marginBottom: 2,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <Ionicons name="flag-outline" size={20} color="#333" />
-                                            <Text numberOfLines={1}
-                                                style={{
-                                                    fontSize: 16,
-                                                    fontWeight: '400',
-                                                    textAlign: "left",
-                                                    marginLeft: 15, marginRight: 10,
-                                                    color: "#333",
-                                                    flex: 1,
-                                            }}>
-                                                {(data.startTime != null) ? (data.startTime.toDate().toLocaleDateString("en-US", {
-                                                month: "short", day: "2-digit", year: "numeric", })
-                                                +" @ "+data.startTime.toDate().toLocaleTimeString("en-US", 
-                                                {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
-                                            </Text>
-                                        </View>
-                                        <View style={{
-                                            width: "90%",
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <Feather name="file-text" size={18} color="#333" />
-                                            <Text numberOfLines={1}
-                                                style={{
-                                                    fontSize: 16,
-                                                    fontWeight: '400',
-                                                    textAlign: "left",
-                                                    marginLeft: 15, marginRight: 10,
-                                                    color: "#333",
-                                                    flex: 1,
-                                            }}>
-                                                {data.description}
-                                            </Text>
-                                        </View>
-                                        <View style={{
-                                            width: "90%", height: 50, marginTop: 20, marginBottom: 15,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                        }}>
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => { viewEvent(id, data) }}
-                                            style={{
-                                                minWidth: 200, height: 45, paddingHorizontal: 20,
-                                                borderColor: "#777", borderWidth: 4, borderRadius: 25,
-                                                backgroundColor: "#fac0",
-                                                flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                            }}>
-                                                <Text style={{
-                                                    fontSize: 18,
-                                                    fontWeight: '800',
-                                                    textAlign: "left",
-                                                    marginLeft: 15, marginRight: 0,
-                                                    color: "#333",
-                                                    flex: 1,
-                                                }}>
-                                                    {"View Event"}
-                                                </Text>
-                                                <Entypo name="chevron-right" size={24} color="#333" />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                            
                         </View>
-                        ))}
-                    </View>
-                </View>
+                        
 
-                {/* Add Event Button */}
-                <TouchableOpacity onPress={addEvent} activeOpacity={0.7}
-                    style={[
-                        {
-                            minWidth: 200, minHeight: 60,
-                            marginTop: 5, paddingHorizontal: 40,
-                            justifyContent: "center", alignItems: "center", flexDirection: "row",
-                            backgroundColor: "#3D8D04",
-                            borderColor: "#000", borderWidth: 2, borderRadius: 30,
+                        {/* Active Events */}
+                        {group.activeEvents.map((event, index) => (
+                            
+                        <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
+                            
+                            console.log("currentTime = "+currentTime.valueOf()/1000);
+                            console.log("event.startTime = "+event.data.startTime.seconds);
+                            console.log("ct > st = "+(event.data.startTime.seconds < (currentTime.valueOf()/1000)));
+                            
+
+                            // navigation.navigate('Groups',
+                            // { screen: 'ViewEvent', params: {topicId: event.topicId, topicName: event.topicName, groupId: group.groupID,
+                            //     groupName: group.groupName, groupOwner: event.groupOwner,
+                            //     eventId: event.id, eventData: event.data} });
+
+                            navigation.push('ViewEventHome',
+                            {topicId: event.topicId, topicName: event.topicName, groupId: group.groupID,
+                                groupName: group.groupName, groupOwner: event.groupOwner,
+                                eventId: event.id, eventData: event.data});
+                        }}
+                        style={[{
+                            maxWidth: "100%", minHeight: 10, backgroundColor: "#fff",
+                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                            borderWidth: 1, borderColor: "#777", borderRadius: 3,
+                            marginHorizontal: 0, marginTop: 0, marginBottom: 15,
+                            borderRadius: 10,
                         },
                         {
                             shadowColor: "#000", shadowOffset: {width: 0, height: 3},
                             shadowRadius: 3, shadowOpacity: 0.4,
-                        }
-                    ]}>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 22,
-						fontWeight: '700',
-						color: 'white', marginRight: 20
-					}}>
-						{"Create New Event"}
-					</Text>
-                    <Entypo name="plus" size={30} color="white" />
-                </TouchableOpacity>
-
-                {/* History Text */}
-                <View style={{
-                    marginTop: 50,
-                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                }}>
-                <Divider width={2} color={"#777"}
-                    style={{
-                        minWidth: "10%",
-                        flexGrow: 1, flex: 1,
-                    }}/>
-                <Text style={{
-                    textAlign: "center",
-                    fontSize: 22,
-                    fontWeight: '700',
-                    color: 'black', marginHorizontal: 10
-                }}>
-                    {"History: Past Events ("+pastEvents.length+")"}
-                </Text>
-                <Divider width={2} color={"#777"}
-                    style={{
-                        minWidth: "10%",
-                        flexGrow: 1, flex: 1,
-                    }}/>
-                </View>
-
-                {/* Past Events */}
-                <View style={{
-                    marginTop: 30, marginBottom: 0, width: "100%",
-                    flexDirection: "column", flexShrink: 1,
-                    justifyContent: "flex-start", alignItems: "center",
-                }}>
-                    {/* Prompt for no Events at all (when pastEvents.length == 0 && activeEvents == 0) */}
-                    <MyView hide={pastEvents.length != 0 || activeEvents.length != 0}
-                        style={{
-                            width: "100%", minHeight: 300, paddingTop: 10,
-                            justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
+                        }]}>
+                        <View style={{
+                            width: 70, height: 70, backgroundColor: "#F8D353",
+                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                            borderTopLeftRadius: 10, borderBottomLeftRadius: 10,
                         }}>
-                        <Entypo name="calendar" size={65} color="#555" />
-                        <Text style={{
-                                    fontSize: 20,
-                                    fontWeight: '800',
-                                    textAlign: "center",
-                                    marginTop: 15,
-                                    color: "#555",
+                            <View style={{
+                                width: 45, height: 45, backgroundColor: "#FDF4D4",
+                                flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                marginHorizontal: 12, marginVertical: 15,
+                                borderRadius: 10,
                             }}>
-                                {"No events found."}
-                        </Text>
-                        <Text style={{
-                                    fontSize: 20,
-                                    fontWeight: '400',
-                                    textAlign: "center",
-                                    maxWidth: 350,
-                                    lineHeight: 24,
-                                    marginTop: 15,
-                                    color: "#555",
+                                <Entypo name="calendar" size={30} color="#333" />
+                            </View>
+                        </View>
+                        
+                        {/* place an event icon here */}
+
+                        <View style={{
+                            flex: 1, flexGrow: 1, height: 70, marginLeft: 10, backgroundColor: "#abe0",
+                            flexDirection: "column", justifyContent: "center", alignItems: "flex-start",
+                        }}>
+                            <Text style={{
+                                fontSize: 18,
+                                fontWeight: '700',
+                                textAlign: "center",
+                                maxWidth: 350,
+                                paddingVertical: 0,
+                                paddingHorizontal: 0,
+                                color: "#333",
+                                marginBottom: 5,
                             }}>
-                                {"Looks like there haven't been any announced events within this Topic."+
-                                    "\nClick the button above to create one."}
-                        </Text>
-                        <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
-                    </MyView>
-                    <View style={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
-                        {pastEvents.map(({ id, data }) => (
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewEvent(id, data)}} key={id}
-                                style={[
-                                    {
-                                        width: "100%", marginTop: 1,
-                                        backgroundColor: "#fff", borderWidth: 0,
-                                        flex: 0, flexGrow: 0, flexDirection: "row",
-                                        justifyContent: "flex-start", alignItems: "center",
-                                        borderRadius: 1,
-                                    },
-                                    {
-                                        shadowColor: "#000", shadowOffset: {width: 0, height: 1},
-                                        shadowRadius: 0, shadowOpacity: 0.5,
-                                    }
-                                ]} >
-                                {/* Left Content */}
-                                <View style={{
-                                    minWidth: "10%",
-                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                    flex: 1, flexGrow: 1, flexDirection: "row",
-                                    justifyContent: "flex-start", alignItems: "center",
+                            {event.data.title}
+                            </Text>
+                            <MyView hide={currentTime === undefined || event.data.startTime.seconds <= (currentTime.valueOf()/1000)}
+                            style={{
+                                flexDirection: "row", justifyContent: "center", alignItems: "flex-start",
+                            }}>
+                                <Feather name="clock" size={18} color="#3D8D04" />
+                                <Text numberOfLines={1} style={{
+                                fontSize: 16,
+                                fontWeight: '600',
+                                textAlign: "center",
+                                paddingRight: 15,
+                                paddingLeft: 5,
+                                color: "#3D8D04",
                                 }}>
-                                    <View style={{
-                                        width: "100%", height: 65,
-                                        paddingHorizontal: 15, paddingVertical: 10,
-                                        backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
-                                        flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
-                                    }}>
-                                        <View style={{
-                                            width: "100%",
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <MaterialIcons name="stars" size={18} color="#777" />
-                                            <Text numberOfLines={1}
-                                                    style={{
-                                                        fontSize: 18,
-                                                        fontWeight: '600',
-                                                        textAlign: "left",
-                                                        marginLeft: 15, marginRight: 10,
-                                                        color: "#777",
-                                                        flex: 1,
-                                                }}>
-                                                <Text style={{fontWeight: '600'}}>"</Text>
-                                                    {data.title}
-                                                <Text style={{fontWeight: '600'}}>"</Text>
-                                            </Text>
-                                        </View>
-                                        <View style={{
-                                            width: "100%",
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <Ionicons name="flag-outline" size={18} color="#777" />
-                                            <Text numberOfLines={1}
-                                                style={{
-                                                    fontSize: 16,
-                                                    fontWeight: '400',
-                                                    textAlign: "left",
-                                                    marginLeft: 15, marginRight: 10,
-                                                    color: "#777",
-                                                    flex: 1,
-                                            }}>
-                                                {(data.startTime != null) ? (data.startTime.toDate().toLocaleDateString("en-US", {
-                                                month: "short", day: "2-digit", year: "numeric", })
-                                                +" @ "+data.startTime.toDate().toLocaleTimeString("en-US", 
-                                                {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </View>
-                                {/* Right Chevron */}
-                                <View style={{
-                                    minWidth: 60,
-                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                    paddingVertical: 0, paddingHorizontal: 15,
-                                    flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
+                                
+                                <Text style={{fontWeight: '800',}}>{"Starts:    "}</Text>
+                                {(event.data.startTime != null) ? (event.data.startTime.toDate().toLocaleDateString("en-US", {
+                                    month: "short", day: "2-digit", })
+                                    +" @ "+event.data.startTime.toDate().toLocaleTimeString("en-US", 
+                                    {hour: "numeric", minute: "2-digit", })) : ("")}
+                                
+                                </Text>
+                            </MyView>
+                            <MyView hide={currentTime === undefined || event.data.startTime.seconds > (currentTime.valueOf()/1000)}
+                            style={{
+                                flexDirection: "row", justifyContent: "center", alignItems: "flex-start",
+                            }}>
+                                <Feather name="clock" size={18} color="#DF3D23" />
+                                <Text numberOfLines={1} style={{
+                                fontSize: 16,
+                                fontWeight: '600',
+                                textAlign: "center",
+                                paddingRight: 15,
+                                paddingLeft: 5,
+                                color: "#DF3D23",
                                 }}>
-                                    <Entypo name="chevron-right" size={34} color="#333" />
-                                </View>
-                            </TouchableOpacity>
+                                
+                                <Text style={{fontWeight: '800',}}>{"Ends:    "}</Text>
+                                {(event.data.endTime != null) ? (event.data.endTime.toDate().toLocaleDateString("en-US", {
+                                    month: "short", day: "2-digit", })
+                                    +" @ "+event.data.endTime.toDate().toLocaleTimeString("en-US", 
+                                    {hour: "numeric", minute: "2-digit", })) : ("")}
+                                
+                                </Text>
+                            </MyView>
+                        </View>
+                        <Icon
+                            name='arrow-forward'
+                            type='ionicon'
+                            color='#333'
+                            size={30}
+                            style={{marginHorizontal: 10,}}
+                        />
+                        </TouchableOpacity>
                         ))}
-                    </View>
+
+                        {(index != groupToData.length-1) ? (
+                        <Divider width={1} color={"#999"} style={{minWidth: "100%", marginTop: 5,}}/>
+                        ) : (null)}
+
+                    </MyView>
+                    ))}
                 </View>
+                </View>
+                
             </ScrollView>
         </SafeAreaView>
     )

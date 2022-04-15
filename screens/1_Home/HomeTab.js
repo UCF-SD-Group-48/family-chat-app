@@ -855,7 +855,7 @@ const HomeTab = ({ navigation, route }) => {
                 onPress={() => {
                   // console.log("Test for users Notifications: ", gArray.length);
                   console.log("groupToData = "+JSON.stringify(groupToData));
-                  navigation.push("ActiveEvents", {groupToData});
+                  navigation.push("ActiveEvents", {groupToData, numEvents});
                 }}
               >
                 <View style={{
@@ -1142,7 +1142,7 @@ const HomeTab = ({ navigation, route }) => {
                     </Text>
                   </View>
                 </TouchableOpacity>
-                ) : (null)
+                ) : (<View style={{widht: 0, height: 0,}}></View>)
                 ))}
 
                 {/* See all messages */}
