@@ -83,7 +83,7 @@ const CreateTopic = ({ navigation, route }) => {
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={() => {navigation.goBack();}}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={() => { navigation.goBack(); }}>
                         <Icon
                             name='arrow-back'
                             type='ionicon'
@@ -196,16 +196,19 @@ const CreateTopic = ({ navigation, route }) => {
         else return `${checked.length}`
     }
 
-    let [membersList, setMembersList] = useState([])
+    // let [membersList, setMembersList] = useState([])
 
     const createTopic = async () => {
         const currentUserID = auth.currentUser.uid;
 
-        let membersArray = [];
+        // let membersArray = [];
 
-        membersList.map((member) => {
-            membersArray.push(member.uid)
-        })
+        // console.log('membersList', membersList)
+        console.log('checked',checked)
+
+        // checked.map((member) => {
+        //     membersArray.push(member.uid)
+        // })
 
         await db.collection('groups').doc(groupId)
             .collection("topics")
@@ -216,11 +219,26 @@ const CreateTopic = ({ navigation, route }) => {
                 originalMessageUID: originalMessageUID || "",
                 // parentGroup: groupId
             })
-            .then(async (newlyCreatedTopic) => {
+            .then((newlyCreatedTopic) => {
                 let topicID = newlyCreatedTopic.id
-                mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
-                membersArray.map(async (memberUID) => {
-                    await db.collection('users').doc(memberUID).update(mapUpdate);
+                // mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
+                // membersArray.map(async (memberUID) => {
+                //     await db.collection('users').doc(memberUID).update(mapUpdate);
+                // })
+
+                console.log('topicID', topicID)
+                console.log(checked)
+                checked.map(async (memberUID, index) => {
+
+                    console.log(index, memberUID)
+
+                    const addTopicMapValue = await db
+                        .collection('users')
+                        .doc(memberUID)
+                        .update({
+                            [`topicMap.${topicID}`]: firebase.firestore.FieldValue.serverTimestamp()
+                        })
+                        .catch((error) => console.log(error));
                 })
 
                 navigation.push("Chat",
@@ -292,11 +310,11 @@ const CreateTopic = ({ navigation, route }) => {
                             onChangeText={(textChange) => {
                                 setNewTopicName(textChange);
                             }}
-                            maxLength={18}
+                            maxLength={17}
                             style={styles.textInputField}
                         />
                         {/* How many Characters newTopicName.length >= 15*/}
-                        <MyView hide={newTopicName.length < 15}
+                        <MyView hide={newTopicName.length < 12}
                             style={{
                                 width: "100%",
                                 paddingHorizontal: 0,
@@ -311,11 +329,11 @@ const CreateTopic = ({ navigation, route }) => {
                                 fontSize: 14,
                                 fontWeight: '500',
                                 color: "#222",
-                                }}>
-                                {"Characters "+newTopicName.length+"/18"}
+                            }}>
+                                {"Characters " + newTopicName.length + "/17"}
                             </Text>
                         </MyView>
-                        <View style={{marginBottom: 22,}}/>
+                        <View style={{ marginBottom: 22, }} />
 
                         <View style={styles.textInput}>
                             <Icon
