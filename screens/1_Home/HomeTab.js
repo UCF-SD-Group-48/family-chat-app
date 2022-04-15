@@ -178,7 +178,8 @@ const HomeTab = ({ navigation, route }) => {
     },
   ]);
 
-  const [groupToActiveEvents, setGroupToActiveEvents] = useState({});
+  const [groupToData, setGroupToData] = useState([]);
+  const [numEvents, setNumEvents] = useState(0);
 
   // const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
   //   const windowWidth = Dimensions.get('window').width;
@@ -542,33 +543,95 @@ const HomeTab = ({ navigation, route }) => {
 
   useLayoutEffect(() => {
     resetActiveEvents();
-  }, [route]);
+  }, [route, isFocused]);
 
   const resetActiveEvents = async () => {
     
     let groups = [];
+    let groupUIDtoData = {};
     let groupToTopics = {};
+    let memberUIDToData = {};
+
+    //getting current user's groups
     await db.collection('users').doc(auth.currentUser.uid).get()
     .then((result) => {
       groups = [...result.data().groups];
     });
 
     for (const groupUID of groups) {
+      
+      //getting a list of topic ids
       let topics = [];
       const snapshot = await db.collection('groups').doc(groupUID).collection("topics").get();
-      
-            for (const topic of snapshot.docs) {
-              topics.push(topic.id);
-            }
-            groupToTopics[groupUID] = [...topics];
+      for (const topic of snapshot.docs) {
+        topics.push(topic.id);
+      }
+      //settings the list of topic ids under a key of the group UID
+      groupToTopics[groupUID] = [...topics];
+
+      //getting group data per group (and members)
+      let members = [];
+      await db.collection('groups').doc(groupUID).get()
+      .then((result) => {
+        groupUIDtoData[groupUID] = result.data();
+        result.data().members.map( (memberUID) =>
+          members.push(memberUID)
+        );
+      });
+
+      for (const member of members) {
+        if(!memberUIDToData.hasOwnProperty(member)) {
+          await db.collection('users').doc(member).get()
+          .then((result) => {
+            memberUIDToData[member] = result.data();
+          });
+        }
+      }
     }
 
-    // console.log("groupToTopics = "+JSON.stringify(groupToTopics));
-    // console.log("\n");
-
-    let groupToActiveEvents = {};
+    let groupData = [];
+    let numActiveEvents = 0;
+    let totalMissedMessages = 0;
     for (const groupUID of groups) {
 
+      totalMissedMessages = 0;
+      let topics = [];
+      for (const topicUID of groupToTopics[groupUID]) {
+
+        //getting all the messages per topic
+        let missedMessages = [];
+        if(memberUIDToData[auth.currentUser.uid].topicMap.hasOwnProperty(topicUID)) {
+          const snapshot = await db.collection('chats').doc(topicUID).collection("messages")
+            .where('timestamp', ">", memberUIDToData[auth.currentUser.uid].topicMap[topicUID])
+            .orderBy('timestamp', 'asc').get();
+            
+          if(snapshot.docs.length > 0) {
+            totalMissedMessages += snapshot.docs.length;
+            for (const message of snapshot.docs) {
+              //TODO only push the last three?
+              missedMessages.push({
+                messageText: message.data().message,
+                messageTime: message.data().timestamp,
+                senderFullName: memberUIDToData[message.data().ownerUID].firstName+" "+memberUIDToData[message.data().ownerUID].lastName,
+                senderPFP: memberUIDToData[message.data().ownerUID].pfp,
+              });
+            }
+
+            //pushing missed messages to topics array
+            const doc = await db.collection('groups').doc(groupUID).collection('topics').doc(topicUID).get();
+            if(doc.exists) {
+              topics.push({
+                missedMessages: missedMessages,
+                topicID: doc.id,
+                topicName: doc.data().topicName,
+              });
+            }
+
+          }
+        }
+      }
+
+      //saving all events
       let events = [];
       for (const topicUID of groupToTopics[groupUID]) {
         const snapshot = await db.collection('chats').doc(topicUID).collection("events")
@@ -580,12 +643,35 @@ const HomeTab = ({ navigation, route }) => {
           });
         }
       }
-      groupToActiveEvents[groupUID] = [...events];
-    }
-    // console.log("groupToActiveEvents = "+JSON.stringify(groupToActiveEvents));
-    // console.log("\n");
 
-    setGroupToActiveEvents(groupToActiveEvents);
+      //pushing to final object groupData
+      if(events.length > 0 && topics.length > 0) {
+        numActiveEvents = numActiveEvents + 1;
+        groupData.push( {
+          activeEvents: [...events],
+          topics: [...topics],
+          totalMissedMessages: totalMissedMessages,
+          groupName: groupUIDtoData[groupUID].groupName,
+          groupColor: groupUIDtoData[groupUID].color,
+          groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
+        });
+      }
+      else if(events.length <= 0 && topics.length > 0) {
+        groupData.push( {
+          activeEvents: null,
+          groupID: groupUID,
+          topics: [...topics],
+          totalMissedMessages: totalMissedMessages,
+          groupName: groupUIDtoData[groupUID].groupName,
+          groupColor: groupUIDtoData[groupUID].color,
+          groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
+        });
+      }
+    }
+
+    //saving to state groupToData
+    setNumEvents(numActiveEvents);
+    setGroupToData(groupData);
 
   }
 
@@ -691,31 +777,75 @@ const HomeTab = ({ navigation, route }) => {
 
           {/* Events */}
           <View style={styles.interactFeaturesContainer}>
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => {
-                console.log("Test for users Notifications: ", gArray.length);
-                console.log("final groupToActiveEvents = "+JSON.stringify(groupToActiveEvents))
-              }}
-            >
-              <View style={[styles.interactiveFeatureButtonDisabled, { marginRight: 7 }]}>
-                <View style={styles.interactiveFeatureLeftHalfDisabled}>
-                  <View style={styles.interactiveFeatureIconBackgroundDisabled}>
-                    <Icon
-                      name='calendar'
-                      type='entypo'
-                      color='#9D9D9D'
-                      size={25}
-                    />
+            <MyView hide={numEvents > 0}>
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() => {
+                  // console.log("Test for users Notifications: ", gArray.length);
+                }}
+              >
+                <View style={[styles.interactiveFeatureButtonDisabled, { marginRight: 7 }]}>
+                  <View style={styles.interactiveFeatureLeftHalfDisabled}>
+                    <View style={styles.interactiveFeatureIconBackgroundDisabled}>
+                      <Icon
+                        name='calendar'
+                        type='entypo'
+                        color='#9D9D9D'
+                        size={25}
+                      />
+                    </View>
+                  </View>
+                  <View style={styles.interactiveFeatureRightHalfDisabled}>
+                    <Text style={styles.interactiveFeatureTextDisabled}>
+                      No Active Events
+                    </Text>
                   </View>
                 </View>
-                <View style={styles.interactiveFeatureRightHalfDisabled}>
-                  <Text style={styles.interactiveFeatureTextDisabled}>
-                    No Active Events
+              </TouchableOpacity>
+            </MyView>
+
+            {/* edit this to show active enets */}
+            <MyView hide={numEvents <= 0}>
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() => {
+                  // console.log("Test for users Notifications: ", gArray.length);
+                }}
+              >
+                <View style={{
+                  minWidth: 100, backgroundColor: "#fff",
+                  borderWidth: 1, borderColor: '#333', borderRadius: 5,
+                  justifyContent: "flex-start", alignItems: 'center', flexDirection: "row", 
+                }}>
+                  <View style={{  flexDirection: "row", height: 40,  }}>
+                    <View style={{
+                      backgroundColor: '#F8D353', paddingHorizontal: 10, paddingVertical: 5,
+                      borderTopLeftRadius: 5, borderBottomLeftRadius: 5,
+                      justifyContent: "flex-start", alignItems: 'center', flexDirection: "row", 
+                    }}>
+                      <Icon
+                        name='calendar'
+                        type='entypo'
+                        color='#000'
+                        size={20}
+                      />
+                    </View>
+                  </View>
+                  <Text style={{
+                    fontSize: 14,
+                    fontWeight: '700',
+                    textAlign: "left",
+                    marginLeft: 10,
+                    color: "#333",
+                  }}>
+                    Active Events
                   </Text>
+                  <Entypo name="chevron-right" size={20} color="#333" style={{
+                    paddingHorizontal: 7,
+                  }} />
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </MyView>
 
             {/* Polls */}
             <TouchableOpacity
@@ -742,7 +872,7 @@ const HomeTab = ({ navigation, route }) => {
           </View>
 
           {/* You're all Caught Up Message */}
-          <MyView hide={false}>
+          <MyView hide={groupToData.length > 0}>
           <View style={styles.allCaughtUpContainer}>
             <View style={styles.allCaughtUpContent}>
               <Text style={{ fontSize: 55 }}>
@@ -785,7 +915,7 @@ const HomeTab = ({ navigation, route }) => {
           </TouchableOpacity>
           </MyView>
 
-          {testData.map((group) => (
+          {groupToData.map((group, index) => (
             <View key={group.groupID} style={[{
               width: "100%", minHeight: 100, marginTop: 15, backgroundColor: "#fff",
               flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
@@ -803,7 +933,10 @@ const HomeTab = ({ navigation, route }) => {
                 borderTopLeftRadius: 25, borderTopRightRadius: 25,
                 paddingVertical: 7,
               }}>
-                <TouchableOpacity activeOpacity={0.7} onPress={() => {}} style={{
+                <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                  //TODO loop through topics and update user's topicMap readTime to current time,
+                  //then remove the group from the data if possible
+                }} style={{
                   backgroundColor: "#E3DFD9",
                   marginRight: 15,
                   flexDirection: "row", justifyContent: "flex-end", alignItems: "center",
@@ -865,8 +998,8 @@ const HomeTab = ({ navigation, route }) => {
                       paddingHorizontal: 12,
                       color: "#DF3D23",
                     }}>
-                      <Text style={{ fontWeight: '800' }}>{"XX+ "}</Text>
-                      {"Missed Messages"}
+                      <Text style={{ fontWeight: '800' }}>{group.totalMissedMessages}</Text>
+                      {" Missed Messages"}
                   </Text>
                   </View>
                 </View>
@@ -921,7 +1054,12 @@ const HomeTab = ({ navigation, route }) => {
                 {topic.missedMessages.map((message, index) => (
                 
                 (topic.missedMessages.length < 3 || index >= (topic.missedMessages.length - 3)) ? (
-                <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {}}
+                <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
+                  navigation.navigate('Groups',
+                  { screen: 'Chat', params: {topicId: topic.topicID, topicName: topic.topicName,
+                    groupId: group.groupID, groupName: group.groupName, groupOwner: null,
+                    color: group.groupColor, coverImageNumber: group.groupImageNumber} });
+                }}
                 style={{
                   maxWidth: "100%", minHeight: 10, backgroundColor: "#F8F8F8",
                   flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
@@ -971,7 +1109,12 @@ const HomeTab = ({ navigation, route }) => {
                   borderWidth: 1, borderColor: "#777", borderRadius: 3,
                   marginHorizontal: 15, marginTop: -1,
                 }}>
-                  <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
+                  <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                    navigation.navigate('Groups',
+                    { screen: 'Chat', params: {topicId: topic.topicID, topicName: topic.topicName,
+                      groupId: group.groupID, groupName: group.groupName, groupOwner: null,
+                      color: group.groupColor, coverImageNumber: group.groupImageNumber} });
+                  }}
                     style={{
                       flex: 1, flexGrow: 1,
                       flexDirection: "row", justifyContent: "center", alignItems: "center",

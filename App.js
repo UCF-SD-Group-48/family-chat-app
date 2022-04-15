@@ -44,6 +44,7 @@ import UserCreated from './screens/0_Authentication/UserCreated';
 
 // ----------------- 'HOME' Screens
 import HomeTab from './screens/1_Home/HomeTab';
+import ActiveEvents from './screens/1_Home/ActiveEvents';
 
 // ----------------- 'GROUP CHATS' Screens
 import GroupChatsTab from './screens/2_GroupChats/GroupChatsTab';
@@ -184,6 +185,7 @@ const HomeStackScreen = () => (
     headerTitleAlign: 'center',
   }}>
     <Stack.Screen name='HomeTab' component={HomeTab} />
+    <Stack.Screen name='ActiveEvents' component={ActiveEvents} />
   </Stack.Navigator>
 )
 
