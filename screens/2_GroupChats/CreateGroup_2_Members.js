@@ -204,13 +204,24 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 						// parentGroup: groupID
 					})
 					.then((newlyCreatedTopic) => {
-						let mapTopics = {}
+						console.log('********** INSIDE THE CREATE FOR THE TOPICMAPARRAY UPDATE')
+						// let mapTopics = {}
 						topicID = newlyCreatedTopic.id
-						mapTopics[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
-						setMapUpdate(mapTopics)
+						// mapTopics[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
+						// setMapUpdate(mapTopics)
+						console.log(membersArray)
 						membersArray.map(async (memberUID) => {
-							await db.collection('users').doc(memberUID).update(mapUpdate);
+							// await db.collection('users').doc(memberUID).update(mapUpdate);
+							const addTopicMapValue = await db
+								.collection('users')
+								.doc(memberUID)
+								.update({
+									[`topicMap.${topicID}`]: firebase.firestore.FieldValue.serverTimestamp()
+								})
+								.catch((error) => console.log(error));
 						})
+
+
 					})
 					.catch((error) => alert(error));
 			})
@@ -240,8 +251,8 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 					groupName,
 					groupOwner,
 					coverImageNumber: route.params.coverImage.imageNumber,
-					color: route.params.coverImage.color, 
-			});
+					color: route.params.coverImage.color,
+				});
 			})
 			.catch((error) => console.log(error));
 	};
@@ -689,17 +700,17 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 
-    ownerBadge: {
-        width: 26,
-        height: 26,
-        backgroundColor: "#F8D353",
-        borderWidth: 2,
-        borderColor: "black",
-        borderRadius: 15,
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
-    },
+	ownerBadge: {
+		width: 26,
+		height: 26,
+		backgroundColor: "#F8D353",
+		borderWidth: 2,
+		borderColor: "black",
+		borderRadius: 15,
+		justifyContent: "center",
+		alignItems: "center",
+		flexDirection: "row",
+	},
 
 	buttonCreate: {
 		width: 125,
