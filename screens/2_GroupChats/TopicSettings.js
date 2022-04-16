@@ -250,6 +250,7 @@ const TopicSettings = ({ navigation, route }) => {
         setTopicData({});
         setNewTopicOwner('');
         setIsLoadingEditContent();
+        
     }
 
     useEffect(async () => {
@@ -335,6 +336,7 @@ const TopicSettings = ({ navigation, route }) => {
             setTopicData({});
             setNewTopicOwner();
             setIsLoadingEditContent();
+            setGroupMembers([])
         };
     }, [toggleOverlay])
 
@@ -565,7 +567,7 @@ const TopicSettings = ({ navigation, route }) => {
                 })
             }
         } catch (error) {
-            alert(error)
+            console.log(error)
         } finally {
             try {
                 const groupSnapshot = await db
@@ -810,7 +812,23 @@ const TopicSettings = ({ navigation, route }) => {
 
         setIsLoadingTransferButton(false)
         setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
+    }
 
+    const updateGroupMembers = async () => {
+        console.log('Updating Group Members')
+
+        const groupSnapshot = await db
+            .collection('groups')
+            .doc(topicObjectForPassing.groupId)
+            .get()
+
+        const groupSnapshotData = groupSnapshot.data();
+
+        setGroupMembers([])
+
+        groupSnapshotData.members.map((memberUID, index) => {
+            getGroupMemberData(memberUID);
+        })
     }
 
     return (
@@ -866,54 +884,56 @@ const TopicSettings = ({ navigation, route }) => {
                             }}
                         >
                             <View style={[styles.memberBoxScrollView, {}]}>
-                                {groupMembers.map((topicMember, index) => (
-                                    <View style={[styles.memberRow, {}]} key={index} id={index}>
-                                        <View style={[styles.member, {}]}>
-                                            <View style={[styles.memberLeftPortion, {}]}>
-                                                <Image
-                                                    source={imageSelection(topicMember.pfp)}
-                                                    style={{ width: 26, height: 26, borderRadius: 5, }}
+                                {groupMembers
+                                    .filter(memberObject => topicMembers.includes(memberObject.uid))
+                                    .map((topicMember, index) => (
+                                        <View style={[styles.memberRow, {}]} key={index} id={index}>
+                                            <View style={[styles.member, {}]}>
+                                                <View style={[styles.memberLeftPortion, {}]}>
+                                                    <Image
+                                                        source={imageSelection(topicMember.pfp)}
+                                                        style={{ width: 26, height: 26, borderRadius: 5, }}
+                                                    />
+                                                    <Text style={[styles.memberName, {}]}>
+                                                        {topicMember.name}
+                                                    </Text>
+                                                    {(topicMember.uid === topicData.topicOwner)
+                                                        ? <Icon
+                                                            name='crown'
+                                                            type='material-community'
+                                                            color='black'
+                                                            size={16}
+                                                            style={{ marginLeft: 10, }}
+                                                        />
+                                                        : null
+                                                    }
+                                                </View>
+                                                <CheckBox
+                                                    center
+                                                    checkedIcon={
+                                                        <Icon
+                                                            name="radio-button-checked"
+                                                            type="material"
+                                                            color="#2352DF"
+                                                            size={25}
+                                                            iconStyle={{ margin: 'auto' }}
+                                                        />
+                                                    }
+                                                    uncheckedIcon={
+                                                        <Icon
+                                                            name="radio-button-unchecked"
+                                                            type="material"
+                                                            color="grey"
+                                                            size={25}
+                                                            iconStyle={{ marginRight: 0 }}
+                                                        />
+                                                    }
+                                                    checked={(topicMember.uid === newTopicOwner)}
+                                                    onPress={() => setNewTopicOwner(topicMember.uid)}
                                                 />
-                                                <Text style={[styles.memberName, {}]}>
-                                                    {topicMember.name}
-                                                </Text>
-                                                {(topicMember.uid === topicData.topicOwner)
-                                                    ? <Icon
-                                                        name='crown'
-                                                        type='material-community'
-                                                        color='black'
-                                                        size={16}
-                                                        style={{ marginLeft: 10, }}
-                                                    />
-                                                    : null
-                                                }
                                             </View>
-                                            <CheckBox
-                                                center
-                                                checkedIcon={
-                                                    <Icon
-                                                        name="radio-button-checked"
-                                                        type="material"
-                                                        color="#2352DF"
-                                                        size={25}
-                                                        iconStyle={{ margin: 'auto' }}
-                                                    />
-                                                }
-                                                uncheckedIcon={
-                                                    <Icon
-                                                        name="radio-button-unchecked"
-                                                        type="material"
-                                                        color="grey"
-                                                        size={25}
-                                                        iconStyle={{ marginRight: 0 }}
-                                                    />
-                                                }
-                                                checked={(topicMember.uid === newTopicOwner)}
-                                                onPress={() => setNewTopicOwner(topicMember.uid)}
-                                            />
                                         </View>
-                                    </View>
-                                ))}
+                                    ))}
                             </View>
                         </ScrollView>
                     </View>
@@ -963,6 +983,7 @@ const TopicSettings = ({ navigation, route }) => {
                     onPress={() => {
                         setIsLoadingGroupSettings(true);
                         goForward();
+                        setIsEditing(false)
                     }}
                     style={styles.groupListItemComponent}
                 >
@@ -1346,6 +1367,7 @@ const TopicSettings = ({ navigation, route }) => {
                                             console.log(topicData)
                                             setIsLoadingSaveButton(false);
                                             setIsLoadingEditButton(true);
+                                            updateGroupMembers();
                                             setIsEditing(true);
                                         }}
                                     >

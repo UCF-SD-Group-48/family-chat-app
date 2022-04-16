@@ -223,9 +223,9 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 
 
 					})
-					.catch((error) => alert(error));
+					.catch((error) => console.log(error));
 			})
-			.catch((error) => alert(error));
+			.catch((error) => console.log(error));
 
 		enterGroup(groupID, route.params.groupName, currentUserID)
 	};

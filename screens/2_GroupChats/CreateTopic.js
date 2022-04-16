@@ -128,7 +128,7 @@ const CreateTopic = ({ navigation, route }) => {
                 setGroupMembers((previous) => [...previous, searchedMember])
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -136,7 +136,7 @@ const CreateTopic = ({ navigation, route }) => {
         try {
             getGroupMembers();
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
 
         return () => {
@@ -257,7 +257,7 @@ const CreateTopic = ({ navigation, route }) => {
             //  setButtonText('CREATED');
             //  navigation.push("Chat", { topicId : String(result.id), topicName : newTopicName, groupId, groupName, groupOwner });
             // })
-            .catch((error) => alert(error));
+            .catch((error) => console.log(error));
     };
 
     const [isLoading, setIsLoading] = useState(false);
