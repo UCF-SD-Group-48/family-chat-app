@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Alert,
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
@@ -23,7 +24,6 @@ import {
   Linking,
 } from 'react-native';
 import {
-  Alert,
   Avatar,
   Button,
   CheckBox,
@@ -57,7 +57,8 @@ import {
   apps,
   auth,
   db,
-  firebaseConfig
+  firebaseConfig,
+  deleteUser
 } from '../../firebase';
 import firebase from 'firebase/compat/app';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
@@ -110,26 +111,104 @@ const ProfileTab = ({ navigation }) => {
       headerTintColor: 'black',
       headerLeft: '',
       headerRight: () => (
-        <View
-          style={{
-            flexDirection: "row",
-            marginRight: 12,
-          }}>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => signOutUser()}
-          >
-            <Icon
-              name='logout'
-              type='material'
-              size={24}
-              color='#363732'
-            />
-          </TouchableOpacity>
+        <View style={{ marginRight: 12, }}>
+          <Menu>
+            <MenuTrigger>
+              <Icon
+                name='dots-three-horizontal'
+                type='entypo'
+                color='black'
+                size={30}
+              />
+            </MenuTrigger>
+            <MenuOptions
+              style={{
+                borderRadius: 12, backgroundColor: "#fff",
+              }}
+              customStyles={{
+                optionsContainer: {
+                  borderRadius: 15, backgroundColor: "#666",
+                },
+              }}>
+              <MenuOption
+                onSelect={() => deleteAccount()}
+                style={{ marginBottom: 10, marginTop: 10, flexDirection: 'row', alignItems: 'center' }}>
+                <Icon
+                  name='trash'
+                  type='feather'
+                  color='red'
+                  size={16}
+                  style={{ marginLeft: 10, }}
+                />
+                <Text style={{ fontSize: 14, color: 'red', marginLeft: 11 }}>
+                  Delete Account
+                </Text>
+              </MenuOption>
+            </MenuOptions>
+          </Menu>
         </View>
       ),
     });
   }, [navigation]);
+
+  const deleteAccount = () => {
+    console.log('Are you sure you want to delete your account?')
+    setDeleted(true);
+
+    Alert.alert(
+      'Delete Account',
+      'Are you sure that you want to delete your account? This will permanently erase data from your groups/topics.',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => setDeleted(false) },
+        {
+          text: 'Yes, Delete',
+          style: 'destructive',
+          onPress: () => {
+            setDeleted(true);
+            removeUserFromGroupsTopics();
+          },
+        },
+      ]
+    );
+  }
+
+  const [deleted, setDeleted] = useState(false)
+
+  const removeUserFromGroupsTopics = async () => {
+
+    // Get current user doc
+    // identify groups
+    // identify current user topicMap
+    // check current user's groups
+    // if the group is only one member = only with them, then delete group/topics/messages
+    // if the group is owned by the current user, give to someone else
+    // if the current user is owner of topics, give to someone else (if there are other members)
+    // remove the DMs
+
+    console.log('Removing user from Groups / Topics');
+    console.log('DELETED ==', deleted);
+
+    await setDeleted(true);
+    setEditing(false);
+
+    Alert.alert(
+      `Account Deleted`,
+      `Your account was successfully deleted.`,
+      [{ text: "OK" }]
+    );
+
+    const userQuery = await db
+      .collection('users')
+      .doc(auth.currentUser.uid)
+      .delete()
+      .then(() => {
+        console.log('DELETED ==', deleted)
+        navigation.replace('UserAuth')
+      })
+      .catch((error) => console.log(error));
+
+    console.log('FINISHED')
+  }
 
   const signOutUser = () => {
     auth.signOut().then(() => {
@@ -175,19 +254,22 @@ const ProfileTab = ({ navigation }) => {
       .collection("users")
       .doc(auth.currentUser.uid)
       .onSnapshot(async (userSnapshot) => {
-        // console.log(userSnapshot.data())
-        setUserSnapshotData(userSnapshot.data())
-        setPushNotifications(userSnapshot.data().pushNotificationEnabled)
-        setDiscoverable(userSnapshot.data().discoverableEnabled)
-        setFormattedPhoneNumber(`(${userSnapshot.data().phoneNumber.slice(0, 3)}) ${userSnapshot.data().phoneNumber.slice(3, 6)}-${userSnapshot.data().phoneNumber.slice(6, 10)}`)
+        if (deleted === false) {
+          console.log(deleted)
+          // console.log(userSnapshot.data())
+          setUserSnapshotData(userSnapshot.data())
+          setPushNotifications(userSnapshot.data().pushNotificationEnabled)
+          setDiscoverable(userSnapshot.data().discoverableEnabled)
+          setFormattedPhoneNumber(`(${userSnapshot.data().phoneNumber.slice(0, 3)}) ${userSnapshot.data().phoneNumber.slice(3, 6)}-${userSnapshot.data().phoneNumber.slice(6, 10)}`)
 
-        setFirstName(userSnapshot.data().firstName);
-        setLastName(userSnapshot.data().lastName);
-        setStatus(userSnapshot.data().statusText);
-        setStatusEmoji(userSnapshot.data().statusEmoji);
-        setEmail(userSnapshot.data().email);
-        setPhoneNumber(formatNumber(userSnapshot.data().phoneNumber));
-        setPfp(userSnapshot.data().pfp);
+          setFirstName(userSnapshot.data().firstName);
+          setLastName(userSnapshot.data().lastName);
+          setStatus(userSnapshot.data().statusText);
+          setStatusEmoji(userSnapshot.data().statusEmoji);
+          setEmail(userSnapshot.data().email);
+          setPhoneNumber(formatNumber(userSnapshot.data().phoneNumber));
+          setPfp(userSnapshot.data().pfp);
+        }
       });
 
     return () => {
@@ -213,17 +295,18 @@ const ProfileTab = ({ navigation }) => {
 
   const contactDeveloper = () => {
     // Linking.openURL('mailto:familychatapp@gmail.com?subject=Inquiry&body=Hey,')
+    Linking.openURL('mailto:parizeaujj@gmail.com?subject=FamilyChat&body=Help')
     // Linking.openURL('message://familychatapp@gmail.com?subject=Inquiry&body=Hey,')
   }
 
   const handleEmoji = (textChange) => {
     let newText = textChange;
-    if(newText.length >= 1) {
-      if(newText.length == 4) { //if it's two emoji's only take the last one
+    if (newText.length >= 1) {
+      if (newText.length == 4) { //if it's two emoji's only take the last one
         newText = [...textChange].slice(1).join('');
       }
-      else if(newText.length == 2) { //if it's one emoji, take it as one character
-        newText = [...textChange].slice(0,1).join('');
+      else if (newText.length == 2) { //if it's one emoji, take it as one character
+        newText = [...textChange].slice(0, 1).join('');
       }
       else { //if it's anything else, set it to nothing
         newText = "";
@@ -233,13 +316,13 @@ const ProfileTab = ({ navigation }) => {
   };
 
   const saveProfileData = async () => {
-    
+
     await db.collection("users").doc(auth.currentUser.uid).update({
-        firstName: firstName,
-        lastName: lastName,
-        statusEmoji: statusEmoji,
-        statusText: status,
-        email: email,
+      firstName: firstName,
+      lastName: lastName,
+      statusEmoji: statusEmoji,
+      statusText: status,
+      email: email,
     });
 
   };
@@ -272,17 +355,17 @@ const ProfileTab = ({ navigation }) => {
                 source={imageSelection(pfp)}
                 style={{ width: 80, height: 80, borderRadius: 5, borderWidth: 2, borderColor: "#777" }}
               />
-              <TouchableOpacity activeOpacity={0.85} onPress={() => {}}
-              style={{
-                width: 26, height: 26, backgroundColor: "#F8F8F8", borderRadius: 15, borderWidth: 2, borderColor: "#777",
-                marginLeft: -19, marginBottom: -7,
-                justifyContent: "center", alignItems: "center",
-              }}>
-                <MaterialIcons name="mode-edit" size={15} color="#333" style={{paddingLeft: 2,}} />
+              <TouchableOpacity activeOpacity={0.85} onPress={() => { }}
+                style={{
+                  width: 26, height: 26, backgroundColor: "#F8F8F8", borderRadius: 15, borderWidth: 2, borderColor: "#777",
+                  marginLeft: -19, marginBottom: -7,
+                  justifyContent: "center", alignItems: "center",
+                }}>
+                <MaterialIcons name="mode-edit" size={15} color="#333" style={{ paddingLeft: 2, }} />
               </TouchableOpacity>
             </View>
 
-            <Divider width={1} color={"#777"} style={{flex: 1, flexGrow: 1, minWidth: "90%", marginVertical: 10,}}/>
+            <Divider width={1} color={"#777"} style={{ flex: 1, flexGrow: 1, minWidth: "90%", marginVertical: 10, }} />
 
             {/* First/Last Name */}
             <View style={{
@@ -290,56 +373,56 @@ const ProfileTab = ({ navigation }) => {
               justifyContent: "space-between", alignItems: "flex-start", flexDirection: "row",
               marginVertical: 10,
             }}>
-              
+
               {/* First Name */}
               <View style={{
                 width: "47%",
                 justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "column",
               }}>
                 <Text style={{
-                    textAlign: 'left', fontSize: 16, fontWeight: '700',
-                    color: 'black', paddingLeft: 0,
-                    }}>
-                    {"First:"}
+                  textAlign: 'left', fontSize: 16, fontWeight: '700',
+                  color: 'black', paddingLeft: 0,
+                }}>
+                  {"First:"}
                 </Text>
                 <View style={{
-                    width: "100%", flexDirection: "row",
+                  width: "100%", flexDirection: "row",
                 }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
-                    }}>
-                        <TextInput placeholder={"First Name"} onChangeText={setFirstName} value={firstName}
-                            multiline={false} maxLength={15}
-                            style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660", color: '#222',
-                                textAlign: 'left', fontSize: 16, fontWeight: '500',
-                            }}
-                        />
-                    </View>
+                  <View style={{
+                    width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                    marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
+                    justifyContent: "flex-start", alignItems: "center",
+                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                  }}>
+                    <TextInput placeholder={"First Name"} onChangeText={setFirstName} value={firstName}
+                      multiline={false} maxLength={15}
+                      style={{
+                        minHeight: 20, width: "100%",
+                        backgroundColor: "#6660", color: '#222',
+                        textAlign: 'left', fontSize: 16, fontWeight: '500',
+                      }}
+                    />
+                  </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
                 <MyView hide={firstName.length < 10}
-                    style={{
-                        width: "100%",
-                        paddingHorizontal: 0,
-                        justifyContent: "flex-end", alignItems: "flex-start",
-                        flexDirection: "row", direction: "ltr",
-                        borderWidth: 2,
-                        borderColor: "#0000",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 0,
-                        textAlign: 'right',
-                        fontSize: 14,
-                        fontWeight: '500',
-                        color: "#222",
-                        }}>
-                        {"Characters "+firstName.length+"/15"}
-                    </Text>
+                  style={{
+                    width: "100%",
+                    paddingHorizontal: 0,
+                    justifyContent: "flex-end", alignItems: "flex-start",
+                    flexDirection: "row", direction: "ltr",
+                    borderWidth: 2,
+                    borderColor: "#0000",
+                  }}>
+                  <Text style={{
+                    paddingLeft: 0,
+                    textAlign: 'right',
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: "#222",
+                  }}>
+                    {"Characters " + firstName.length + "/15"}
+                  </Text>
                 </MyView>
               </View>
 
@@ -349,49 +432,49 @@ const ProfileTab = ({ navigation }) => {
                 justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "column",
               }}>
                 <Text style={{
-                    textAlign: 'left', fontSize: 16, fontWeight: '700',
-                    color: 'black', paddingLeft: 0,
-                    }}>
-                    {"Last:"}
+                  textAlign: 'left', fontSize: 16, fontWeight: '700',
+                  color: 'black', paddingLeft: 0,
+                }}>
+                  {"Last:"}
                 </Text>
                 <View style={{
-                    width: "100%", flexDirection: "row",
+                  width: "100%", flexDirection: "row",
                 }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
-                    }}>
-                        <TextInput placeholder={"Last Name"} onChangeText={setLastName} value={lastName}
-                            multiline={false} maxLength={30}
-                            style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660", color: '#222',
-                                textAlign: 'left', fontSize: 16, fontWeight: '500',
-                            }}
-                        />
-                    </View>
+                  <View style={{
+                    width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                    marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
+                    justifyContent: "flex-start", alignItems: "center",
+                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                  }}>
+                    <TextInput placeholder={"Last Name"} onChangeText={setLastName} value={lastName}
+                      multiline={false} maxLength={30}
+                      style={{
+                        minHeight: 20, width: "100%",
+                        backgroundColor: "#6660", color: '#222',
+                        textAlign: 'left', fontSize: 16, fontWeight: '500',
+                      }}
+                    />
+                  </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
                 <MyView hide={lastName.length < 25}
-                    style={{
-                        width: "100%",
-                        paddingHorizontal: 0,
-                        justifyContent: "flex-end", alignItems: "flex-start",
-                        flexDirection: "row", direction: "ltr",
-                        borderWidth: 2,
-                        borderColor: "#0000",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 0,
-                        textAlign: 'right',
-                        fontSize: 14,
-                        fontWeight: '500',
-                        color: "#222",
-                        }}>
-                        {"Characters "+lastName.length+"/30"}
-                    </Text>
+                  style={{
+                    width: "100%",
+                    paddingHorizontal: 0,
+                    justifyContent: "flex-end", alignItems: "flex-start",
+                    flexDirection: "row", direction: "ltr",
+                    borderWidth: 2,
+                    borderColor: "#0000",
+                  }}>
+                  <Text style={{
+                    paddingLeft: 0,
+                    textAlign: 'right',
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: "#222",
+                  }}>
+                    {"Characters " + lastName.length + "/30"}
+                  </Text>
                 </MyView>
               </View>
             </View>
@@ -402,73 +485,73 @@ const ProfileTab = ({ navigation }) => {
               justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "row",
               marginVertical: 10,
             }}>
-              
+
               {/* Status */}
               <View style={{
                 maxWidth: "100%", flex: 1, flexGrow: 1,
                 justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "column",
               }}>
                 <Text style={{
-                    textAlign: 'left', fontSize: 16, fontWeight: '700',
-                    color: 'black', paddingLeft: 0,
-                    }}>
-                    {"Status:"}
+                  textAlign: 'left', fontSize: 16, fontWeight: '700',
+                  color: 'black', paddingLeft: 0,
+                }}>
+                  {"Status:"}
                 </Text>
                 <View style={{
-                    width: "100%", flexDirection: "row",
+                  width: "100%", flexDirection: "row",
                 }}>
+                  <View style={{
+                    width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "row",
+                    marginTop: 2, marginHorizontal: 0,
+                    justifyContent: "flex-start", alignItems: "center",
+                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                  }}>
                     <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "row",
-                        marginTop: 2, marginHorizontal: 0, 
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                      height: "100%", width: 40, backgroundColor: "#F8F8F8",
+                      justifyContent: "center", alignItems: "center", flexDirection: "row",
+                      borderTopLeftRadius: 3, borderBottomLeftRadius: 3,
+                      borderRightWidth: 1, borderColor: "#333",
                     }}>
-                      <View style={{
-                        height: "100%", width: 40, backgroundColor: "#F8F8F8",
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        borderTopLeftRadius: 3, borderBottomLeftRadius: 3,
-                        borderRightWidth: 1, borderColor: "#333",
-                      }}>
-                        <TextInput placeholder={""} onChangeText={(textChange) => handleEmoji(textChange)}
-                            value={statusEmoji} selectTextOnFocus={true}
-                            multiline={false} maxLength={4}
-                            style={{
-                                height: "100%", width: "100%",
-                                backgroundColor: "#6660", color: '#222',
-                                textAlign: 'center', fontSize: 16, fontWeight: '500',
-                            }}
-                        />
-                      </View>
-                      <TextInput placeholder={"Status"} onChangeText={setStatus} value={status}
-                          multiline={false} maxLength={50}
-                          style={{
-                              paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
-                              minHeight: 20, width: (screenWidth*.81 - 40),
-                              backgroundColor: "#6660", color: '#222',
-                              textAlign: 'left', fontSize: 16, fontWeight: '500',
-                          }}
+                      <TextInput placeholder={""} onChangeText={(textChange) => handleEmoji(textChange)}
+                        value={statusEmoji} selectTextOnFocus={true}
+                        multiline={false} maxLength={4}
+                        style={{
+                          height: "100%", width: "100%",
+                          backgroundColor: "#6660", color: '#222',
+                          textAlign: 'center', fontSize: 16, fontWeight: '500',
+                        }}
                       />
                     </View>
+                    <TextInput placeholder={"Status"} onChangeText={setStatus} value={status}
+                      multiline={false} maxLength={50}
+                      style={{
+                        paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
+                        minHeight: 20, width: (screenWidth * .81 - 40),
+                        backgroundColor: "#6660", color: '#222',
+                        textAlign: 'left', fontSize: 16, fontWeight: '500',
+                      }}
+                    />
+                  </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
                 <MyView hide={status.length < 40}
-                    style={{
-                        width: "100%",
-                        paddingHorizontal: 0,
-                        justifyContent: "flex-end", alignItems: "flex-start",
-                        flexDirection: "row", direction: "ltr",
-                        borderWidth: 2,
-                        borderColor: "#0000",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 0,
-                        textAlign: 'right',
-                        fontSize: 14,
-                        fontWeight: '500',
-                        color: "#222",
-                        }}>
-                        {"Characters "+status.length+"/50"}
-                    </Text>
+                  style={{
+                    width: "100%",
+                    paddingHorizontal: 0,
+                    justifyContent: "flex-end", alignItems: "flex-start",
+                    flexDirection: "row", direction: "ltr",
+                    borderWidth: 2,
+                    borderColor: "#0000",
+                  }}>
+                  <Text style={{
+                    paddingLeft: 0,
+                    textAlign: 'right',
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: "#222",
+                  }}>
+                    {"Characters " + status.length + "/50"}
+                  </Text>
                 </MyView>
               </View>
             </View>
@@ -479,56 +562,56 @@ const ProfileTab = ({ navigation }) => {
               justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
               marginVertical: 10,
             }}>
-              
+
               {/* Email */}
               <View style={{
                 width: "100%",
                 justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "column",
               }}>
                 <Text style={{
-                    textAlign: 'left', fontSize: 16, fontWeight: '700',
-                    color: 'black', paddingLeft: 0,
-                    }}>
-                    {"Email:"}
+                  textAlign: 'left', fontSize: 16, fontWeight: '700',
+                  color: 'black', paddingLeft: 0,
+                }}>
+                  {"Email:"}
                 </Text>
                 <View style={{
-                    width: "100%", flexDirection: "row",
+                  width: "100%", flexDirection: "row",
                 }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                        marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
-                    }}>
-                        <TextInput placeholder={"Email"} onChangeText={setEmail} value={email}
-                            multiline={false} maxLength={50}
-                            style={{
-                                minHeight: 20, width: "100%",
-                                backgroundColor: "#6660", color: '#222',
-                                textAlign: 'left', fontSize: 16, fontWeight: '500',
-                            }}
-                        />
-                    </View>
+                  <View style={{
+                    width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                    marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
+                    justifyContent: "flex-start", alignItems: "center",
+                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                  }}>
+                    <TextInput placeholder={"Email"} onChangeText={setEmail} value={email}
+                      multiline={false} maxLength={50}
+                      style={{
+                        minHeight: 20, width: "100%",
+                        backgroundColor: "#6660", color: '#222',
+                        textAlign: 'left', fontSize: 16, fontWeight: '500',
+                      }}
+                    />
+                  </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
                 <MyView hide={email.length < 40}
-                    style={{
-                        width: "100%",
-                        paddingHorizontal: 0,
-                        justifyContent: "flex-end", alignItems: "flex-start",
-                        flexDirection: "row", direction: "ltr",
-                        borderWidth: 2,
-                        borderColor: "#0000",
-                    }}>
-                    <Text style={{
-                        paddingLeft: 0,
-                        textAlign: 'right',
-                        fontSize: 14,
-                        fontWeight: '500',
-                        color: "#222",
-                        }}>
-                        {"Characters "+email.length+"/50"}
-                    </Text>
+                  style={{
+                    width: "100%",
+                    paddingHorizontal: 0,
+                    justifyContent: "flex-end", alignItems: "flex-start",
+                    flexDirection: "row", direction: "ltr",
+                    borderWidth: 2,
+                    borderColor: "#0000",
+                  }}>
+                  <Text style={{
+                    paddingLeft: 0,
+                    textAlign: 'right',
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: "#222",
+                  }}>
+                    {"Characters " + email.length + "/50"}
+                  </Text>
                 </MyView>
               </View>
 
@@ -547,30 +630,30 @@ const ProfileTab = ({ navigation }) => {
                 justifyContent: "flex-start", alignItems: "flex-start", flexDirection: "column",
               }}>
                 <Text style={{
-                    textAlign: 'left', fontSize: 16, fontWeight: '700',
-                    color: '#999', paddingLeft: 0,
-                    }}>
-                    {"Phone Number:"}
+                  textAlign: 'left', fontSize: 16, fontWeight: '700',
+                  color: '#999', paddingLeft: 0,
+                }}>
+                  {"Phone Number:"}
                 </Text>
                 <View style={{
-                    width: "100%", flexDirection: "row",
+                  width: "100%", flexDirection: "row",
                 }}>
-                    <View style={{
-                        width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "row",
-                        marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
-                        justifyContent: "flex-start", alignItems: "center",
-                        borderWidth: 1, borderColor: "#999", borderRadius: 3, backgroundColor: "#F8F8F8"
+                  <View style={{
+                    width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "row",
+                    marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
+                    justifyContent: "flex-start", alignItems: "center",
+                    borderWidth: 1, borderColor: "#999", borderRadius: 3, backgroundColor: "#F8F8F8"
+                  }}>
+                    <Text style={{
+                      textAlign: 'left', fontSize: 16, fontWeight: '500',
+                      color: '#aaa',
                     }}>
-                        <Text style={{
-                          textAlign: 'left', fontSize: 16, fontWeight: '500',
-                          color: '#aaa',
-                          }}>
-                          {phoneNumber}
-                        </Text>
-                    </View>
+                      {phoneNumber}
+                    </Text>
+                  </View>
                 </View>
               </View>
-              
+
             </View>
 
             {/* Save */}
@@ -588,7 +671,7 @@ const ProfileTab = ({ navigation }) => {
                 <Text style={{
                   textAlign: 'center', fontSize: 16, fontWeight: '800',
                   color: '#fff', marginRight: 10,
-                  }}>
+                }}>
                   {"SAVE"}
                 </Text>
                 <Octicons name="check" size={24} color="white" />
@@ -598,32 +681,32 @@ const ProfileTab = ({ navigation }) => {
           </MyView>
 
           <MyView hide={editing}>
-          <View style={styles.publicInformation}>
-            <View style={styles.userProfilePicture}>
-              <Image
-                source={imageSelection(userSnapshotData.pfp)}
-                style={{ width: 80, height: 80, borderRadius: 5, }}
-              />
+            <View style={styles.publicInformation}>
+              <View style={styles.userProfilePicture}>
+                <Image
+                  source={imageSelection(userSnapshotData.pfp)}
+                  style={{ width: 80, height: 80, borderRadius: 5, }}
+                />
+              </View>
+              <View style={styles.userText}>
+                <Text style={styles.userName}>
+                  {userSnapshotData.firstName}
+                </Text>
+                <Text style={styles.userName}>
+                  {userSnapshotData.lastName}
+                </Text>
+                <Text style={styles.userStatus}>
+                  {userSnapshotData.statusEmoji}  {userSnapshotData.statusText}
+                </Text>
+              </View>
             </View>
-            <View style={styles.userText}>
-              <Text style={styles.userName}>
-                {userSnapshotData.firstName}
-              </Text>
-              <Text style={styles.userName}>
-                {userSnapshotData.lastName}
-              </Text>
-              <Text style={styles.userStatus}>
-                {userSnapshotData.statusEmoji}  {userSnapshotData.statusText}
-              </Text>
-            </View>
-          </View>
 
-          <View style={styles.privateInformation}>
-            <View style={styles.privateInformationHeader}>
-              <Text style={{ fontSize: 16, fontWeight: '700'}}>
-                Private Information:
-              </Text>
-              {/* <TouchableOpacity
+            <View style={styles.privateInformation}>
+              <View style={styles.privateInformationHeader}>
+                <Text style={{ fontSize: 16, fontWeight: '700' }}>
+                  Private Information:
+                </Text>
+                {/* <TouchableOpacity
                 activeOpacity={0.75}
               >
                 <Tooltip
@@ -646,52 +729,52 @@ const ProfileTab = ({ navigation }) => {
                   />
                 </Tooltip>
               </TouchableOpacity> */}
-            </View>
+              </View>
 
-            <View style={styles.privateInformationEmail}>
-              <Icon
-                name="email"
-                type="material"
-                size={20}
-                color="#363732"
-              />
-              <Text style={styles.privateInformationEmailText}>
-                {userSnapshotData.email}
-              </Text>
-            </View>
-            <View style={styles.privateInformationPhone}>
-              <Icon
-                name="phone"
-                type="material"
-                size={20}
-                color="#363732"
-              />
-              <Text style={styles.privateInformationPhoneText}>
-                {formattedPhoneNumber}
-              </Text>
-            </View>
-          </View>
-
-          <TouchableOpacity
-            activeOpacity={0.75}
-            onPress={() => {
-              setEditing(true);
-            }}
-          >
-            <View style={styles.buttonSpacing}>
-              <View style={[styles.buttonEdit, { borderColor: '#363732', }]}>
-                <Text style={styles.buttonEditText}>
-                  EDIT
-                </Text>
+              <View style={styles.privateInformationEmail}>
                 <Icon
-                  name="edit"
+                  name="email"
                   type="material"
                   size={20}
                   color="#363732"
                 />
+                <Text style={styles.privateInformationEmailText}>
+                  {userSnapshotData.email}
+                </Text>
+              </View>
+              <View style={styles.privateInformationPhone}>
+                <Icon
+                  name="phone"
+                  type="material"
+                  size={20}
+                  color="#363732"
+                />
+                <Text style={styles.privateInformationPhoneText}>
+                  {formattedPhoneNumber}
+                </Text>
               </View>
             </View>
-          </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.75}
+              onPress={() => {
+                setEditing(true);
+              }}
+            >
+              <View style={styles.buttonSpacing}>
+                <View style={[styles.buttonEdit, { borderColor: '#363732', }]}>
+                  <Text style={styles.buttonEditText}>
+                    EDIT
+                  </Text>
+                  <Icon
+                    name="edit"
+                    type="material"
+                    size={20}
+                    color="#363732"
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
 
           </MyView>
 
@@ -746,8 +829,7 @@ const ProfileTab = ({ navigation }) => {
         </View> */}
 
         <View style={styles.buttonExternalsContainer}>
-          
-          {/* Tutorial Button */}
+{/* 
           <TouchableOpacity
             activeOpacity={0.75}
           // onPress={() => viewAppTutorial()}
@@ -765,12 +847,13 @@ const ProfileTab = ({ navigation }) => {
                 />
               </View>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {/* FAQ Button */}
           <TouchableOpacity
             activeOpacity={0.75}
             onPress={() => visitFAQ()}
+            style={{marginTop: 10}}
           >
             <View style={styles.buttonExternalsSpacing}>
               <View style={[styles.buttonExternalsEnabled, {}]}>
@@ -790,18 +873,18 @@ const ProfileTab = ({ navigation }) => {
           {/* Contact Developer Button */}
           <TouchableOpacity
             activeOpacity={0.75}
-          // onPress={() => contactDeveloper()}
+            onPress={() => contactDeveloper()}
           >
             <View style={styles.buttonExternalsSpacing}>
-              <View style={[styles.buttonExternalsDisabled, {}]}>
-                <Text style={styles.buttonExternalsTextDisabled}>
+              <View style={[styles.buttonExternalsEnabled, {}]}>
+                <Text style={styles.buttonExternalsTextEnabled}>
                   Contact Developer
                 </Text>
                 <Icon
                   name="report"
                   type="material"
                   size={24}
-                  color="#9D9D9D"
+                  color="#363732"
                 />
               </View>
             </View>
@@ -815,7 +898,7 @@ const ProfileTab = ({ navigation }) => {
           style={{ width: '90%', alignSelf: 'center' }}
         />
 
-            
+
 
         {/* Log out Button */}
         <TouchableOpacity
