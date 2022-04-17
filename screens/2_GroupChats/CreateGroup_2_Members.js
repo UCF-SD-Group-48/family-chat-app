@@ -32,6 +32,7 @@ import * as SMS from 'expo-sms';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 import { useIsFocused } from '@react-navigation/native';
+import CreateGroupObj from '../../helperFunctions/CreateGroupObj';
 
 const CreateGroup_2_Members = ({ navigation, route }) => {
 
@@ -179,15 +180,18 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 
 		let groupID, topicID;
 
+		let payload = CreateGroupObj(
+				route.params.groupName,
+				currentUserID,
+				route.params.coverImage.imageNumber,
+				route.params.coverImage.color,
+				membersArray
+		);
+
+		console.log("After Payload: ", JSON.stringify(payload, null, "\t"))
 		await db
 			.collection("groups")
-			.add({
-				groupName: route.params.groupName,
-				groupOwner: currentUserID,
-				coverImageNumber: route.params.coverImage.imageNumber,
-				color: route.params.coverImage.color,
-				members: membersArray
-			})
+			.add(payload)
 			.then(async (newlyCreatedGroup) => {
 				groupID = newlyCreatedGroup.id;
 				membersArray.map(async (memberUID) => {
