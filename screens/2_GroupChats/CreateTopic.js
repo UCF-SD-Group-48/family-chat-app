@@ -435,7 +435,7 @@ const CreateTopic = ({ navigation, route }) => {
                                                     ? <ActivityIndicator
                                                         size="small"
                                                         color="white"
-                                                        size={18}
+                                                        style={{height: 18, width: 18}}
                                                     />
                                                     : <Icon
                                                         name="chatbubble-ellipses"
