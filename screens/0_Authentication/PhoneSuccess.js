@@ -54,7 +54,7 @@ import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 
 // Imports for: Helper Functions
-import CreatePayload from '../../helperFunctions/CreatePayload';
+import CreatePayload from '../../helperFunctions/CreateUserPayload';
 
 // *************************************************************
 

@@ -141,8 +141,10 @@ const ChatScreen = ({ navigation, route }) => {
         topicMap: [],
     });
 
+    const [lastMessageTime, setLastMessageTime] = useState(null);
+
     const isFocused = useIsFocused();
-    const flatList = useRef(null);
+    const flatList = useRef();
 
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
@@ -250,6 +252,11 @@ const ChatScreen = ({ navigation, route }) => {
     }
     useEffect(() => {
         messageMapFunction();
+
+        if(messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
+            setLastMessageTime(messages[messages.length-1].data.timestamp);
+        }
+        
         return () => {
             setMessageMap({});
         }
@@ -322,11 +329,11 @@ const ChatScreen = ({ navigation, route }) => {
 
     const goBackward = async () => {
 
-        // const topicMapString = "topicMap."+topicId;
+        const topicMapString = "topicMap."+topicId;
 
-        // await db.collection("users").doc(auth.currentUser.uid).update({
-        //     [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
-        // });
+        await db.collection("users").doc(auth.currentUser.uid).update({
+            [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+        });
 
         navigation.navigate('GroupsTab')
     };
@@ -635,11 +642,11 @@ const ChatScreen = ({ navigation, route }) => {
     const [copiedText, setCopiedText] = useState(false)
 
     const reachEnd = async () => {
-        const topicMapString = "topicMap."+topicId;
+        // const topicMapString = "topicMap."+topicId;
 
-        await db.collection("users").doc(auth.currentUser.uid).update({
-            [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
-        });
+        // await db.collection("users").doc(auth.currentUser.uid).update({
+        //     [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+        // });
     }
 
     return (
@@ -1544,9 +1551,11 @@ const ChatScreen = ({ navigation, route }) => {
                                             <MyView hide={messageMap[id] == undefined || messageMap[id].previousMessage == undefined
                                                             || messageMap[id].previousMessage.data == undefined
                                                             || currentUser.topicMap.length <= 0
-                                                            || currentUser.topicMap[topicId] == undefined
+                                                            || currentUser.topicMap[topicId] == null
+                                                            || data.timestamp == null || messageMap[id].previousMessage.data.timestamp == null
                                                             || (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
-                                                                || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)}
+                                                                || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)
+                                                            || (lastMessageTime!= null && data.timestamp.seconds > lastMessageTime.seconds)}
                                                 style={{height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
                                                     justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",}}>
                                                 <Divider width={2} color={"#E2290B"}
