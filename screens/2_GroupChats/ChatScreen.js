@@ -829,14 +829,14 @@ const ChatScreen = ({ navigation, route }) => {
                                 <View style={{
                                     width: "100%", marginBottom: 20,
                                     backgroundColor: "#DFD7CE0",
-                                    justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                    justifyContent: "center", alignItems: "center", flexDirection: "row",
                                 }}>
                                     {/* Pins */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Pins") }}
                                         style={[styles.featuresOuterView,
                                         {
                                             shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
-                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                            shadowRadius: 3, shadowOpacity: 0.25, marginRight: 20,
                                         }]}>
                                         <Entypo name="pin" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
@@ -879,14 +879,14 @@ const ChatScreen = ({ navigation, route }) => {
                                 {/* Feature Icons 2 */}
                                 <View style={{
                                     width: "100%", backgroundColor: "#0cf0",
-                                    justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                    justifyContent: "center", alignItems: "center", flexDirection: "row",
                                 }}>
                                     {/* Events */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Events")}
                                         style={[styles.featuresOuterView,
                                         {
                                             shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
-                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                            shadowRadius: 3, shadowOpacity: 0.25, marginRight: 20,
                                         }]}>
                                         <Entypo name="calendar" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
@@ -1776,7 +1776,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     featuresOuterView: {
-        width: 145,
+        width: 120,
         paddingHorizontal: 5, paddingVertical: 15,
         borderRadius: 10, borderWidth: 1, borderColor: "#777",
         backgroundColor: "#fff",
