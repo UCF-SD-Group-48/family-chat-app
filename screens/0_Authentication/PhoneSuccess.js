@@ -54,7 +54,7 @@ import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 
 // Imports for: Helper Functions
-import CreatePayload from '../../helperFunctions/CreatePayload';
+// import CreatePayload from '../../helperFunctions/CreateUserPayload';
 
 // *************************************************************
 
@@ -153,38 +153,13 @@ const PhoneSuccess = ({ navigation, route }) => {
 		}
 	};
 
-	let payload = CreatePayload(firstName, lastName, pfp,email,phoneNumber);
+	// let payload = CreatePayload(firstName, lastName, pfp,email,phoneNumber);
 
-	const register = async () => {
-		await db
-			.collection('users').doc(auth.currentUser.uid)
-			.set(payload)
-			.then((result) => {
-				console.log('Profile Updated!')
-				console.log(result)
-				navigation.navigate('UserCreated', { firstName, lastName, pfp, });
-			})
-			.catch((error) => { alert(error.message) });
-	};
-	
 	// const register = async () => {
 	// 	await db
-	// 		.collection('users').doc(auth.currentUser.uid)
-	// 		.set({
-	// 			firstName: firstName,
-	// 			lastName: lastName,
-	// 			pfp: pfp,
-	// 			color: 'Blue',
-	// 			statusText: 'New to FamilyChat!',
-	// 			statusEmoji: '👋',
-	// 			email: email,
-	// 			phoneNumber: phoneNumber,
-	// 			pushNotificationEnabled: true,
-	// 			discoverableEnabled: true,
-	// 			groups: [],
-	// 			lastOn: firebase.firestore.FieldValue.serverTimestamp(),
-	// 			topicMap: ([]),
-	// 		})
+	// 		.collection('users')
+	// 		.doc(auth.currentUser.uid)
+	// 		.set(payload)
 	// 		.then((result) => {
 	// 			console.log('Profile Updated!')
 	// 			console.log(result)
@@ -192,6 +167,32 @@ const PhoneSuccess = ({ navigation, route }) => {
 	// 		})
 	// 		.catch((error) => { alert(error.message) });
 	// };
+	
+	const register = async () => {
+		await db
+			.collection('users').doc(auth.currentUser.uid)
+			.set({
+				firstName: firstName,
+				lastName: lastName,
+				pfp: pfp,
+				color: 'Blue',
+				statusText: 'New to FamilyChat!',
+				statusEmoji: '👋',
+				email: email,
+				phoneNumber: phoneNumber,
+				pushNotificationEnabled: true,
+				discoverableEnabled: true,
+				groups: [],
+				lastOn: firebase.firestore.FieldValue.serverTimestamp(),
+				topicMap: ([]),
+			})
+			.then((result) => {
+				console.log('Profile Updated!')
+				console.log(result)
+				navigation.navigate('UserCreated', { firstName, lastName, pfp, });
+			})
+			.catch((error) => { alert(error.message) });
+	};
 
     const handleEmailInput = (textChange) => {
         setEmail(textChange);
