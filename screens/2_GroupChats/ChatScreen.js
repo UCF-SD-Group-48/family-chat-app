@@ -176,7 +176,7 @@ const ChatScreen = ({ navigation, route }) => {
                 .delete()
 
             navigation.navigate('DMsTab');
-            
+
         } catch (error) { console.log(error) };
     }
 
@@ -253,10 +253,10 @@ const ChatScreen = ({ navigation, route }) => {
     useEffect(() => {
         messageMapFunction();
 
-        if(messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
-            setLastMessageTime(messages[messages.length-1].data.timestamp);
+        if (messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
+            setLastMessageTime(messages[messages.length - 1].data.timestamp);
         }
-        
+
         return () => {
             setMessageMap({});
         }
@@ -329,7 +329,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     const goBackward = async () => {
 
-        const topicMapString = "topicMap."+topicId;
+        const topicMapString = "topicMap." + topicId;
 
         await db.collection("users").doc(auth.currentUser.uid).update({
             [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
@@ -430,11 +430,11 @@ const ChatScreen = ({ navigation, route }) => {
             .collection('chats').doc(topicId).collection('banners')
             .orderBy('timestamp', 'desc').limit(1)
             .onSnapshot((snapshot) => {
-                
+
                 if (!snapshot.empty) {
                     // console.log("snapshot = "+JSON.stringify(snapshot));
                     let doc = snapshot.docs[0];
-                    console.log("doc = "+JSON.stringify(doc));
+                    console.log("doc = " + JSON.stringify(doc));
                     let data = doc.data();
                     let viewedBy = `${data.viewedBy}`;
                     if (!viewedBy.includes(auth.currentUser.uid)) {
@@ -443,16 +443,16 @@ const ChatScreen = ({ navigation, route }) => {
                             data: doc.data(),
                         });
                         setAlertExists(true);
-        
+
                         // get the event the alert is referencing to if event
-                        if(`${data.type}` == "Event") {
+                        if (`${data.type}` == "Event") {
                             db.collection('chats').doc(topicId).collection('events').doc(`${data.referenceUID}`).get()
-                            .then((result) => {
-                                setAlertEvent({
-                                    id: result.id,
-                                    data: result.data(),
+                                .then((result) => {
+                                    setAlertEvent({
+                                        id: result.id,
+                                        data: result.data(),
+                                    });
                                 });
-                            });
                         }
                     }
                 }
@@ -541,11 +541,11 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const viewBanner = (bannerId, bannerData) => {
-        if(bannerData.type == "Banner") {
+        if (bannerData.type == "Banner") {
             // console.log("Banner");
             navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
         }
-        else if(bannerData.type == "Event") {
+        else if (bannerData.type == "Event") {
             // console.log("Event");
             navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId: alertEvent.id, eventData: alertEvent.data });
         }
@@ -857,22 +857,11 @@ const ChatScreen = ({ navigation, route }) => {
                                         </Text>
                                     </TouchableOpacity>
 
-                                    {/* Events */}
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Events")}
-                                        style={[styles.featuresOuterView,
-                                        {
-                                            shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
-                                            shadowRadius: 3, shadowOpacity: 0.25,
-                                        }]}>
-                                        <Entypo name="calendar" size={30} color="#333" />
-                                        <Text style={styles.featuresText}>
-                                            Events
-                                        </Text>
-                                    </TouchableOpacity>
+
                                 </View>
 
-                                <Divider width={1} color={"#777"} style={{ width: screenWidth - 25, marginTop: 10, }} />
-                                <View style={{
+                                {/* <Divider width={1} color={"#777"} style={{ width: screenWidth - 25, marginTop: 10, }} /> */}
+                                {/* <View style={{
                                     width: "100%", marginBottom: 10, marginTop: 10,
                                     justifyContent: "felx-start", alignItems: "center", flexDirection: "row",
                                 }}>
@@ -885,27 +874,47 @@ const ChatScreen = ({ navigation, route }) => {
                                     }}>
                                         In Progress Features
                                     </Text>
-                                </View>
+                                </View> */}
 
                                 {/* Feature Icons 2 */}
                                 <View style={{
                                     width: "100%", backgroundColor: "#0cf0",
                                     justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                 }}>
+                                    {/* Events */}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Events")}
+                                        style={[styles.featuresOuterView,
+                                        {
+                                            shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Entypo name="calendar" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Events
+                                        </Text>
+                                    </TouchableOpacity>
+
                                     {/* Polls */}
-                                    <View style={[styles.featuresOuterViewDisabled,
+                                    {/* <View style={[styles.featuresOuterViewDisabled,
                                     {
                                         // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
                                         // shadowRadius: 3, shadowOpacity: 0.25,
-                                    }]}>
-                                        <Entypo name="bar-graph" size={30} color="#777" />
-                                        <Text style={styles.featuresTextDisabled}>
+                                    }]}> */}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
+                                        style={[styles.featuresOuterView,
+                                        {
+                                            shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
+                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                        }]}>
+                                        <Entypo name="bar-graph" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
                                             Polls
                                         </Text>
-                                    </View>
+                                    </TouchableOpacity>
+                                    {/* </View> */}
 
                                     {/* Images */}
-                                    <View style={[styles.featuresOuterViewDisabled,
+                                    {/* <View style={[styles.featuresOuterViewDisabled,
                                     {
                                         // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
                                         // shadowRadius: 3, shadowOpacity: 0.25,
@@ -914,10 +923,10 @@ const ChatScreen = ({ navigation, route }) => {
                                         <Text style={styles.featuresTextDisabled}>
                                             Images
                                         </Text>
-                                    </View>
+                                    </View> */}
 
                                     {/* Lists */}
-                                    <View style={[styles.featuresOuterViewDisabled,
+                                    {/* <View style={[styles.featuresOuterViewDisabled,
                                     {
                                         // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
                                         // shadowRadius: 3, shadowOpacity: 0.25,
@@ -926,7 +935,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         <Text style={styles.featuresTextDisabled}>
                                             Lists
                                         </Text>
-                                    </View>
+                                    </View> */}
                                 </View>
                             </View>
                         </Overlay>
@@ -1141,93 +1150,93 @@ const ChatScreen = ({ navigation, route }) => {
                         {/* Calendar for later <FontAwesome5 name="calendar-alt" size={24} color="black" /> */}
                         <MyView hide={!alertExists}
                             style={{
-                                    width: "100%",
-                                    flex: 0, flexGrow: 0, flexDirection: "column",
-                                    justifyContent: "flex-start", alignItems: "center",
-                                }}>
-                        <MyView hide={(alert.data.type || "") != "Event"}
-                            style={[
-                                {
-                                    width: "100%",
-                                    backgroundColor: "#F8D353", borderWidth: 0,
-                                    flex: 0, flexGrow: 0, flexDirection: "column",
-                                    justifyContent: "flex-start", alignItems: "center",
-                                    borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
-                                },
-                                {
-                                    shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
-                                    shadowRadius: 2, shadowOpacity: 0.5,
-                                }
-                            ]} >
-                            {/* Title */}
-                            <View style={{
                                 width: "100%",
-                                paddingHorizontal: 10, paddingVertical: 10,
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                flex: 0, flexGrow: 0, flexDirection: "row",
-                                justifyContent: "space-between", alignItems: "center",
+                                flex: 0, flexGrow: 0, flexDirection: "column",
+                                justifyContent: "flex-start", alignItems: "center",
                             }}>
-                                <View style={{
-                                    paddingHorizontal: 15, paddingVertical: 5,
-                                    backgroundColor: "#fffb", borderRadius: 7, borderWidth: 0,
-                                    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-                                }}>
-                                    <Entypo name="calendar" size={22} color="black" />
-                                    <Text style={{
-                                        fontSize: 18,
-                                        fontWeight: '800',
-                                        textAlign: "center",
-                                        marginLeft: 15, marginRight: 5,
-                                    }}>
-                                        Event
-                                    </Text>
-                                </View>
-                                <TouchableOpacity activeOpacity={0.7} onPress={dismissBanner}
-                                    style={{
-                                        paddingHorizontal: 5, paddingVertical: 5,
-                                        backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
-                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                    }}>
-                                    <Fontisto name="close-a" size={18} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                            {/* Content */}
-                            <View style={{
-                                width: "100%",
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                paddingVertical: 5, paddingHorizontal: 15, marginBottom: 5,
-                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                            }}>
-                                <View activeOpacity={0.7} onPress={() => {  }}
-                                    style={[
-                                        {
-                                            width: "100%", marginTop: 0,
-                                            backgroundColor: "#fff0", borderWidth: 0,
-                                            flex: 0, flexGrow: 0, flexDirection: "row",
-                                            justifyContent: "flex-start", alignItems: "center",
-                                            borderRadius: 1,
-                                        },
-                                    ]} >
-                                    {/* Left Content */}
-                                    <View style={{
-                                        minWidth: "10%",
-                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                        flex: 1, flexGrow: 1, flexDirection: "row",
+                            <MyView hide={(alert.data.type || "") != "Event"}
+                                style={[
+                                    {
+                                        width: "100%",
+                                        backgroundColor: "#F8D353", borderWidth: 0,
+                                        flex: 0, flexGrow: 0, flexDirection: "column",
                                         justifyContent: "flex-start", alignItems: "center",
+                                        borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
+                                    },
+                                    {
+                                        shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
+                                        shadowRadius: 2, shadowOpacity: 0.5,
+                                    }
+                                ]} >
+                                {/* Title */}
+                                <View style={{
+                                    width: "100%",
+                                    paddingHorizontal: 10, paddingVertical: 10,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flex: 0, flexGrow: 0, flexDirection: "row",
+                                    justifyContent: "space-between", alignItems: "center",
+                                }}>
+                                    <View style={{
+                                        paddingHorizontal: 15, paddingVertical: 5,
+                                        backgroundColor: "#fffb", borderRadius: 7, borderWidth: 0,
+                                        flexDirection: "row", justifyContent: "space-between", alignItems: "center",
                                     }}>
+                                        <Entypo name="calendar" size={22} color="black" />
+                                        <Text style={{
+                                            fontSize: 18,
+                                            fontWeight: '800',
+                                            textAlign: "center",
+                                            marginLeft: 15, marginRight: 5,
+                                        }}>
+                                            Event
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={dismissBanner}
+                                        style={{
+                                            paddingHorizontal: 5, paddingVertical: 5,
+                                            backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
+                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                        }}>
+                                        <Fontisto name="close-a" size={18} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                                {/* Content */}
+                                <View style={{
+                                    width: "100%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                    paddingVertical: 5, paddingHorizontal: 15, marginBottom: 5,
+                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <View activeOpacity={0.7} onPress={() => { }}
+                                        style={[
+                                            {
+                                                width: "100%", marginTop: 0,
+                                                backgroundColor: "#fff0", borderWidth: 0,
+                                                flex: 0, flexGrow: 0, flexDirection: "row",
+                                                justifyContent: "flex-start", alignItems: "center",
+                                                borderRadius: 1,
+                                            },
+                                        ]} >
+                                        {/* Left Content */}
                                         <View style={{
-                                            width: "100%", height: 68,
-                                            paddingHorizontal: 15, paddingVertical: 0,
-                                            backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
-                                            flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
+                                            minWidth: "10%",
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                            flex: 1, flexGrow: 1, flexDirection: "row",
+                                            justifyContent: "flex-start", alignItems: "center",
                                         }}>
                                             <View style={{
-                                                width: "100%",
-                                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                                width: "100%", height: 68,
+                                                paddingHorizontal: 15, paddingVertical: 0,
+                                                backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
+                                                flexDirection: "column", justifyContent: "space-between", alignItems: "flex-start",
                                             }}>
-                                                <MaterialIcons name="stars" size={18} color="black" />
-                                                <Text numberOfLines={1}
+                                                <View style={{
+                                                    width: "100%",
+                                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                                }}>
+                                                    <MaterialIcons name="stars" size={18} color="black" />
+                                                    <Text numberOfLines={1}
                                                         style={{
                                                             fontSize: 18,
                                                             fontWeight: '800',
@@ -1235,38 +1244,39 @@ const ChatScreen = ({ navigation, route }) => {
                                                             marginLeft: 15, marginRight: 10,
                                                             color: "black",
                                                             flex: 1,
-                                                    }}>
+                                                        }}>
                                                         {alertEvent.data.title}
-                                                </Text>
-                                            </View>
-                                            <View style={{
-                                                width: "100%",
-                                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                            }}>
-                                                <Ionicons name="flag-outline" size={18} color="black" />
-                                                <Text numberOfLines={1}
-                                                    style={{
-                                                        fontSize: 16,
-                                                        fontWeight: '400',
-                                                        textAlign: "left",
-                                                        marginLeft: 15, marginRight: 10,
-                                                        color: "black",
-                                                        flex: 1,
+                                                    </Text>
+                                                </View>
+                                                <View style={{
+                                                    width: "100%",
+                                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                                 }}>
-                                                    {(alertEvent.data.startTime != null) ? (alertEvent.data.startTime.toDate().toLocaleDateString("en-US", {
-                                                    month: "short", day: "2-digit", year: "numeric", })
-                                                    +" @ "+alertEvent.data.startTime.toDate().toLocaleTimeString("en-US", 
-                                                    {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
-                                                </Text>
-                                            </View>
-                                            <View style={{
-                                                width: "100%",
-                                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                            }}>
-                                                <Feather name="file-text" size={18} color="black" />
-                                                <Text numberOfLines={1}
+                                                    <Ionicons name="flag-outline" size={18} color="black" />
+                                                    <Text numberOfLines={1}
+                                                        style={{
+                                                            fontSize: 16,
+                                                            fontWeight: '400',
+                                                            textAlign: "left",
+                                                            marginLeft: 15, marginRight: 10,
+                                                            color: "black",
+                                                            flex: 1,
+                                                        }}>
+                                                        {(alertEvent.data.startTime != null) ? (alertEvent.data.startTime.toDate().toLocaleDateString("en-US", {
+                                                            month: "short", day: "2-digit", year: "numeric",
+                                                        })
+                                                            + " @ " + alertEvent.data.startTime.toDate().toLocaleTimeString("en-US",
+                                                                { hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
+                                                    </Text>
+                                                </View>
+                                                <View style={{
+                                                    width: "100%",
+                                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                                }}>
+                                                    <Feather name="file-text" size={18} color="black" />
+                                                    <Text numberOfLines={1}
                                                         style={{
                                                             fontSize: 18,
                                                             fontWeight: '400',
@@ -1274,135 +1284,135 @@ const ChatScreen = ({ navigation, route }) => {
                                                             marginLeft: 15, marginRight: 10,
                                                             color: "black",
                                                             flex: 1,
-                                                    }}>
+                                                        }}>
                                                         {alertEvent.data.description}
-                                                </Text>
+                                                    </Text>
+                                                </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
-                            </View>
-                            {/* Action */}
-                            <View style={{
-                                minHeight: 0, width: "100%",
-                                marginTop: 5, marginBottom: 15,
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
-                                flex: 0, flexGrow: 0,
-                                flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
-                            }}>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(alert.id, alert.data) }}
-                                    style={{
-                                        height: 40, paddingHorizontal: 10,
-                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                        backgroundColor: "#fffb",
-                                        borderColor: "#7C6A29", borderWidth: 4, borderRadius: 20,
+                                {/* Action */}
+                                <View style={{
+                                    minHeight: 0, width: "100%",
+                                    marginTop: 5, marginBottom: 15,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
+                                    flex: 0, flexGrow: 0,
+                                    flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(alert.id, alert.data) }}
+                                        style={{
+                                            height: 40, paddingHorizontal: 10,
+                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                            backgroundColor: "#fffb",
+                                            borderColor: "#7C6A29", borderWidth: 4, borderRadius: 20,
+                                        }}>
+                                        <Text style={{
+                                            fontSize: 15,
+                                            fontWeight: '700',
+                                            textAlign: "center",
+                                            marginHorizontal: 15,
+                                            color: "black",
+                                        }}>
+                                            {"View Event"}
+                                        </Text>
+                                        <Entypo name="chevron-right" size={24} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                            </MyView>
+                            <MyView hide={(alert.data.type || "") != "Banner"}
+                                style={[
+                                    {
+                                        width: "100%",
+                                        backgroundColor: "#EC7169", borderWidth: 0,
+                                        flex: 0, flexGrow: 0, flexDirection: "column",
+                                        justifyContent: "flex-start", alignItems: "center",
+                                        borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
+                                    },
+                                    {
+                                        shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
+                                        shadowRadius: 2, shadowOpacity: 0.5,
+                                    }
+                                ]} >
+                                {/* Title */}
+                                <View style={{
+                                    width: "100%",
+                                    paddingHorizontal: 10, paddingVertical: 10,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flex: 0, flexGrow: 0, flexDirection: "row",
+                                    justifyContent: "space-between", alignItems: "center",
+                                }}>
+                                    <View style={{
+                                        paddingHorizontal: 15, paddingVertical: 5,
+                                        backgroundColor: "#fffb", borderRadius: 7, borderWidth: 0,
+                                        flexDirection: "row", justifyContent: "space-between", alignItems: "center",
                                     }}>
+                                        <Entypo name="megaphone" size={22} color="black" />
+                                        <Text style={{
+                                            fontSize: 18,
+                                            fontWeight: '800',
+                                            textAlign: "center",
+                                            marginLeft: 15, marginRight: 5,
+                                        }}>
+                                            Alert
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={dismissBanner}
+                                        style={{
+                                            paddingHorizontal: 5, paddingVertical: 5,
+                                            backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
+                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                        }}>
+                                        <Fontisto name="close-a" size={18} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                                {/* Content */}
+                                <View style={{
+                                    width: "100%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                    paddingVertical: 5, paddingHorizontal: 15,
+                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                }}>
                                     <Text style={{
-                                        fontSize: 15,
+                                        fontSize: 16,
                                         fontWeight: '700',
-                                        textAlign: "center",
+                                        textAlign: "left",
                                         marginHorizontal: 15,
                                         color: "black",
                                     }}>
-                                        {"View Event"}
-                                    </Text>
-                                    <Entypo name="chevron-right" size={24} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                        </MyView>
-                        <MyView hide={(alert.data.type || "") != "Banner"}
-                            style={[
-                                {
-                                    width: "100%",
-                                    backgroundColor: "#EC7169", borderWidth: 0,
-                                    flex: 0, flexGrow: 0, flexDirection: "column",
-                                    justifyContent: "flex-start", alignItems: "center",
-                                    borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
-                                },
-                                {
-                                    shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
-                                    shadowRadius: 2, shadowOpacity: 0.5,
-                                }
-                            ]} >
-                            {/* Title */}
-                            <View style={{
-                                width: "100%",
-                                paddingHorizontal: 10, paddingVertical: 10,
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                flex: 0, flexGrow: 0, flexDirection: "row",
-                                justifyContent: "space-between", alignItems: "center",
-                            }}>
-                                <View style={{
-                                    paddingHorizontal: 15, paddingVertical: 5,
-                                    backgroundColor: "#fffb", borderRadius: 7, borderWidth: 0,
-                                    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-                                }}>
-                                    <Entypo name="megaphone" size={22} color="black" />
-                                    <Text style={{
-                                        fontSize: 18,
-                                        fontWeight: '800',
-                                        textAlign: "center",
-                                        marginLeft: 15, marginRight: 5,
-                                    }}>
-                                        Alert
+                                        <Text style={{ fontWeight: '600' }}>"</Text>
+                                        {(alert.data.description) || ("")}
+                                        <Text style={{ fontWeight: '600' }}>"</Text>
                                     </Text>
                                 </View>
-                                <TouchableOpacity activeOpacity={0.7} onPress={dismissBanner}
-                                    style={{
-                                        paddingHorizontal: 5, paddingVertical: 5,
-                                        backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
-                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                    }}>
-                                    <Fontisto name="close-a" size={18} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                            {/* Content */}
-                            <View style={{
-                                width: "100%",
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                paddingVertical: 5, paddingHorizontal: 15,
-                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                            }}>
-                                <Text style={{
-                                    fontSize: 16,
-                                    fontWeight: '700',
-                                    textAlign: "left",
-                                    marginHorizontal: 15,
-                                    color: "black",
+                                {/* Action */}
+                                <View style={{
+                                    minHeight: 0, width: "100%",
+                                    marginTop: 5, marginBottom: 15,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
+                                    flex: 0, flexGrow: 0,
+                                    flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
                                 }}>
-                                    <Text style={{ fontWeight: '600' }}>"</Text>
-                                        {(alert.data.description) || ("")}
-                                    <Text style={{ fontWeight: '600' }}>"</Text>
-                                </Text>
-                            </View>
-                            {/* Action */}
-                            <View style={{
-                                minHeight: 0, width: "100%",
-                                marginTop: 5, marginBottom: 15,
-                                borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
-                                flex: 0, flexGrow: 0,
-                                flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
-                            }}>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(alert.id, alert.data) }}
-                                    style={{
-                                        height: 40, paddingHorizontal: 10,
-                                        flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                        backgroundColor: "#fffb",
-                                        borderColor: "#9E4C46", borderWidth: 4, borderRadius: 20,
-                                    }}>
-                                    <Text style={{
-                                        fontSize: 15,
-                                        fontWeight: '700',
-                                        textAlign: "center",
-                                        marginHorizontal: 15,
-                                        color: "black",
-                                    }}>
-                                        {"View Alert"}
-                                    </Text>
-                                    <Entypo name="chevron-right" size={24} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                        </MyView>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(alert.id, alert.data) }}
+                                        style={{
+                                            height: 40, paddingHorizontal: 10,
+                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                            backgroundColor: "#fffb",
+                                            borderColor: "#9E4C46", borderWidth: 4, borderRadius: 20,
+                                        }}>
+                                        <Text style={{
+                                            fontSize: 15,
+                                            fontWeight: '700',
+                                            textAlign: "center",
+                                            marginHorizontal: 15,
+                                            color: "black",
+                                        }}>
+                                            {"View Alert"}
+                                        </Text>
+                                        <Entypo name="chevron-right" size={24} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                            </MyView>
                         </MyView>
 
                         {/* Messages */}
@@ -1413,7 +1423,7 @@ const ChatScreen = ({ navigation, route }) => {
                             onEndReachedThreshold={0.5} onEndReached={reachEnd}
                             renderItem={({ item: { id, data } }) => {
                                 return (
-                                    
+
                                     (messageMap[id] != undefined && messageMap[id].previousMessage != undefined
                                         && messageMap[id].previousMessage.data != undefined
                                         && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber
@@ -1421,7 +1431,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         && (data.timestamp.seconds - messageMap[id].previousMessage.data.timestamp.seconds) < 300
                                         && (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
                                             || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)
-                                        ) ? (
+                                    ) ? (
                                         //message without profile picture
                                         <View key={id} style={{
                                             width: "100%",
@@ -1549,20 +1559,22 @@ const ChatScreen = ({ navigation, route }) => {
                                             backgroundColor: "#6660",
                                         }}>
                                             <MyView hide={messageMap[id] == undefined || messageMap[id].previousMessage == undefined
-                                                            || messageMap[id].previousMessage.data == undefined
-                                                            || currentUser.topicMap.length <= 0
-                                                            || currentUser.topicMap[topicId] == null
-                                                            || data.timestamp == null || messageMap[id].previousMessage.data.timestamp == null
-                                                            || (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
-                                                                || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)
-                                                            || (lastMessageTime!= null && data.timestamp.seconds > lastMessageTime.seconds)}
-                                                style={{height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
-                                                    justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",}}>
+                                                || messageMap[id].previousMessage.data == undefined
+                                                || currentUser.topicMap.length <= 0
+                                                || currentUser.topicMap[topicId] == null
+                                                || data.timestamp == null || messageMap[id].previousMessage.data.timestamp == null
+                                                || (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
+                                                    || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)
+                                                || (lastMessageTime != null && data.timestamp.seconds > lastMessageTime.seconds)}
+                                                style={{
+                                                    height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
+                                                    justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
+                                                }}>
                                                 <Divider width={2} color={"#E2290B"}
                                                     style={{
                                                         minWidth: "10%",
                                                         flexGrow: 1, flex: 1,
-                                                    }}/>
+                                                    }} />
                                                 <Text style={{
                                                     textAlign: "center",
                                                     fontSize: 20,
@@ -1575,7 +1587,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                     style={{
                                                         minWidth: "10%",
                                                         flexGrow: 1, flex: 1,
-                                                    }}/>
+                                                    }} />
                                             </MyView>
                                             <View style={styles.message}>
                                                 <View style={styles.userContainer}>
@@ -1764,7 +1776,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     featuresOuterView: {
-        width: 90,
+        width: 145,
         paddingHorizontal: 5, paddingVertical: 15,
         borderRadius: 10, borderWidth: 1, borderColor: "#777",
         backgroundColor: "#fff",
