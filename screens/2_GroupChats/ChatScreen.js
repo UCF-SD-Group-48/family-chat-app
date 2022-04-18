@@ -390,7 +390,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             style={{ marginLeft: 10, }}
                                         />
                                         <Text style={{ fontSize: 14, color: 'red', marginLeft: 11 }}>
-                                            Delete Direct Messages
+                                            Delete Messages
                                         </Text>
                                     </MenuOption>
                                 </MenuOptions>
