@@ -28,7 +28,14 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
-import { AntDesign, Feather, Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+  } from 'react-native-popup-menu';
+  import FeatherIcon from 'react-native-vector-icons/Feather';
+import { AntDesign, Feather, Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 
 
 // Imports for: Expo
@@ -59,19 +66,37 @@ const Polls = ({ navigation, route }) => {
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
 
-    const [pastEvents, setPastEvents] = useState([]);
-    const [activeEvents, setActiveEvents] = useState([]);
+    const [pastPolls, setPastPolls] = useState([]);
+    const [activePolls, setActivePolls] = useState([]);
 
-    //past events
+    const IconOption = ({iconName, text, value, isLast, isSpacer, isDestructive, selectFunction}) => (
+        <MenuOption value={value} onSelect={selectFunction}
+        style={{
+            borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
+            borderColor: "#dedede",
+            height: (isSpacer) ? 47 : 40,
+            paddingLeft: 15, paddingVertical: 12,
+        }}>
+          <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
+            <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15}/>
+            {"   "+text}
+          </Text>
+        </MenuOption>
+    );
+    const triggerStyles = {
+        triggerTouchable: {underlayColor: "#0001"},
+    }
+
+    //past polls
     useLayoutEffect(() => {
         const unsubscribe = db
             .collection('chats')
             .doc(topicId)
-            .collection('events')
-            .where("endTime", "<", new Date())
+            .collection('polls')
+            .where("endTime", "<=", new Date())
             .orderBy('endTime', 'desc')
             .onSnapshot((snapshot) =>
-                setPastEvents(
+                setPastPolls(
                     snapshot.docs.map(doc => ({
                         id: doc.id,
                         data: doc.data(),
@@ -81,21 +106,22 @@ const Polls = ({ navigation, route }) => {
         return unsubscribe;
     }, [route]);
 
-    //Active Events
+    //Active Polls
     useLayoutEffect(() => {
         const unsubscribe = db
             .collection('chats')
             .doc(topicId)
-            .collection('events')
+            .collection('polls')
             .where("endTime", ">", new Date())
             .orderBy('endTime', 'desc')
             .onSnapshot((snapshot) =>
-                setActiveEvents(
+                setActivePolls(
                     snapshot.docs.map(doc => ({
                         id: doc.id,
                         data: doc.data(),
                     }))
-                ));
+                )
+            );
         
         return unsubscribe;
     }, [route]);
@@ -158,8 +184,8 @@ const Polls = ({ navigation, route }) => {
         navigation.push("AddPoll", { topicId, topicName, groupId, groupName, groupOwner });
     };
 
-    const viewEvent = (eventId, eventData) => {
-        navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId, eventData });
+    const viewPoll = (pollId, pollData) => {
+        navigation.push("ViewPoll", { topicId, topicName, groupId, groupName, groupOwner, pollId, pollData });
     };
 
     // const getString = (uid) => {
@@ -168,6 +194,51 @@ const Polls = ({ navigation, route }) => {
     //     }
     //     else return "";
     // }
+
+    const unselectPollOption = async (pollData, pollId, option) => {
+        const pollMapString = "memberVotes."+auth.currentUser.uid;
+        const votingOptionString = "votingOptions."+option;
+        await db.collection("chats").doc(topicId).collection("polls").doc(pollId).update({
+            [pollMapString]: "",
+            [votingOptionString]: pollData.votingOptions[option] - 1,
+        });
+    };
+
+    const selectPollOption = async (pollData, pollId, option) => {
+        const pollMapString = "memberVotes."+auth.currentUser.uid;
+        const votingOptionString = "votingOptions."+option;
+        
+        if(pollData.memberVotes[auth.currentUser.uid] != undefined && pollData.memberVotes[auth.currentUser.uid] != ""){
+            let pastVotingOptionString = "votingOptions."+pollData.memberVotes[auth.currentUser.uid];
+            await db.collection("chats").doc(topicId).collection("polls").doc(pollId).update({
+                [pollMapString]: option,
+                [votingOptionString]: pollData.votingOptions[option] + 1,
+                [pastVotingOptionString]: pollData.votingOptions[pollData.memberVotes[auth.currentUser.uid]] - 1,
+            });
+        }
+        else {
+            await db.collection("chats").doc(topicId).collection("polls").doc(pollId).update({
+                [pollMapString]: option,
+                [votingOptionString]: pollData.votingOptions[option] + 1,
+            });
+        }
+    };
+
+    const getWinner = (data) => {
+        let returnString = "";
+        let max = 0;
+        Object.keys(data.votingOptions).forEach(key => {
+            if(data.votingOptions[key] > max) {
+                returnString = key;
+                max = data.votingOptions[key];
+            }
+            else if(data.votingOptions[key] == max) {
+                returnString = "--Tie--";
+            }
+        });
+
+        return returnString;
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -178,14 +249,14 @@ const Polls = ({ navigation, route }) => {
                     flex: 0, flexGrow: 1, borderWidth: 0, paddingBottom: 75,
                 }}>
 
-                {/* Active Events */}
+                {/* Active Polls */}
                 <View style={{
                     marginTop: 30, marginBottom: 0, width: "100%",
                     flexDirection: "column", flexShrink: 0,
                     justifyContent: "flex-start", alignItems: "center",
                 }}>
                     <View style={{ paddingTop: 0, width: "90%", }}>
-                        {activeEvents.map(({ id, data }) => (
+                        {activePolls.map(({ id, data }) => (
                         <View key={id} style={{
                                 width: "100%",
                                 backgroundColor: "#fff0", borderWidth: 0,
@@ -199,7 +270,7 @@ const Polls = ({ navigation, route }) => {
                                 style={[
                                     {
                                         width: "100%", marginTop: 1,
-                                        backgroundColor: "#F8D353", borderWidth: 0,
+                                        backgroundColor: "#F1A45C", borderWidth: 0,
                                         flex: 0, flexGrow: 0, flexDirection: "row",
                                         justifyContent: "flex-start", alignItems: "center",
                                         borderRadius: 1,
@@ -209,7 +280,7 @@ const Polls = ({ navigation, route }) => {
                                         shadowRadius: 3, shadowOpacity: 0.4,
                                     }
                                 ]} >
-                                {/* Active Event */}
+                                {/* Active Poll */}
                                 <View style={{
                                     // minWidth: "10%",
                                     borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
@@ -219,15 +290,15 @@ const Polls = ({ navigation, route }) => {
                                     <View style={{
                                         width: "100%", height: 60,
                                         paddingHorizontal: 15, paddingVertical: 10,
-                                        backgroundColor: "#F8D353", borderRadius: 0, borderWidth: 0,
+                                        backgroundColor: "#F1A45C", borderRadius: 0, borderWidth: 0,
                                         flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                     }}>
                                         <View style={{
-                                            width: 190, height: 35, paddingHorizontal: 15, borderRadius: 7,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#FDF4D4",
+                                            width: 150, height: 35, paddingLeft: 12, borderRadius: 7,
+                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#FCE8D6",
                                             flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                         }}>
-                                            <Entypo name="calendar" size={20} color="#333" />
+                                            <Entypo name="bar-graph" size={20} color="#333" />
                                             <Text style={{
                                                         fontSize: 18,
                                                         fontWeight: '800',
@@ -236,21 +307,31 @@ const Polls = ({ navigation, route }) => {
                                                         color: "#333",
                                                         flex: 1,
                                                 }}>
-                                                    {"Active Event"}
+                                                    {"Open Poll"}
                                             </Text>
                                         </View>
                                     </View>
                                 </View>
                                 {/* Moderator */}
                                 {(data.ownerUID === auth.currentUser.uid) ? (
-                                    <View style={{
-                                        minWidth: 26, minHeight: 26,
-                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
-                                        flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
-                                    }}>
-                                        <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} />
-                                    </View>
+                                    <Menu>
+                                        <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
+                                            <MaterialCommunityIcons name="dots-horizontal" size={35} color="black" style={{marginHorizontal: 12,}} />
+                                        </MenuTrigger>
+                                        <MenuOptions style={{
+                                            borderRadius: 12, backgroundColor: "#fff",
+                                        }}
+                                        customStyles={{
+                                            optionsContainer: {
+                                                borderRadius: 15, backgroundColor: "#666",
+                                            },
+                                        }}>
+                                            <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
+                                                selectFunction={() => {
+                                                    db.collection("chats").doc(topicId).collection("polls").doc(id).delete();
+                                                }}/>
+                                        </MenuOptions>
+                                    </Menu>
                                 ) : (
                                     <View style={{
                                         minWidth: 26, minHeight: 26,
@@ -277,7 +358,8 @@ const Polls = ({ navigation, route }) => {
                                         shadowRadius: 3, shadowOpacity: 0.4,
                                     }
                                 ]} >
-                                {/* Left Content */}
+
+                                {/* Main Content */}
                                 <View style={{
                                     minWidth: "10%",
                                     borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
@@ -286,92 +368,135 @@ const Polls = ({ navigation, route }) => {
                                 }}>
                                     <View style={{
                                         width: "100%", //height: 90,
-                                        paddingHorizontal: 15, paddingVertical: 10,
+                                        paddingHorizontal: 0, paddingVertical: 10,
                                         backgroundColor: "#0000", borderRadius: 7, borderWidth: 0,
-                                        flexDirection: "column", justifyContent: "space-between", alignItems: "center",
+                                        flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
                                     }}>
+                                        {/* Question */}
                                         <View style={{
-                                            width: "90%", marginTop: 10, marginBottom: 2,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <MaterialIcons name="stars" size={20} color="#333" />
-                                            <Text numberOfLines={1}
-                                                    style={{
-                                                        fontSize: 18,
-                                                        fontWeight: '800',
-                                                        textAlign: "left",
-                                                        marginLeft: 15, marginRight: 10,
-                                                        color: "#333",
-                                                        flex: 1,
+                                                width: "90%", minHeight: 30,
+                                                marginHorizontal: 20, marginTop: 5,
+                                                justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                                                backgroundColor: "#6660",
+                                            }}>
+                                            <Text style={{
+                                                paddingLeft: 0,
+                                                textAlign: 'left',
+                                                fontSize: 18,
+                                                fontWeight: '700',
+                                                color: 'black',
                                                 }}>
-                                                    {data.title}
+                                                {"Question:"}
                                             </Text>
                                         </View>
                                         <View style={{
-                                            width: "90%",marginBottom: 2,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                            width: "90%", flexDirection: "row",
                                         }}>
-                                            <Ionicons name="flag-outline" size={20} color="#333" />
-                                            <Text numberOfLines={1}
-                                                style={{
-                                                    fontSize: 16,
-                                                    fontWeight: '400',
-                                                    textAlign: "left",
-                                                    marginLeft: 15, marginRight: 10,
-                                                    color: "#333",
-                                                    flex: 1,
+                                            <View style={{
+                                                width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                                                marginTop: 2, marginHorizontal: 0, paddingTop: 7, paddingBottom: 12, paddingHorizontal: 15,
+                                                justifyContent: "flex-start", alignItems: "center",
+                                                borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
                                             }}>
-                                                {(data.startTime != null) ? (data.startTime.toDate().toLocaleDateString("en-US", {
+                                                <View style={{
+                                                    width: "100%", borderWidth: 0,
+                                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "flex-start",
+                                                }}>
+                                                    <FontAwesome5 name="question-circle" size={18} color="#333" />
+                                                    <Text style={{
+                                                        textAlign: 'left', fontSize: 16, fontWeight: '700',
+                                                        color: 'black', borderWidth: 0, marginLeft: 15, marginRight: 5, flexGrow: 1,
+                                                        }}>
+                                                        {data.question}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        </View>
+
+                                        {/* Choices */}
+                                        <View style={{
+                                                width: "90%", minHeight: 30,
+                                                marginHorizontal: 20, marginTop: 20,
+                                                justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                                                backgroundColor: "#6660",
+                                            }}>
+                                            <Text style={{
+                                                paddingLeft: 0,
+                                                textAlign: 'left',
+                                                fontSize: 18,
+                                                fontWeight: '700',
+                                                color: 'black',
+                                                }}>
+                                                {"Choices:"}
+                                            </Text>
+                                        </View>
+
+                                        <View style={{ paddingTop: 0, width: "90%", }}>
+                                        {Object.keys(data.votingOptions).sort().map((option) => (
+                                        <View key={option.length+""+option} style={{
+                                                width: "100%",
+                                                backgroundColor: "#fff0", borderWidth: 0,
+                                                flex: 0, flexGrow: 0,
+                                                flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                                                marginBottom: 7,
+                                            }}>
+                                            
+                                            {(data.memberVotes[auth.currentUser.uid] != undefined && data.memberVotes[auth.currentUser.uid] == option
+                                            ) ? (
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {unselectPollOption(data, id, option)}}
+                                            style={{width: "100%", height: 35,
+                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                                borderRadius: 3,  borderWidth: 1.5,  borderColor: "#1174EC", backgroundColor: "#F8F8F8"
+                                                }}>
+                                                <Text numberOfLines={1} style={{
+                                                    textAlign: 'left', fontSize: 16, fontWeight: '700',
+                                                    color: 'black', borderWidth: 0, marginLeft: 15, flexGrow: 1,
+                                                    }}>
+                                                    {option}
+                                                </Text>
+                                                <MaterialIcons name="check-box" size={24} color="#1174EC" style={{marginHorizontal: 5}} />
+                                            </TouchableOpacity>
+                                            ) : (
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {selectPollOption(data, id, option)}}
+                                            style={{width: "100%", height: 35,
+                                                flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                                borderRadius: 3,  borderWidth: 1,  borderColor: "#777",
+                                                }}>
+                                                <Text numberOfLines={1} style={{
+                                                    textAlign: 'left', fontSize: 16, fontWeight: '500',
+                                                    color: '#333', borderWidth: 0, marginLeft: 15, flexGrow: 1,
+                                                    }}>
+                                                    {option}
+                                                </Text>
+                                                <MaterialIcons name="check-box-outline-blank" size={24} color="black" style={{marginHorizontal: 5}} />
+                                            </TouchableOpacity>
+                                            )}
+                                        </View>
+                                        ))}
+                                        </View>
+
+                                        {/* Closes at */}
+                                        <View style={{
+                                                width: "90%", minHeight: 30,
+                                                marginHorizontal: 20, marginTop: 15,
+                                                justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
+                                                backgroundColor: "#6660",
+                                            }}>
+                                            <Text style={{
+                                                paddingLeft: 0,
+                                                textAlign: 'left',
+                                                fontSize: 14,
+                                                fontWeight: '500',
+                                                color: '#DF3D23',
+                                                }}>
+                                                <Text style={{fontWeight: '700',}}> {"Closes: "}</Text>
+                                                {(data.endTime != null) ? (data.endTime.toDate().toLocaleDateString("en-US", {
                                                 month: "short", day: "2-digit", year: "numeric", })
-                                                +" @ "+data.startTime.toDate().toLocaleTimeString("en-US", 
+                                                +" @ "+data.endTime.toDate().toLocaleTimeString("en-US", 
                                                 {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
                                             </Text>
                                         </View>
-                                        <View style={{
-                                            width: "90%",
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
-                                        }}>
-                                            <Feather name="file-text" size={18} color="#333" />
-                                            <Text numberOfLines={1}
-                                                style={{
-                                                    fontSize: 16,
-                                                    fontWeight: '400',
-                                                    textAlign: "left",
-                                                    marginLeft: 15, marginRight: 10,
-                                                    color: "#333",
-                                                    flex: 1,
-                                            }}>
-                                                {data.description}
-                                            </Text>
-                                        </View>
-                                        <View style={{
-                                            width: "90%", height: 50, marginTop: 20, marginBottom: 15,
-                                            borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
-                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                        }}>
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => { viewEvent(id, data) }}
-                                            style={{
-                                                minWidth: 200, height: 45, paddingHorizontal: 20,
-                                                borderColor: "#777", borderWidth: 4, borderRadius: 25,
-                                                backgroundColor: "#fac0",
-                                                flexDirection: "row", justifyContent: "center", alignItems: "center",
-                                            }}>
-                                                <Text style={{
-                                                    fontSize: 18,
-                                                    fontWeight: '800',
-                                                    textAlign: "left",
-                                                    marginLeft: 15, marginRight: 0,
-                                                    color: "#333",
-                                                    flex: 1,
-                                                }}>
-                                                    {"View Event"}
-                                                </Text>
-                                                <Entypo name="chevron-right" size={24} color="#333" />
-                                            </TouchableOpacity>
-                                        </View>
+
                                     </View>
                                 </View>
                             </View>
@@ -381,7 +506,7 @@ const Polls = ({ navigation, route }) => {
                     </View>
                 </View>
 
-                {/* Add Event Button */}
+                {/* Add Poll Button */}
                 <TouchableOpacity onPress={addPoll} activeOpacity={0.7}
                     style={[
                         {
@@ -423,7 +548,7 @@ const Polls = ({ navigation, route }) => {
                     fontWeight: '700',
                     color: 'black', marginHorizontal: 10
                 }}>
-                    {"History: Closed Polls ("+pastEvents.length+")"}
+                    {"History: Closed Polls ("+pastPolls.length+")"}
                 </Text>
                 <Divider width={2} color={"#777"}
                     style={{
@@ -432,14 +557,14 @@ const Polls = ({ navigation, route }) => {
                     }}/>
                 </View>
 
-                {/* Past Events */}
+                {/* Past Polls */}
                 <View style={{
                     marginTop: 30, marginBottom: 0, width: "100%",
                     flexDirection: "column", flexShrink: 1,
                     justifyContent: "flex-start", alignItems: "center",
                 }}>
-                    {/* Prompt for no Events at all (when pastEvents.length == 0 && activeEvents == 0) */}
-                    <MyView hide={pastEvents.length != 0 || activeEvents.length != 0}
+                    {/* Prompt for no Polls at all (when pastPolls.length == 0 && activePolls == 0) */}
+                    <MyView hide={pastPolls.length != 0 || activePolls.length != 0}
                         style={{
                             width: "100%", minHeight: 300, paddingTop: 10,
                             justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
@@ -469,8 +594,8 @@ const Polls = ({ navigation, route }) => {
                         <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
                     </MyView>
                     <View style={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
-                        {pastEvents.map(({ id, data }) => (
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewEvent(id, data)}} key={id}
+                        {pastPolls.map(({ id, data }) => (
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPoll(id, data)}} key={id}
                                 style={[
                                     {
                                         width: "100%", marginTop: 1,
@@ -502,19 +627,17 @@ const Polls = ({ navigation, route }) => {
                                             borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
                                             flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                         }}>
-                                            <MaterialIcons name="stars" size={18} color="#777" />
+                                            <FontAwesome5 name="question-circle" size={18} color="#777" />
                                             <Text numberOfLines={1}
-                                                    style={{
-                                                        fontSize: 18,
-                                                        fontWeight: '600',
-                                                        textAlign: "left",
-                                                        marginLeft: 15, marginRight: 10,
-                                                        color: "#777",
-                                                        flex: 1,
+                                                style={{
+                                                    fontSize: 16,
+                                                    fontWeight: '800',
+                                                    textAlign: "left",
+                                                    marginLeft: 15, marginRight: 10,
+                                                    color: "#777",
+                                                    flex: 1,
                                                 }}>
-                                                <Text style={{fontWeight: '600'}}>"</Text>
-                                                    {data.title}
-                                                <Text style={{fontWeight: '600'}}>"</Text>
+                                                {data.question}
                                             </Text>
                                         </View>
                                         <View style={{
@@ -522,7 +645,7 @@ const Polls = ({ navigation, route }) => {
                                             borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
                                             flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                                         }}>
-                                            <Ionicons name="flag-outline" size={18} color="#777" />
+                                            <MaterialCommunityIcons name="check-decagram" size={20} color="#777" />
                                             <Text numberOfLines={1}
                                                 style={{
                                                     fontSize: 16,
@@ -532,10 +655,7 @@ const Polls = ({ navigation, route }) => {
                                                     color: "#777",
                                                     flex: 1,
                                             }}>
-                                                {(data.startTime != null) ? (data.startTime.toDate().toLocaleDateString("en-US", {
-                                                month: "short", day: "2-digit", year: "numeric", })
-                                                +" @ "+data.startTime.toDate().toLocaleTimeString("en-US", 
-                                                {hour: "numeric", minute: "2-digit", timeZoneName: "short" })) : ("")}
+                                                {getWinner(data)}
                                             </Text>
                                         </View>
                                     </View>
