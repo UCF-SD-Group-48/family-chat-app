@@ -66,6 +66,7 @@ import MyView from '../../components/MyView';
 import LineDivider from '../../components/LineDivider';
 import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 import helpers from '../../helperFunctions/helpers';
+import CreateChatObj from '../../helperFunctions/CreateChatObj';
 
 import SkeletonContent from 'react-native-skeleton-content';
 
@@ -503,18 +504,22 @@ const ChatScreen = ({ navigation, route }) => {
     const sendMessage = () => {
         Keyboard.dismiss();
 
+        let chatPayload = CreateChatObj( trimmedInput, auth.currentUser.uid, auth.currentUser.phoneNumber)
         const trimmedInput = input.trim();
         if (trimmedInput.length > 0) {
-
-            db.collection('chats').doc(topicId).collection('messages').add({
-                editedTime: null,
-                membersWhoReacted: [],
-                message: trimmedInput,
-                ownerUID: auth.currentUser.uid,
-                phoneNumber: auth.currentUser.phoneNumber,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-            }); // id passed in when we entered the chatroom
+            db.collection('chats').doc(topicId).collection('messages').add(chatPayload); // id passed in when we entered the chatroom
         }
+
+        // if (trimmedInput.length > 0) {
+        //     db.collection('chats').doc(topicId).collection('messages').add({
+        //         editedTime: null,
+        //         membersWhoReacted: [],
+        //         message: trimmedInput,
+        //         ownerUID: auth.currentUser.uid,
+        //         phoneNumber: auth.currentUser.phoneNumber,
+        //         timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
+        //     }); // id passed in when we entered the chatroom
+        // }
 
         setInput(''); // clears messaging box
     };

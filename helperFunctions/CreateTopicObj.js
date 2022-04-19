@@ -1,12 +1,11 @@
-const CreateTopicObj = (groupName, currentUserID, imageNumber, color, membersArray) => {
+const CreateTopicObj = (currentUser, topicName, members, originalMessageUID,) => {
 	
 	let payload = 
         {
-            groupName: groupName,
-            groupOwner: currentUserID,
-            coverImageNumber: imageNumber,
-            color: color,
-            members: membersArray
+            topicOwner: currentUser,
+            topicName: topicName,
+            members: members,
+            originalMessageUID: originalMessageUID || "",
         }
     
 	return payload;

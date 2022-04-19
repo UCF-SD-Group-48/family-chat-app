@@ -48,6 +48,8 @@ import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/fi
 import firebase from 'firebase/compat/app';
 import { useIsFocused } from '@react-navigation/native';
 
+import CreateTopicObj from '../../helperFunctions/CreateTopicObj';
+
 
 import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
@@ -210,15 +212,19 @@ const CreateTopic = ({ navigation, route }) => {
         //     membersArray.push(member.uid)
         // })
 
+        let topicPayload = CreateTopicObj(auth.currentUser.uid, newTopicName, checked, originalMessageUID );
+
+        // {
+        //     topicOwner: auth.currentUser.uid,
+        //     topicName: newTopicName,
+        //     members: checked,
+        //     originalMessageUID: originalMessageUID || "",
+        //     // parentGroup: groupId
+        // }
+
         await db.collection('groups').doc(groupId)
             .collection("topics")
-            .add({
-                topicOwner: auth.currentUser.uid,
-                topicName: newTopicName,
-                members: checked,
-                originalMessageUID: originalMessageUID || "",
-                // parentGroup: groupId
-            })
+            .add(topicPayload)
             .then((newlyCreatedTopic) => {
                 let topicID = newlyCreatedTopic.id
                 // mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
