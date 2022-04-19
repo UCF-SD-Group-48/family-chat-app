@@ -482,22 +482,22 @@ const ChatScreen = ({ navigation, route }) => {
     const sendMessage = () => {
         Keyboard.dismiss();
 
-        let chatPayload = CreateChatObj( trimmedInput, auth.currentUser.uid, auth.currentUser.phoneNumber)
+        // let chatPayload = CreateChatObj( trimmedInput, auth.currentUser.uid, auth.currentUser.phoneNumber)
         const trimmedInput = input.trim();
-        if (trimmedInput.length > 0) {
-            db.collection('chats').doc(topicId).collection('messages').add(chatPayload); // id passed in when we entered the chatroom
-        }
-
         // if (trimmedInput.length > 0) {
-        //     db.collection('chats').doc(topicId).collection('messages').add({
-        //         editedTime: null,
-        //         membersWhoReacted: [],
-        //         message: trimmedInput,
-        //         ownerUID: auth.currentUser.uid,
-        //         phoneNumber: auth.currentUser.phoneNumber,
-        //         timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-        //     }); // id passed in when we entered the chatroom
+        //     db.collection('chats').doc(topicId).collection('messages').add(chatPayload); // id passed in when we entered the chatroom
         // }
+
+        if (trimmedInput.length > 0) {
+            db.collection('chats').doc(topicId).collection('messages').add({
+                editedTime: null,
+                membersWhoReacted: [],
+                message: trimmedInput,
+                ownerUID: auth.currentUser.uid,
+                phoneNumber: auth.currentUser.phoneNumber,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
+            }); // id passed in when we entered the chatroom
+        }
 
         setInput(''); // clears messaging box
     };
