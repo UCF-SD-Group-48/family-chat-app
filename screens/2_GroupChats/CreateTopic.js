@@ -212,19 +212,17 @@ const CreateTopic = ({ navigation, route }) => {
         //     membersArray.push(member.uid)
         // })
 
-        let topicPayload = CreateTopicObj(auth.currentUser.uid, newTopicName, checked, originalMessageUID );
+        // let topicPayload = CreateTopicObj(auth.currentUser.uid, newTopicName, checked, originalMessageUID );
 
-        // {
-        //     topicOwner: auth.currentUser.uid,
-        //     topicName: newTopicName,
-        //     members: checked,
-        //     originalMessageUID: originalMessageUID || "",
-        //     // parentGroup: groupId
-        // }
 
         await db.collection('groups').doc(groupId)
             .collection("topics")
-            .add(topicPayload)
+            .add({
+                topicOwner: auth.currentUser.uid,
+                topicName: newTopicName,
+                members: checked,
+                originalMessageUID: originalMessageUID || "",
+            })
             .then((newlyCreatedTopic) => {
                 let topicID = newlyCreatedTopic.id
                 // mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()

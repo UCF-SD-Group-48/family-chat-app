@@ -179,19 +179,16 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		})
 
 		let groupID, topicID;
-
-		let payload = CreateGroupObj(
-				route.params.groupName,
-				currentUserID,
-				route.params.coverImage.imageNumber,
-				route.params.coverImage.color,
-				membersArray
-		);
-
-		console.log("After Payload: ", JSON.stringify(payload, null, "\t"))
+		
 		await db
 			.collection("groups")
-			.add(payload)
+			.add({
+				groupName: route.params.groupName,
+				groupOwner: currentUserID,
+				coverImageNumber: route.params.coverImage.imageNumber,
+				color: route.params.coverImage.color,
+				members: membersArray
+			})
 			.then(async (newlyCreatedGroup) => {
 				groupID = newlyCreatedGroup.id;
 				membersArray.map(async (memberUID) => {
