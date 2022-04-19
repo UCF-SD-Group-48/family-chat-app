@@ -186,8 +186,10 @@ const GroupsTab = ({ navigation }) => {
 								alignSelf: 'flex-end',
 								borderBottomLeftRadius: 500,
 								borderTopLeftRadius: 500,
-
+								backgroundColor: '#DFD7CE'
 							},]}
+							boneColor={'#EFEAE2'}
+							highlightColor={'#FFFFFF'}
 						/>
 						<SkeletonContent
 							containerStyle={{
@@ -207,8 +209,10 @@ const GroupsTab = ({ navigation }) => {
 								alignSelf: 'flex-end',
 								borderBottomLeftRadius: 500,
 								borderTopLeftRadius: 500,
-
+								backgroundColor: '#DFD7CE'
 							},]}
+							boneColor={'#EFEAE2'}
+							highlightColor={'#FFFFFF'}
 						/>
 						<SkeletonContent
 							containerStyle={{
@@ -228,8 +232,10 @@ const GroupsTab = ({ navigation }) => {
 								alignSelf: 'flex-end',
 								borderBottomLeftRadius: 500,
 								borderTopLeftRadius: 500,
-
+								backgroundColor: '#DFD7CE'
 							},]}
+							boneColor={'#EFEAE2'}
+							highlightColor={'#FFFFFF'}
 						/>
 						<SkeletonContent
 							containerStyle={{
@@ -249,8 +255,10 @@ const GroupsTab = ({ navigation }) => {
 								alignSelf: 'flex-end',
 								borderBottomLeftRadius: 500,
 								borderTopLeftRadius: 500,
-
+								backgroundColor: '#DFD7CE'
 							},]}
+							boneColor={'#EFEAE2'}
+							highlightColor={'#FFFFFF'}
 						/>
 						<SkeletonContent
 							containerStyle={{
@@ -270,8 +278,10 @@ const GroupsTab = ({ navigation }) => {
 								alignSelf: 'flex-end',
 								borderBottomLeftRadius: 500,
 								borderTopLeftRadius: 500,
-
+								backgroundColor: '#DFD7CE'
 							},]}
+							boneColor={'#EFEAE2'}
+							highlightColor={'#FFFFFF'}
 						/>
 
 					</View>
