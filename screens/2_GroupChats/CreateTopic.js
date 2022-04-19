@@ -198,22 +198,8 @@ const CreateTopic = ({ navigation, route }) => {
         else return `${checked.length}`
     }
 
-    // let [membersList, setMembersList] = useState([])
-
     const createTopic = async () => {
         const currentUserID = auth.currentUser.uid;
-
-        // let membersArray = [];
-
-        // console.log('membersList', membersList)
-        console.log('checked',checked)
-
-        // checked.map((member) => {
-        //     membersArray.push(member.uid)
-        // })
-
-        // let topicPayload = CreateTopicObj(auth.currentUser.uid, newTopicName, checked, originalMessageUID );
-
 
         await db.collection('groups').doc(groupId)
             .collection("topics")
@@ -225,10 +211,6 @@ const CreateTopic = ({ navigation, route }) => {
             })
             .then((newlyCreatedTopic) => {
                 let topicID = newlyCreatedTopic.id
-                // mapUpdate[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
-                // membersArray.map(async (memberUID) => {
-                //     await db.collection('users').doc(memberUID).update(mapUpdate);
-                // })
 
                 console.log('topicID', topicID)
                 console.log(checked)
@@ -257,10 +239,6 @@ const CreateTopic = ({ navigation, route }) => {
                     }
                 );
             })
-            // .then((result) => {
-            //  setButtonText('CREATED');
-            //  navigation.push("Chat", { topicId : String(result.id), topicName : newTopicName, groupId, groupName, groupOwner });
-            // })
             .catch((error) => console.log(error));
     };
 

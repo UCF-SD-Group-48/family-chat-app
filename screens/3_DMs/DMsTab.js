@@ -200,7 +200,46 @@ const DirectMessagesTab = ({ navigation }) => {
 
   const createDM = async () => {
 
+    // const currentUserID = auth.currentUser.uid;
+
+    // await db.collection('groups').doc(groupId)
+    //   .collection("topics")
+    //   .add({
+    //     topicOwner: auth.currentUser.uid,
+    //     topicName: newTopicName,
+    //     members: checked,
+    //     originalMessageUID: originalMessageUID || "",
+    //   })
+    //   .then((newlyCreatedDM) => {
+    //     let chatsID = newlyCreatedDM.id
+
+    //     newlyCreatedDM.data().members.map(async (memberUID, index) => {
+
+    //       console.log(index, memberUID)
+
+    //       const addChatsValueToTopicMap = await db
+    //         .collection('users')
+    //         .doc(memberUID)
+    //         .update({
+    //           [`topicMap.${chatsID}`]: firebase.firestore.FieldValue.serverTimestamp()
+    //         })
+    //         .catch((error) => console.log(error));
+    //     })
+
+    //     navigation.push("Chat",
+    //       {
+    //         topicId: newChat.id,
+    //         topicName: "DM",
+    //         isDM: true,
+    //         otherUserFullName: searchedUser.name
+    //       }
+    //     );
+    //   })
+    //   .catch((error) => console.log(error));
+
     setShownPhoneText("");
+
+    console.log('Entered CreateDM')
 
     //if dm already exists, route to dm
     const snapshot = await db.collection("chats")
@@ -214,13 +253,51 @@ const DirectMessagesTab = ({ navigation }) => {
       }
     }
 
-    await db.collection('chats').add({
-      members: [searchedUser.uid, auth.currentUser.uid],
-    })
-      .then((newChat) => {
-        navigation.push("Chat", { topicId: newChat.id, topicName: "DM", isDM: true, otherUserFullName: searchedUser.name });
-      });
+    // Doesn't exist, CREATE A NEW ONE
+    const createNewDMConversation = await db
+      .collection('chats')
+      .add(
+        {
+          members: [searchedUser.uid, auth.currentUser.uid],
+        }
+      )
+      .catch((error) => console.log(error));
+
+    // Get the newly created chats document
+    const newlyCreatedDM = await db
+      .collection("chats")
+      .where('members', 'array-contains', searchedUser.uid)
+      .get()
+      .catch((error) => console.log(error));
+
+    // Enter if a new chat was created
+    if (!newlyCreatedDM.empty) {
+
+      // ID of chats (DMs) document
+      let chatsID = newlyCreatedDM.docs[0].id
+
+      // Add the DM conversation value to both member's topicMap
+      newlyCreatedDM.docs[0].data().members.map(async (memberUID, index) => {
+        const addChatsValueToTopicMap = await db
+          .collection('users')
+          .doc(memberUID)
+          .update({
+            [`topicMap.${chatsID}`]: firebase.firestore.FieldValue.serverTimestamp()
+          })
+          .catch((error) => console.log(error));
+      })
+
+      navigation.push("Chat",
+        {
+          topicId: chatsID,
+          topicName: "DMs",
+          isDM: true,
+          otherUserFullName: searchedUser.name
+        }
+      )
+    }
   }
+
 
   const [isLoadingDMs, setIsLoadingDMs] = useState(false);
 
@@ -378,30 +455,31 @@ const DirectMessagesTab = ({ navigation }) => {
       }}>
         <MyView hide={chats.length > 0} style={{
           width: "100%", minHeight: 300, paddingTop: 30,
-          justifyContent: "flex-start", alignItems: "center", flexDirection: "column", backgroundColor: "#abc0"}}>
-            <FontAwesome name="paper-plane" size={50} color="#555" />
-            <Text style={{
-                        fontSize: 20,
-                        fontWeight: '800',
-                        textAlign: "center",
-                        marginTop: 15,
-                        color: "#555",
-                }}>
-                    {"No DMs found."}
-            </Text>
-            <Text style={{
-                        fontSize: 20,
-                        fontWeight: '400',
-                        textAlign: "center",
-                        maxWidth: 350,
-                        lineHeight: 24,
-                        marginTop: 15,
-                        color: "#555",
-                }}>
-                    {" Looks like there aren't any direct messages yet."+
-                        "\nSearch for a user above to start a conversation."}
-            </Text>
-            <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
+          justifyContent: "flex-start", alignItems: "center", flexDirection: "column", backgroundColor: "#abc0"
+        }}>
+          <FontAwesome name="paper-plane" size={50} color="#555" />
+          <Text style={{
+            fontSize: 20,
+            fontWeight: '800',
+            textAlign: "center",
+            marginTop: 15,
+            color: "#555",
+          }}>
+            {"No DMs found."}
+          </Text>
+          <Text style={{
+            fontSize: 20,
+            fontWeight: '400',
+            textAlign: "center",
+            maxWidth: 350,
+            lineHeight: 24,
+            marginTop: 15,
+            color: "#555",
+          }}>
+            {" Looks like there aren't any direct messages yet." +
+              "\nSearch for a user above to start a conversation."}
+          </Text>
+          <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
         </MyView>
         {chats.map(({ id, data }) => (
           <TouchableOpacity key={id} activeOpacity={0.7} onPress={() => {
