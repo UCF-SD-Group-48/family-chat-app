@@ -212,8 +212,8 @@ const ProfileTab = ({ navigation }) => {
 
   const signOutUser = () => {
     auth.signOut().then(() => {
-      navigation.replace('UserAuth');
-    });
+      navigation.navigate('UserAuth')
+    })
   };
 
   const [discoverable, setDiscoverable] = useState();
@@ -327,6 +327,35 @@ const ProfileTab = ({ navigation }) => {
 
   };
 
+  const togglePFPSelection = () => {
+
+  }
+
+  const checkIfSelected = (imageNumber) => {
+    if (pfp === imageNumber) {
+      // Selected Profile Option
+      return {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        margin: 5,
+        opacity: 1,
+        borderWidth: 5,
+        borderColor: '#2C6BED'
+      }
+    }
+    else {
+      // Default faded styling for profile options
+      return {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        margin: 5,
+        opacity: .3
+      }
+    }
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView
@@ -349,13 +378,13 @@ const ProfileTab = ({ navigation }) => {
             <View style={{
               width: "90%", minHeight: 50, backgroundColor: "#abc0",
               justifyContent: "flex-start", alignItems: "flex-end", flexDirection: "row",
-              marginTop: 10, marginBottom: 5,
+              marginTop: 15, marginBottom: 5,
             }}>
               <Image
                 source={imageSelection(pfp)}
                 style={{ width: 80, height: 80, borderRadius: 5, borderWidth: 2, borderColor: "#777" }}
               />
-              <TouchableOpacity activeOpacity={0.85} onPress={() => { }}
+              <TouchableOpacity activeOpacity={0.85} onPress={() => togglePFPSelection(pfp)}
                 style={{
                   width: 26, height: 26, backgroundColor: "#F8F8F8", borderRadius: 15, borderWidth: 2, borderColor: "#777",
                   marginLeft: -19, marginBottom: -7,
@@ -829,7 +858,7 @@ const ProfileTab = ({ navigation }) => {
         </View> */}
 
         <View style={styles.buttonExternalsContainer}>
-{/* 
+          {/* 
           <TouchableOpacity
             activeOpacity={0.75}
           // onPress={() => viewAppTutorial()}
@@ -853,7 +882,7 @@ const ProfileTab = ({ navigation }) => {
           <TouchableOpacity
             activeOpacity={0.75}
             onPress={() => visitFAQ()}
-            style={{marginTop: 10}}
+            style={{ marginTop: 10 }}
           >
             <View style={styles.buttonExternalsSpacing}>
               <View style={[styles.buttonExternalsEnabled, {}]}>

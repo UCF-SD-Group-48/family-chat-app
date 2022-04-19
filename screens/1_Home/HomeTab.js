@@ -196,7 +196,7 @@ const HomeTab = ({ navigation, route }) => {
 
   // const [blockHidden, setBlockHidden] = useState(false);
   // const [phoneNumber, setPhoneNumber] = useState((auth.currentUser.phoneNumber).substring(1));
-  const [uid, setUID] = useState(auth.currentUser.uid);
+  const [uid, setUID] = useState(auth?.currentUser?.uid);
 
 
   const [userData, setUserData] = useState(async () => {
@@ -580,148 +580,157 @@ const HomeTab = ({ navigation, route }) => {
     let topicUIDtoData = {};
     let memberUIDToData = {};
 
-    //getting current user's groups
-    await db.collection('users').doc(auth.currentUser.uid).get()
-      .then((result) => {
-        groups = [...result.data().groups];
-      });
+    try {
 
-    for (const groupUID of groups) {
-
-      //getting a list of topic ids
-      let topics = [];
-      const snapshot = await db.collection('groups').doc(groupUID).collection("topics").get();
-      for (const topic of snapshot.docs) {
-        topics.push(topic.id);
-        topicUIDtoData[topic.id] = topic.data();
-      }
-      //settings the list of topic ids under a key of the group UID
-      groupUIDToTopics[groupUID] = [...topics];
-
-      console.log(groupUID)
-
-      //getting group data per group (and members)
-      let members = [];
-      await db.collection('groups').doc(groupUID).get()
+      //getting current user's groups
+      await db.collection('users').doc(auth?.currentUser?.uid).get()
         .then((result) => {
-          console.log(result.data())
-          const resultData = result.data();
-          groupUIDtoData[groupUID] = resultData;
-          resultData.members.map((memberUID) =>
-            members.push(memberUID)
-          );
+          groups = [...result.data().groups];
         });
 
-      for (const member of members) {
-        if (!memberUIDToData.hasOwnProperty(member)) {
-          await db.collection('users').doc(member).get()
-            .then((result) => {
-              memberUIDToData[member] = result.data();
-            });
+      for (const groupUID of groups) {
+
+        //getting a list of topic ids
+        let topics = [];
+        const snapshot = await db.collection('groups').doc(groupUID).collection("topics").get();
+        for (const topic of snapshot.docs) {
+          topics.push(topic.id);
+          topicUIDtoData[topic.id] = topic.data();
+        }
+        //settings the list of topic ids under a key of the group UID
+        groupUIDToTopics[groupUID] = [...topics];
+
+        console.log(groupUID)
+
+        //getting group data per group (and members)
+        let members = [];
+        await db.collection('groups').doc(groupUID).get()
+          .then((result) => {
+            console.log(result.data())
+            const resultData = result.data();
+            groupUIDtoData[groupUID] = resultData;
+            resultData.members.map((memberUID) =>
+              members.push(memberUID)
+            );
+          });
+
+        for (const member of members) {
+          if (!memberUIDToData.hasOwnProperty(member)) {
+            await db.collection('users').doc(member).get()
+              .then((result) => {
+                memberUIDToData[member] = result.data();
+              });
+          }
         }
       }
-    }
 
-    let groupData = [];
-    let numActiveEvents = 0;
-    let totalMissedMessages = 0;
-    let numGroupsWithMissedMessages = 0;
-    for (const groupUID of groups) {
+      let groupData = [];
+      let numActiveEvents = 0;
+      let totalMissedMessages = 0;
+      let numGroupsWithMissedMessages = 0;
+      for (const groupUID of groups) {
 
-      totalMissedMessages = 0;
-      let topics = [];
-      let events = [];
-      for (const topicUID of groupUIDToTopics[groupUID]) {
+        totalMissedMessages = 0;
+        let topics = [];
+        let events = [];
+        for (const topicUID of groupUIDToTopics[groupUID]) {
 
-        //getting all the messages per topic
-        let missedMessages = [];
-        if (memberUIDToData[auth.currentUser.uid].topicMap.hasOwnProperty(topicUID)) {
-          const snapshot = await db.collection('chats').doc(topicUID).collection("messages")
-            .where('timestamp', ">", memberUIDToData[auth.currentUser.uid].topicMap[topicUID])
-            // .where('ownerUID', "==", !auth.currentUser.uid)
-            .orderBy('timestamp', 'asc').get();
+          //getting all the messages per topic
+          let missedMessages = [];
+          if (memberUIDToData[auth.currentUser.uid].topicMap.hasOwnProperty(topicUID)) {
+            const snapshot = await db.collection('chats').doc(topicUID).collection("messages")
+              .where('timestamp', ">", memberUIDToData[auth.currentUser.uid].topicMap[topicUID])
+              // .where('ownerUID', "==", !auth.currentUser.uid)
+              .orderBy('timestamp', 'asc').get();
 
-          if (snapshot.docs.length > 0) {
-            totalMissedMessages += snapshot.docs.length;
-            for (const message of snapshot.docs) {
-              //TODO only push the last three?
-              missedMessages.push({
-                messageText: message.data().message,
-                messageTime: message.data().timestamp,
-                senderFullName: memberUIDToData[message.data().ownerUID].firstName + " " + memberUIDToData[message.data().ownerUID].lastName,
-                senderPFP: memberUIDToData[message.data().ownerUID].pfp,
+            if (snapshot.docs.length > 0) {
+              totalMissedMessages += snapshot.docs.length;
+              for (const message of snapshot.docs) {
+                //TODO only push the last three?
+                missedMessages.push({
+                  messageText: message.data().message,
+                  messageTime: message.data().timestamp,
+                  senderFullName: memberUIDToData[message.data().ownerUID].firstName + " " + memberUIDToData[message.data().ownerUID].lastName,
+                  senderPFP: memberUIDToData[message.data().ownerUID].pfp,
+                });
+              }
+
+              //pushing missed messages to topics array
+              topics.push({
+                missedMessages: missedMessages,
+                topicID: topicUID,
+                topicName: topicUIDtoData[topicUID].topicName,
               });
+
             }
+          }
 
-            //pushing missed messages to topics array
-            topics.push({
-              missedMessages: missedMessages,
-              topicID: topicUID,
+          //saving all events
+          const snapshot = await db.collection('chats').doc(topicUID).collection("events")
+            .where("endTime", ">", new Date()).orderBy('endTime', 'desc').get();
+          for (const event of snapshot.docs) {
+            events.push({
+              id: event.id,
+              data: event.data(),
+              topicId: topicUID,
               topicName: topicUIDtoData[topicUID].topicName,
+              groupOwner: groupUIDtoData[groupUID].groupOwner,
             });
-
           }
         }
 
-        //saving all events
-        const snapshot = await db.collection('chats').doc(topicUID).collection("events")
-          .where("endTime", ">", new Date()).orderBy('endTime', 'desc').get();
-        for (const event of snapshot.docs) {
-          events.push({
-            id: event.id,
-            data: event.data(),
-            topicId: topicUID,
-            topicName: topicUIDtoData[topicUID].topicName,
+        //pushing to final object groupData
+        if (events.length > 0 && topics.length > 0) {
+          numActiveEvents = numActiveEvents + 1;
+          numGroupsWithMissedMessages = numGroupsWithMissedMessages + 1;
+          groupData.push({
+            activeEvents: [...events],
+            groupID: groupUID,
+            topics: [...topics],
+            totalMissedMessages: totalMissedMessages,
+            groupName: groupUIDtoData[groupUID].groupName,
+            groupColor: groupUIDtoData[groupUID].color,
+            groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
+            groupOwner: groupUIDtoData[groupUID].groupOwner,
+
+          });
+        }
+        else if (events.length <= 0 && topics.length > 0) {
+          numGroupsWithMissedMessages = numGroupsWithMissedMessages + 1;
+          groupData.push({
+            activeEvents: null,
+            groupID: groupUID,
+            topics: [...topics],
+            totalMissedMessages: totalMissedMessages,
+            groupName: groupUIDtoData[groupUID].groupName,
+            groupColor: groupUIDtoData[groupUID].color,
+            groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
+            groupOwner: groupUIDtoData[groupUID].groupOwner,
+
+          });
+        }
+        else if (events.length > 0 && topics.length <= 0) {
+          numActiveEvents = numActiveEvents + 1;
+          groupData.push({
+            activeEvents: [...events],
+            groupID: groupUID,
+            topics: [],
+            totalMissedMessages: totalMissedMessages,
+            groupName: groupUIDtoData[groupUID].groupName,
+            groupColor: groupUIDtoData[groupUID].color,
+            groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
             groupOwner: groupUIDtoData[groupUID].groupOwner,
           });
         }
       }
 
-      //pushing to final object groupData
-      if (events.length > 0 && topics.length > 0) {
-        numActiveEvents = numActiveEvents + 1;
-        numGroupsWithMissedMessages = numGroupsWithMissedMessages + 1;
-        groupData.push({
-          activeEvents: [...events],
-          groupID: groupUID,
-          topics: [...topics],
-          totalMissedMessages: totalMissedMessages,
-          groupName: groupUIDtoData[groupUID].groupName,
-          groupColor: groupUIDtoData[groupUID].color,
-          groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
-        });
-      }
-      else if (events.length <= 0 && topics.length > 0) {
-        numGroupsWithMissedMessages = numGroupsWithMissedMessages + 1;
-        groupData.push({
-          activeEvents: null,
-          groupID: groupUID,
-          topics: [...topics],
-          totalMissedMessages: totalMissedMessages,
-          groupName: groupUIDtoData[groupUID].groupName,
-          groupColor: groupUIDtoData[groupUID].color,
-          groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
-        });
-      }
-      else if (events.length > 0 && topics.length <= 0) {
-        numActiveEvents = numActiveEvents + 1;
-        groupData.push({
-          activeEvents: [...events],
-          groupID: groupUID,
-          topics: [],
-          totalMissedMessages: totalMissedMessages,
-          groupName: groupUIDtoData[groupUID].groupName,
-          groupColor: groupUIDtoData[groupUID].color,
-          groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
-        });
-      }
-    }
+      //saving to state groupToData
+      setNumEvents(numActiveEvents);
+      setGroupsWithMissedMessages(numGroupsWithMissedMessages);
+      setGroupToData(groupData);
+      setIsContentLoading(false);
 
-    //saving to state groupToData
-    setNumEvents(numActiveEvents);
-    setGroupsWithMissedMessages(numGroupsWithMissedMessages);
-    setGroupToData(groupData);
-    setIsContentLoading(false);
+    } catch (error) { console.log(error) };
 
     console.log('[Home Tab] Finished')
   }
@@ -747,6 +756,8 @@ const HomeTab = ({ navigation, route }) => {
       groupName: group.groupName,
       groupColor: group.groupColor,
       groupImageNumber: group.groupImageNumber,
+      groupOwner: group.groupOwner,
+
     })
     setGroupToData(result);
     setGroupsWithMissedMessages(groupsWithMissedMessages - 1);
@@ -840,7 +851,6 @@ const HomeTab = ({ navigation, route }) => {
                   shadowRadius: 1,
                   shadowOpacity: .25,
                   marginTop: 17,
-                  marginBottom: 22,
                   justifyContent: 'space-between'
                 }}
                 animationDirection="horizontalRight"
@@ -860,6 +870,22 @@ const HomeTab = ({ navigation, route }) => {
                 boneColor={'#DFD7CE'}
                 highlightColor={'#EFEAE2'}
               />
+
+              <View style={styles.callToActionFooterText}>
+                <Text style={{
+                  marginTop: 2,
+                  width: 325,
+                  alignSelf: 'center',
+                  textAlign: 'center',
+                  color: '#9D9D9D',
+                  fontWeight: '700',
+                  fontSize: 14,
+                  // fontStyle: 'italic',
+                }}
+                >
+                  One moment while we load your messages...
+                </Text>
+              </View>
             </View>
 
             : <View style={styles.interactFeaturesContainer}>
@@ -1101,16 +1127,30 @@ const HomeTab = ({ navigation, route }) => {
 
                         (topic.missedMessages.length < 3 || index >= (topic.missedMessages.length - 3)) ? (
                           <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                            dismissButtonPressed(group);
-                            navigation.push('GroupsTab',
-                              {
-                                screen: 'Chat', params: {
-                                  topicId: topic.topicID, topicName: topic.topicName,
-                                  groupId: group.groupID, groupName: group.groupName, groupOwner: null,
-                                  color: group.groupColor, coverImageNumber: group.groupImageNumber
-                                }
-                              });
-
+                            try {
+                              navigation.push('TabStack',
+                                {
+                                  screen: 'Groups', params: {
+                                    screen: 'Chat', params: {
+                                      topicId: topic.topicID,
+                                      topicName: topic.topicName,
+                                      groupId: group.groupID,
+                                      groupName: group.groupName,
+                                      groupOwner: group.groupOwner,
+                                      color: group.groupColor,
+                                      coverImageNumber: group.groupImageNumber
+                                    }
+                                  }
+                                }).then(() => {
+                                  console.log('[Home Tab] Navigation → DISMISSED')
+                                  dismissButtonPressed(group);
+                                })
+                            } catch (error) {
+                              console.log(error)
+                            } finally {
+                              console.log('FINALLY')
+                              // dismissButtonPressed(group);
+                            }
                           }}
                             style={{
                               maxWidth: "100%", minHeight: 10, backgroundColor: "#F8F8F8",
@@ -1228,9 +1268,12 @@ const HomeTab = ({ navigation, route }) => {
                     </Text>
                   </View>
 
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     activeOpacity={0.75}
-                    onPress={() => navigation.navigate('GroupsTab')}
+                    onPress={() => {
+                      navigation.navigate('TabStack', { screen: 'GroupsTab' });
+                    }
+                    }
                   >
                     <View style={styles.buttonSpacing}>
                       <View style={[styles.buttonGroups, { borderColor: '#363732', }]}>
@@ -1245,7 +1288,7 @@ const HomeTab = ({ navigation, route }) => {
                         />
                       </View>
                     </View>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </MyView>
                 : null
               }

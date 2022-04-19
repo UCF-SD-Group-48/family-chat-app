@@ -94,7 +94,7 @@ const UserCreated = ({ navigation, route }) => {
   console.log()
 
 	const enterApp = () => {
-		navigation.navigate('TabStack');
+		navigation.navigate('TabStack', { screen: 'HomeTab'});
 	};
 
   return (

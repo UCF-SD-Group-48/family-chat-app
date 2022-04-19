@@ -160,6 +160,10 @@ const ChatScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused();
     const flatList = useRef();
 
+    useEffect(() => {
+        console.log('[Chat Screen] Started')
+    }, [])
+
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
         setCopiedText(false)
@@ -229,6 +233,7 @@ const ChatScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
+
         pinMapFunction();
         // return () => {
         //     setPinMap();
@@ -265,6 +270,7 @@ const ChatScreen = ({ navigation, route }) => {
         // console.log("messageSenderUIDs = "+JSON.stringify(messageSenderUIDs));
     }
     useEffect(() => {
+        console.log('MESSAGES ---')
         messageMapFunction();
 
         if (messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
