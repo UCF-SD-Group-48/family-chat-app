@@ -28,6 +28,13 @@ import {
     Input,
     Tooltip,
 } from 'react-native-elements';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+  } from 'react-native-popup-menu';
+  import FeatherIcon from 'react-native-vector-icons/Feather';
 import { AntDesign, Feather, Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 
 
@@ -61,6 +68,24 @@ const Polls = ({ navigation, route }) => {
 
     const [pastPolls, setPastPolls] = useState([]);
     const [activePolls, setActivePolls] = useState([]);
+
+    const IconOption = ({iconName, text, value, isLast, isSpacer, isDestructive, selectFunction}) => (
+        <MenuOption value={value} onSelect={selectFunction}
+        style={{
+            borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
+            borderColor: "#dedede",
+            height: (isSpacer) ? 47 : 40,
+            paddingLeft: 15, paddingVertical: 12,
+        }}>
+          <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
+            <FeatherIcon name={iconName} color={(isDestructive) ? "red" : "black"} size={15}/>
+            {"   "+text}
+          </Text>
+        </MenuOption>
+    );
+    const triggerStyles = {
+        triggerTouchable: {underlayColor: "#0001"},
+    }
 
     //past polls
     useLayoutEffect(() => {
@@ -159,8 +184,8 @@ const Polls = ({ navigation, route }) => {
         navigation.push("AddPoll", { topicId, topicName, groupId, groupName, groupOwner });
     };
 
-    const viewPoll = (eventId, eventData) => {
-        // navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId, eventData });
+    const viewPoll = (pollId, pollData) => {
+        navigation.push("ViewPoll", { topicId, topicName, groupId, groupName, groupOwner, pollId, pollData });
     };
 
     // const getString = (uid) => {
@@ -289,14 +314,24 @@ const Polls = ({ navigation, route }) => {
                                 </View>
                                 {/* Moderator */}
                                 {(data.ownerUID === auth.currentUser.uid) ? (
-                                    <View style={{
-                                        minWidth: 26, minHeight: 26,
-                                        borderColor: "#000", borderWidth: 0, backgroundColor: "#F8D353",
-                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
-                                        flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
-                                    }}>
-                                        <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} />
-                                    </View>
+                                    <Menu>
+                                        <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
+                                            <MaterialCommunityIcons name="dots-horizontal" size={35} color="black" style={{marginHorizontal: 12,}} />
+                                        </MenuTrigger>
+                                        <MenuOptions style={{
+                                            borderRadius: 12, backgroundColor: "#fff",
+                                        }}
+                                        customStyles={{
+                                            optionsContainer: {
+                                                borderRadius: 15, backgroundColor: "#666",
+                                            },
+                                        }}>
+                                            <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
+                                                selectFunction={() => {
+                                                    db.collection("chats").doc(topicId).collection("polls").doc(id).delete();
+                                                }}/>
+                                        </MenuOptions>
+                                    </Menu>
                                 ) : (
                                     <View style={{
                                         minWidth: 26, minHeight: 26,
