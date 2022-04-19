@@ -1139,7 +1139,9 @@ const HomeTab = ({ navigation, route }) => {
                                       groupOwner: group.groupOwner,
                                       color: group.groupColor,
                                       coverImageNumber: group.groupImageNumber
-                                    }
+                                    },
+                                    initial: false,
+
                                   }
                                 }).then(() => {
                                   console.log('[Home Tab] Navigation → DISMISSED')
