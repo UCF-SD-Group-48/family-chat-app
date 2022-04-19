@@ -582,10 +582,10 @@ const ChatScreen = ({ navigation, route }) => {
             // console.log("Event");
             navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId: alertEvent.id, eventData: alertEvent.data });
         }
-        // else if (bannerData.type == "Poll") {
-        //     // console.log("Poll");
-        //     navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId: alertEvent.id, eventData: alertEvent.data });
-        // }
+        else if (bannerData.type == "Poll") {
+            // console.log("Poll");
+            navigateTo("Polls");
+        }
     };
 
     const dismissBanner = () => {
@@ -1539,7 +1539,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             marginHorizontal: 15,
                                             color: "black",
                                         }}>
-                                            {"View Poll"}
+                                            {"View Polls"}
                                         </Text>
                                         <Entypo name="chevron-right" size={24} color="black" />
                                     </TouchableOpacity>
