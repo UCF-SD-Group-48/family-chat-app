@@ -68,7 +68,8 @@ const Banners = ({ navigation, route }) => {
             .collection('chats')
             .doc(topicId)
             .collection('banners')
-            .orderBy('timestamp', 'desc')
+            .where("type", "==", "Banner")
+            // .orderBy('timestamp', 'desc')
             .onSnapshot((snapshot) =>
                 setBanners(
                     snapshot.docs.map(doc => ({

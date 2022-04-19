@@ -122,6 +122,19 @@ const ChatScreen = ({ navigation, route }) => {
         },
         id: "",
     });
+    const [alertPoll, setAlertPoll] = useState({
+        data: {
+            ownerPhoneNumber: "",
+            ownerUID: "",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            endTime: firebase.firestore.Timestamp.fromDate(new Date()),
+            question: "",
+            winningOption: "",
+            memberVotes: {},
+            votingOptions: {},
+        },
+        id: "",
+    });
     const [pinMap, setPinMap] = useState({});
     const [topicMap, setTopicMap] = useState({});
 
@@ -454,6 +467,15 @@ const ChatScreen = ({ navigation, route }) => {
                                     });
                                 });
                         }
+                        else if (`${data.type}` == "Poll") {
+                            db.collection('chats').doc(topicId).collection('polls').doc(`${data.referenceUID}`).get()
+                                .then((result) => {
+                                    setAlertPoll({
+                                        id: result.id,
+                                        data: result.data(),
+                                    });
+                                });
+                        }
                     }
                 }
 
@@ -549,6 +571,10 @@ const ChatScreen = ({ navigation, route }) => {
             // console.log("Event");
             navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId: alertEvent.id, eventData: alertEvent.data });
         }
+        // else if (bannerData.type == "Poll") {
+        //     // console.log("Poll");
+        //     navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId: alertEvent.id, eventData: alertEvent.data });
+        // }
     };
 
     const dismissBanner = () => {
@@ -900,7 +926,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
                                         // shadowRadius: 3, shadowOpacity: 0.25,
                                     }]}> */}
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Polls")}
                                         style={[styles.featuresOuterView,
                                         {
                                             shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
@@ -1154,7 +1180,8 @@ const ChatScreen = ({ navigation, route }) => {
                                 flex: 0, flexGrow: 0, flexDirection: "column",
                                 justifyContent: "flex-start", alignItems: "center",
                             }}>
-                            <MyView hide={(alert.data.type || "") != "Event"}
+                                
+                            <MyView hide={(alert.data.type || "") != "Event" || alertEvent.data == undefined}
                                 style={[
                                     {
                                         width: "100%",
@@ -1320,6 +1347,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     </TouchableOpacity>
                                 </View>
                             </MyView>
+
                             <MyView hide={(alert.data.type || "") != "Banner"}
                                 style={[
                                     {
@@ -1408,6 +1436,99 @@ const ChatScreen = ({ navigation, route }) => {
                                             color: "black",
                                         }}>
                                             {"View Alert"}
+                                        </Text>
+                                        <Entypo name="chevron-right" size={24} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                            </MyView>
+                            <MyView hide={(alert.data.type || "") != "Poll" || alertPoll.data == undefined}
+                                style={[
+                                    {
+                                        width: "100%",
+                                        backgroundColor: "#F1A45C", borderWidth: 0,
+                                        flex: 0, flexGrow: 0, flexDirection: "column",
+                                        justifyContent: "flex-start", alignItems: "center",
+                                        borderBottomLeftRadius: 5, borderBottomRightRadius: 5,
+                                    },
+                                    {
+                                        shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
+                                        shadowRadius: 2, shadowOpacity: 0.5,
+                                    }
+                                ]} >
+                                {/* Title */}
+                                <View style={{
+                                    width: "100%",
+                                    paddingHorizontal: 10, paddingVertical: 10,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#fac0",
+                                    flex: 0, flexGrow: 0, flexDirection: "row",
+                                    justifyContent: "space-between", alignItems: "center",
+                                }}>
+                                    <View style={{
+                                        paddingHorizontal: 15, paddingVertical: 5,
+                                        backgroundColor: "#fffb", borderRadius: 7, borderWidth: 0,
+                                        flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+                                    }}>
+                                        <Entypo name="bar-graph" size={22} color="black" />
+                                        <Text style={{
+                                            fontSize: 18,
+                                            fontWeight: '800',
+                                            textAlign: "center",
+                                            marginLeft: 15, marginRight: 5,
+                                        }}>
+                                            Poll
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={dismissBanner}
+                                        style={{
+                                            paddingHorizontal: 5, paddingVertical: 5,
+                                            backgroundColor: "#eec0", borderRadius: 10, borderWidth: 0,
+                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                        }}>
+                                        <Fontisto name="close-a" size={18} color="black" />
+                                    </TouchableOpacity>
+                                </View>
+                                {/* Content */}
+                                <View style={{
+                                    width: "100%",
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
+                                    paddingVertical: 5, paddingHorizontal: 15,
+                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <Text style={{
+                                        fontSize: 16,
+                                        fontWeight: '700',
+                                        textAlign: "left",
+                                        marginHorizontal: 15,
+                                        color: "black",
+                                    }}>
+                                        <Text style={{ fontWeight: '600' }}>"</Text>
+                                        {(alertPoll.data.question) || ("")}
+                                        <Text style={{ fontWeight: '600' }}>"</Text>
+                                    </Text>
+                                </View>
+                                {/* Action */}
+                                <View style={{
+                                    minHeight: 0, width: "100%",
+                                    marginTop: 10, marginBottom: 15,
+                                    borderColor: "#000", borderWidth: 0, backgroundColor: "#cfa0",
+                                    flex: 0, flexGrow: 0,
+                                    flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                                }}>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => { viewBanner(alert.id, alert.data) }}
+                                        style={{
+                                            height: 40, paddingHorizontal: 10,
+                                            flexDirection: "row", justifyContent: "center", alignItems: "center",
+                                            backgroundColor: "#fffb",
+                                            borderColor: "#9E4C46", borderWidth: 4, borderRadius: 20,
+                                        }}>
+                                        <Text style={{
+                                            fontSize: 15,
+                                            fontWeight: '700',
+                                            textAlign: "center",
+                                            marginHorizontal: 15,
+                                            color: "black",
+                                        }}>
+                                            {"View Poll"}
                                         </Text>
                                         <Entypo name="chevron-right" size={24} color="black" />
                                     </TouchableOpacity>
