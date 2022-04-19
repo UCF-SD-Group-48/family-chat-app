@@ -1,5 +1,6 @@
+import firebase from "firebase/compat";
 
-const CreateUserPayload = ({firstName, lastName, pfp, email, phoneNumber}) => {
+const CreateUserPayload = (firstName, lastName, pfp , email, phoneNumber) => {
 	
 	let payload = {
 			firstName: firstName,

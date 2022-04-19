@@ -3,19 +3,17 @@ import CreateTopicObj from "../helperFunctions/CreateTopicObj";
 describe('CreateTopicObj', () => {
     it('returns a Topic Object', () => {
         
-      const groupName = "UnitTestCreateGroup"
-      const currentUserID = "1234567"
-      const imageNumber = 5
-      const color = "red"
-      const membersArray = [currentUserID]
+      const currentUser =  "12345"
+      const topicName = "Topic Unit Test"
+      const members = ["12345"]
+      const originalMessageUID = ""
 
-      const result = CreateGroupObj(groupName, currentUserID, imageNumber, color, membersArray);
+      const result = CreateTopicObj(currentUser, topicName, members, originalMessageUID);
       const expected = {
-          "color": "red",
-          "coverImageNumber": 5,
-          "groupName": "UnitTestCreateGroup",
-          "groupOwner": "1234567",
-          "members":  ["1234567"]
+        "members": ["12345"],
+        "originalMessageUID": "",
+        "topicName": "Topic Unit Test",
+        "topicOwner": "12345",
       };
   
       expect(result).toEqual(expected);
