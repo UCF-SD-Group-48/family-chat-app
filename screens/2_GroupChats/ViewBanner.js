@@ -76,6 +76,8 @@ const ViewBanner = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
     const bannerId = route.params.bannerId;
     const bannerData = route.params.bannerData;
     

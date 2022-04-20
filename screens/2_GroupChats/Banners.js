@@ -58,6 +58,8 @@ const Banners = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
 
     const [banners, setBanners] = useState([]);
     const [bannerOwners, setBannerOwners] = useState({});
@@ -151,11 +153,11 @@ const Banners = ({ navigation, route }) => {
 	};
     
     const addBanner = () => {
-        navigation.push("AddBanner", { topicId, topicName, groupId, groupName, groupOwner });
+        navigation.push("AddBanner", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
     };
 
     const viewBanner = (bannerId, bannerData) => {
-        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
+        navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, bannerId, bannerData });
     };
 
     const getString = (uid) => {

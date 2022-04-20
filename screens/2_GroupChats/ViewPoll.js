@@ -76,6 +76,8 @@ const ViewPoll = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
     const pollId = route.params.pollId;
     const pollData = route.params.pollData;
     
@@ -123,6 +125,12 @@ const ViewPoll = ({ navigation, route }) => {
                                 <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
                                     selectFunction={() => {
                                         db.collection("chats").doc(topicId).collection("polls").doc(pollId).delete();
+                                        db.collection("chats").doc(topicId).collection("banners")
+                                            .where("referenceUID", '==', pollId).get().then((snapshot) => {
+                                                for(const doc of snapshot.docs) {
+                                                    db.collection("chats").doc(topicId).collection("banners").doc(doc.id).delete();
+                                                }
+                                            })
                                         navigation.goBack();
                                     }}/>
                             </MenuOptions>
@@ -252,7 +260,7 @@ const ViewPoll = ({ navigation, route }) => {
                         <View style={{
                             minWidth: 26, minHeight: 26,
                             borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                            paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
+                            paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 0,
                             flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
                         }}>
                             {/* <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} /> */}

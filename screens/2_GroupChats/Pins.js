@@ -56,6 +56,9 @@ const Pins = ({ navigation, route }) => {
     const topicName = route.params.topicName;
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
+    const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
 
     const [pins, setPins] = useState([])
 
@@ -80,21 +83,21 @@ const Pins = ({ navigation, route }) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "Pins",
-            headerRight: () => (
-				<View
-					style={{
-						flexDirection: "row",
-						justifyContent: "space-between",
-						marginRight: 10,
-					}}>
-					<TouchableOpacity
-						activeOpacity={0.5}
-						onPress={() => {console.log("info blurb here")}}
-					>
-						<Ionicons name="information-circle" size={28} color="black" />
-					</TouchableOpacity>
-				</View>
-			),
+            // headerRight: () => (
+			// 	<View
+			// 		style={{
+			// 			flexDirection: "row",
+			// 			justifyContent: "space-between",
+			// 			marginRight: 10,
+			// 		}}>
+			// 		<TouchableOpacity
+			// 			activeOpacity={0.5}
+			// 			onPress={() => {console.log("info blurb here")}}
+			// 		>
+			// 			<Ionicons name="information-circle" size={28} color="black" />
+			// 		</TouchableOpacity>
+			// 	</View>
+			// ),
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
                     <TouchableOpacity activeOpacity={0.5} onPress={() => {navigation.goBack();}}>
@@ -141,7 +144,7 @@ const Pins = ({ navigation, route }) => {
     };
 
     const viewPin = (pinId, pinData, message) => {
-        navigation.push("ViewPin", { topicId, topicName, groupId, groupName, pinId, pinData, message });
+        navigation.push("ViewPin", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, pinId, pinData, message });
     };
 
     return (

@@ -69,6 +69,8 @@ const AddPoll = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
 
     const [question, setQuestion] = useState("");
     const [choices, setChoices] = useState(2);
@@ -184,7 +186,7 @@ const AddPoll = ({ navigation, route }) => {
         setChoice3("");
         setChoice4("");
 
-        navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner });
+        navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
     };
 
     const addChoice = () => {

@@ -485,6 +485,20 @@ const ChatScreen = ({ navigation, route }) => {
                         }
                     }
                 }
+                else {
+                    setAlert({
+                        data: {
+                            description: "",
+                            ownerPhoneNumber: "",
+                            ownerUID: "",
+                            referenceUID: "",
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            type: "",
+                            viewedBy: [],
+                        },
+                        id: "",
+                    })
+                }
 
             });
         return unsubscribe;
@@ -576,11 +590,11 @@ const ChatScreen = ({ navigation, route }) => {
     const viewBanner = (bannerId, bannerData) => {
         if (bannerData.type == "Banner") {
             // console.log("Banner");
-            navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, bannerId, bannerData });
+            navigation.push("ViewBanner", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, bannerId, bannerData });
         }
         else if (bannerData.type == "Event") {
             // console.log("Event");
-            navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId: alertEvent.id, eventData: alertEvent.data });
+            navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, eventId: alertEvent.id, eventData: alertEvent.data });
         }
         else if (bannerData.type == "Poll") {
             // console.log("Poll");
@@ -1560,8 +1574,9 @@ const ChatScreen = ({ navigation, route }) => {
                                         && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber
                                         && data.timestamp != null && messageMap[id].previousMessage.data.timestamp != null
                                         && (data.timestamp.seconds - messageMap[id].previousMessage.data.timestamp.seconds) < 300
-                                        && (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
-                                            || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)
+                                        && (currentUser.topicMap[topicId] == null ||
+                                            (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
+                                            || currentUser.topicMap[topicId].seconds > data.timestamp.seconds))
                                     ) ? (
                                         //message without profile picture
                                         <View key={id} style={{
@@ -1614,11 +1629,11 @@ const ChatScreen = ({ navigation, route }) => {
                                                             <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
                                                                 isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
                                                                 selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
+                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM || (getPinData(id) != null)}
                                                                 selectFunction={() => { addPinFromMessage(data, id) }} />
                                                             <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic'
-                                                                hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
-                                                                selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, originalMessageUID: id }) }} />
+                                                                hide={data.ownerUID != auth.currentUser.uid || topicName != "General" || (getTopicData(id) != null)}
+                                                                selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, originalMessageUID: id }) }} />
                                                             <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
                                                             <IconOption value={5} iconName='edit' text='Edit' hide={true} />
                                                             <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
@@ -1694,8 +1709,9 @@ const ChatScreen = ({ navigation, route }) => {
                                                 || currentUser.topicMap.length <= 0
                                                 || currentUser.topicMap[topicId] == null
                                                 || data.timestamp == null || messageMap[id].previousMessage.data.timestamp == null
-                                                || (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
-                                                    || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)
+                                                || (currentUser.topicMap[topicId] != null &&
+                                                    (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
+                                                    || currentUser.topicMap[topicId].seconds > data.timestamp.seconds))
                                                 || (lastMessageTime != null && data.timestamp.seconds > lastMessageTime.seconds)}
                                                 style={{
                                                     height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
@@ -1777,11 +1793,11 @@ const ChatScreen = ({ navigation, route }) => {
                                                                 <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
                                                                     isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
                                                                     selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                                <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM}
+                                                                <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM || (getPinData(id) != null)}
                                                                     selectFunction={() => { addPinFromMessage(data, id) }} />
                                                                 <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
-                                                                    hide={data.ownerUID != auth.currentUser.uid || topicName != "General"}
-                                                                    selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, originalMessageUID: id }) }} />
+                                                                    hide={data.ownerUID != auth.currentUser.uid || topicName != "General" || (getTopicData(id) != null)}
+                                                                    selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, originalMessageUID: id }) }} />
                                                                 <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
                                                                 <IconOption value={5} iconName='edit' text='Edit' hide={true} />
                                                                 <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}

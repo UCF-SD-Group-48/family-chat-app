@@ -67,6 +67,9 @@ const AddPin = ({ navigation, route }) => {
     const topicName = route.params.topicName;
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
+    const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
     const message = route.params.message;
     const messageId = route.params.messageId;
 

@@ -77,6 +77,8 @@ const ViewEvent = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
     const eventId = route.params.eventId;
     const eventData = route.params.eventData;
     
@@ -233,6 +235,12 @@ const ViewEvent = ({ navigation, route }) => {
                                 <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
                                     selectFunction={() => {
                                         db.collection("chats").doc(topicId).collection("events").doc(eventId).delete();
+                                        db.collection("chats").doc(topicId).collection("banners")
+                                            .where("referenceUID", '==', eventId).get().then((snapshot) => {
+                                                for(const doc of snapshot.docs) {
+                                                    db.collection("chats").doc(topicId).collection("banners").doc(doc.id).delete();
+                                                }
+                                            })
                                         navigation.goBack();
                                     }}/>
                             </MenuOptions>

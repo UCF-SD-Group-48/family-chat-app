@@ -58,6 +58,8 @@ const Events = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
 
     const [pastEvents, setPastEvents] = useState([]);
     const [activeEvents, setActiveEvents] = useState([]);
@@ -170,11 +172,11 @@ const Events = ({ navigation, route }) => {
 	// };
     
     const addEvent = () => {
-        navigation.push("AddEvent", { topicId, topicName, groupId, groupName, groupOwner });
+        navigation.push("AddEvent", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
     };
 
     const viewEvent = (eventId, eventData) => {
-        navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, eventId, eventData });
+        navigation.push("ViewEvent", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, eventId, eventData });
     };
 
     // const getString = (uid) => {

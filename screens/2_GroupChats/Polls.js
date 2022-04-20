@@ -65,6 +65,8 @@ const Polls = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
 
     const [pastPolls, setPastPolls] = useState([]);
     const [activePolls, setActivePolls] = useState([]);
@@ -181,11 +183,11 @@ const Polls = ({ navigation, route }) => {
 	// };
     
     const addPoll = () => {
-        navigation.push("AddPoll", { topicId, topicName, groupId, groupName, groupOwner });
+        navigation.push("AddPoll", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
     };
 
     const viewPoll = (pollId, pollData) => {
-        navigation.push("ViewPoll", { topicId, topicName, groupId, groupName, groupOwner, pollId, pollData });
+        navigation.push("ViewPoll", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, pollId, pollData });
     };
 
     // const getString = (uid) => {
@@ -329,6 +331,12 @@ const Polls = ({ navigation, route }) => {
                                             <IconOption value={1} isLast={true} isDestructive={true} iconName='trash' text='Delete'
                                                 selectFunction={() => {
                                                     db.collection("chats").doc(topicId).collection("polls").doc(id).delete();
+                                                    db.collection("chats").doc(topicId).collection("banners")
+                                                    .where("referenceUID", '==', id).get().then((snapshot) => {
+                                                        for(const doc of snapshot.docs) {
+                                                            db.collection("chats").doc(topicId).collection("banners").doc(doc.id).delete();
+                                                        }
+                                                    })
                                                 }}/>
                                         </MenuOptions>
                                     </Menu>
@@ -432,7 +440,7 @@ const Polls = ({ navigation, route }) => {
                                         </View>
 
                                         <View style={{ paddingTop: 0, width: "90%", }}>
-                                        {Object.keys(data.votingOptions).sort().map((option) => (
+                                        {Object.keys(data.votingOptions).sort().map((option, index) => (
                                         <View key={option.length+""+option} style={{
                                                 width: "100%",
                                                 backgroundColor: "#fff0", borderWidth: 0,

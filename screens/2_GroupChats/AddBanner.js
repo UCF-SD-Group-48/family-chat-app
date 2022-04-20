@@ -68,6 +68,8 @@ const AddBanner = ({ navigation, route }) => {
     const groupId = route.params.groupId;
     const groupName = route.params.groupName;
     const groupOwner = route.params.groupOwner;
+    const color = route.params.color;
+    const coverImageNumber = route.params.coverImageNumber;
 
     const [content, setContent] = useState("");
 
@@ -108,7 +110,7 @@ const AddBanner = ({ navigation, route }) => {
 
         setContent(""); // clears input
 
-        navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner });
+        navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
     };
 
     return (

@@ -572,9 +572,9 @@ const HomeTab = ({ navigation, route }) => {
   const getAllData = async () => {
 
 
-    console.log('*')
-    console.log('[Home Tab] Started')
-    console.log(isContentLoading)
+    // console.log('*')
+    // console.log('[Home Tab] Started')
+    // console.log(isContentLoading)
 
     let groups = [];
     let groupUIDtoData = {};
@@ -602,13 +602,13 @@ const HomeTab = ({ navigation, route }) => {
         //settings the list of topic ids under a key of the group UID
         groupUIDToTopics[groupUID] = [...topics];
 
-        console.log(groupUID)
+        // console.log(groupUID)
 
         //getting group data per group (and members)
         let members = [];
         await db.collection('groups').doc(groupUID).get()
           .then((result) => {
-            console.log(result.data())
+            // console.log(result.data())
             const resultData = result.data();
             groupUIDtoData[groupUID] = resultData;
             resultData.members.map((memberUID) =>
@@ -733,7 +733,7 @@ const HomeTab = ({ navigation, route }) => {
 
     } catch (error) { console.log(error) };
 
-    console.log('[Home Tab] Finished')
+    // console.log('[Home Tab] Finished')
   }
 
   const dismissButtonPressed = async (group) => {
@@ -891,7 +891,7 @@ const HomeTab = ({ navigation, route }) => {
 
             : <View style={styles.interactFeaturesContainer}>
               {(numEvents <= 0)
-                ? <MyView
+                ? <View
                 // hide={numEvents > 0}
                 >
                   <TouchableOpacity
@@ -918,8 +918,8 @@ const HomeTab = ({ navigation, route }) => {
                       </View>
                     </View>
                   </TouchableOpacity>
-                </MyView>
-                : <MyView
+                </View>
+                : <View
                 // hide={numEvents <= 0}
                 >
                   <TouchableOpacity
@@ -963,7 +963,7 @@ const HomeTab = ({ navigation, route }) => {
                       }} />
                     </View>
                   </TouchableOpacity>
-                </MyView>
+                </View>
               }
 
               {/* Polls */}
@@ -1118,7 +1118,7 @@ const HomeTab = ({ navigation, route }) => {
                   </View>
 
                   {/* Missed Messages -Topics */}
-                  {group.topics.map((topic) => (
+                  {group.topics.map((topic, index) => (
                     <View key={topic.topicID} style={{
                       width: "100%", minHeight: 50, backgroundColor: "#CFC5BA00",
                       flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
@@ -1233,11 +1233,11 @@ const HomeTab = ({ navigation, route }) => {
                               </Text>
                             </View>
                           </TouchableOpacity>
-                        ) : (<View style={{ widht: 0, height: 0, }}></View>)
+                        ) : (<View key={index} style={{ widht: 0, height: 0, }}></View>)
                       ))}
 
                       {/* See all messages */}
-                      <MyView key={"index"} hide={topic.missedMessages.length < 3} style={{
+                      <MyView hide={topic.missedMessages.length < 3} style={{
                         maxWidth: "100%", minHeight: 10, backgroundColor: "#E5E5E5",
                         flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                         borderWidth: 1, borderColor: "#777", borderRadius: 3,
@@ -1284,7 +1284,7 @@ const HomeTab = ({ navigation, route }) => {
             </View>
             : <View>
               {(isContentLoading === false)
-                ? <MyView
+                ? <View
                   // hide={groupToData.length > 0 && groupsWithMissedMessages > 0}
                   style={{ marginTop: 15, }}
                 >
@@ -1331,8 +1331,8 @@ const HomeTab = ({ navigation, route }) => {
                       </View>
                     </View>
                   </TouchableOpacity> */}
-                </MyView>
-                : null
+                </View>
+                :<View style={{width: 0, height: 0,}} />
               }
             </View>
           }
