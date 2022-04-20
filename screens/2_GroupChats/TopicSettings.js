@@ -22,6 +22,7 @@ import {
     View,
     Dimensions,
     Touchable,
+    Linking
 } from 'react-native';
 import {
     Avatar,
@@ -562,34 +563,38 @@ const TopicSettings = ({ navigation, route }) => {
     const [newOwnerSaveTrigger, setNewOwnerSaveTrigger] = useState(false)
 
     const addNewTopicOwner = async () => {
+        try {
+            const newTopicOwnerQuery = await db
+                .collection('groups')
+                .doc(topicObjectForPassing.groupId)
+                .collection('topics')
+                .doc(topicObjectForPassing.topicId)
+                .update({
+                    topicOwner: newTopicOwner
+                })
+                .catch((error) => console.log(error));
 
-        const newTopicOwnerQuery = await db
-            .collection('groups')
-            .doc(topicObjectForPassing.groupId)
-            .collection('topics')
-            .doc(topicObjectForPassing.topicId)
-            .update({
-                topicOwner: newTopicOwner
-            })
-            .catch((error) => console.log(error));
+            const currentTopicOwnerQuery = await db
+                .collection('groups')
+                .doc(topicObjectForPassing.groupId)
+                .collection('topics')
+                .doc(topicObjectForPassing.topicId)
+                .get()
+                .catch((error) => console.log(error));
+        } catch (error) {
+            console.log(error)
+        } finally {
 
-        const currentTopicOwnerQuery = await db
-            .collection('groups')
-            .doc(topicObjectForPassing.groupId)
-            .collection('topics')
-            .doc(topicObjectForPassing.topicId)
-            .get()
-            .catch((error) => console.log(error));
+            topicData.topicOwner = newTopicOwner;
+            topicObjectForPassing.topicOwner = newTopicOwner;
 
-        topicData.topicOwner = newTopicOwner;
-        topicObjectForPassing.topicOwner = newTopicOwner;
-
-        setIsEditing(false);
-        setIsLoadingSaveButton(false);
-        setIsLoadingEditButton(false);
-        setIsOwner(false);
-        setIsLoadingTransferButton(false)
-        setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
+            setIsEditing(false);
+            setIsLoadingSaveButton(false);
+            setIsLoadingEditButton(false);
+            setIsOwner(false);
+            setIsLoadingTransferButton(false)
+            setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
+        }
     }
 
     const updateGroupMembers = async () => {
@@ -610,7 +615,6 @@ const TopicSettings = ({ navigation, route }) => {
     }
 
     const addNewTopicName = async () => {
-
         try {
             const newTopicNameQuery = await db
                 .collection('groups')
@@ -669,7 +673,7 @@ const TopicSettings = ({ navigation, route }) => {
                         </Text>
                         <View style={[styles.overlayTitleBox, { height: 30, borderRadius: 2, backgroundColor: 'white', opacity: .75, padding: 5, marginTop: 8, minWidth: 50, maxWidth: '100%', marginBottom: 5, }]}>
                             <Text style={[styles.overlayTitle, { fontSize: 16, fontWeight: '600', }]}>
-                                {newTopicName}
+                                {topicData.topicName}
                             </Text>
                         </View>
                     </View>
@@ -761,6 +765,7 @@ const TopicSettings = ({ navigation, route }) => {
                             activeOpacity={0.75}
                             onPress={() => {
                                 setIsLoadingTransferButton(true);
+                                setNewTopicName(topicObjectForPassing.topicName)
                                 addNewTopicOwner();
                             }}
                         >

@@ -2,7 +2,6 @@ import {
 	ActivityIndicator,
 	Keyboard,
 	KeyboardAvoidingView,
-	Linking,
 	Platform,
 	SafeAreaView,
 	ScrollView,
@@ -12,6 +11,7 @@ import {
 	TouchableOpacity,
 	TouchableWithoutFeedback,
 	View,
+	Linking
 } from 'react-native';
 import React, { useLayoutEffect, useState, useEffect } from 'react';
 import {
@@ -115,6 +115,10 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		//  setSearchResults();
 		//  setSearchedUser({});
 		// }
+		// return () => {
+		// 	setSearchResults();
+		// 	setSearchedUser({});
+		// }
 	}, searchedUserPhoneNumber);
 
 	const checkTheMembersList = (searchedUserPhoneNumber) => {
@@ -124,7 +128,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 	const [searchedUserPhoneNumber, setSearchedUserPhoneNumber] = useState('');
 
 	const openTextMessage = () => {
-		// const searchedUserPhoneNumber = '+16505551234'
 		const textMessageText = `I just created a group within the FamilyChat app. Join in on the conversation by clicking this download link: https://www.familychat.app/`
 		Linking.openURL(`sms://+1${searchedUserPhoneNumber}&body=${textMessageText}`)
 	}
@@ -134,18 +137,22 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 	let [searchedUser, setSearchedUser] = useState({})
 
 	const searchForUser = async () => {
-		const query = await db
-			.collection('users')
-			.where('phoneNumber', '==', searchedUserPhoneNumber)
-			.get();
+		try {
+			const query = await db
+				.collection('users')
+				.where('phoneNumber', '==', searchedUserPhoneNumber)
+				.get();
 
-		if (!query.empty) {
-			setSearchResults('exists')
-			const snapshot = query.docs[0];
-			const data = snapshot.data();
-			const searchedUserFullName = `${data.firstName} ${data.lastName}`;
-			setSearchedUser({ uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: false })
-		} else { setSearchResults('nonexistent') }
+			if (!query.empty) {
+				setSearchResults('exists')
+				const snapshot = query.docs[0];
+				const data = snapshot.data();
+				const searchedUserFullName = `${data.firstName} ${data.lastName}`;
+				setSearchedUser({ uid: snapshot.id, name: `${searchedUserFullName}`, pfp: data.pfp, owner: false })
+			} else { setSearchResults('nonexistent') }
+		} catch (error) {
+			console.log(error)
+		}
 	};
 
 	function formatPhoneInput(value) {
@@ -179,7 +186,7 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		})
 
 		let groupID, topicID;
-		
+
 		await db
 			.collection("groups")
 			.add({

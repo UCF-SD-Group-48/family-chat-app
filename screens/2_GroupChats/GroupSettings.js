@@ -21,6 +21,7 @@ import {
     TouchableWithoutFeedback,
     View,
     Dimensions,
+    Linking
 } from 'react-native';
 import {
     Avatar,
@@ -238,8 +239,6 @@ const GroupSettings = ({ navigation, route }) => {
         };
     }, [toggleOverlay, newGroupOwner])
 
-    // --------
-
     useEffect(() => {
         if (searchedUserPhoneNumber.length === 10) {
             if (searchResults != ('exists' || 'nonexistent')) {
@@ -248,14 +247,9 @@ const GroupSettings = ({ navigation, route }) => {
         }
     }, searchedUserPhoneNumber);
 
-    // const checkTheMembersList = (searchedUserPhoneNumber) => {
-    //     if (!membersList.includes(memberToCheck)) setMembersList([...membersList, searchedUserName]);
-    // }
-
     const [searchedUserPhoneNumber, setSearchedUserPhoneNumber] = useState('');
 
     const openTextMessage = () => {
-        // const searchedUserPhoneNumber = '+16505551234'
         const textMessageText = `I just created a group within the FamilyChat app. Join in on the conversation by clicking this download link: https://www.familychat.app/`
         Linking.openURL(`sms://+1${searchedUserPhoneNumber}&body=${textMessageText}`)
     }
@@ -300,8 +294,6 @@ const GroupSettings = ({ navigation, route }) => {
         }
     };
 
-    // --------
-
     const [useEffectGroupSnapshotData, setUseEffectGroupSnapshotData] = useState({});
     const [groupMembers, setGroupMembers] = useState([]);
     const [isOwner, setIsOwner] = useState(false);
@@ -332,7 +324,6 @@ const GroupSettings = ({ navigation, route }) => {
     const [leaveGroupFlag, setLeaveGroupFlag] = useState(false);
 
     const leaveGroup = async () => {
-        console.log('///////// Entered "leaveGroup()"');
 
         // Set the groupID for repeated use throughout function
         const groupID = topicObjectForPassing.groupId;
@@ -1858,6 +1849,7 @@ const GroupSettings = ({ navigation, route }) => {
                                         setIsLoadingSaveButton(true);
                                         setIsLoadingEditButton(false);
                                         addNewGroupMembersToDatabase();
+                                        setSearchResults('incomplete')
                                         // console.log(groupMembers)
                                     }}
                                 >
@@ -1885,169 +1877,6 @@ const GroupSettings = ({ navigation, route }) => {
                                 : null
                             }
                         </View>
-
-                        // <View style={styles.groupUsersInvolved}>
-                        //     <View style={styles.groupMembersContainer}>
-                        //         <View style={styles.groupMembersHeader}>
-                        //             <Icon
-                        //                 name='groups'
-                        //                 type='material'
-                        //                 color='#363732'
-                        //                 size={24}
-                        //             />
-                        //             <Text style={styles.groupMembersTitle}>
-                        //                 Group Members:
-                        //             </Text>
-                        //         </View>
-
-                        //         <View style={styles.searchResultsContainer}>
-                        //             {(searchResults === 'incomplete')
-                        //                 ? <View style={styles.incompleteSearchResult}>
-                        //                     <Text style={styles.incompleteSearchResultText}>
-                        //                         No results
-                        //                     </Text>
-                        //                 </View>
-                        //                 : (searchResults === 'exists')
-                        //                     ? <View style={styles.userExistsSearchResult}>
-                        //                         <View style={styles.userResult}>
-                        //                             <Image
-                        //                                 source={imageSelection(searchedUser.pfp)}
-                        //                                 style={{ width: 30, height: 30, borderRadius: 5 }}
-                        //                             />
-                        //                             <Text style={styles.completedSearchResultText}>
-                        //                                 {searchedUser.name}
-                        //                             </Text>
-                        //                         </View>
-                        //                         {(groupMembers.some(memberObject => memberObject.name === searchedUser.name))
-                        //                             ? <View style={styles.memberExists}>
-                        //                                 <Icon
-                        //                                     name="check-bold"
-                        //                                     type="material-community"
-                        //                                     size={24}
-                        //                                     color="white"
-                        //                                 />
-                        //                             </View>
-                        //                             : <TouchableOpacity
-                        //                                 activeOpacity={0.75}
-                        //                                 onPress={() => { setMembersList([...membersList, searchedUser]) }}
-                        //                             >
-                        //                                 <View style={[styles.searchResultsButtonAdd, { orderColor: '#2352DF', }]}>
-                        //                                     <Text style={styles.searchResultsButtonAddText}>
-                        //                                         ADD
-                        //                                     </Text>
-                        //                                     <Icon
-                        //                                         name="person-add"
-                        //                                         type="material"
-                        //                                         size={18}
-                        //                                         color="#2352DF"
-                        //                                     />
-                        //                                 </View>
-                        //                             </TouchableOpacity>
-                        //                         }
-                        //                     </View>
-                        //                     : <View style={styles.userNonexistentSearchResult}>
-                        //                         <Text style={styles.completedSearchResultText}>
-                        //                             No user found.
-                        //                         </Text>
-                        //                         <TouchableOpacity
-                        //                             activeOpacity={0.75}
-                        //                             onPress={() => openTextMessage()}
-                        //                         >
-                        //                             <View style={[styles.searchResultsButtonInvite, { orderColor: '#363732', }]}>
-                        //                                 <Text style={styles.searchResultsButtonInviteText}>
-                        //                                     App Invite
-                        //                                 </Text>
-                        //                                 <Icon
-                        //                                     name="email-outline"
-                        //                                     type="material-community"
-                        //                                     size={18}
-                        //                                     color="#363732"
-                        //                                 />
-                        //                             </View>
-                        //                         </TouchableOpacity>
-                        //                     </View>
-                        //             }
-                        //         </View>
-
-                        //         <View style={styles.memberEditContainer}>
-                        //             <ScrollView containerStyle={{ paddingTop: 10 }}>
-                        //                 {groupMembers.map((groupMember, index) => (
-                        //                     <View style={styles.memberEditRow} key={index} id={index}>
-                        //                         <View style={styles.member}>
-                        //                             <View style={styles.memberLeftPortion}>
-                        //                                 <Image
-                        //                                     source={imageSelection(groupMember.pfp)}
-                        //                                     style={{ width: 26, height: 26, borderRadius: 5, }}
-                        //                                 />
-                        //                                 <Text style={styles.memberName}>
-                        //                                     {groupMember.name}
-                        //                                 </Text>
-                        //                             </View>
-                        //                             <View style={styles.memberRightPortion}>
-                        //                                 {(groupMember.uid === useEffectGroupSnapshotData.groupOwner)
-                        //                                     ? <View style={{ marginRight: 25 }}>
-                        //                                         <Icon
-                        //                                             name='crown'
-                        //                                             type='material-community'
-                        //                                             color='#363732'
-                        //                                             size={20}
-                        //                                         />
-                        //                                     </View>
-                        //                                     : <View style={{ height: 55 }}>
-                        //                                         <CheckBox
-                        //                                             center
-                        //                                             checked={groupMembers.includes(groupMember.uid)}
-                        //                                             onPress={() => {
-                        //                                                 if (groupMembers.includes(groupMember.uid)) {
-                        //                                                     setGroupMembers((previous) => {
-                        //                                                         return previous.filter((memberToKeep) => { return memberToKeep != groupMember.uid })
-                        //                                                     })
-                        //                                                 } else setGroupMembers((previous) => { return [...previous, groupMember.uid] });
-                        //                                             }}
-                        //                                         />
-                        //                                     </View>
-                        //                                 }
-                        //                             </View>
-                        //                         </View>
-                        //                     </View>
-                        //                 ))
-                        //                 }
-                        //             </ScrollView>
-                        //         </View>
-                        // {isOwner
-                        //     ? <TouchableOpacity
-                        //         activeOpacity={0.75}
-                        //         onPress={() => {
-                        //             setIsLoadingSaveButton(true);
-                        //             setIsLoadingEditButton(false);
-                        //             addNewGroupMembersToDatabase();
-                        //         }}
-                        //     >
-                        //         <View style={styles.buttonSpacing}>
-                        //             <View style={[styles.buttonSave, { borderColor: '#363732', }]}>
-                        //                 <Text style={styles.buttonSaveText}>
-                        //                     SAVE
-                        //                 </Text>
-
-                        //                 {(isLoadingSaveButton)
-                        //                     ? <ActivityIndicator
-                        //                         size="small"
-                        //                         color="white"
-                        //                     />
-                        //                     : <Icon
-                        //                         name="check-bold"
-                        //                         type="material-community"
-                        //                         size={20}
-                        //                         color="white"
-                        //                     />
-                        //                 }
-                        //             </View>
-                        //         </View>
-                        //     </TouchableOpacity>
-                        //     : null
-                        // }
-                        //     </View>
-                        // </View>
 
                         : <View style={styles.groupUsersInvolved}>
                             <View style={styles.groupOwnerContainer}>
