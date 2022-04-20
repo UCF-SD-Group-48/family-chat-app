@@ -181,6 +181,7 @@ const HomeTab = ({ navigation, route }) => {
 
   const [groupToData, setGroupToData] = useState([]);
   const [numEvents, setNumEvents] = useState(0);
+  const [numPolls, setNumPolls] = useState(0);
   const [groupsWithMissedMessages, setGroupsWithMissedMessages] = useState(0);
 
   // const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
@@ -561,6 +562,7 @@ const HomeTab = ({ navigation, route }) => {
     return () => {
       setIsContentLoading(false);
       setNumEvents();
+      setNumPolls();
       setGroupsWithMissedMessages();
       setGroupToData([]);
       setIsContentLoading(false);
@@ -626,6 +628,7 @@ const HomeTab = ({ navigation, route }) => {
 
       let groupData = [];
       let numActiveEvents = 0;
+      let numActivePolls = 0;
       let totalMissedMessages = 0;
       let numGroupsWithMissedMessages = 0;
       for (const groupUID of groups) {
@@ -633,6 +636,7 @@ const HomeTab = ({ navigation, route }) => {
         totalMissedMessages = 0;
         let topics = [];
         let events = [];
+        let polls = [];
         for (const topicUID of groupUIDToTopics[groupUID]) {
 
           //getting all the messages per topic
@@ -677,14 +681,37 @@ const HomeTab = ({ navigation, route }) => {
               groupOwner: groupUIDtoData[groupUID].groupOwner,
             });
           }
+
+          //saving all events
+          const pollSnapshot = await db.collection('chats').doc(topicUID).collection("polls")
+            .where("endTime", ">", new Date()).orderBy('endTime', 'desc').get();
+          for (const poll of pollSnapshot.docs) {
+            polls.push({
+              id: poll.id,
+              data: poll.data(),
+              topicId: topicUID,
+              topicName: topicUIDtoData[topicUID].topicName,
+              groupOwner: groupUIDtoData[groupUID].groupOwner,
+            });
+          }
+        }
+
+        //updating counters
+        if (topics.length > 0) {
+          numGroupsWithMissedMessages = numGroupsWithMissedMessages + 1;
+        }
+        if (events.length > 0) {
+          numActiveEvents = numActiveEvents + 1;
+        }
+        if (polls.length > 0) {
+          numActivePolls = numActivePolls + 1;
         }
 
         //pushing to final object groupData
-        if (events.length > 0 && topics.length > 0) {
-          numActiveEvents = numActiveEvents + 1;
-          numGroupsWithMissedMessages = numGroupsWithMissedMessages + 1;
+        if (topics.length > 0 || events.length > 0 || polls.length > 0) {
           groupData.push({
             activeEvents: [...events],
+            activePolls: [...polls],
             groupID: groupUID,
             topics: [...topics],
             totalMissedMessages: totalMissedMessages,
@@ -693,39 +720,13 @@ const HomeTab = ({ navigation, route }) => {
             groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
             groupOwner: groupUIDtoData[groupUID].groupOwner,
 
-          });
-        }
-        else if (events.length <= 0 && topics.length > 0) {
-          numGroupsWithMissedMessages = numGroupsWithMissedMessages + 1;
-          groupData.push({
-            activeEvents: null,
-            groupID: groupUID,
-            topics: [...topics],
-            totalMissedMessages: totalMissedMessages,
-            groupName: groupUIDtoData[groupUID].groupName,
-            groupColor: groupUIDtoData[groupUID].color,
-            groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
-            groupOwner: groupUIDtoData[groupUID].groupOwner,
-
-          });
-        }
-        else if (events.length > 0 && topics.length <= 0) {
-          numActiveEvents = numActiveEvents + 1;
-          groupData.push({
-            activeEvents: [...events],
-            groupID: groupUID,
-            topics: [],
-            totalMissedMessages: totalMissedMessages,
-            groupName: groupUIDtoData[groupUID].groupName,
-            groupColor: groupUIDtoData[groupUID].color,
-            groupImageNumber: groupUIDtoData[groupUID].coverImageNumber,
-            groupOwner: groupUIDtoData[groupUID].groupOwner,
           });
         }
       }
 
       //saving to state groupToData
       setNumEvents(numActiveEvents);
+      setNumPolls(numActivePolls);
       setGroupsWithMissedMessages(numGroupsWithMissedMessages);
       setGroupToData(groupData);
       setIsContentLoading(false);
@@ -900,7 +901,7 @@ const HomeTab = ({ navigation, route }) => {
                     }}
                   >
                     <View style={[styles.interactiveFeatureButtonDisabled, { marginRight: 7 }]}>
-                      <View style={styles.interactiveFeatureLeftHalfDisabled}>
+                      <View style={[styles.interactiveFeatureLeftHalfDisabled, {height: 40,}]}>
                         <View style={styles.interactiveFeatureIconBackgroundDisabled}>
                           <Icon
                             name='calendar'
@@ -966,10 +967,11 @@ const HomeTab = ({ navigation, route }) => {
               }
 
               {/* Polls */}
+              {(numPolls <= 0) ? (
               <TouchableOpacity
                 activeOpacity={0.75}>
                 <View style={[styles.interactiveFeatureButtonDisabled, { marginLeft: 7 }]}>
-                  <View style={styles.interactiveFeatureLeftHalfDisabled}>
+                  <View style={[styles.interactiveFeatureLeftHalfDisabled, {height: 40,}]}>
                     <View style={styles.interactiveFeatureIconBackgroundDisabled}>
                       <Icon
                         name='bar-graph'
@@ -986,6 +988,44 @@ const HomeTab = ({ navigation, route }) => {
                   </View>
                 </View>
               </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                    activeOpacity={0.75}
+                    onPress={() => {
+                      // console.log("Test for users Notifications: ", gArray.length);
+                      console.log("groupToData = " + JSON.stringify(groupToData));
+                      navigation.push("ActivePolls", { groupToData, numPolls });
+                    }}
+                  >
+                    <View style={{
+                      minWidth: 100, backgroundColor: "#fff",
+                      borderWidth: 1, borderColor: '#333', borderRadius: 5,
+                      justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
+                    }}>
+                      <View style={{ flexDirection: "row", height: 40, }}>
+                        <View style={{
+                          backgroundColor: '#ED984F', paddingHorizontal: 10, paddingVertical: 5,
+                          borderTopLeftRadius: 5, borderBottomLeftRadius: 5,
+                          justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
+                        }}>
+                          <Entypo name="bar-graph" size={20} color="#000" />
+                        </View>
+                      </View>
+                      <Text style={{
+                        fontSize: 12,
+                        fontWeight: '800',
+                        textAlign: "left",
+                        marginLeft: 10,
+                        color: "#333",
+                      }}>
+                        Open Polls
+                      </Text>
+                      <Entypo name="chevron-right" size={20} color="#333" style={{
+                        paddingHorizontal: 7,
+                      }} />
+                    </View>
+                  </TouchableOpacity>
+              )}
             </View>
           }
           {((groupToData.length > 0) && (groupsWithMissedMessages > 0))

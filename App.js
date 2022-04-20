@@ -46,6 +46,8 @@ import UserCreated from './screens/0_Authentication/UserCreated';
 import HomeTab from './screens/1_Home/HomeTab';
 import ActiveEvents from './screens/1_Home/ActiveEvents';
 import ViewEventHome from './screens/1_Home/ViewEventHome';
+import ActivePolls from './screens/1_Home/ActivePolls';
+import ViewPollHome from './screens/1_Home/ViewPollHome';
 
 // ----------------- 'GROUP CHATS' Screens
 import GroupChatsTab from './screens/2_GroupChats/GroupChatsTab';
@@ -191,6 +193,8 @@ const HomeStackScreen = () => (
     <Stack.Screen name='HomeTab' component={HomeTab} />
     <Stack.Screen name='ActiveEvents' component={ActiveEvents} />
     <Stack.Screen name='ViewEventHome' component={ViewEventHome} />
+    <Stack.Screen name='ActivePolls' component={ActivePolls} />
+    <Stack.Screen name='ViewPollHome' component={ViewPollHome} />
   </Stack.Navigator>
 )
 

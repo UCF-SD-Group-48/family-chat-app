@@ -1503,18 +1503,17 @@ const ChatScreen = ({ navigation, route }) => {
                                     width: "100%",
                                     borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
                                     paddingVertical: 5, paddingHorizontal: 15,
-                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                    flexDirection: "row", justifyContent: "flex-start", alignItems: "flex-start",
                                 }}>
+                                    <FontAwesome5 name="question-circle" size={20} color="#333" />
                                     <Text style={{
                                         fontSize: 16,
-                                        fontWeight: '700',
+                                        fontWeight: '600',
                                         textAlign: "left",
                                         marginHorizontal: 15,
                                         color: "black",
                                     }}>
-                                        <Text style={{ fontWeight: '600' }}>"</Text>
                                         {(alertPoll.data.question) || ("")}
-                                        <Text style={{ fontWeight: '600' }}>"</Text>
                                     </Text>
                                 </View>
                                 {/* Action */}
@@ -1530,7 +1529,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             height: 40, paddingHorizontal: 10,
                                             flexDirection: "row", justifyContent: "center", alignItems: "center",
                                             backgroundColor: "#fffb",
-                                            borderColor: "#9E4C46", borderWidth: 4, borderRadius: 20,
+                                            borderColor: "#79522E", borderWidth: 4, borderRadius: 20,
                                         }}>
                                         <Text style={{
                                             fontSize: 15,
