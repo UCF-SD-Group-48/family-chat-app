@@ -61,6 +61,7 @@ import MyView from '../../components/MyView';
 
 // *************************************************************
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 const AddPoll = ({ navigation, route }) => {
@@ -208,7 +209,7 @@ const AddPoll = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView width={"100%"}
+            <KeyboardAwareScrollView width={"100%"}
                 contentContainerStyle={{
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                 }}>
@@ -667,7 +668,7 @@ const AddPoll = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </ScrollView>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     )
 }

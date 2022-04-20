@@ -69,6 +69,7 @@ import { imageSelection } from '../5_Supplementary/GenerateProfileIcon';
 
 // *************************************************************
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 const ViewEvent = ({ navigation, route }) => {
@@ -278,7 +279,7 @@ const ViewEvent = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView width={"100%"}
+            <KeyboardAwareScrollView width={"100%"}
                 contentContainerStyle={{
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                     flex: 0, flexGrow: 1, paddingBottom: 75, paddingTop: 20,
@@ -1063,7 +1064,7 @@ const ViewEvent = ({ navigation, route }) => {
 
                 </MyView>
 
-            </ScrollView>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     )
 }

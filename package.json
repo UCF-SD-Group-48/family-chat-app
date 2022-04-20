@@ -48,6 +48,7 @@
     "react-native-enhanced-popup-menu": "^0.7.0",
     "react-native-gesture-handler": "~2.1.0",
     "react-native-hold-menu": "^0.1.2",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-modal-datetime-picker": "^13.1.2",
     "react-native-popup-menu": "^0.15.12",
     "react-native-reanimated": "~2.3.1",

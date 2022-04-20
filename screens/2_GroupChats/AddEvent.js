@@ -61,6 +61,7 @@ import MyView from '../../components/MyView';
 
 // *************************************************************
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 const AddEvent = ({ navigation, route }) => {
@@ -202,10 +203,13 @@ const AddEvent = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView width={"100%"}
+            
+            <KeyboardAwareScrollView width={"100%"}
                 contentContainerStyle={{
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
                 }}>
+
+
                 <View style={[
                         {
                             width: "90%",
@@ -665,40 +669,9 @@ const AddEvent = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </ScrollView>
-            {/* <View style={{
-                width: "100%", minHeight: 100,
-                flex: 1, flexGrow: 0, flexDirection: "column", justifyContent: "flex-start", alignItems: "center", 
-            }}>
-                
-                <TouchableOpacity onPress={addBanner} activeOpacity={0.7}
-                    style={{
-                        width: 250, height: 75,
-                        marginTop: 0,
-                        justifyContent: "center", alignItems: "center", flexDirection: "row",
-                        backgroundColor: "#fbd",
-                        borderColor: "#000", borderWidth: 2, borderRadius: 10,
-                    }}>
-					<Text style={{
-						textAlign: "center",
-						fontSize: 18,
-						fontWeight: '600',
-						color: 'black', marginLeft: 0
-					}}>
-						{"Send Alert"}
-					</Text>
-                    <Icon
-						name='plus'
-                        type='antdesign'
-                        color='#000'
-						style={{
-							width: 25, height: 25, marginLeft: 10, justifyContent: "center"
-						}}
-					/>
-                </TouchableOpacity>
-                
-                
-            */}
+            
+            </KeyboardAwareScrollView>
+
         </SafeAreaView>
     )
 }
