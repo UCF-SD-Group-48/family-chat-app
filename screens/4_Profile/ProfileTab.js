@@ -297,7 +297,7 @@ const ProfileTab = ({ navigation }) => {
   }
 
   const visitFAQ = () => {
-    Linking.openURL('https://www.familychat.app/');
+    Linking.openURL('https://www.familychat.app/#FAQ');
   }
 
   const contactDeveloper = () => {
@@ -308,11 +308,11 @@ const ProfileTab = ({ navigation }) => {
 
   const handleEmoji = (textChange) => {
     let newText = textChange;
-    if (newText.length >= 1) {
-      if (newText.length == 4) { //if it's two emoji's only take the last one
+    if (newText?.length >= 1) {
+      if (newText?.length == 4) { //if it's two emoji's only take the last one
         newText = [...textChange].slice(1).join('');
       }
-      else if (newText.length == 2) { //if it's one emoji, take it as one character
+      else if (newText?.length == 2) { //if it's one emoji, take it as one character
         newText = [...textChange].slice(0, 1).join('');
       }
       else { //if it's anything else, set it to nothing
@@ -441,7 +441,7 @@ const ProfileTab = ({ navigation }) => {
                   </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
-                <MyView hide={firstName.length < 10}
+                <MyView hide={firstName?.length < 10}
                   style={{
                     width: "100%",
                     paddingHorizontal: 0,
@@ -457,7 +457,7 @@ const ProfileTab = ({ navigation }) => {
                     fontWeight: '500',
                     color: "#222",
                   }}>
-                    {"Characters " + firstName.length + "/15"}
+                    {"Characters " + firstName?.length + "/15"}
                   </Text>
                 </MyView>
               </View>
@@ -493,7 +493,7 @@ const ProfileTab = ({ navigation }) => {
                   </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
-                <MyView hide={lastName.length < 25}
+                <MyView hide={lastName?.length < 25}
                   style={{
                     width: "100%",
                     paddingHorizontal: 0,
@@ -509,7 +509,7 @@ const ProfileTab = ({ navigation }) => {
                     fontWeight: '500',
                     color: "#222",
                   }}>
-                    {"Characters " + lastName.length + "/30"}
+                    {"Characters " + lastName?.length + "/30"}
                   </Text>
                 </MyView>
               </View>
@@ -570,7 +570,7 @@ const ProfileTab = ({ navigation }) => {
                   </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
-                <MyView hide={status.length < 40}
+                <MyView hide={status?.length < 40}
                   style={{
                     width: "100%",
                     paddingHorizontal: 0,
@@ -586,7 +586,7 @@ const ProfileTab = ({ navigation }) => {
                     fontWeight: '500',
                     color: "#222",
                   }}>
-                    {"Characters " + status.length + "/50"}
+                    {"Characters " + status?.length + "/50"}
                   </Text>
                 </MyView>
               </View>
@@ -630,7 +630,7 @@ const ProfileTab = ({ navigation }) => {
                   </View>
                 </View>
                 {/* How many Characters description.length >= 55*/}
-                <MyView hide={email.length < 40}
+                <MyView hide={email?.length < 40}
                   style={{
                     width: "100%",
                     paddingHorizontal: 0,
@@ -646,7 +646,7 @@ const ProfileTab = ({ navigation }) => {
                     fontWeight: '500',
                     color: "#222",
                   }}>
-                    {"Characters " + email.length + "/50"}
+                    {"Characters " + email?.length + "/50"}
                   </Text>
                 </MyView>
               </View>

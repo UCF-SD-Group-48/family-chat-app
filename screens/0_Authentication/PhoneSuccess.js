@@ -352,38 +352,6 @@ const PhoneSuccess = ({ navigation, route }) => {
 										style={checkIfSelected(5)}
 									/>
 								</TouchableOpacity>
-
-								{/* <TouchableOpacity
-									activeOpacity={0.75}
-									onPress={() => {
-										setPFP(6)
-									}}
-								>
-									<View
-										style={{
-											width: 50,
-											height: 50,
-											borderRadius: 8,
-											margin: 5,
-											opacity: 1,
-											backgroundColor: '#e3e6e8',
-											alignContent: 'center',
-											justifyContent: 'center',
-											borderColor: 'grey',
-											borderWidth: 2,
-										}}
-									>
-										<Icon
-											name='add'
-											type='material'
-											color='grey'
-											size={32}
-											// onPress={getPermissions}
-											onPress={pickImage}
-
-										/>
-									</View>
-								</TouchableOpacity> */}
 							</View>
 
 						</View>
