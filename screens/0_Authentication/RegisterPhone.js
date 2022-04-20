@@ -165,28 +165,6 @@ const RegisterPhone = ({ navigation, route }) => {
                         }}
                     >
                         <View
-                            style={{
-                                width: 75,
-                                height: 50,
-                                borderColor: 'grey',
-                                borderRadius: '0%',
-                                borderWidth: 2,
-                                backgroundColor: 'white',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Text style={{ fontSize: 32 }}>🇺🇸</Text>
-                            <Icon
-                                name='caret-down-sharp'
-                                type='ionicon'
-                                color='black'
-                                size={12}
-                                style={{ alignSelf: 'flex-end', marginLeft: 5 }}
-                            />
-                        </View>
-                        <View
                             style={(
                                 phoneNumber.length === 0)
                                 ? styles.phoneInputStart

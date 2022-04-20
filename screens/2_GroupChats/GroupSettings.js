@@ -91,7 +91,7 @@ const GroupSettings = ({ navigation, route }) => {
 
     const goBackward = () => {
         console.log(topicObjectForPassing)
-        navigation.navigate("Chat",
+        navigation.navigate("TopicSettings",
             {
                 color: topicObjectForPassing.color,
                 coverImageNumber: topicObjectForPassing.coverImageNumber,

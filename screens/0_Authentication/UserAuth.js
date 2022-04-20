@@ -97,7 +97,7 @@ const UserAuth = ({ navigation }) => {
 
             if (verificationId) {
                 const phoneNumberToPass = (phoneNumber.length > 3) ? phoneNumberFormatted : '+1 650 555 1234';
-                navigation.navigate('VerifyPhone', { verificationId, phoneNumberToPass, newUserRegistration});
+                navigation.navigate('VerifyPhone', { verificationId, phoneNumberToPass, newUserRegistration });
             };
         } catch (error) {
             console.log('[UserAuth.js] phoneSubmit() / ERROR: ' + error);
@@ -115,7 +115,10 @@ const UserAuth = ({ navigation }) => {
 
     return (
         <SafeAreaView>
-            <ScrollView style={styles.container}>
+            <ScrollView
+            contentContainerStyle={{alignItems: "center",}}
+            style={styles.container}
+            >
 
                 <FirebaseRecaptchaVerifierModal
                     ref={recaptchaVerifier}
@@ -157,9 +160,10 @@ const UserAuth = ({ navigation }) => {
                             marginBottom: 35,
                             justifyContent: 'center',
                             alignItems: 'center',
+                            textAlign: 'center'
                         }}
                     >
-                        <View
+                        {/* <View
                             style={{
                                 width: 75,
                                 height: 50,
@@ -180,7 +184,7 @@ const UserAuth = ({ navigation }) => {
                                 size={12}
                                 style={{ alignSelf: 'flex-end', marginLeft: 5 }}
                             />
-                        </View>
+                        </View> */}
                         <View
                             style={(
                                 phoneNumber.length === 0)
@@ -190,7 +194,7 @@ const UserAuth = ({ navigation }) => {
                                     : styles.phoneInputDuring
                                 )}
                         >
-                            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>+1 </Text>
+                            <Text style={{ marginLeft: 30, fontWeight: 'bold', fontSize: 22}}>+1 </Text>
                             <TextInput
                                 onChangeText={(textChange) => handlePhoneInput(textChange)}
                                 placeholder={'(201) 555-0123'}
@@ -199,7 +203,7 @@ const UserAuth = ({ navigation }) => {
                                 keyboardType={'phone-pad'}
                                 maxLength={14}
                                 autoFocus={false}
-                                style={{ fontSize: 18, marginLeft: 3, marginRight: 15 }}
+                                style={{ fontSize: 22, marginLeft: 3, marginRight: 15 }}
                             />
                         </View>
                     </View>
@@ -242,21 +246,22 @@ const UserAuth = ({ navigation }) => {
                 <View style={
                     {
                         width: '100%',
-                        alignItems: 'center', 
+                        alignItems: 'center',
                         // position: 'absolute',
                         // bottom: 0,
                         display: 'flex',
-                        flexDirection: 'column',
-                        marginTop: 20
-                        }}>
-                <Image
-                    source={require('../../assets/userAuthPicture.png')}
-                    style={{ width: 400, height: 250, alignSelf: 'center'}}
-                />
+                        flexDirection: 'row',
+                        marginTop: 50,
+                        justifyContent: 'center'
+                    }}>
+                    <Image
+                        source={require('../../assets/abstractBlob.png')}
+                        style={{ width: 350, height: 250, alignSelf: 'center', marginLeft: 60 }}
+                    />
                 </View>
             </ScrollView>
         </SafeAreaView>
-        
+
     );
 };
 
@@ -277,8 +282,9 @@ const styles = StyleSheet.create({
     phoneInputStart: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        height: 50,
-        width: 200,
+        height: 60,
+        width: 300,
+        borderRadius: 2,
         alignItems: 'center',
         marginLeft: 13,
         paddingLeft: 13,
@@ -289,8 +295,8 @@ const styles = StyleSheet.create({
     phoneInputDuring: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        height: 50,
-        width: 200,
+        height: 60,
+        width: 300,
         alignItems: 'center',
         marginLeft: 13,
         paddingLeft: 13,
@@ -301,8 +307,8 @@ const styles = StyleSheet.create({
     phoneInputEnd: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        height: 50,
-        width: 200,
+        height: 60,
+        width: 300,
         alignItems: 'center',
         marginLeft: 13,
         paddingLeft: 13,

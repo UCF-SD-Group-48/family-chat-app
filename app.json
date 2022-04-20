@@ -2,7 +2,7 @@
   "expo": {
     "name": "Family Chat",
     "icon": "./assets/familychat.png",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "slug": "family-chat-app",
     "orientation": "portrait",
     "splash": {
@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.parizeauinnovations.familychat",
-      "buildNumber": "1.0.4"
+      "buildNumber": "1.0.5"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +28,7 @@
         "backgroundColor": "#1982FC"
       },
       "package": "com.parizeauinnovations.familychat",
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": []
     },
     "web": {
