@@ -73,18 +73,6 @@ const TopicSettings = ({ navigation, route }) => {
 
     const topicObjectForPassing = route.params.topicObjectForPassing;
 
-    // const topicObjectForPassing = {
-    //     color: color,
-    //     coverImageNumber: coverImageNumber,
-    //     groupId: groupId,
-    //     groupName: groupName,
-    //     groupOwner: groupOwner,
-    //     topicId: currentTopic.id,
-    //     topicName: data.topicName,
-    //     topicOwner: data.topicOwner,
-    //     topicMembers: data.members,
-    // }
-
     const goBackward = () => navigation.navigate("Chat",
         {
             color: topicObjectForPassing.color,
@@ -100,7 +88,6 @@ const TopicSettings = ({ navigation, route }) => {
     )
 
     const goForward = () => {
-        console.log('------- TOPIC', topicObjectForPassing)
         navigation.push("GroupSettings", { topicObjectForPassing })
     }
 
@@ -187,16 +174,15 @@ const TopicSettings = ({ navigation, route }) => {
         });
     }, [navigation]);
 
-    // const [useEffectGroupSnapshotData, setUseEffectGroupSnapshotData] = useState({});
     const [groupColor, setGroupColor] = useState('');
     const [groupMembers, setGroupMembers] = useState([]);
     const [topicMembers, setTopicMembers] = useState([]);
     const [isGeneral, setIsGeneral] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
-    const [topicData, setTopicData] = useState({})
+    const [topicData, setTopicData] = useState({});
+    const [newTopicName, setNewTopicName] = useState('');
 
     const getGroupMemberData = async (memberUID) => {
-
         const userSnapshot = await db
             .collection('users')
             .doc(memberUID)
@@ -212,49 +198,7 @@ const TopicSettings = ({ navigation, route }) => {
         }]);
     }
 
-    const [groupSnapshot, setGroupSnapshot] = useState({});
-
-    // useEffect(() => {
-    //     const unsubscribe = db
-    //         .collection("groups")
-    //         .doc(topicObjectForPassing.groupId)
-    //         .onSnapshot(async (groupSnapshot) => {
-    //             const groupSnapshotData = groupSnapshot.data();
-
-    //             if (!groupSnapshotData.members.includes(auth.currentUser.uid)) {
-    //                 Alert.alert(
-    //                     `Removed From Group`,
-    //                     `Woops! It seems that you're no longer a member of this group, so we've sent you back to the "Groups" tab.`,
-    //                     [{ text: "OK" }]
-    //                 );
-    //                 navigation.navigate('GroupsTab');
-    //             }
-    //         })
-
-    //     return () => {
-    //         setGroupSnapshot({});
-    //         setGroupColor();
-    //         setGroupMembers([]);
-    //         setTopicMembers([]);
-    //         setTopicData({});
-    //         setNewTopicOwner();
-    //         unsubscribe;
-    //         nestedUnsubscribe;
-    //     }
-    // }, []);
-
-    const setVariables = () => {
-        setTopicMembers([]);
-        setIsGeneral();
-        setIsOwner();
-        setTopicData({});
-        setNewTopicOwner('');
-        setIsLoadingEditContent();
-        
-    }
-
     useEffect(async () => {
-
         try {
             const groupSnapshot = await db
                 .collection('groups')
@@ -307,7 +251,6 @@ const TopicSettings = ({ navigation, route }) => {
             }
 
             setTopicMembers([])
-            console.log(topicSnapshotMembers)
             setTopicMembers(topicSnapshotMembers);
 
             groupSnapshotData.members.map((memberUID, index) => {
@@ -323,6 +266,8 @@ const TopicSettings = ({ navigation, route }) => {
                 topicOwner: topicSnapshotData.topicOwner,
             })
 
+            setNewTopicName(topicSnapshotData.topicName);
+
             setNewTopicOwner(topicSnapshotData.topicOwner);
             setIsLoadingEditContent(false);
 
@@ -334,109 +279,14 @@ const TopicSettings = ({ navigation, route }) => {
             setIsGeneral();
             setIsOwner();
             setTopicData({});
+            setNewTopicName();
             setNewTopicOwner();
             setIsLoadingEditContent();
             setGroupMembers([])
         };
     }, [toggleOverlay])
 
-    // useEffect(() => {
-    //     setVariables();
-
-    //     const unsubscribe = db
-    //         .collection('groups')
-    //         .doc(topicObjectForPassing.groupId)
-    //         .collection('topics')
-    //         .doc(topicObjectForPassing.topicId)
-    //         .onSnapshot(async (topicSnapshot) => {
-    //             const topicSnapshotData = topicSnapshot.data();
-    //             const topicSnapshotMembers = topicSnapshotData.members;
-
-    //             try {
-    //                 const groupSnapshot = await db
-    //                     .collection('groups')
-    //                     .doc(topicObjectForPassing.groupId)
-    //                     .get()
-
-    //                 const groupSnapshotData = groupSnapshot.data();
-    //                 setGroupColor(groupSnapshotData.color);
-
-    //                 // setGroupSnapshot(groupSnapshot);
-    //                 // setUseEffectGroupSnapshotData({ ...groupSnapshotData, groupId: groupSnapshot.id });
-    //                 // console.log(useEffectGroupSnapshotData)
-    //                 // const groupSnapshotData = groupSnapshot.data();
-
-    //                 if ((!topicSnapshotMembers.includes(auth.currentUser.uid)) && (leaveTopicFlag === false)) {
-
-    //                     // console.log('HELLO', leaveTopicFlag)
-
-    //                     Alert.alert(
-    //                         `Removed from Topic`,
-    //                         `Woops! It seems that you're no longer a member of this topic, so we've sent you back to the "General" topic.`,
-    //                         "My Alert Msg",
-    //                         [{ text: "OK" }]
-    //                     );
-
-    //                     const generalTopicSnapshot = await db
-    //                         .collection("groups")
-    //                         .doc(groupSnapshot.id)
-    //                         .collection("topics")
-    //                         .where("topicName", '==', 'General')
-    //                         .get()
-    //                         .catch((error) => console.log(error));
-
-    //                     const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
-
-    //                     navigation.navigate('Chat',
-    //                         {
-    //                             color: groupSnapshotData.color,
-    //                             coverImageNumber: groupSnapshotData.coverImageNumber,
-    //                             topicId: generalTopicSnapshot.docs[0].id,
-    //                             topicName: 'General',
-    //                             groupId: groupSnapshot.id,
-    //                             groupName: groupSnapshotData.groupName,
-    //                             groupOwner: groupSnapshotData.groupOwner,
-    //                         }
-    //                     );
-    //                 }
-
-    //                 setTopicMembers(topicSnapshotMembers);
-
-    //                 groupSnapshotData.members.map((memberUID, index) => {
-    //                     getGroupMemberData(memberUID);
-    //                 })
-
-    //                 if (topicSnapshotData.topicName === 'General') setIsGeneral(true);
-    //                 if (topicSnapshotData.topicOwner === auth.currentUser.uid) setIsOwner(true);
-
-    //                 await setTopicData({
-    //                     topicId: topicSnapshot.id,
-    //                     topicName: topicSnapshotData.topicName,
-    //                     topicOwner: topicSnapshotData.topicOwner,
-    //                 })
-
-    //                 setNewTopicOwner(topicSnapshotData.topicOwner);
-    //                 setIsLoadingEditContent(false);
-
-    //             } catch (error) { console.log(error) };
-
-    //             // })
-    //         });
-
-    //     return () => {
-    //         setGroupColor('');
-    //         setTopicMembers([]);
-    //         setIsGeneral();
-    //         setIsOwner();
-    //         setTopicData({});
-    //         setNewTopicOwner();
-    //         setIsLoadingEditContent();
-    //         unsubscribe;
-    //     };
-    // }, []);
-
     const [isEditing, setIsEditing] = useState(false);
-
     const [isLoadingGroupSettings, setIsLoadingGroupSettings] = useState(false);
     const [isLoadingEditContent, setIsLoadingEditContent] = useState(true);
     const [isLoadingEditButton, setIsLoadingEditButton] = useState(false);
@@ -461,7 +311,6 @@ const TopicSettings = ({ navigation, route }) => {
     }, [isFocused]);
 
     const [leaveTopicFlag, setLeaveTopicFlag] = useState(false);
-
 
     const leaveTopic = async () => {
 
@@ -536,7 +385,8 @@ const TopicSettings = ({ navigation, route }) => {
             .doc(groupID)
             .collection('topics')
             .doc(topicID)
-            .get();
+            .get()
+            .catch((error) => console.log(error));
 
         const databaseListOfTopicMembers = topicSnapshot.data().members;
 
@@ -547,14 +397,6 @@ const TopicSettings = ({ navigation, route }) => {
                 .update({
                     [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
                 })
-                // .set(
-                //     {
-                //         topicMap: {
-                //             [topicID]: firebase.firestore.FieldValue.delete(),
-                //         },
-                //     },
-                //     { merge: true }
-                // )
                 .catch((error) => console.log(error));
         })
 
@@ -574,6 +416,7 @@ const TopicSettings = ({ navigation, route }) => {
                     .collection('groups')
                     .doc(topicObjectForPassing.groupId)
                     .get()
+                    .catch((error) => console.log(error));
 
                 const groupSnapshotData = groupSnapshot.data();
 
@@ -591,10 +434,6 @@ const TopicSettings = ({ navigation, route }) => {
                     .catch((error) => console.log(error));
 
                 const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
-                // console.log('THIS', generalTopicSnapshot.docs[0].id)
-                // console.log('THAT???', generalTopicSnapshot.id)
-
-                // console.log('general:', generalTopicSnapshotData);
 
                 Alert.alert(
                     `Topic Deleted`,
@@ -654,8 +493,6 @@ const TopicSettings = ({ navigation, route }) => {
                     })
                     .catch((error) => console.log(error));
 
-
-                // const updateStringValue = { `topicMap.${topicID}` : firebase.firestore.FieldValue.delete() };
                 const updates = {}
                 updates[`topicMap.${topicID}`] = firebase.firestore.FieldValue.delete();
 
@@ -667,8 +504,6 @@ const TopicSettings = ({ navigation, route }) => {
                         [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
                     })
                     .catch((error) => console.log(error));
-
-
             })
         }
 
@@ -684,17 +519,6 @@ const TopicSettings = ({ navigation, route }) => {
                     })
                     .catch((error) => console.log(error));
 
-
-                // const getUserTopicMap = await db
-                //     .collection('users')
-                //     .doc(memberUIDToAdd)
-                //     .get()
-
-                // console.log(getUserTopicMap.data().topicMap)
-                // getUserTopicMap.data().topicMap.map((topic, index) => {
-                //     console.log(topic)
-                // })
-
                 const addTopicMapValue = await db
                     .collection('users')
                     .doc(memberUIDToAdd)
@@ -702,31 +526,14 @@ const TopicSettings = ({ navigation, route }) => {
                         [`topicMap.${topicID}`]: firebase.firestore.FieldValue.serverTimestamp()
                     })
                     .catch((error) => console.log(error));
-                // .set({
-                //     [`topicMap.${topicID}`]: firebase.firestore.FieldValue.array()
-                // },
-                //     SetOptions(merge: true),
-                // );
-                // .update(
-                // {
-                //     topicMap: {
-                //         [topicID]: firebase.firestore.FieldValue.serverTimestamp()
-                //     },
-                // },
-                // { merge: true }
-                // );
             })
         }
-
         setIsEditing(false);
     }
 
     const [ownershipOverlayVisibility, setOwnershipOverlayVisibility] = useState(false);
-    // const [overlayFirstRound, setOverlayFirstRound] = useState(true);
-
 
     const toggleOverlay = () => {
-        // console.log('hello....', topicData.topicOwner)
         if (newTopicOwner != topicData.topicOwner) {
             console.log('Unsaved changes')
             Alert.alert(
@@ -745,45 +552,16 @@ const TopicSettings = ({ navigation, route }) => {
                 ]
             );
         } else setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
-
-
-        // setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
-        // console.log('TOGGLE', ownershipOverlayVisibility)
     }
 
     const transferTopicOwnership = async () => {
-        // console.log('overlayFirstRound',overlayFirstRound)
-        // setOverlayFirstRound(true);
         toggleOverlay();
-
-        // console.log(ownershipOverlayVisibility)
-
-        // // Trigger an Overlay, for the user to choose new Owner
-
-        // const groupID = useEffectGroupSnapshotData.groupId;
-        // const topicID = topicObjectForPassing.topicId;
-
-        // const newOwner = auth.currentUser.uid;
-
-        // await db
-        //     .collection('groups')
-        //     .doc(groupID)
-        //     .collection('topics')
-        //     .doc(topicID)
-        //     .update({
-        //         topicOwner: newOwner
-        //     });
     }
 
     const [newTopicOwner, setNewTopicOwner] = useState('');
     const [newOwnerSaveTrigger, setNewOwnerSaveTrigger] = useState(false)
 
     const addNewTopicOwner = async () => {
-        console.log(topicData.topicOwner)
-        console.log(newTopicOwner)
-
-        // console.log(topicObjectForPassing)
-        // console.log(topicData)
 
         const newTopicOwnerQuery = await db
             .collection('groups')
@@ -803,24 +581,24 @@ const TopicSettings = ({ navigation, route }) => {
             .get()
             .catch((error) => console.log(error));
 
-        currentTopicOwnerQuery.data().topicOwner === newTopicOwner ? console.log('SUCCESSFUL') : console.log('FAILED')
-
-        // console.log(currentTopicOwnerQuery)
-
         topicData.topicOwner = newTopicOwner;
         topicObjectForPassing.topicOwner = newTopicOwner;
 
+        setIsEditing(false);
+        setIsLoadingSaveButton(false);
+        setIsLoadingEditButton(false);
+        setIsOwner(false);
         setIsLoadingTransferButton(false)
         setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
     }
 
     const updateGroupMembers = async () => {
-        console.log('Updating Group Members')
 
         const groupSnapshot = await db
             .collection('groups')
             .doc(topicObjectForPassing.groupId)
             .get()
+            .catch((error) => console.log(error));
 
         const groupSnapshotData = groupSnapshot.data();
 
@@ -829,6 +607,38 @@ const TopicSettings = ({ navigation, route }) => {
         groupSnapshotData.members.map((memberUID, index) => {
             getGroupMemberData(memberUID);
         })
+    }
+
+    const addNewTopicName = async () => {
+
+        try {
+            const newTopicNameQuery = await db
+                .collection('groups')
+                .doc(topicObjectForPassing.groupId)
+                .collection('topics')
+                .doc(topicObjectForPassing.topicId)
+                .update({
+                    topicName: newTopicName
+                })
+                .catch((error) => console.log(error));
+
+            const currentTopicOwnerQuery = await db
+                .collection('groups')
+                .doc(topicObjectForPassing.groupId)
+                .collection('topics')
+                .doc(topicObjectForPassing.topicId)
+                .get()
+                .catch((error) => console.log(error));
+
+            (currentTopicOwnerQuery.data().topicName === newTopicName)
+                ? console.log('SUCCESSFUL: Topic Name Change {', newTopicName, '}')
+                : console.log('FAILED: Topic Name Change');
+        } catch (error) {
+            console.log(error)
+        } finally {
+            topicData.topicName = newTopicName;
+            topicObjectForPassing.topicName = newTopicName;
+        }
     }
 
     return (
@@ -859,7 +669,7 @@ const TopicSettings = ({ navigation, route }) => {
                         </Text>
                         <View style={[styles.overlayTitleBox, { height: 30, borderRadius: 2, backgroundColor: 'white', opacity: .75, padding: 5, marginTop: 8, minWidth: 50, maxWidth: '100%', marginBottom: 5, }]}>
                             <Text style={[styles.overlayTitle, { fontSize: 16, fontWeight: '600', }]}>
-                                {topicData.topicName}
+                                {newTopicName}
                             </Text>
                         </View>
                     </View>
@@ -1119,31 +929,125 @@ const TopicSettings = ({ navigation, route }) => {
                         }
                     </View>
 
-                    <View style={styles.topicContext}>
-                        <View style={styles.topicContextLeftHalf}>
-                            <Icon
-                                name="chatbubble-ellipses-outline"
-                                type="ionicon"
-                                color="#363732"
-                                size={30}
-                                style={{ marginRight: 12, alignItems: 'center', alignSelf: 'center', }}
-                            />
-                            <Text style={styles.topicText}>
-                                {topicObjectForPassing.topicName}
-                            </Text>
-                        </View>
-                        {isOwner
-                            ? <View style={styles.ownerBadge}>
+                    {isEditing
+                        ? <View style={{
+                            width: "100%",
+                            justifyContent: "flex-start",
+                            alignItems: "flex-start",
+                            flexDirection: "column",
+                            borderWidth: 1,
+                            borderBottomWidth: 1,
+                            borderTopWidth: 0,
+                            borderColor: '#363732',
+                            paddingLeft: 12,
+                            paddingRight: 12,
+                            paddingTop: 15,
+                            paddingBottom: 20,
+
+
+
+
+                        }}>
+                            <View style={{ flexDirection: 'row' }}>
                                 <Icon
-                                    name='crown'
-                                    type='material-community'
-                                    color='#363732'
-                                    size={16}
+                                    name="chatbubble-ellipses-outline"
+                                    type="ionicon"
+                                    color="#363732"
+                                    size={20}
+                                    style={{ marginRight: 8 }}
+                                // style={{ marginRight: 12, alignItems: 'center', alignSelf: 'center', }}
                                 />
+                                <Text style={{
+                                    textAlign: 'left', fontSize: 16, fontWeight: '700',
+                                    color: 'black', paddingLeft: 0,
+                                }}>
+                                    Topic Name:
+                                </Text>
                             </View>
-                            : null
-                        }
-                    </View>
+                            <View style={{
+                                width: "100%", flexDirection: "row",
+                            }}>
+                                <View style={{
+                                    marginTop: 10,
+                                    width: 50,
+                                    minHeight: 10,
+                                    maxHeight: 250,
+                                    flex: 1,
+                                    flexGrow: 1,
+                                    flexDirection: "column",
+                                    marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
+                                    justifyContent: "flex-start", alignItems: "center",
+                                    borderWidth: 1,
+                                    borderColor: '#9D9D9D',
+                                    borderRadius: 3, backgroundColor: "#F8F8F8"
+                                }}>
+                                    <TextInput
+                                        placeholder={"First Name"}
+                                        onChangeText={setNewTopicName}
+                                        value={newTopicName}
+                                        multiline={false}
+                                        maxLength={17}
+                                        style={{
+                                            minHeight: 20, width: "100%",
+                                            backgroundColor: "#6660",
+                                            color: '#222',
+                                            textAlign: 'left', fontSize: 16, fontWeight: '500',
+                                        }}
+                                    />
+                                </View>
+                            </View>
+
+                            {/* How many Characters description.length >= 55*/}
+                            {(newTopicName.length < 12)
+                                ? null
+                                : <View
+                                    style={{
+                                        width: "100%",
+                                        paddingHorizontal: 0,
+                                        justifyContent: "flex-end", alignItems: "flex-start",
+                                        flexDirection: "row", direction: "ltr",
+                                        borderWidth: 2,
+                                        borderColor: "#0000",
+                                    }}>
+                                    <Text style={{
+                                        paddingLeft: 0,
+                                        textAlign: 'right',
+                                        fontSize: 14,
+                                        fontWeight: '500',
+                                        color: "#222",
+                                    }}>
+                                        {"Characters " + newTopicName.length + "/17"}
+                                    </Text>
+                                </View>
+                            }
+
+                        </View>
+                        : <View style={[styles.topicContext, { borderTopWidth: 0 }]}>
+                            <View style={styles.topicContextLeftHalf}>
+                                <Icon
+                                    name="chatbubble-ellipses-outline"
+                                    type="ionicon"
+                                    color="#363732"
+                                    size={30}
+                                    style={{ marginRight: 12, alignItems: 'center', alignSelf: 'center', }}
+                                />
+                                <Text style={styles.topicText}>
+                                    {newTopicName}
+                                </Text>
+                            </View>
+                            {isOwner
+                                ? <View style={styles.ownerBadge}>
+                                    <Icon
+                                        name='crown'
+                                        type='material-community'
+                                        color='#363732'
+                                        size={16}
+                                    />
+                                </View>
+                                : null
+                            }
+                        </View>
+                    }
 
                     {isEditing
                         ? <View style={styles.topicUsersInvolved}>
@@ -1214,6 +1118,7 @@ const TopicSettings = ({ navigation, route }) => {
                                             setIsLoadingSaveButton(true);
                                             setIsLoadingEditButton(false);
                                             addNewTopicMembersToDatabase();
+                                            addNewTopicName();
                                         }}
                                     >
                                         <View style={styles.buttonSpacing}>
@@ -1488,7 +1393,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 58,
         borderWidth: 1,
-        borderTopWidth: 0,
         borderColor: '#363732',
         alignSelf: 'center',
         flexDirection: "row",

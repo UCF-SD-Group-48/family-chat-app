@@ -256,7 +256,7 @@ const ProfileTab = ({ navigation }) => {
       .onSnapshot(async (userSnapshot) => {
         if (deleted === false) {
           console.log(deleted)
-          // console.log(userSnapshot.data())
+
           setUserSnapshotData(userSnapshot.data())
           setPushNotifications(userSnapshot.data().pushNotificationEnabled)
           setDiscoverable(userSnapshot.data().discoverableEnabled)
@@ -277,6 +277,13 @@ const ProfileTab = ({ navigation }) => {
       setPushNotifications();
       setDiscoverable();
       setFormattedPhoneNumber()
+      setFirstName();
+      setLastName();
+      setStatus();
+      setStatusEmoji();
+      setEmail();
+      setPhoneNumber();
+      setPfp();
       unsubscribe;
     }
   }, []);
