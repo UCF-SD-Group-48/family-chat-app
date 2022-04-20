@@ -72,9 +72,11 @@ import SkeletonContent from 'react-native-skeleton-content';
 
 const TopicSettings = ({ navigation, route }) => {
 
-    const topicObjectForPassing = route.params.topicObjectForPassing;
+    const [topicObjectForPassing, setTopicObjectForPassing] = useState(route.params.topicObjectForPassing);
 
-    const goBackward = () => navigation.navigate("Chat",
+    const goBackward = () => {
+        console.log(topicObjectForPassing)
+        navigation.navigate("Chat", 
         {
             color: topicObjectForPassing.color,
             coverImageNumber: topicObjectForPassing.coverImageNumber,
@@ -85,12 +87,11 @@ const TopicSettings = ({ navigation, route }) => {
             topicName: topicObjectForPassing.topicName,
             topicOwner: topicObjectForPassing.topicOwner,
             topicMembers: topicObjectForPassing.topicMembers,
-        }
-    )
-
-    const goForward = () => {
-        navigation.push("GroupSettings", { topicObjectForPassing })
+        })
     }
+
+    const goForward = () => navigation.push("GroupSettings", { topicObjectForPassing })
+
 
     const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
         const windowWidth = Dimensions.get('window').width;
@@ -208,6 +209,7 @@ const TopicSettings = ({ navigation, route }) => {
 
             const groupSnapshotData = groupSnapshot.data();
             setGroupColor(groupSnapshotData.color);
+            topicObjectForPassing.color = groupSnapshotData.color;
 
             const topicSnapshot = await db
                 .collection('groups')
@@ -272,6 +274,19 @@ const TopicSettings = ({ navigation, route }) => {
             setNewTopicOwner(topicSnapshotData.topicOwner);
             setIsLoadingEditContent(false);
 
+            setTopicObjectForPassing({
+                color: groupSnapshotData.color,
+                coverImageNumber: groupSnapshotData.coverImageNumber,
+                groupId: route.params.topicObjectForPassing.groupId,
+                groupName: groupSnapshotData.groupName,
+                groupOwner: groupSnapshotData.groupOwner,
+                topicId: route.params.topicObjectForPassing.topicId,
+                topicName: topicSnapshotData.topicName,
+                topicOwner: topicSnapshotData.topicOwner,
+                topicMembers: topicSnapshotData.topicMembers,
+            })
+
+
         } catch (error) { console.log(error) };
 
         return () => {
@@ -300,6 +315,7 @@ const TopicSettings = ({ navigation, route }) => {
         setIsLoadingEditContent(true);
         setIsLoadingEditButton(false);
         setIsLoadingSaveButton(false);
+        setGroupColor(topicObjectForPassing.color)
 
         setTimeout(() => setIsLoadingEditContent(false), 1500);
 
@@ -592,7 +608,7 @@ const TopicSettings = ({ navigation, route }) => {
             setIsLoadingSaveButton(false);
             setIsLoadingEditButton(false);
             setIsOwner(false);
-            setIsLoadingTransferButton(false)
+            setIsLoadingTransferButton(false);
             setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
         }
     }
@@ -948,10 +964,6 @@ const TopicSettings = ({ navigation, route }) => {
                             paddingRight: 12,
                             paddingTop: 15,
                             paddingBottom: 20,
-
-
-
-
                         }}>
                             <View style={{ flexDirection: 'row' }}>
                                 <Icon

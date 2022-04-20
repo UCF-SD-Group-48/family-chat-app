@@ -32,6 +32,7 @@ import {
     Input,
     Tooltip,
     Overlay,
+    Divider,
 } from 'react-native-elements';
 import { HoldItem } from 'react-native-hold-menu';
 
@@ -86,10 +87,27 @@ import helpers from '../../helperFunctions/helpers';
 
 const GroupSettings = ({ navigation, route }) => {
 
-    const topicObjectForPassing = route.params.topicObjectForPassing;
+    const [topicObjectForPassing, setTopicObjectForPassing] = useState(route.params.topicObjectForPassing);
 
-    const goBackward = () => navigation.navigate("TopicSettings", { topicObjectForPassing })
+    const goBackward = () => {
+        console.log(topicObjectForPassing)
+        navigation.navigate("Chat",
+            {
+                color: topicObjectForPassing.color,
+                coverImageNumber: topicObjectForPassing.coverImageNumber,
+                groupId: topicObjectForPassing.groupId,
+                groupName: topicObjectForPassing.groupName,
+                groupOwner: topicObjectForPassing.groupOwner,
+                topicId: topicObjectForPassing.topicId,
+                topicName: topicObjectForPassing.topicName,
+                topicOwner: topicObjectForPassing.topicOwner,
+                topicMembers: topicObjectForPassing.topicMembers,
+            })
+    }
 
+    // const topicObjectForPassing = route.params.topicObjectForPassing;
+
+    // const goBackward = () => navigation.navigate("TopicSettings", { topicObjectForPassing })
 
     // const goBackward = () => navigation.navigate("Chat",
     //     {
@@ -154,40 +172,13 @@ const GroupSettings = ({ navigation, route }) => {
                 navigation.navigate('GroupsTab');
             }
 
-            // setGroupColor(groupSnapshotData.color);
+            setIsOwner(groupSnapshotData.groupOwner === auth.currentUser.uid);
+            setUseEffectGroupSnapshotData({ ...groupSnapshotData, groupId: groupSnapshot.id });
+            setNewGroupCoverImageColor(groupSnapshotData.color)
+            setNewGroupCoverImageNumber(groupSnapshotData.coverImageNumber)
+            setCoverImage({ color: groupSnapshotData.color, imageNumber: groupSnapshotData.coverImageNumber })
 
-            // const generalTopicSnapshot = await db
-            //     .collection("groups")
-            //     .doc(groupSnapshot.id)
-            //     .collection("topics")
-            //     .where("topicName", '==', 'General')
-            //     .get()
-            //     .catch((error) => console.log(error));
-
-            // const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
-
-            // navigation.navigate('Chat',
-            //     {
-            //         color: groupSnapshotData.color,
-            //         coverImageNumber: groupSnapshotData.coverImageNumber,
-            //         topicId: generalTopicSnapshot.docs[0].id,
-            //         topicName: 'General',
-            //         groupId: groupSnapshot.id,
-            //         groupName: groupSnapshotData.groupName,
-            //         groupOwner: groupSnapshotData.groupOwner,
-            //     }
-            // );
-
-            console.log('Setting values')
-
-
-            setIsOwner(groupSnapshotData.groupOwner === auth.currentUser.uid)
-
-            // console.log('GROUP', groupSnapshotData)
-            setUseEffectGroupSnapshotData({ ...groupSnapshotData, groupId: groupSnapshot.id })
-            setGroupMembersCount(groupSnapshotData.members.length)
-
-            console.log('Topics')
+            setGroupMembersCount(groupSnapshotData.members.length);
 
             const topicSnapshot = await db
                 .collection('groups')
@@ -196,36 +187,36 @@ const GroupSettings = ({ navigation, route }) => {
                 .get()
                 .catch((error) => console.log(error));
 
-            // await topicSnapshot.docs.map(doc => console.log(doc.id));
-
-            console.log('COUNT', topicSnapshot.docs.length)
-
             setTopicCount(topicSnapshot.docs.length)
 
             groupSnapshotData.members.map((memberUID, index) => {
                 getGroupMemberData(memberUID, groupSnapshotData.groupOwner);
             })
 
-            console.log('??????????', groupOwnerName)
-
             setNewGroupOwner(groupSnapshotData.groupOwner);
-            setIsLoadingEditContent(false)
+            setNewGroupName(groupSnapshotData.groupName)
 
+            setTopicObjectForPassing({
+                color: groupSnapshotData.color,
+                coverImageNumber: groupSnapshotData.coverImageNumber,
+                groupId: route.params.topicObjectForPassing.groupId,
+                groupName: groupSnapshotData.groupName,
+                groupOwner: groupSnapshotData.groupOwner,
+                topicId: route.params.topicObjectForPassing.topicId,
+                topicName: route.params.topicObjectForPassing.topicName,
+                topicOwner: route.params.topicObjectForPassing.topicOwner,
+                topicMembers: route.params.topicObjectForPassing.topicMembers,
+            })
 
+            setIsLoadingEditContent(false);
         } catch (error) { console.log(error) };
     }
 
     useEffect(() => {
-        console.log('TRIED')
-
         unsubscribe();
 
         return () => {
-            // setGroupColor('');
-            // setTopicMembers([]);
-            // setIsGeneral();
             setIsOwner();
-            // setNewTopicOwner();
             setIsLoadingEditContent();
             setUseEffectGroupSnapshotData({});
             setGroupMembersCount(0);
@@ -235,9 +226,12 @@ const GroupSettings = ({ navigation, route }) => {
             setGroupMembers([]);
             setNewGroupOwner('');
             setSearchResults('')
-            setSearchedUser({})
+            setSearchedUser({});
+            setNewGroupCoverImageColor('');
+            setNewGroupCoverImageNumber(0);
+            setCoverImage({});
         };
-    }, [toggleOverlay, newGroupOwner])
+    }, [toggleOverlay, newGroupOwner]);
 
     useEffect(() => {
         if (searchedUserPhoneNumber.length === 10) {
@@ -250,8 +244,8 @@ const GroupSettings = ({ navigation, route }) => {
     const [searchedUserPhoneNumber, setSearchedUserPhoneNumber] = useState('');
 
     const openTextMessage = () => {
-        const textMessageText = `I just created a group within the FamilyChat app. Join in on the conversation by clicking this download link: https://www.familychat.app/`
-        Linking.openURL(`sms://+1${searchedUserPhoneNumber}&body=${textMessageText}`)
+        const textMessageText = `I just created a group within the FamilyChat app. Join in on the conversation by clicking this download link: https://www.familychat.app/`;
+        Linking.openURL(`sms://+1${searchedUserPhoneNumber}&body=${textMessageText}`);
     }
 
     let [searchResults, setSearchResults] = useState('incomplete');
@@ -297,12 +291,11 @@ const GroupSettings = ({ navigation, route }) => {
     const [useEffectGroupSnapshotData, setUseEffectGroupSnapshotData] = useState({});
     const [groupMembers, setGroupMembers] = useState([]);
     const [isOwner, setIsOwner] = useState(false);
-    const [groupOwnerName, setGroupOwnerName] = useState('')
-    const [topicCount, setTopicCount] = useState(0)
-    const [groupMembersCount, setGroupMembersCount] = useState(0)
+    const [groupOwnerName, setGroupOwnerName] = useState('');
+    const [topicCount, setTopicCount] = useState(0);
+    const [groupMembersCount, setGroupMembersCount] = useState(0);
 
     const getGroupMemberData = async (memberUID, groupOwnerUID) => {
-
         const userSnapshot = await db
             .collection('users')
             .doc(memberUID)
@@ -311,9 +304,9 @@ const GroupSettings = ({ navigation, route }) => {
 
         const userSnapshotData = userSnapshot.data();
 
-        if (groupOwnerUID === memberUID) setGroupOwnerName(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
+        if (groupOwnerUID === memberUID) setGroupOwnerName(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`);
 
-        console.log(`NAME OF USER: ${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
+        console.log(`NAME OF USER: ${userSnapshotData.firstName} ${userSnapshotData.lastName}`);
         setGroupMembers((previous) => [...previous, {
             name: `${userSnapshotData.firstName} ${userSnapshotData.lastName}`,
             pfp: userSnapshotData.pfp,
@@ -326,7 +319,7 @@ const GroupSettings = ({ navigation, route }) => {
     const leaveGroup = async () => {
 
         // Set the groupID for repeated use throughout function
-        const groupID = topicObjectForPassing.groupId;
+        const groupID = route.params.topicObjectForPassing.groupId;
 
         // Set this flag as true, to not trigger the "REMOVED FROM GROUP" Alert
         setLeaveGroupFlag(true);
@@ -334,7 +327,7 @@ const GroupSettings = ({ navigation, route }) => {
         // Get fresh snapshot of Group
         const groupSnapshot = await db
             .collection('groups')
-            .doc(topicObjectForPassing.groupId)
+            .doc(groupID)
             .get()
             .catch((error) => console.log(error));
 
@@ -344,7 +337,7 @@ const GroupSettings = ({ navigation, route }) => {
         // Get all topics within the Group
         const groupTopicsQuery = await db
             .collection('groups')
-            .doc(topicObjectForPassing.groupId)
+            .doc(groupID)
             .collection('topics')
             .get()
             .catch((error) => console.log(error));
@@ -360,11 +353,11 @@ const GroupSettings = ({ navigation, route }) => {
         const topicMapObject = userQuery.data().topicMap;
 
         // Build an array from the object of objects; topicMap
-        let userTopicMapArray = []
+        let userTopicMapArray = [];
 
         for (var key in topicMapObject) {
-            userTopicMapArray.push(key)
-        }
+            userTopicMapArray.push(key);
+        };
 
         // Map through the all of the group's topics
         await groupTopicsQuery.docs.map(async (topicObject, index) => {
@@ -830,196 +823,154 @@ const GroupSettings = ({ navigation, route }) => {
     }
 
     const addNewGroupMembersToDatabase = async () => {
+        try {
+            // Set the groupID for repeated use throughout function
+            const groupID = route.params.topicObjectForPassing.groupId;
 
-        // Set the groupID for repeated use throughout function
-        const groupID = topicObjectForPassing.groupId;
+            // Get fresh snapshot of Group
+            const groupSnapshot = await db
+                .collection('groups')
+                .doc(groupID)
+                .get()
+                .catch((error) => console.log(error));
 
-        // Get fresh snapshot of Group
-        const groupSnapshot = await db
-            .collection('groups')
-            .doc(groupID)
-            .get()
-            .catch((error) => console.log(error));
+            // Set the Data variable for repeated use throughout function
+            const groupSnapshotData = groupSnapshot.data();
 
-        // Set the Data variable for repeated use throughout function
-        const groupSnapshotData = groupSnapshot.data();
+            // Get all topics within the Group
+            const groupTopicsQuery = await db
+                .collection('groups')
+                .doc(groupID)
+                .collection('topics')
+                .get()
+                .catch((error) => console.log(error));
 
-        // Get all topics within the Group
-        const groupTopicsQuery = await db
-            .collection('groups')
-            .doc(groupID)
-            .collection('topics')
-            .get()
-            .catch((error) => console.log(error));
+            // Get group's General Topic ID/data
+            const generalTopicSnapshot = await db
+                .collection("groups")
+                .doc(groupID)
+                .collection("topics")
+                .where("topicName", '==', 'General')
+                .get()
+                .catch((error) => console.log(error));
 
-        // Get group's General Topic ID/data
-        const generalTopicSnapshot = await db
-            .collection("groups")
-            .doc(groupID)
-            .collection("topics")
-            .where("topicName", '==', 'General')
-            .get()
-            .catch((error) => console.log(error));
+            const generalTopicSnapshotID = generalTopicSnapshot.docs[0].id;
 
-        const generalTopicSnapshotID = generalTopicSnapshot.docs[0].id;
+            // Create new array for the UIDs of the current group members
+            const newGroupMembersUIDArray = []
+            const createArrayOfUIDs = groupMembers.map((groupMemberObject, index) => {
+                newGroupMembersUIDArray.push(groupMemberObject.uid)
+            })
 
-        // Create new array for the UIDs of the current group members
-        const newGroupMembersUIDArray = []
-        const createArrayOfUIDs = groupMembers.map((groupMemberObject, index) => {
-            newGroupMembersUIDArray.push(groupMemberObject.uid)
-        })
+            // Create new array for the UIDs of the group members REMOVED by owner
+            let membersToRemoveArray = [];
+            const checkForMembersToRemove = await groupSnapshotData.members.map((memberUID, index) => {
+                if (!newGroupMembersUIDArray.includes(memberUID)) membersToRemoveArray.push(memberUID);
+            })
+            console.log('TO REMOVE', membersToRemoveArray)
 
-        // Create new array for the UIDs of the group members REMOVED by owner
-        let membersToRemoveArray = [];
-        const checkForMembersToRemove = await groupSnapshotData.members.map((memberUID, index) => {
-            if (!newGroupMembersUIDArray.includes(memberUID)) membersToRemoveArray.push(memberUID);
-        })
-        console.log('TO REMOVE', membersToRemoveArray)
+            // Create new array for the UIDs of the group members ADDED by owner
+            let membersToAddArray = [];
+            const checkForMembersToAdd = await newGroupMembersUIDArray.map((memberUID, index) => {
+                if (!groupSnapshotData.members.includes(memberUID)) membersToAddArray.push(memberUID);
+            })
+            console.log('TO ADD', membersToAddArray)
 
-        // Create new array for the UIDs of the group members ADDED by owner
-        let membersToAddArray = [];
-        const checkForMembersToAdd = await newGroupMembersUIDArray.map((memberUID, index) => {
-            if (!groupSnapshotData.members.includes(memberUID)) membersToAddArray.push(memberUID);
-        })
-        console.log('TO ADD', membersToAddArray)
+            // ***********************************************************************************************
+            // figure out who to remove
+            // go through their topicMap and get all the relevant topics
+            // compare with group's topics
+            // check those topics and see if they're owners
+            // if only member delete topic + messages
+            // default ownership (if group owner, else last person)
+            // remove them from members list in topics
+            // remove the topic from user topicMap
+            // remove the group from user Array
+            //***********************************************************************************************
 
-        // ***********************************************************************************************
-        // figure out who to remove
-        // go through their topicMap and get all the relevant topics
-        // compare with group's topics
-        // check those topics and see if they're owners
-        // if only member delete topic + messages
-        // default ownership (if group owner, else last person)
-        // remove them from members list in topics
-        // remove the topic from user topicMap
-        // remove the group from user Array
-        //***********************************************************************************************
+            if (membersToRemoveArray.length > 0) {
 
-        if (membersToRemoveArray.length > 0) {
+                membersToRemoveArray.map(async (memberUIDToRemove, index) => {
 
-            membersToRemoveArray.map(async (memberUIDToRemove, index) => {
+                    // Get the current user's information
+                    const userQuery = await db
+                        .collection('users')
+                        .doc(memberUIDToRemove)
+                        .get()
+                        .catch((error) => console.log(error));
 
-                // Get the current user's information
-                const userQuery = await db
-                    .collection('users')
-                    .doc(memberUIDToRemove)
-                    .get()
-                    .catch((error) => console.log(error));
+                    // Set variable for the current user's topicMap
+                    const topicMapObject = userQuery.data().topicMap;
 
-                // Set variable for the current user's topicMap
-                const topicMapObject = userQuery.data().topicMap;
+                    // Build an array from the object of objects; topicMap
+                    let userTopicMapArray = []
+                    for (var key in topicMapObject) {
+                        userTopicMapArray.push(key)
+                    }
 
-                // Build an array from the object of objects; topicMap
-                let userTopicMapArray = []
-                for (var key in topicMapObject) {
-                    userTopicMapArray.push(key)
-                }
+                    // Map through the all of the group's topics
+                    await groupTopicsQuery.docs.map(async (topicObject, index) => {
 
-                // Map through the all of the group's topics
-                await groupTopicsQuery.docs.map(async (topicObject, index) => {
+                        // Check to see if the user is involved with any of the group topics
+                        if (userTopicMapArray.includes(topicObject.id)) {
 
-                    // Check to see if the user is involved with any of the group topics
-                    if (userTopicMapArray.includes(topicObject.id)) {
+                            // Set variables from the Topic for repeated use throughout the function
+                            const topicID = topicObject.id;
+                            const topicObjectData = topicObject.data();
 
-                        // Set variables from the Topic for repeated use throughout the function
-                        const topicID = topicObject.id;
-                        const topicObjectData = topicObject.data();
+                            // Start the if checks for which Edge case to handle
+                            if (topicObjectData.members.length === 1) {
 
-                        // Start the if checks for which Edge case to handle
-                        if (topicObjectData.members.length === 1) {
-
-                            // Remove the topicMap value from the current user's document
-                            const removeTopicMapValueFromUser = await db
-                                .collection('users')
-                                .doc(memberUIDToRemove)
-                                .update({
-                                    [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
-                                })
-                                .catch((error) => console.log(error));
-
-                            if (topicID != generalTopicSnapshotID) {
-                                // Get the Topic's messages
-                                const chatRef = await db
-                                    .collection('chats')
-                                    .doc(topicID)
-                                    .collection('messages')
-                                    .get()
+                                // Remove the topicMap value from the current user's document
+                                const removeTopicMapValueFromUser = await db
+                                    .collection('users')
+                                    .doc(memberUIDToRemove)
+                                    .update({
+                                        [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
+                                    })
                                     .catch((error) => console.log(error));
 
-                                // If the Topic has any messages
-                                if (chatRef) {
-                                    chatRef.docs.map(async (topicMessage, index) => {
+                                if (topicID != generalTopicSnapshotID) {
+                                    // Get the Topic's messages
+                                    const chatRef = await db
+                                        .collection('chats')
+                                        .doc(topicID)
+                                        .collection('messages')
+                                        .get()
+                                        .catch((error) => console.log(error));
 
-                                        // Go through and delete every message in that topic
-                                        const chatMessagesQuery = await db
-                                            .collection('chats')
-                                            .doc(topicID)
-                                            .collection('messages')
-                                            .doc(topicMessage.id)
-                                            .delete()
-                                            .catch((error) => console.log(error));
-                                    })
+                                    // If the Topic has any messages
+                                    if (chatRef) {
+                                        chatRef.docs.map(async (topicMessage, index) => {
+
+                                            // Go through and delete every message in that topic
+                                            const chatMessagesQuery = await db
+                                                .collection('chats')
+                                                .doc(topicID)
+                                                .collection('messages')
+                                                .doc(topicMessage.id)
+                                                .delete()
+                                                .catch((error) => console.log(error));
+                                        })
+                                    }
+
+                                    // Delete the Topic document from the Chats collection
+                                    const deleteChatQuery = await db
+                                        .collection('chats')
+                                        .doc(topicID)
+                                        .delete()
+                                        .catch((error) => console.log(error));
+
+                                    // Delete the Topic document from the Groups collection
+                                    const deleteTopicQuery = await db
+                                        .collection('groups')
+                                        .doc(groupID)
+                                        .collection('topics')
+                                        .doc(topicID)
+                                        .delete()
+                                        .catch((error) => console.log(error));
                                 }
 
-                                // Delete the Topic document from the Chats collection
-                                const deleteChatQuery = await db
-                                    .collection('chats')
-                                    .doc(topicID)
-                                    .delete()
-                                    .catch((error) => console.log(error));
-
-                                // Delete the Topic document from the Groups collection
-                                const deleteTopicQuery = await db
-                                    .collection('groups')
-                                    .doc(groupID)
-                                    .collection('topics')
-                                    .doc(topicID)
-                                    .delete()
-                                    .catch((error) => console.log(error));
-                            }
-
-                            // ------------------------------------------------------
-                            // CONSOLE LOGS FOR TESTING THE EDGE CASES
-                            console.log('--------')
-                            console.log('Topic Name:', topicObjectData.topicName)
-                            console.log('Owner:', topicObjectData.topicOwner)
-                            console.log('--------')
-
-                            console.log('.')
-
-                            console.log('*********** SCENARIO: ***********')
-                            console.log('USER REMOVED FROM GROUP > [EDGE 1] Current User is the ONLY member')
-                            console.log('(Topic deleted) which should not be in the Group topics documents list : ', topicID)
-                            // ------------------------------------------------------
-                        }
-
-                        // The Length of members is greater than 1
-                        // meaning that there are other users involved in the Topic
-                        else {
-
-                            // Check if the current user (who is trying to leave the Topic+Group), is NOT the owner
-                            if (topicObjectData.topicOwner !== memberUIDToRemove) {
-
-                                // 1. Remove the current user from the members list
-                                const removeFromMembersQuery = await db
-                                    .collection('groups')
-                                    .doc(groupID)
-                                    .collection('topics')
-                                    .doc(topicID)
-                                    .update({
-                                        members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
-                                    })
-                                    .catch((error) => console.log(error));
-
-                                // 2. Remove the topic:timestamp value from the current user's topicMap
-                                const removeTopicMapValueFromUser = await db
-                                    .collection('users')
-                                    .doc(memberUIDToRemove)
-                                    .update({
-                                        [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
-                                    })
-                                    .catch((error) => console.log(error));
-
                                 // ------------------------------------------------------
                                 // CONSOLE LOGS FOR TESTING THE EDGE CASES
                                 console.log('--------')
@@ -1030,242 +981,345 @@ const GroupSettings = ({ navigation, route }) => {
                                 console.log('.')
 
                                 console.log('*********** SCENARIO: ***********')
-                                console.log('USER REMOVED FROM GROUP > [EDGE 2] Multiple members > Current User is NOT the TOPIC Owner')
+                                console.log('USER REMOVED FROM GROUP > [EDGE 1] Current User is the ONLY member')
+                                console.log('(Topic deleted) which should not be in the Group topics documents list : ', topicID)
                                 // ------------------------------------------------------
-
                             }
 
-                            // The current user IS the owner
-                            // and there are other members
-                            // Now check if any of those other members are the GroupOwner
-                            // Try to default the ownership to the GroupOwner first
+                            // The Length of members is greater than 1
+                            // meaning that there are other users involved in the Topic
                             else {
 
-                                let newTopicOwnerByDefault = '';
+                                // Check if the current user (who is trying to leave the Topic+Group), is NOT the owner
+                                if (topicObjectData.topicOwner !== memberUIDToRemove) {
 
-                                topicObjectData.members.map(async (topicMemberUID, index) => {
+                                    // 1. Remove the current user from the members list
+                                    const removeFromMembersQuery = await db
+                                        .collection('groups')
+                                        .doc(groupID)
+                                        .collection('topics')
+                                        .doc(topicID)
+                                        .update({
+                                            members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
+                                        })
+                                        .catch((error) => console.log(error));
 
-                                    // Enter if one of the Topic members is ALSO the Group Owner
-                                    if (topicMemberUID === groupSnapshotData.groupOwner) {
+                                    // 2. Remove the topic:timestamp value from the current user's topicMap
+                                    const removeTopicMapValueFromUser = await db
+                                        .collection('users')
+                                        .doc(memberUIDToRemove)
+                                        .update({
+                                            [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
+                                        })
+                                        .catch((error) => console.log(error));
 
-                                        // 1. Replace the Owner
-                                        const newTopicOwnerQuery = await db
-                                            .collection('groups')
-                                            .doc(groupID)
-                                            .collection('topics')
-                                            .doc(topicID)
-                                            .update({
-                                                topicOwner: topicMemberUID
-                                            })
-                                            .catch((error) => console.log(error));
+                                    // ------------------------------------------------------
+                                    // CONSOLE LOGS FOR TESTING THE EDGE CASES
+                                    console.log('--------')
+                                    console.log('Topic Name:', topicObjectData.topicName)
+                                    console.log('Owner:', topicObjectData.topicOwner)
+                                    console.log('--------')
 
-                                        // 2. Remove the current user from the members list
-                                        const removeFromMembersQuery = await db
-                                            .collection('groups')
-                                            .doc(groupID)
-                                            .collection('topics')
-                                            .doc(topicID)
-                                            .update({
-                                                members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
-                                            })
-                                            .catch((error) => console.log(error));
+                                    console.log('.')
 
-                                        // 3. Remove the topic:timestamp value from the current user's topicMap
-                                        const removeTopicMapValueFromUser = await db
-                                            .collection('users')
-                                            .doc(memberUIDToRemove)
-                                            .update({
-                                                [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
-                                            })
-                                            .catch((error) => console.log(error));
+                                    console.log('*********** SCENARIO: ***********')
+                                    console.log('USER REMOVED FROM GROUP > [EDGE 2] Multiple members > Current User is NOT the TOPIC Owner')
+                                    // ------------------------------------------------------
 
-                                        // ------------------------------------------------------
-                                        // CONSOLE LOGS FOR TESTING THE EDGE CASES
-                                        console.log('--------')
-                                        console.log('Topic Name:', topicObjectData.topicName)
-                                        console.log('Owner:', topicObjectData.topicOwner)
-                                        console.log('--------')
+                                }
 
-                                        console.log('.')
+                                // The current user IS the owner
+                                // and there are other members
+                                // Now check if any of those other members are the GroupOwner
+                                // Try to default the ownership to the GroupOwner first
+                                else {
 
-                                        console.log('*********** SCENARIO: ***********')
-                                        console.log('USER REMOVED FROM GROUP > [EDGE 3] Current User IS the TOPIC Owner > GROUP Owner IS in Members list')
-                                        console.log('New owner should be: ', topicMemberUID)
-                                        // ------------------------------------------------------
+                                    let newTopicOwnerByDefault = '';
 
-                                    } else {
-                                        if (topicMemberUID !== memberUIDToRemove) {
-                                            newTopicOwnerByDefault = topicMemberUID
-                                            if ((newTopicOwnerByDefault === '') || (newTopicOwnerByDefault === undefined)) newTopicOwnerByDefault = auth.currentUser.uid
-                                        }
-                                    };
-                                })
+                                    topicObjectData.members.map(async (topicMemberUID, index) => {
 
-                                // If reached, this means that:
-                                // --- Current user IS the topic owner
-                                // --- There ARE other members
-                                // --- GROUP owner is not in the members list
-                                // So default to the next last other member in the list
-                                console.log('************', newTopicOwnerByDefault)
-                                console.log('und', newTopicOwnerByDefault === undefined)
-                                console.log('empty', newTopicOwnerByDefault === '')
-                                if (newTopicOwnerByDefault === undefined) newTopicOwnerByDefault = auth.currentUser.uid
-                                if ((newTopicOwnerByDefault === '') || (newTopicOwnerByDefault === undefined)) newTopicOwnerByDefault = auth.currentUser.uid
-                                console.log('after if -', newTopicOwnerByDefault)
+                                        // Enter if one of the Topic members is ALSO the Group Owner
+                                        if (topicMemberUID === groupSnapshotData.groupOwner) {
 
-                                // 1. Replace the Owner
-                                const newTopicOwnerQuery = await db
-                                    .collection('groups')
-                                    .doc(groupID)
-                                    .collection('topics')
-                                    .doc(topicID)
-                                    .update({
-                                        topicOwner: newTopicOwnerByDefault
+                                            // 1. Replace the Owner
+                                            const newTopicOwnerQuery = await db
+                                                .collection('groups')
+                                                .doc(groupID)
+                                                .collection('topics')
+                                                .doc(topicID)
+                                                .update({
+                                                    topicOwner: topicMemberUID
+                                                })
+                                                .catch((error) => console.log(error));
+
+                                            // 2. Remove the current user from the members list
+                                            const removeFromMembersQuery = await db
+                                                .collection('groups')
+                                                .doc(groupID)
+                                                .collection('topics')
+                                                .doc(topicID)
+                                                .update({
+                                                    members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
+                                                })
+                                                .catch((error) => console.log(error));
+
+                                            // 3. Remove the topic:timestamp value from the current user's topicMap
+                                            const removeTopicMapValueFromUser = await db
+                                                .collection('users')
+                                                .doc(memberUIDToRemove)
+                                                .update({
+                                                    [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
+                                                })
+                                                .catch((error) => console.log(error));
+
+                                            // ------------------------------------------------------
+                                            // CONSOLE LOGS FOR TESTING THE EDGE CASES
+                                            console.log('--------')
+                                            console.log('Topic Name:', topicObjectData.topicName)
+                                            console.log('Owner:', topicObjectData.topicOwner)
+                                            console.log('--------')
+
+                                            console.log('.')
+
+                                            console.log('*********** SCENARIO: ***********')
+                                            console.log('USER REMOVED FROM GROUP > [EDGE 3] Current User IS the TOPIC Owner > GROUP Owner IS in Members list')
+                                            console.log('New owner should be: ', topicMemberUID)
+                                            // ------------------------------------------------------
+
+                                        } else {
+                                            if (topicMemberUID !== memberUIDToRemove) {
+                                                newTopicOwnerByDefault = topicMemberUID
+                                                if ((newTopicOwnerByDefault === '') || (newTopicOwnerByDefault === undefined)) newTopicOwnerByDefault = auth.currentUser.uid
+                                            }
+                                        };
                                     })
-                                    .catch((error) => console.log(error));
 
-                                // 2. Remove the current user from the members list
-                                const removeFromMembersQuery = await db
-                                    .collection('groups')
-                                    .doc(groupID)
-                                    .collection('topics')
-                                    .doc(topicID)
-                                    .update({
-                                        members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
-                                    })
-                                    .catch((error) => console.log(error));
+                                    // If reached, this means that:
+                                    // --- Current user IS the topic owner
+                                    // --- There ARE other members
+                                    // --- GROUP owner is not in the members list
+                                    // So default to the next last other member in the list
+                                    console.log('************', newTopicOwnerByDefault)
+                                    console.log('und', newTopicOwnerByDefault === undefined)
+                                    console.log('empty', newTopicOwnerByDefault === '')
+                                    if (newTopicOwnerByDefault === undefined) newTopicOwnerByDefault = auth.currentUser.uid
+                                    if ((newTopicOwnerByDefault === '') || (newTopicOwnerByDefault === undefined)) newTopicOwnerByDefault = auth.currentUser.uid
+                                    console.log('after if -', newTopicOwnerByDefault)
 
-                                // 3. Remove the topic:timestamp value from the current user's topicMap
-                                const removeTopicMapValueFromUser = await db
-                                    .collection('users')
-                                    .doc(memberUIDToRemove)
-                                    .update({
-                                        [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
-                                    })
-                                    .catch((error) => console.log(error));
+                                    // 1. Replace the Owner
+                                    const newTopicOwnerQuery = await db
+                                        .collection('groups')
+                                        .doc(groupID)
+                                        .collection('topics')
+                                        .doc(topicID)
+                                        .update({
+                                            topicOwner: newTopicOwnerByDefault
+                                        })
+                                        .catch((error) => console.log(error));
 
-                                // ------------------------------------------------------
-                                // CONSOLE LOGS FOR TESTING THE EDGE CASES
-                                console.log('--------')
-                                console.log('Topic Name:', topicObjectData.topicName)
-                                console.log('Owner:', topicObjectData.topicOwner)
-                                console.log('--------')
+                                    // 2. Remove the current user from the members list
+                                    const removeFromMembersQuery = await db
+                                        .collection('groups')
+                                        .doc(groupID)
+                                        .collection('topics')
+                                        .doc(topicID)
+                                        .update({
+                                            members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
+                                        })
+                                        .catch((error) => console.log(error));
 
-                                console.log('.')
+                                    // 3. Remove the topic:timestamp value from the current user's topicMap
+                                    const removeTopicMapValueFromUser = await db
+                                        .collection('users')
+                                        .doc(memberUIDToRemove)
+                                        .update({
+                                            [`topicMap.${topicID}`]: firebase.firestore.FieldValue.delete()
+                                        })
+                                        .catch((error) => console.log(error));
 
-                                console.log('*********** SCENARIO: ***********')
-                                console.log('USER REMOVED FROM GROUP > [EDGE 4] Current User IS the TOPIC Owner > GROUP Owner is NOT in Members list > Ownership defaulted to last member')
-                                console.log('New owner should be: ', newTopicOwnerByDefault)
-                                // ------------------------------------------------------
+                                    // ------------------------------------------------------
+                                    // CONSOLE LOGS FOR TESTING THE EDGE CASES
+                                    console.log('--------')
+                                    console.log('Topic Name:', topicObjectData.topicName)
+                                    console.log('Owner:', topicObjectData.topicOwner)
+                                    console.log('--------')
 
+                                    console.log('.')
+
+                                    console.log('*********** SCENARIO: ***********')
+                                    console.log('USER REMOVED FROM GROUP > [EDGE 4] Current User IS the TOPIC Owner > GROUP Owner is NOT in Members list > Ownership defaulted to last member')
+                                    console.log('New owner should be: ', newTopicOwnerByDefault)
+                                    // ------------------------------------------------------
+
+                                }
                             }
                         }
-                    }
+                    })
+
+                    // Update the user's groups Array
+                    const removeGroupFromUserArrayQuery = await db
+                        .collection('users')
+                        .doc(memberUIDToRemove)
+                        .update({
+                            groups: firebase.firestore.FieldValue.arrayRemove(groupID)
+                        })
+                        .catch((error) => console.log(error));
+
+                    // Update the user's groups Array
+                    const removeFromMembersQuery = await db
+                        .collection('groups')
+                        .doc(groupID)
+                        .update({
+                            members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
+                        })
+                        .catch((error) => console.log(error));
+
+                    console.log('/// FINISHED WITH TOPICS MAP + User removed from Group + Group removed from User')
+                    //--
                 })
+            }
 
-                console.log('/// Helllllooooo????')
+            // ***********************************************************************************************
+            // figure out who to add        
+            // for those who you add
+            // go through and give them the topicMap updates for general topic
+            // go through and give them the group array update
+            // add them to group members + general topic members
+            // ***********************************************************************************************
 
-                // Update the user's groups Array
-                const removeGroupFromUserArrayQuery = await db
-                    .collection('users')
-                    .doc(memberUIDToRemove)
-                    .update({
-                        groups: firebase.firestore.FieldValue.arrayRemove(groupID)
-                    })
-                    .catch((error) => console.log(error));
+            if (membersToAddArray.length > 0) {
 
-                // Update the user's groups Array
-                const removeFromMembersQuery = await db
-                    .collection('groups')
-                    .doc(groupID)
-                    .update({
-                        members: firebase.firestore.FieldValue.arrayRemove(memberUIDToRemove)
-                    })
-                    .catch((error) => console.log(error));
+                console.log('----------------------------------------------- entered ADD')
 
-                console.log('/// FINISHED WITH TOPICS MAP + User removed from Group + Group removed from User')
-                //--
-            })
+                console.log(generalTopicSnapshot.docs[0].data())
+
+                membersToAddArray.map(async (memberUIDToAdd, index) => {
+
+                    console.log('----------------------------------------------- entered map', memberUIDToAdd)
+
+                    // Add the user to the GROUP members list
+                    const addUserToGroupMembersArray = await db
+                        .collection('groups')
+                        .doc(groupID)
+                        .update({
+                            members: firebase.firestore.FieldValue.arrayUnion(memberUIDToAdd)
+                        })
+                        .catch((error) => console.log(error));
+
+
+
+
+                    // Add the user to the 'General' TOPIC members list
+                    const addUserToTopicGeneralMembersArray = await db
+                        .collection('groups')
+                        .doc(groupID)
+                        .collection('topics')
+                        .doc(generalTopicSnapshotID)
+                        .update({
+                            members: firebase.firestore.FieldValue.arrayUnion(memberUIDToAdd)
+                        })
+                        .catch((error) => console.log(error));
+
+                    // Add the groupID to the user's 'groups' ARRAY
+                    const addGroupToUsersArray = await db
+                        .collection('users')
+                        .doc(memberUIDToAdd)
+                        .update({
+                            groups: firebase.firestore.FieldValue.arrayUnion(groupID)
+                        })
+                        .catch((error) => console.log(error));
+
+                    // console.log('-----------------------------------------------')
+                    // console.log('.')
+                    // // Get the current user's information
+                    // const userQuery = await db
+                    //     .collection('users')
+                    //     .doc(memberUIDToAdd)
+                    //     .get()
+                    //     .catch((error) => console.log(error));
+                    // // Set variable for the current user's topicMap
+                    // console.log(userQuery.data().groups);
+                    // console.log('-----------------------------------------------')
+
+                    // Add the 'General' topic value to the user's 'topicMap' MAP
+                    const addValueToUserTopicMap = await db
+                        .collection('users')
+                        .doc(memberUIDToAdd)
+                        .update({
+                            [`topicMap.${generalTopicSnapshotID}`]: firebase.firestore.FieldValue.serverTimestamp()
+                        })
+                        .catch((error) => console.log(error));
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsEditing(false);
         }
-
-        // ***********************************************************************************************
-        // figure out who to add        
-        // for those who you add
-        // go through and give them the topicMap updates for general topic
-        // go through and give them the group array update
-        // add them to group members + general topic members
-        // ***********************************************************************************************
-
-        if (membersToAddArray.length > 0) {
-
-            console.log('----------------------------------------------- entered ADD')
-
-            console.log(generalTopicSnapshot.docs[0].data())
-
-            membersToAddArray.map(async (memberUIDToAdd, index) => {
-
-                console.log('----------------------------------------------- entered map', memberUIDToAdd)
-
-                // Add the user to the GROUP members list
-                const addUserToGroupMembersArray = await db
-                    .collection('groups')
-                    .doc(groupID)
-                    .update({
-                        members: firebase.firestore.FieldValue.arrayUnion(memberUIDToAdd)
-                    })
-                    .catch((error) => console.log(error));
-
-
-
-
-                // Add the user to the 'General' TOPIC members list
-                const addUserToTopicGeneralMembersArray = await db
-                    .collection('groups')
-                    .doc(groupID)
-                    .collection('topics')
-                    .doc(generalTopicSnapshotID)
-                    .update({
-                        members: firebase.firestore.FieldValue.arrayUnion(memberUIDToAdd)
-                    })
-                    .catch((error) => console.log(error));
-
-
-
-
-                // Add the groupID to the user's 'groups' ARRAY
-                const addGroupToUsersArray = await db
-                    .collection('users')
-                    .doc(memberUIDToAdd)
-                    .update({
-                        groups: firebase.firestore.FieldValue.arrayUnion(groupID)
-                    })
-                    .catch((error) => console.log(error));
-
-                // console.log('-----------------------------------------------')
-                // console.log('.')
-                // // Get the current user's information
-                // const userQuery = await db
-                //     .collection('users')
-                //     .doc(memberUIDToAdd)
-                //     .get()
-                //     .catch((error) => console.log(error));
-                // // Set variable for the current user's topicMap
-                // console.log(userQuery.data().groups);
-                // console.log('-----------------------------------------------')
-
-                // Add the 'General' topic value to the user's 'topicMap' MAP
-                const addValueToUserTopicMap = await db
-                    .collection('users')
-                    .doc(memberUIDToAdd)
-                    .update({
-                        [`topicMap.${generalTopicSnapshotID}`]: firebase.firestore.FieldValue.serverTimestamp()
-                    })
-                    .catch((error) => console.log(error));
-            })
-        }
-
-        setIsEditing(false);
     }
+
+
+    const addNewGroupName = async () => {
+        try {
+
+            const groupID = route.params.topicObjectForPassing.groupId;
+
+            const newGroupNameQuery = await db
+                .collection('groups')
+                .doc(groupID)
+                .update({
+                    groupName: newGroupName
+                })
+                .catch((error) => console.log(error));
+
+            const resultingGroupQuery = await db
+                .collection('groups')
+                .doc(groupID)
+                .get()
+                .catch((error) => console.log(error));
+
+            (resultingGroupQuery.data().groupName === newGroupName)
+                ? console.log('SUCCESSFUL: Group Name Change {', newGroupName, '}')
+                : console.log('FAILED: Group Name Change');
+        } catch (error) {
+            console.log(error)
+        } finally {
+            useEffectGroupSnapshotData.groupName = newGroupName;
+            topicObjectForPassing.groupName = newGroupName;
+        }
+    }
+
+    const addNewCoverImage = async () => {
+        try {
+            const newGroupImageQuery = await db
+                .collection('groups')
+                .doc(topicObjectForPassing.groupId)
+                .update({
+                    color: coverImage.color,
+                    coverImageNumber: coverImage.imageNumber
+                })
+                .catch((error) => console.log(error));
+
+            const resultingGroupQuery = await db
+                .collection('groups')
+                .doc(topicObjectForPassing.groupId)
+                .get()
+                .catch((error) => console.log(error));
+
+            (resultingGroupQuery.data().color === coverImage.color)
+                ? console.log('SUCCESSFUL: Group Image Change')
+                : console.log('FAILED: Group Image Change');
+        } catch (error) {
+            console.log(error)
+        } finally {
+            useEffectGroupSnapshotData.color = coverImage.color;
+            topicObjectForPassing.color = coverImage.color;
+
+            useEffectGroupSnapshotData.coverImageNumber = coverImage.imageNumber;
+            topicObjectForPassing.coverImageNumber = coverImage.imageNumber;
+        }
+    }
+
 
     const [ownershipOverlayVisibility, setOwnershipOverlayVisibility] = useState(false);
 
@@ -1279,7 +1333,7 @@ const GroupSettings = ({ navigation, route }) => {
             console.log('Unsaved changes')
             Alert.alert(
                 'Unsaved Changes',
-                'Are you sure to leave before saving your changes? If discarded, there will not be a new Topic Owner.',
+                'Are you sure to leave before saving your changes? If discarded, there will not be a new Group Owner.',
                 [
                     { text: "Don't leave", style: 'cancel', onPress: () => { } },
                     {
@@ -1303,70 +1357,88 @@ const GroupSettings = ({ navigation, route }) => {
     const [newOwnerSaveTrigger, setNewOwnerSaveTrigger] = useState(false)
 
     const addNewGroupOwner = async () => {
+        try {
+            const groupID = route.params.topicObjectForPassing.groupId;
 
-        const groupID = topicObjectForPassing.groupId;
+            const newGroupOwnerQuery = await db
+                .collection('groups')
+                .doc(groupID)
+                .update({
+                    groupOwner: newGroupOwner
+                })
+                .catch((error) => console.log(error));
 
-        const newGroupOwnerQuery = await db
-            .collection('groups')
-            .doc(groupID)
-            .update({
-                groupOwner: newGroupOwner
-            })
-            .catch((error) => console.log(error));
+            const currentGroupOwnerQuery = await db
+                .collection('groups')
+                .doc(groupID)
+                .get()
+                .catch((error) => console.log(error));
 
-        const currentGroupOwnerQuery = await db
-            .collection('groups')
-            .doc(groupID)
-            .get()
-            .catch((error) => console.log(error));
+            currentGroupOwnerQuery.data().groupOwner === newGroupOwner ? console.log('SUCCESSFUL') : console.log('FAILED')
 
-        currentGroupOwnerQuery.data().groupOwner === newGroupOwner ? console.log('SUCCESSFUL') : console.log('FAILED')
+            useEffectGroupSnapshotData.groupOwner = newGroupOwner;
+            console.log('useEffect', useEffectGroupSnapshotData.groupOwner)
+            topicObjectForPassing.groupOwner = newGroupOwner;
+            console.log('topicObject', topicObjectForPassing.groupOwner)
+            console.log('NEW GROUP OWNER ****', newGroupOwner)
+            console.log('GROUP OWNER NAME', groupOwnerName)
 
-        useEffectGroupSnapshotData.groupOwner = newGroupOwner;
-        console.log('useEffect', useEffectGroupSnapshotData.groupOwner)
-        topicObjectForPassing.groupOwner = newGroupOwner;
-        console.log('topicObject', topicObjectForPassing.groupOwner)
-        console.log('NEW GROUP OWNER ****', newGroupOwner)
-        console.log('GROUP OWNER NAME', groupOwnerName)
+            const userSnapshot = await db
+                .collection('users')
+                .doc(newGroupOwner)
+                .get()
+                .catch((error) => console.log(error));
 
-        const userSnapshot = await db
-            .collection('users')
-            .doc(newGroupOwner)
-            .get()
-            .catch((error) => console.log(error));
+            const userSnapshotData = userSnapshot.data();
 
-        const userSnapshotData = userSnapshot.data();
+            setGroupOwnerName(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
 
-        setGroupOwnerName(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
+            console.log('GROUP OWNER NAME', groupOwnerName)
+            console.log(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
 
-        console.log('GROUP OWNER NAME', groupOwnerName)
-        console.log(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
+            const generalTopicSnapshot = await db
+                .collection("groups")
+                .doc(groupID)
+                .collection("topics")
+                .where("topicName", '==', 'General')
+                .get()
+                .catch((error) => console.log(error));
 
-        const generalTopicSnapshot = await db
-            .collection("groups")
-            .doc(groupID)
-            .collection("topics")
-            .where("topicName", '==', 'General')
-            .get()
-            .catch((error) => console.log(error));
+            const generalTopicSnapshotID = generalTopicSnapshot.docs[0].id;
 
-        const generalTopicSnapshotID = generalTopicSnapshot.docs[0].id;
+            console.log('GENERAL ID', generalTopicSnapshotID)
 
-        console.log('GENERAL ID', generalTopicSnapshotID)
+            const generalTopicOwnerUpdate = await db
+                .collection("groups")
+                .doc(groupID)
+                .collection("topics")
+                .doc(generalTopicSnapshotID)
+                .update({
+                    topicOwner: newGroupOwner
+                })
+                .catch((error) => console.log(error));
+        } catch (error) {
+            console.log(error)
+        } finally {
+            useEffectGroupSnapshotData.groupOwner = newGroupOwner;
+            topicObjectForPassing.groupOwner = newGroupOwner;
 
-        const generalTopicOwnerUpdate = await db
-            .collection("groups")
-            .doc(groupID)
-            .collection("topics")
-            .doc(generalTopicSnapshotID)
-            .update({
-                topicOwner: newGroupOwner
-            })
-            .catch((error) => console.log(error));
+            useEffectGroupSnapshotData.groupName = newGroupName;
+            topicObjectForPassing.groupName = newGroupName;
 
-        setIsOwner(false);
-        setIsLoadingTransferButton(false)
-        setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
+            useEffectGroupSnapshotData.color = coverImage.color;
+            topicObjectForPassing.color = coverImage.color;
+
+            useEffectGroupSnapshotData.coverImageNumber = coverImage.imageNumber;
+            topicObjectForPassing.coverImageNumber = coverImage.imageNumber;
+
+            setIsEditing(false);
+            setIsLoadingSaveButton(false);
+            setIsLoadingEditButton(false);
+            setIsOwner(false);
+            setIsLoadingTransferButton(false)
+            setOwnershipOverlayVisibility(!ownershipOverlayVisibility);
+        }
     }
 
     const [isEditing, setIsEditing] = useState(false);
@@ -1393,6 +1465,199 @@ const GroupSettings = ({ navigation, route }) => {
             setIsEditing();
         };
     }, [isFocused]);
+
+    const [newGroupName, setNewGroupName] = useState('');
+    const [newGroupCoverImageColor, setNewGroupCoverImageColor] = useState('');
+    const [newGroupCoverImageNumber, setNewGroupCoverImageNumber] = useState();
+
+    const checkIfSelected = (color, number) => {
+        if ((coverImage.color === color) & (coverImage.imageNumber === number)) {
+            // Selected Profile Option
+            return {
+                width: 50,
+                height: 50,
+                borderWidth: 2,
+                borderColor: '#2352DF',
+                borderRadius: 5,
+                marginLeft: 5,
+                marginRight: 5,
+            }
+        }
+        else {
+            return {
+                width: 50,
+                height: 50,
+                borderRadius: 5,
+                marginLeft: 5,
+                marginRight: 5,
+            }
+        }
+    };
+
+    // const toggleCoverImageSelection = () => {
+    //     consol
+
+    // }
+
+    const [coverImage, setCoverImage] = useState({ color: topicObjectForPassing.color, imageNumber: topicObjectForPassing.coverImageNumber })
+
+    const getSelectedImage = () => {
+        if (coverImage.color === 'purple') {
+            switch (coverImage.imageNumber) {
+                case 1: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_P1.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 2: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_P2.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 3: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_P3.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 4: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_P4.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+            }
+        } else if (coverImage.color === 'blue') {
+            switch (coverImage.imageNumber) {
+                case 1: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_B1.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 2: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_B2.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 3: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_B3.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 4: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_B4.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+            }
+        } else if (coverImage.color === 'green') {
+            switch (coverImage.imageNumber) {
+                case 1: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_G1.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 2: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_G2.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 3: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_G3.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 4: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_G4.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+            }
+        } else if (coverImage.color === 'yellow') {
+            switch (coverImage.imageNumber) {
+                case 1: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_Y1.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 2: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_Y2.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 3: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_Y3.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                default: {
+                    return;
+                }
+            }
+        } else if (coverImage.color === 'orange') {
+            switch (coverImage.imageNumber) {
+                case 1: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_O1.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 2: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_O2.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 3: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_O3.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                default: {
+                    return;
+                }
+            }
+        } else if (coverImage.color === 'red') {
+            switch (coverImage.imageNumber) {
+                case 1: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_R1.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 2: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_R2.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                case 3: {
+                    return <Image
+                        source={require('../../assets/groupCoverImages/cover_R3.png')}
+                        style={styles.coverImageSelection}
+                    />
+                }
+                default: {
+                    return;
+                }
+            }
+        }
+    }
+
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -1512,6 +1777,8 @@ const GroupSettings = ({ navigation, route }) => {
                             activeOpacity={0.75}
                             onPress={() => {
                                 setIsLoadingTransferButton(true);
+                                setNewGroupName(topicObjectForPassing.groupName)
+                                setCoverImage({ color: topicObjectForPassing.color, imageNumber: topicObjectForPassing.coverImageNumber })
                                 addNewGroupOwner();
                             }}
                         >
@@ -1540,7 +1807,7 @@ const GroupSettings = ({ navigation, route }) => {
                 </Overlay>
 
                 <View style={styles.innerContainer}>
-                    <View style={[styles.settingsBar, { backgroundColor: getHexValue(useEffectGroupSnapshotData.color), }]}>
+                    <View style={[styles.settingsBar, { backgroundColor: getHexValue(coverImage.color), }]}>
                         <View style={styles.groupSettingsBlock}>
                             <Text style={styles.groupSettingsText}>
                                 Group Settings:
@@ -1637,6 +1904,461 @@ const GroupSettings = ({ navigation, route }) => {
                         </View>
                     </View>
 
+                    {isEditing
+                        ? <View style={{
+                            width: "100%",
+                            justifyContent: "flex-start",
+                            alignItems: "flex-start",
+                            flexDirection: "column",
+                            borderWidth: 1,
+                            borderBottomWidth: 1,
+                            borderTopWidth: 0,
+                            borderColor: '#363732',
+                            paddingLeft: 15,
+                            paddingRight: 20,
+                            paddingTop: 15,
+                            paddingBottom: 20,
+                        }}>
+                            <View style={{ flexDirection: 'row', width: '100%' }}>
+
+                                <TouchableOpacity activeOpacity={0.5}>
+                                    <Tooltip
+                                        width={toggleWindowWidth}
+                                        backgroundColor={'#EFEAE2'}
+                                        containerStyle={[styles.toolTipBlockImage, { alignItems: 'center' }]}
+                                        onClose={() => console.log(coverImage)}
+                                        popover={
+                                            <View style={[styles.imagesGridContainer, { alignSelf: 'center' }]}>
+
+                                                <View style={styles.imagesGridTop2}>
+                                                    <View style={styles.Top2LeftHalf}>
+                                                        {getSelectedImage()}
+                                                    </View>
+                                                    <View style={styles.Top2RightHalf}>
+                                                        <View style={styles.imagesGridRow1}>
+                                                            <View style={styles.imageOptions}>
+                                                                <TouchableOpacity
+                                                                    activeOpacity={0.75}
+                                                                    onPress={() => setCoverImage({ color: 'purple', imageNumber: 1 })}
+                                                                >
+                                                                    <Image
+                                                                        source={require('../../assets/groupCoverImages/cover_P1.png')}
+                                                                        style={checkIfSelected('purple', 1)}
+                                                                    />
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                            <View style={styles.imageOptions}>
+                                                                <TouchableOpacity
+                                                                    activeOpacity={0.75}
+                                                                    onPress={() => setCoverImage({ color: 'blue', imageNumber: 1 })}
+                                                                >
+                                                                    <Image
+                                                                        source={require('../../assets/groupCoverImages/cover_B1.png')}
+                                                                        style={checkIfSelected('blue', 1)}
+                                                                    />
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                            <View style={styles.imageOptions}>
+                                                                <TouchableOpacity
+                                                                    activeOpacity={0.75}
+                                                                    onPress={() => setCoverImage({ color: 'green', imageNumber: 1 })}
+                                                                >
+                                                                    <Image
+                                                                        source={require('../../assets/groupCoverImages/cover_G1.png')}
+                                                                        style={checkIfSelected('green', 1)}
+                                                                    />
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                        </View>
+                                                        <View style={styles.imagesGridRow2}>
+                                                            <View style={styles.imageOptions}>
+                                                                <TouchableOpacity
+                                                                    activeOpacity={0.75}
+                                                                    onPress={() => setCoverImage({ color: 'yellow', imageNumber: 1 })}
+                                                                >
+                                                                    <Image
+                                                                        source={require('../../assets/groupCoverImages/cover_Y1.png')}
+                                                                        style={checkIfSelected('yellow', 1)}
+                                                                    />
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                            <View style={styles.imageOptions}>
+                                                                <TouchableOpacity
+                                                                    activeOpacity={0.75}
+                                                                    onPress={() => setCoverImage({ color: 'orange', imageNumber: 1 })}
+                                                                >
+                                                                    <Image
+                                                                        source={require('../../assets/groupCoverImages/cover_O1.png')}
+                                                                        style={checkIfSelected('orange', 1)}
+                                                                    />
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                            <View style={styles.imageOptions}>
+                                                                <TouchableOpacity
+                                                                    activeOpacity={0.75}
+                                                                    onPress={() => setCoverImage({ color: 'red', imageNumber: 1 })}
+                                                                >
+                                                                    <Image
+                                                                        source={require('../../assets/groupCoverImages/cover_R1.png')}
+                                                                        style={checkIfSelected('red', 1)}
+                                                                    />
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                                <View style={styles.imagesGridBottom3}>
+                                                    <View style={styles.imagesGridRow3}>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'purple', imageNumber: 2 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_P2.png')}
+                                                                    style={checkIfSelected('purple', 2)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'blue', imageNumber: 2 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_B2.png')}
+                                                                    style={checkIfSelected('blue', 2)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'green', imageNumber: 2 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_G2.png')}
+                                                                    style={checkIfSelected('green', 2)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'yellow', imageNumber: 2 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_Y2.png')}
+                                                                    style={checkIfSelected('yellow', 2)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'orange', imageNumber: 2 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_O2.png')}
+                                                                    style={checkIfSelected('orange', 2)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    </View>
+                                                    <View style={styles.imagesGridRow4}>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'red', imageNumber: 2 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_R2.png')}
+                                                                    style={checkIfSelected('red', 2)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'purple', imageNumber: 3 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_P3.png')}
+                                                                    style={checkIfSelected('purple', 3)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'blue', imageNumber: 3 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_B3.png')}
+                                                                    style={checkIfSelected('blue', 3)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'green', imageNumber: 3 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_G3.png')}
+                                                                    style={checkIfSelected('green', 3)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'yellow', imageNumber: 3 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_Y3.png')}
+                                                                    style={checkIfSelected('yellow', 3)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    </View>
+                                                    <View style={styles.imagesGridRow5}>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'orange', imageNumber: 3 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_O3.png')}
+                                                                    style={checkIfSelected('orange', 3)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'red', imageNumber: 3 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_R3.png')}
+                                                                    style={checkIfSelected('red', 3)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'purple', imageNumber: 4 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_P4.png')}
+                                                                    style={checkIfSelected('purple', 4)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'blue', imageNumber: 4 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_B4.png')}
+                                                                    style={checkIfSelected('blue', 4)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={styles.imageOptions}>
+                                                            <TouchableOpacity
+                                                                activeOpacity={0.75}
+                                                                onPress={() => setCoverImage({ color: 'green', imageNumber: 4 })}
+                                                            >
+                                                                <Image
+                                                                    source={require('../../assets/groupCoverImages/cover_G4.png')}
+                                                                    style={checkIfSelected('green', 4)}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        }>
+
+                                        <View style={{
+                                            width: "90%", minHeight: 50, backgroundColor: "#abc0",
+                                            justifyContent: "flex-start", alignItems: "flex-end", flexDirection: "row",
+                                            marginRight: 15,
+
+                                        }}>
+                                            <Image
+                                                source={helpers.getGroupCoverImage(coverImage.color, coverImage.imageNumber)}
+                                                style={{
+                                                    width: 68,
+                                                    height: 68,
+                                                    borderRadius: 5,
+                                                    marginRight: 13,
+                                                    borderWidth: 2,
+                                                    borderColor: "#777",
+
+                                                }}
+                                            />
+                                            {/* <TouchableOpacity activeOpacity={0.85} onPress={() => toggleCoverImageSelection(pfp)}
+                                                style={{
+                                                    width: 26, height: 26, backgroundColor: "#F8F8F8", borderRadius: 15, borderWidth: 2, borderColor: "#777",
+                                                    marginLeft: -19, marginBottom: -7,
+                                                    justifyContent: "center", alignItems: "center",
+                                                }}> */}
+                                            <View
+                                                style={{
+                                                    width: 26,
+                                                    height: 26,
+                                                    backgroundColor: "#F8F8F8",
+                                                    borderRadius: 15,
+                                                    borderWidth: 2,
+                                                    borderColor: "#777",
+                                                    marginLeft: -35,
+                                                    marginBottom: -5,
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                }}>
+                                                <Icon
+                                                    name="mode-edit"
+                                                    type="material"
+                                                    color="#333"
+                                                    size={15}
+                                                    style={{ paddingLeft: 2, }}
+                                                />
+                                                {/* <MaterialIcons name="mode-edit" size={15} color="#333" style={{ paddingLeft: 2, }} /> */}
+                                            </View>
+                                            {/* </TouchableOpacity> */}
+                                        </View>
+                                    </Tooltip>
+                                </TouchableOpacity>
+
+                                <View style={{ width: 250 }}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Icon
+                                            name="source"
+                                            type="material"
+                                            color="#363732"
+                                            size={20}
+                                            style={{ marginRight: 8 }}
+                                        />
+                                        <Text style={{
+                                            textAlign: 'left', fontSize: 16, fontWeight: '700',
+                                            color: 'black', paddingLeft: 0,
+                                        }}>
+                                            Group Name:
+                                        </Text>
+                                    </View>
+                                    <View style={{
+                                        width: "100%", flexDirection: "row",
+                                    }}>
+                                        <View style={{
+                                            marginTop: 10,
+                                            // width: 100,
+                                            minHeight: 10,
+                                            maxHeight: 250,
+                                            flex: 1,
+                                            flexGrow: 1,
+                                            flexDirection: "column",
+                                            marginHorizontal: 0, paddingTop: 7, paddingBottom: 7, paddingHorizontal: 15,
+                                            justifyContent: "flex-start", alignItems: "center",
+                                            borderWidth: 1,
+                                            borderColor: '#9D9D9D',
+                                            borderRadius: 3, backgroundColor: "#F8F8F8"
+                                        }}>
+                                            <TextInput
+                                                placeholder={topicObjectForPassing.groupName}
+                                                onChangeText={setNewGroupName}
+                                                value={newGroupName}
+                                                multiline={false}
+                                                maxLength={25}
+                                                style={{
+                                                    minHeight: 20, width: "100%",
+                                                    backgroundColor: "#6660",
+                                                    color: '#222',
+                                                    textAlign: 'left', fontSize: 16, fontWeight: '500',
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+
+                            {/* How many Characters description.length >= 55*/}
+                            {(newGroupName.length < 20)
+                                ? null
+                                : <View
+                                    style={{
+                                        width: "100%",
+                                        paddingHorizontal: 0,
+                                        justifyContent: "flex-end", alignItems: "flex-start",
+                                        flexDirection: "row", direction: "ltr",
+                                        borderWidth: 2,
+                                        borderColor: "#0000",
+                                    }}>
+                                    <Text style={{
+                                        paddingLeft: 0,
+                                        textAlign: 'right',
+                                        fontSize: 14,
+                                        fontWeight: '500',
+                                        color: "#222",
+                                    }}>
+                                        {"Characters " + newGroupName.length + "/25"}
+                                    </Text>
+                                </View>
+                            }
+                        </View>
+                        : <View style={styles.groupContext}>
+                            <View style={styles.groupContextLeftHalf}>
+
+
+                                <Image
+                                    source={helpers.getGroupCoverImage(coverImage.color, coverImage.imageNumber)}
+                                    style={{
+                                        width: 50, height: 50, borderRadius: 5, marginRight: 13
+                                    }}
+                                />
+
+                                <View style={styles.groupContextLeftHalfText}>
+                                    <Text style={styles.groupText}>
+                                        {/* {useEffectGroupSnapshotData.groupName} */}
+                                        {newGroupName}
+
+                                    </Text>
+                                    <View style={styles.groupContextLeftHalfMembers}>
+                                        <Icon
+                                            name='groups'
+                                            type='material'
+                                            color='#9D9D9D'
+                                            size={25}
+                                        />
+                                        <Text style={styles.membersText}>
+                                            {(groupMembersCount < 999) ? groupMembersCount : '999+'} Member{(groupMembersCount > 1) ? 's' : null}
+                                        </Text>
+
+                                    </View>
+
+                                </View>
+
+                            </View>
+                            {isOwner
+                                ? <View style={styles.ownerBadge}>
+                                    <Icon
+                                        name='crown'
+                                        type='material-community'
+                                        color='#363732'
+                                        size={16}
+                                    />
+                                </View>
+                                : null
+                            }
+                        </View>
+                    }
+
+
+
+                    {/* 
                     <View style={styles.groupContext}>
                         <View style={styles.groupContextLeftHalf}>
                             <Image
@@ -1677,6 +2399,7 @@ const GroupSettings = ({ navigation, route }) => {
                             : null
                         }
                     </View>
+                    */}
 
                     {isEditing
                         ?
@@ -1849,6 +2572,8 @@ const GroupSettings = ({ navigation, route }) => {
                                         setIsLoadingSaveButton(true);
                                         setIsLoadingEditButton(false);
                                         addNewGroupMembersToDatabase();
+                                        addNewGroupName();
+                                        addNewCoverImage();
                                         setSearchResults('incomplete')
                                         // console.log(groupMembers)
                                     }}
@@ -2013,7 +2738,6 @@ const GroupSettings = ({ navigation, route }) => {
                                     ? <TouchableOpacity
                                         activeOpacity={0.75}
                                         onPress={() => {
-                                            // console.log(topicData)
                                             setIsLoadingSaveButton(false);
                                             setIsLoadingEditButton(true);
                                             setIsEditing(true);
@@ -2062,6 +2786,15 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 5 },
         shadowRadius: 2,
         shadowOpacity: .25,
+    },
+
+    toolTipBlockImage: {
+        height: 375,
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: 5 },
+        shadowRadius: 2,
+        shadowOpacity: .25,
+        // padding: 40,
     },
 
     groupSettingsContainer: {
@@ -2578,6 +3311,70 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '800',
         marginRight: 5
+    },
+
+    imagesGridContainer: {
+        // marginBottom: 22,
+        marginTop: 20,
+        marginBottom: 20,
+
+    },
+
+    imagesGridTop2: {
+        flexDirection: "row",
+        marginTop: 30
+
+    },
+
+    Top2LeftHalf: {
+
+    },
+
+    Top2RightHalf: {
+
+    },
+
+    imagesGridRow1: {
+        flexDirection: "row",
+        marginBottom: 10,
+    },
+
+    imagesGridRow2: {
+        flexDirection: "row",
+        marginBottom: 10,
+    },
+
+    imagesGridRow3: {
+        flexDirection: "row",
+        marginBottom: 10,
+    },
+
+    imagesGridRow4: {
+        flexDirection: "row",
+        marginBottom: 10,
+    },
+
+    imagesGridRow5: {
+        flexDirection: "row",
+        marginBottom: 30,
+    },
+
+    coverImageSelection: {
+        width: 100,
+        height: 100,
+        borderRadius: 250,
+        marginLeft: 5,
+        marginRight: 15,
+        borderWidth: 5,
+        borderColor: '#2352DF'
+    },
+
+    coverImageOption: {
+        width: 50,
+        height: 50,
+        borderRadius: 5,
+        marginLeft: 5,
+        marginRight: 5,
     },
 
 

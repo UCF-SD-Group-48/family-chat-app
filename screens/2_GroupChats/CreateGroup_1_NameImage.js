@@ -315,7 +315,7 @@ const CreateGroup_1_NameImage = ({ navigation }) => {
 							</Text>
 						</View>
 
-						<View style={styles.imagesGridContainer}>
+						<View style={[styles.imagesGridContainer, { alignSelf: 'center'}]}>
 							<View style={styles.imagesGridTop2}>
 								<View style={styles.Top2LeftHalf}>
 									{getSelectedImage()}
