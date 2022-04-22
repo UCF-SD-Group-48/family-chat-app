@@ -90,8 +90,6 @@ const GroupSettings = ({ navigation, route }) => {
     const [topicObjectForPassing, setTopicObjectForPassing] = useState(route.params.topicObjectForPassing);
 
     const goBackward = () => {
-        console.log('------------------------', topicObjectForPassing)
-
         navigation.navigate("TopicSettings", { topicObjectForPassing })
 
     }
@@ -1309,7 +1307,6 @@ const GroupSettings = ({ navigation, route }) => {
             useEffectGroupSnapshotData.coverImageNumber = coverImage.imageNumber;
             topicObjectForPassing.coverImageNumber = coverImage.imageNumber;
             setTopicObjectForPassing({ ...topicObjectForPassing, color: coverImage.color })
-            console.log('????????', topicObjectForPassing);
             setNewGroupCoverImageColor(topicObjectForPassing.color)
             setNewGroupCoverImageNumber(topicObjectForPassing.imageNumber)
 
@@ -2555,7 +2552,6 @@ const GroupSettings = ({ navigation, route }) => {
                                         addNewGroupName();
                                         addNewCoverImage();
                                         setSearchResults('incomplete')
-                                        console.log('------', topicObjectForPassing)
                                     }}
                                 >
                                     <View style={styles.buttonSpacing}>
@@ -2721,7 +2717,6 @@ const GroupSettings = ({ navigation, route }) => {
                                             setIsLoadingSaveButton(false);
                                             setIsLoadingEditButton(true);
                                             setIsEditing(true);
-                                            console.log('EDIT', topicObjectForPassing)
                                         }}
                                     >
                                         <View style={styles.buttonSpacing}>

@@ -73,14 +73,11 @@ import SkeletonContent from 'react-native-skeleton-content';
 const TopicSettings = ({ navigation, route }) => {
 
     const [topicObjectForPassing, setTopicObjectForPassing] = useState(() => {
-        console.log('hello?')
-
         return route.params.topicObjectForPassing;
 
     });
 
     const goBackward = () => {
-        console.log(topicObjectForPassing)
         navigation.navigate("Chat", 
         {
             color: topicObjectForPassing.color,
@@ -322,7 +319,6 @@ const TopicSettings = ({ navigation, route }) => {
         setIsLoadingSaveButton(false);
         setGroupColor(topicObjectForPassing.color)
         // console.log(route.params.topicObjectForPassing.color)
-        console.log('****', route?.params?.topicObjectForPassing)
 
         setTimeout(() => setIsLoadingEditContent(false), 1500);
 
@@ -1293,7 +1289,6 @@ const TopicSettings = ({ navigation, route }) => {
                                     ? <TouchableOpacity
                                         activeOpacity={0.75}
                                         onPress={() => {
-                                            console.log(topicData)
                                             setIsLoadingSaveButton(false);
                                             setIsLoadingEditButton(true);
                                             updateGroupMembers();
