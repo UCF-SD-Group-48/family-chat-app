@@ -117,7 +117,6 @@ const RegisterPhone = ({ navigation, route }) => {
     const phoneSubmit = async () => {
         try {
             const newUserRegistration = true;
-            console.log(phoneNumber);
             const phoneNumberFormatted = '+1' + phoneNumber.slice(0, 3) + '' + phoneNumber.slice(3, 6) + '' + phoneNumber.slice(6, 10);
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(

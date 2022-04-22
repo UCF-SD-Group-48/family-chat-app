@@ -140,14 +140,11 @@ const VerifyPhone = ({ navigation, route }) => {
             );
             const user = await auth.signInWithCredential(credential)
             if (newUserRegistration) {
-                console.log('No account found with given phone number.');
-                console.log('User forwarded to Registration (instead of HomeTab.)');
+
 
                 // No account found, phone is verified, navigate to Registration (UserCreated) screen.
-                console.log(phoneNumber)
                 navigation.navigate('PhoneSuccess', { phoneNumber });
             } else {
-                console.log("user is authenticated")
                 navigation.replace('TabStack');
             }
         } catch (err) {

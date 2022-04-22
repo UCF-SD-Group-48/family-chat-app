@@ -90,19 +90,10 @@ const GroupSettings = ({ navigation, route }) => {
     const [topicObjectForPassing, setTopicObjectForPassing] = useState(route.params.topicObjectForPassing);
 
     const goBackward = () => {
-        console.log(topicObjectForPassing)
-        navigation.navigate("TopicSettings",
-            {
-                color: topicObjectForPassing.color,
-                coverImageNumber: topicObjectForPassing.coverImageNumber,
-                groupId: topicObjectForPassing.groupId,
-                groupName: topicObjectForPassing.groupName,
-                groupOwner: topicObjectForPassing.groupOwner,
-                topicId: topicObjectForPassing.topicId,
-                topicName: topicObjectForPassing.topicName,
-                topicOwner: topicObjectForPassing.topicOwner,
-                topicMembers: topicObjectForPassing.topicMembers,
-            })
+        console.log('------------------------', topicObjectForPassing)
+
+        navigation.navigate("TopicSettings", { topicObjectForPassing })
+
     }
 
     // const topicObjectForPassing = route.params.topicObjectForPassing;
@@ -128,6 +119,20 @@ const GroupSettings = ({ navigation, route }) => {
         return (windowWidth * .93);
     });
 
+    const setThenMove = () => {
+        setTopicObjectForPassing({
+            color: newGroupCoverImageColor,
+            coverImageNumber: newGroupCoverImageNumber,
+            groupId: topicObjectForPassing.groupId,
+            groupName: topicObjectForPassing.groupName,
+            groupOwner: topicObjectForPassing.groupOwner,
+            topicId: topicObjectForPassing.topicId,
+            topicName: topicObjectForPassing.topicName,
+            topicOwner: topicObjectForPassing.topicOwner,
+            topicMembers: topicObjectForPassing.topicMembers,
+        })
+    }
+
     useLayoutEffect(() => {
         navigation.setOptions({
             title: 'Group Settings',
@@ -136,7 +141,10 @@ const GroupSettings = ({ navigation, route }) => {
             headerTintColor: 'black',
             headerLeft: () => (
                 <View style={{ marginLeft: 12 }}>
-                    <TouchableOpacity activeOpacity={0.5} onPress={goBackward}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={async () => {
+                        await setThenMove();
+                        await goBackward();
+                    }}>
                         <Icon
                             name='arrow-back'
                             type='ionicon'
@@ -1300,6 +1308,11 @@ const GroupSettings = ({ navigation, route }) => {
 
             useEffectGroupSnapshotData.coverImageNumber = coverImage.imageNumber;
             topicObjectForPassing.coverImageNumber = coverImage.imageNumber;
+            setTopicObjectForPassing({ ...topicObjectForPassing, color: coverImage.color })
+            console.log('????????', topicObjectForPassing);
+            setNewGroupCoverImageColor(topicObjectForPassing.color)
+            setNewGroupCoverImageNumber(topicObjectForPassing.imageNumber)
+
         }
     }
 
@@ -2542,6 +2555,7 @@ const GroupSettings = ({ navigation, route }) => {
                                         addNewGroupName();
                                         addNewCoverImage();
                                         setSearchResults('incomplete')
+                                        console.log('------', topicObjectForPassing)
                                     }}
                                 >
                                     <View style={styles.buttonSpacing}>
@@ -2707,6 +2721,7 @@ const GroupSettings = ({ navigation, route }) => {
                                             setIsLoadingSaveButton(false);
                                             setIsLoadingEditButton(true);
                                             setIsEditing(true);
+                                            console.log('EDIT', topicObjectForPassing)
                                         }}
                                     >
                                         <View style={styles.buttonSpacing}>

@@ -72,7 +72,12 @@ import SkeletonContent from 'react-native-skeleton-content';
 
 const TopicSettings = ({ navigation, route }) => {
 
-    const [topicObjectForPassing, setTopicObjectForPassing] = useState(route.params.topicObjectForPassing);
+    const [topicObjectForPassing, setTopicObjectForPassing] = useState(() => {
+        console.log('hello?')
+
+        return route.params.topicObjectForPassing;
+
+    });
 
     const goBackward = () => {
         console.log(topicObjectForPassing)
@@ -300,7 +305,7 @@ const TopicSettings = ({ navigation, route }) => {
             setIsLoadingEditContent();
             setGroupMembers([])
         };
-    }, [toggleOverlay])
+    }, [isFocused, toggleOverlay])
 
     const [isEditing, setIsEditing] = useState(false);
     const [isLoadingGroupSettings, setIsLoadingGroupSettings] = useState(false);
@@ -316,6 +321,8 @@ const TopicSettings = ({ navigation, route }) => {
         setIsLoadingEditButton(false);
         setIsLoadingSaveButton(false);
         setGroupColor(topicObjectForPassing.color)
+        // console.log(route.params.topicObjectForPassing.color)
+        console.log('****', route?.params?.topicObjectForPassing)
 
         setTimeout(() => setIsLoadingEditContent(false), 1500);
 
@@ -851,7 +858,7 @@ const TopicSettings = ({ navigation, route }) => {
                 </TouchableOpacity>
 
                 <View style={styles.innerContainer}>
-                    <View style={[styles.settingsBar, { backgroundColor: getHexValue(groupColor), }]}>
+                    <View style={[styles.settingsBar, { backgroundColor: getHexValue(topicObjectForPassing.color), }]}>
                         <View style={styles.topicSettingsBlock}>
                             <Text style={styles.topicSettingsText}>
                                 Topic Settings:

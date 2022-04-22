@@ -807,6 +807,8 @@ const ChatScreen = ({ navigation, route }) => {
                                                     topicMembers: data.members,
                                                 }
 
+                                                console.log('From CHAT', topicObjectForPassing)
+
                                                 navigation.push("TopicSettings", { topicObjectForPassing })
                                             });
                                     }}

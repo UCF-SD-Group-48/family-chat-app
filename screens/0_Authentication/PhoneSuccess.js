@@ -188,8 +188,6 @@ const PhoneSuccess = ({ navigation, route }) => {
 				topicMap: ([]),
 			})
 			.then((result) => {
-				console.log('Profile Updated!')
-				console.log(result)
 				navigation.navigate('UserCreated', { firstName, lastName, pfp, });
 			})
 			.catch((error) => { alert(error.message) });

@@ -72,7 +72,6 @@ const UserCreated = ({ navigation, route }) => {
   const lastName = route.params.lastName;
   // const profilePic = route.params.profilePic;
   const pfp = route.params.pfp;
-  console.log(pfp)
 
   const isLoggedIn = () => {
     if (auth?.currentUser === null) {
@@ -82,19 +81,9 @@ const UserCreated = ({ navigation, route }) => {
     }
   };
 
-  console.log(isLoggedIn() + '' + auth?.currentUser?.phoneNumber);
-
-  console.log(auth?.currentUser != null)
-  console.log("CURRENT", auth?.currentUser)
-  console.log(imageSelection(1))
-
-  console.log("PFP", pfp)
-
-  const passedPhoneNumberValue = "+16505551234"
-  console.log()
-
 	const enterApp = () => {
 		navigation.navigate('TabStack', { screen: 'HomeTab'});
+    console.log('[WELCOME TO: FamilyChat!]')
 	};
 
   return (

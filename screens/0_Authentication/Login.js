@@ -90,7 +90,6 @@ const Login = ({ navigation }) => {
 
     const phoneSubmit = async () => {
         try {
-            console.log(phoneNumber)
             const phoneProvider = new firebase.auth.PhoneAuthProvider();
             const verificationId = await phoneProvider.verifyPhoneNumber(
                 // Allow for application login entry with any variation of "DEV" string.
@@ -100,7 +99,7 @@ const Login = ({ navigation }) => {
             setVerificationId(verificationId);
             
         } catch (err) {
-            console.log("error caught " + err)
+            console.log(err)
         }
     };
 
@@ -113,16 +112,14 @@ const Login = ({ navigation }) => {
             );
             user = await auth.signInWithCredential(credential)
             if (user){
-                console.log("user is authenticated")
-                navigation.replace('TabStack');
+                navigation.navigate('TabStack', { screen: 'HomeTab'});
+                console.log('[WELCOME TO: FamilyChat!]')                
             } else {
                 navigation.navigate('Login')
             }
 
         } catch (err) {
-            console.log("verification code " + verificationCode)
-            console.log("verifcationId " + verificationId)
-            console.log("failed")
+            console.log(err)
         }
     }
 
