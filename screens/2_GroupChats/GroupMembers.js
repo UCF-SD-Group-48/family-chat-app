@@ -89,7 +89,6 @@ const GroupMembers = ({ navigation, route }) => {
         if(memberIDs.length > 0) {
             try {
                 let membersRef = [];
-                console.log('memberIDs = ', memberIDs); //documentId or uid or FieldPath.documentId
                 // const tempArray = ["Red", "Purple"];
                 membersRef = await db.collection("users").where(firebase.firestore.FieldPath.documentId(), 'in', memberIDs).get();
                 
@@ -101,30 +100,10 @@ const GroupMembers = ({ navigation, route }) => {
                         }))
                     )
                     
-                    // membersRef.docs.map((doc) => {
-                    //     setMembers(doc.data());
-                    //     // console.log("doc = ",doc);
-                    //     // console.log("doc = ",doc.data());
-                    // });
                 }
 
                 return membersRef;
-                    // .then((docs) => {
-                    //      if (docs.exists) {
-                    //         setMembers(docs.data());
-                    //         console.log('response data = ', docs.data());
-                    //      }
-                    //      else {
-                    //          console.log("doesnt");
-                    //      }
-                    // });
-
-                    // if(membersRef.exists) {
-                    //     console.log('response data = ', membersRef.data());
-                    // }
-                    // else {
-                    //     console.log('doesnt');
-                    // }
+                  
             } catch(err) {
                 console.error("Error fetching members from firebase");
                 console.error(err);
@@ -137,38 +116,10 @@ const GroupMembers = ({ navigation, route }) => {
     useLayoutEffect(() => {
         const value = fetchData();
         if(value != null) {
-            // console.log(value.data());
         }
     }, [memberIDs]);
 
 
-    // const memberMapFunction = () => {
-    //     memberIDs.map((member) => {
-    //         async () => {
-    //             const doc = await db.collection("users").doc(member).then((doc) => {
-    //                 setMembers({
-    //                     id: doc.id,
-    //                     data: doc.data(),
-    //                 });
-    //                 // console.log("\n..members is:");
-    //                 // console.log(doc.id);
-    //                 // console.log(doc.data());
-    //             });
-    //         }
-    //     });
-    //     console.log(members), console.log("\n..members are.");
-    // }
-    // useEffect(() => {
-    //     memberMapFunction();
-    //     return () => {
-    //         // setMembers({});
-    //     }
-    // }, [memberIDs]);
-
-    const printMembers = () => {
-        console.log(members);
-        console.log("..\n");
-    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -254,7 +205,7 @@ const GroupMembers = ({ navigation, route }) => {
                     justifyContent: "space-evenly", alignItems: "center", flexDirection: "row",
                     paddingVertical: 45,
                     }}>
-                    <TouchableOpacity onPress={printMembers} activeOpacity={0.7}
+                    <TouchableOpacity activeOpacity={0.7}
                         style={{
                             width: 150, height: 50,
                             marginTop: 20,

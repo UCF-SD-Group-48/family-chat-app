@@ -212,12 +212,10 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 						// parentGroup: groupID
 					})
 					.then((newlyCreatedTopic) => {
-						console.log('********** INSIDE THE CREATE FOR THE TOPICMAPARRAY UPDATE')
 						// let mapTopics = {}
 						topicID = newlyCreatedTopic.id
 						// mapTopics[`topicMap.${topicID}`] = firebase.firestore.FieldValue.serverTimestamp()
 						// setMapUpdate(mapTopics)
-						console.log(membersArray)
 						membersArray.map(async (memberUID) => {
 							// await db.collection('users').doc(memberUID).update(mapUpdate);
 							const addTopicMapValue = await db
@@ -422,7 +420,6 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 											activeOpacity={0.75}
 											onPress={() => {
 												setMembersList(membersList.filter((memberToKeep) => memberToKeep.name !== individualMember.name))
-												console.log('NEW', membersList)
 											}}
 										>
 											<Icon

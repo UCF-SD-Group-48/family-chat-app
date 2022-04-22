@@ -141,11 +141,6 @@ const ViewPollHome = ({ navigation, route }) => {
             ),
         });
 
-        console.log("pollData = "+JSON.stringify(pollData));
-        console.log("pollid = "+pollId);
-        console.log("topicId = "+topicId);
-        
-
     }, [navigation]);
 
     const unselectPollOption = async (option) => {

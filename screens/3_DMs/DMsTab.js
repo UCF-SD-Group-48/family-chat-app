@@ -239,8 +239,6 @@ const DirectMessagesTab = ({ navigation }) => {
 
     setShownPhoneText("");
 
-    console.log('Entered CreateDM')
-
     //if dm already exists, route to dm
     const snapshot = await db.collection("chats")
       .where('members', 'array-contains', searchedUser.uid).get();
@@ -485,7 +483,6 @@ const DirectMessagesTab = ({ navigation }) => {
           <TouchableOpacity key={id} activeOpacity={0.7} onPress={() => {
             setIsLoadingDMs(true);
             const otherUserFullName = getSenderName(id)
-            console.log(id)
             setTimeout(() => navigation.push("Chat", { topicId: id, topicName: "DM", isDM: true, otherUserFullName }));
           }}
             style={[{

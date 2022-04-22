@@ -158,9 +158,28 @@ const GenerateProfileIcon = (props) => {
     });
     const [profileImageNumber, setProfileImageNumber] = useState(userDocument.pfp)
 
-    useEffect(() => {
-        setProfileImageNumber(userDocument.pfp)
-    });
+
+    useEffect(async () => {
+		const unsubscribe = db
+			.collection('users')
+            .doc(uid)
+			.onSnapshot((snapshot) => {
+                setProfileImageNumber(snapshot?.data().pfp)
+			});
+		return unsubscribe;
+	}, []);
+
+
+    // useEffect(async () => {
+
+    //     const unsubscribe = await db
+    //         .collection('users')
+    //         .doc(uid)
+    //         .get()
+    //         .then((documentSnapshot) => { if (documentSnapshot.exists) setUserDocument(documentSnapshot.data()) });
+    //     return initialState;
+    //     setProfileImageNumber(userDocument.pfp)
+    // });
 
     return (
         <View>

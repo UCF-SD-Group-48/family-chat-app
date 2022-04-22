@@ -99,8 +99,6 @@ const AddEvent = ({ navigation, route }) => {
     const handleConfirmDate = (date) => {
         if(isStart) {
             setStartDate(date);
-            console.log("A "+(isStart ? "start" : "finish")+" date has been picked: ", date);
-            console.log(startDate);
         }
         else {
             setEndDate(date);
@@ -120,8 +118,6 @@ const AddEvent = ({ navigation, route }) => {
     const handleConfirmTime = (date) => {
         if(isStart) {
             setStartTime(date);
-            console.log("A "+(isStart ? "start" : "finish")+" time has been picked: ", date);
-            console.log(startTime);
         }
         else {
             setEndTime(date);
@@ -140,11 +136,7 @@ const AddEvent = ({ navigation, route }) => {
 
         finalDate.setMinutes(time.getMinutes());
         finalDate.setHours(time.getHours());
-
-        // console.log("finalDate = "+finalDate);
-        // console.log(finalDate.toLocaleDateString("en-US",
-        //     {month: "short", day: "2-digit", year: "numeric", hour: "numeric", minute: "2-digit"}));
-
+        
         return finalDate;
     };
 

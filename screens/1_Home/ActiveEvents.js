@@ -161,11 +161,7 @@ const ActiveEvents = ({ navigation, route }) => {
                         {group.activeEvents.map((event, index) => (
                             
                         <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                            
-                            console.log("currentTime = "+currentTime.valueOf()/1000);
-                            console.log("event.startTime = "+event.data.startTime.seconds);
-                            console.log("ct > st = "+(event.data.startTime.seconds < (currentTime.valueOf()/1000)));
-                            
+                                                    
 
                             // navigation.navigate('Groups',
                             // { screen: 'ViewEvent', params: {topicId: event.topicId, topicName: event.topicName, groupId: group.groupID,

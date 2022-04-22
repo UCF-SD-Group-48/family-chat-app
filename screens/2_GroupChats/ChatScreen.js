@@ -160,10 +160,6 @@ const ChatScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused();
     const flatList = useRef();
 
-    useEffect(() => {
-        console.log('[Chat Screen] Started')
-    }, [])
-
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
         setCopiedText(false)
@@ -178,7 +174,6 @@ const ChatScreen = ({ navigation, route }) => {
                 .get()
 
             DMQuery.docs.map(async (messageDocument, index) => {
-                console.log(messageDocument.id);
 
                 const messagesDeleteQuery = await db
                     .collection('chats')
@@ -270,7 +265,6 @@ const ChatScreen = ({ navigation, route }) => {
         // console.log("messageSenderUIDs = "+JSON.stringify(messageSenderUIDs));
     }
     useEffect(() => {
-        console.log('MESSAGES ---')
         messageMapFunction();
 
         if (messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
@@ -452,9 +446,7 @@ const ChatScreen = ({ navigation, route }) => {
             .onSnapshot((snapshot) => {
 
                 if (!snapshot.empty) {
-                    // console.log("snapshot = "+JSON.stringify(snapshot));
                     let doc = snapshot.docs[0];
-                    console.log("doc = " + JSON.stringify(doc));
                     let data = doc.data();
                     let viewedBy = `${data.viewedBy}`;
                     if (!viewedBy.includes(auth.currentUser.uid)) {
@@ -556,8 +548,6 @@ const ChatScreen = ({ navigation, route }) => {
         // update the topicMap of the current user here
         mapUpdate[`topicMap.${id}`] = firebase.firestore.FieldValue.serverTimestamp()
         await db.collection('users').doc(auth.currentUser.uid).update(mapUpdate)
-
-        console.log("topic entered and topicMap updated for: ", id)
         // find the topic in the topic map
 
         // }
@@ -603,12 +593,10 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const dismissBanner = () => {
-        console.log("dismiss");
         db.collection('chats').doc(topicId).collection('banners').doc(alert.id).update({
             viewedBy: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid),
         })
             .then(() => {
-                console.log("Document successfully updated!");
                 setAlertExists(false);
             })
             .catch((error) => {

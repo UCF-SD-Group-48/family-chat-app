@@ -145,7 +145,6 @@ const Banners = ({ navigation, route }) => {
             const snapshot = await db.collection("users").where('phoneNumber', 'in', phoneNumbers).get();
             snapshot.docs.map((doc) => {
                 bannerMap[doc.id] = doc.data();
-                console.log("doc.id = "+doc.id);
             });
 
             setBannerOwners(bannerMap);

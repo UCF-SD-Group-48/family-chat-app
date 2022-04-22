@@ -85,12 +85,10 @@ const Topics = ({ navigation, route }) => {
 			.then((phoneNumber) => {
 				// find that invited user's uid. 
 				// add user to groups.members array
-				console.log("PhoneNumber" + phoneNumber)
 
 				// Add groupID to users's array
 			})
 			.catch((error) => {
-				console.log("didn't find phoneNumbers")
 				alert(error)
 			}	
 			);

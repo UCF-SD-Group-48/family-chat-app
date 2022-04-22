@@ -152,8 +152,6 @@ const GroupSettings = ({ navigation, route }) => {
 
     const unsubscribe = async () => {
         try {
-            console.log('Entered Try')
-
             const groupSnapshot = await db
                 .collection('groups')
                 .doc(topicObjectForPassing.groupId)
@@ -162,8 +160,6 @@ const GroupSettings = ({ navigation, route }) => {
             const groupSnapshotData = groupSnapshot.data();
 
             if (!groupSnapshotData.members.includes(auth.currentUser.uid) && (leaveGroupFlag === false)) {
-                console.log('Entered REMOVE GROUP Alert')
-
                 Alert.alert(
                     `Removed from Group`,
                     `Woops! It seems that you're no longer a member of this group, so we've sent you back to the "Groups" tab.`,
@@ -230,6 +226,7 @@ const GroupSettings = ({ navigation, route }) => {
             setNewGroupCoverImageColor('');
             setNewGroupCoverImageNumber(0);
             setCoverImage({});
+            setTopicObjectForPassing({});
         };
     }, [toggleOverlay, newGroupOwner]);
 
@@ -306,7 +303,6 @@ const GroupSettings = ({ navigation, route }) => {
 
         if (groupOwnerUID === memberUID) setGroupOwnerName(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`);
 
-        console.log(`NAME OF USER: ${userSnapshotData.firstName} ${userSnapshotData.lastName}`);
         setGroupMembers((previous) => [...previous, {
             name: `${userSnapshotData.firstName} ${userSnapshotData.lastName}`,
             pfp: userSnapshotData.pfp,
@@ -361,11 +357,9 @@ const GroupSettings = ({ navigation, route }) => {
 
         // Map through the all of the group's topics
         await groupTopicsQuery.docs.map(async (topicObject, index) => {
-            console.log('/////// Entered "topics.map()"');
 
             // Check to see if the user is involved with any of the group topics
             if (userTopicMapArray.includes(topicObject.id)) {
-                console.log('//// Entered "relevant topic"', topicObject.topicName);
 
                 // Set variables from the Topic for repeated use throughout the function
                 const topicID = topicObject.id;
@@ -734,7 +728,6 @@ const GroupSettings = ({ navigation, route }) => {
                     .update({
                         groups: firebase.firestore.FieldValue.arrayRemove(groupID)
                     })
-                    .then((result) => { console.log('RESULT last......:', result) })
                     .catch((error) => console.log(error));
 
                 // console.log(removeGroupFromUserArrayQuery)
@@ -1099,12 +1092,8 @@ const GroupSettings = ({ navigation, route }) => {
                                     // --- There ARE other members
                                     // --- GROUP owner is not in the members list
                                     // So default to the next last other member in the list
-                                    console.log('************', newTopicOwnerByDefault)
-                                    console.log('und', newTopicOwnerByDefault === undefined)
-                                    console.log('empty', newTopicOwnerByDefault === '')
                                     if (newTopicOwnerByDefault === undefined) newTopicOwnerByDefault = auth.currentUser.uid
                                     if ((newTopicOwnerByDefault === '') || (newTopicOwnerByDefault === undefined)) newTopicOwnerByDefault = auth.currentUser.uid
-                                    console.log('after if -', newTopicOwnerByDefault)
 
                                     // 1. Replace the Owner
                                     const newTopicOwnerQuery = await db
@@ -1189,13 +1178,7 @@ const GroupSettings = ({ navigation, route }) => {
 
             if (membersToAddArray.length > 0) {
 
-                console.log('----------------------------------------------- entered ADD')
-
-                console.log(generalTopicSnapshot.docs[0].data())
-
                 membersToAddArray.map(async (memberUIDToAdd, index) => {
-
-                    console.log('----------------------------------------------- entered map', memberUIDToAdd)
 
                     // Add the user to the GROUP members list
                     const addUserToGroupMembersArray = await db
@@ -1325,10 +1308,6 @@ const GroupSettings = ({ navigation, route }) => {
 
 
     const toggleOverlay = () => {
-        console.log('ENTER TOGGLE OVERLAY')
-        console.log('newGroupOwner', newGroupOwner)
-        console.log('useEffectGroupSnapshotData.groupOwner', useEffectGroupSnapshotData.groupOwner)
-
         if ((newGroupOwner != useEffectGroupSnapshotData.groupOwner) && (leaveGroupFlag === false)) {
             console.log('Unsaved changes')
             Alert.alert(
@@ -1377,12 +1356,7 @@ const GroupSettings = ({ navigation, route }) => {
             currentGroupOwnerQuery.data().groupOwner === newGroupOwner ? console.log('SUCCESSFUL') : console.log('FAILED')
 
             useEffectGroupSnapshotData.groupOwner = newGroupOwner;
-            console.log('useEffect', useEffectGroupSnapshotData.groupOwner)
             topicObjectForPassing.groupOwner = newGroupOwner;
-            console.log('topicObject', topicObjectForPassing.groupOwner)
-            console.log('NEW GROUP OWNER ****', newGroupOwner)
-            console.log('GROUP OWNER NAME', groupOwnerName)
-
             const userSnapshot = await db
                 .collection('users')
                 .doc(newGroupOwner)
@@ -1393,9 +1367,6 @@ const GroupSettings = ({ navigation, route }) => {
 
             setGroupOwnerName(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
 
-            console.log('GROUP OWNER NAME', groupOwnerName)
-            console.log(`${userSnapshotData.firstName} ${userSnapshotData.lastName}`)
-
             const generalTopicSnapshot = await db
                 .collection("groups")
                 .doc(groupID)
@@ -1405,8 +1376,6 @@ const GroupSettings = ({ navigation, route }) => {
                 .catch((error) => console.log(error));
 
             const generalTopicSnapshotID = generalTopicSnapshot.docs[0].id;
-
-            console.log('GENERAL ID', generalTopicSnapshotID)
 
             const generalTopicOwnerUpdate = await db
                 .collection("groups")
@@ -1926,7 +1895,6 @@ const GroupSettings = ({ navigation, route }) => {
                                         width={toggleWindowWidth}
                                         backgroundColor={'#EFEAE2'}
                                         containerStyle={[styles.toolTipBlockImage, { alignItems: 'center' }]}
-                                        onClose={() => console.log(coverImage)}
                                         popover={
                                             <View style={[styles.imagesGridContainer, { alignSelf: 'center' }]}>
 
@@ -2540,7 +2508,6 @@ const GroupSettings = ({ navigation, route }) => {
                                                     activeOpacity={0.75}
                                                     onPress={() => {
                                                         setGroupMembers(groupMembers.filter((memberToKeep) => memberToKeep.name !== individualMember.name))
-                                                        console.log('NEW', groupMembers)
                                                     }}
                                                 >
                                                     <Icon
@@ -2575,7 +2542,6 @@ const GroupSettings = ({ navigation, route }) => {
                                         addNewGroupName();
                                         addNewCoverImage();
                                         setSearchResults('incomplete')
-                                        // console.log(groupMembers)
                                     }}
                                 >
                                     <View style={styles.buttonSpacing}>

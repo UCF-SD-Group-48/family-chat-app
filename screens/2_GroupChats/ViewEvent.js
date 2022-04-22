@@ -115,8 +115,6 @@ const ViewEvent = ({ navigation, route }) => {
     const handleConfirmDate = (date) => {
         if(isStart) {
             setStartDate(date);
-            console.log("A "+(isStart ? "start" : "finish")+" date has been picked: ", date);
-            console.log(startDate);
         }
         else {
             setEndDate(date);
@@ -136,8 +134,6 @@ const ViewEvent = ({ navigation, route }) => {
     const handleConfirmTime = (date) => {
         if(isStart) {
             setStartTime(date);
-            console.log("A "+(isStart ? "start" : "finish")+" time has been picked: ", date);
-            console.log(startTime);
         }
         else {
             setEndTime(date);

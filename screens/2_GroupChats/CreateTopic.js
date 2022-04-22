@@ -212,11 +212,7 @@ const CreateTopic = ({ navigation, route }) => {
             .then((newlyCreatedTopic) => {
                 let topicID = newlyCreatedTopic.id
 
-                console.log('topicID', topicID)
-                console.log(checked)
                 checked.map(async (memberUID, index) => {
-
-                    console.log(index, memberUID)
 
                     const addTopicMapValue = await db
                         .collection('users')
