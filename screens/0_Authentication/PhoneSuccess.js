@@ -57,6 +57,7 @@ import UserPrompt from '../../components/UserPrompt';
 import CreateUserPayload from '../../helperFunctions/CreateUserPayload';
 
 // *************************************************************
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 // The provided phone was accepted, now take the user's input to create account.
 const PhoneSuccess = ({ navigation, route }) => {
@@ -200,7 +201,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 
 	return (
 		<SafeAreaView>
-			<ScrollView style={styles.container}>
+			<KeyboardAwareScrollView style={styles.container}>
 				<View style={styles.title}>
 					<Text style={{ fontSize: 30, textAlign: 'center', fontWeight: 'bold' }}>
 						User Information:
@@ -470,7 +471,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 					</View>
 				</View>
 
-			</ScrollView>
+			</KeyboardAwareScrollView>
 		</SafeAreaView >
 	);
 };

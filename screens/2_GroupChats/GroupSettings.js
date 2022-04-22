@@ -2234,7 +2234,7 @@ const GroupSettings = ({ navigation, route }) => {
                                     </Tooltip>
                                 </TouchableOpacity>
 
-                                <View style={{ width: 250 }}>
+                                <View style={{ flex: 1, }}>
                                     <View style={{ flexDirection: 'row' }}>
                                         <Icon
                                             name="source"

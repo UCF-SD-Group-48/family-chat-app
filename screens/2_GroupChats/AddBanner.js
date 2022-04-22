@@ -7,6 +7,7 @@ import React, {
     useState,
 } from 'react';
 import {
+    Alert,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
@@ -20,7 +21,6 @@ import {
     View,
 } from 'react-native';
 import {
-    Alert,
     Avatar,
     Button,
     Divider,
@@ -98,19 +98,30 @@ const AddBanner = ({ navigation, route }) => {
     const addBanner = () => {
         Keyboard.dismiss();
 
-        db.collection('chats').doc(topicId).collection('banners').add({
-            description: content,
-            ownerPhoneNumber: auth.currentUser.phoneNumber,
-            ownerUID: auth.currentUser.uid,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
-            type: "Banner",
-            referenceUID: "",
-            viewedBy: [],
-        }); // id passed in when we entered the chatroom
+        const trimmedInput = content.trim();
 
-        setContent(""); // clears input
+        if(trimmedInput.length > 0) {
+            db.collection('chats').doc(topicId).collection('banners').add({
+                description: trimmedInput,
+                ownerPhoneNumber: auth.currentUser.phoneNumber,
+                ownerUID: auth.currentUser.uid,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
+                type: "Banner",
+                referenceUID: "",
+                viewedBy: [],
+            }); // id passed in when we entered the chatroom
 
-        navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
+            setContent(""); // clears input
+
+            navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
+        }
+        else {
+            Alert.alert(
+                `Invalid Content`,
+                `Please enter a message to send as an alert to your family.`,
+                [{ text: "OK" }]
+              );
+        }
     };
 
     return (

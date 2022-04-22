@@ -382,24 +382,36 @@ const ProfileTab = ({ navigation }) => {
             justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
           }}>
             {/* Profile Picture */}
-            <View style={{
+            <TouchableOpacity activeOpacity={0.85} onPress={() => togglePFPSelection(pfp)}
+            style={{
               width: "90%", minHeight: 50, backgroundColor: "#abc0",
               justifyContent: "flex-start", alignItems: "flex-end", flexDirection: "row",
               marginTop: 15, marginBottom: 5,
             }}>
+              <Tooltip
+                width={toggleWindowWidth}
+                backgroundColor={'#EFEAE2'}
+                containerStyle={[styles.toolTipBlockImage, { alignItems: 'center' }]}
+                onClose={() => console.log("")}
+                popover={
+                  <View style={{width: 50, height: 50, backgroundColor: "#abc"}} />
+                }>
+
               <Image
                 source={imageSelection(pfp)}
                 style={{ width: 80, height: 80, borderRadius: 5, borderWidth: 2, borderColor: "#777" }}
               />
-              <TouchableOpacity activeOpacity={0.85} onPress={() => togglePFPSelection(pfp)}
+              <View 
                 style={{
                   width: 26, height: 26, backgroundColor: "#F8F8F8", borderRadius: 15, borderWidth: 2, borderColor: "#777",
                   marginLeft: -19, marginBottom: -7,
                   justifyContent: "center", alignItems: "center",
                 }}>
                 <MaterialIcons name="mode-edit" size={15} color="#333" style={{ paddingLeft: 2, }} />
-              </TouchableOpacity>
-            </View>
+              </View>
+              
+              </Tooltip>
+            </TouchableOpacity>
 
             <Divider width={1} color={"#777"} style={{ flex: 1, flexGrow: 1, minWidth: "90%", marginVertical: 10, }} />
 
@@ -775,7 +787,7 @@ const ProfileTab = ({ navigation }) => {
                   color="#363732"
                 />
                 <Text style={styles.privateInformationEmailText}>
-                  {userSnapshotData.email}
+                  {userSnapshotData.email || "no email found"}
                 </Text>
               </View>
               <View style={styles.privateInformationPhone}>
@@ -990,6 +1002,15 @@ const ProfileTab = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+
+  toolTipBlockImage: {
+    height: 350,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 2,
+    shadowOpacity: .25,
+    // padding: 40,
+},
 
   mainContainer: {
     backgroundColor: '#EFEAE2',
