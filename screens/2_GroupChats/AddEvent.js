@@ -61,6 +61,7 @@ import MyView from '../../components/MyView';
 
 // *************************************************************
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
@@ -77,54 +78,27 @@ const AddEvent = ({ navigation, route }) => {
     const [location, setLocation] = useState("");
     const [description, setDescription] = useState("");
 
-
-    const [isStart, setIsStart] = useState(true);
-    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
-
     const [startDate, setStartDate] = useState(new Date());
     const [startTime, setStartTime] = useState(new Date());
 
     const [endDate, setEndDate] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
 
-    // Date Picker
-    const showDatePicker = (isItStart) => {
-        setIsStart(isItStart);
-        setDatePickerVisibility(true);
-    };
-    const hideDatePicker = () => {
-        setDatePickerVisibility(false);
-    };
-    const handleConfirmDate = (date) => {
-        if(isStart) {
-            setStartDate(date);
-        }
-        else {
-            setEndDate(date);
-        }
+    // Start
+    const updateStartDate = (event, date) => {
+        setStartDate(date);
+    }
+    const updateStartTime = (event, date) => {
+        setStartTime(date);
+    }
 
-        hideDatePicker();
-    };
-
-    //Time Picker
-    const showTimePicker = (isItStart) => {
-        setIsStart(isItStart);
-        setTimePickerVisibility(true);
-    };
-    const hideTimePicker = () => {
-        setTimePickerVisibility(false);
-    };
-    const handleConfirmTime = (date) => {
-        if(isStart) {
-            setStartTime(date);
-        }
-        else {
-            setEndTime(date);
-        }
-
-        hideTimePicker();
-    };
+    //End Picker
+    const updateEndDate = (event, date) => {
+        setEndDate(date);
+    }
+    const updateEndTime = (event, date) => {
+        setEndTime(date);
+    }
 
     //combine
     const combineDateTime = (date, time) => {
@@ -338,32 +312,22 @@ const AddEvent = ({ navigation, route }) => {
                                 }}>
                                 {"Date:"}
                             </Text>
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {showDatePicker(true)}}
-                                style={{
+                            <View style={{
                                     width: "100%", minHeight: 30,
-                                    paddingHorizontal: 10, paddingVertical: 10, marginTop: 5,
-                                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8",
-                                    justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                                    paddingHorizontal: 0, paddingVertical: 0, marginTop: 5,
+                                    borderWidth: 0, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F800",
+                                    justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
                                 }}>
-                                <Text style={{
-                                    paddingLeft: 0,
-                                    textAlign: 'left',
-                                    fontSize: 15,
-                                    fontWeight: '500',
-                                    color: '#222',
-                                    }}>
-                                    {(startDate != undefined) ? (
-                                        startDate.toLocaleDateString("en-US", {month: "short", day: "2-digit", year: "numeric"})
-                                    ) : ""}
-                                </Text>
-                                <Entypo name="calendar" size={18} color="#333" />
-                            </TouchableOpacity>
-                            <DateTimePickerModal
-                                isVisible={isDatePickerVisible}
-                                mode="date" display="inline"
-                                onConfirm={handleConfirmDate}
-                                onCancel={hideDatePicker}
-                            />
+                                <DateTimePicker
+                                    value={startDate}
+                                    mode={"date"}
+                                    accentColor={"blue"}
+                                    themeVariant={"light"}
+                                    display={"compact"}
+                                    onChange={updateStartDate}
+                                    style={{width: "100%", marginLeft: 0,}}
+                                />
+                            </View>
                         </View>
                         {/* Time */}
                         <View style={{
@@ -381,32 +345,23 @@ const AddEvent = ({ navigation, route }) => {
                                 }}>
                                 {"Time:"}
                             </Text>
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {showTimePicker(true)}}
-                                style={{
+                            <View style={{
                                     width: "100%", minHeight: 30,
-                                    paddingHorizontal: 10, paddingVertical: 10, marginTop: 5,
-                                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8",
+                                    paddingHorizontal: 0, paddingVertical: 0, marginTop: 5,
+                                    borderWidth: 0, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F800",
                                     justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                 }}>
-                                <Text style={{
-                                    paddingLeft: 0,
-                                    textAlign: 'left',
-                                    fontSize: 15,
-                                    fontWeight: '500',
-                                    color: '#222',
-                                    }}>
-                                    {(startTime != undefined) ?
-                                    (startTime.toLocaleTimeString("en-US", {hour: "numeric", minute: "2-digit" })
-                                    ) : ("")}
-                                </Text>
-                                <Feather name="clock" size={18} color="#333" />
-                            </TouchableOpacity>
-                            <DateTimePickerModal
-                                isVisible={isTimePickerVisible}
-                                mode="time"
-                                onConfirm={handleConfirmTime}
-                                onCancel={hideTimePicker}
-                            />
+                                <DateTimePicker
+                                    value={startTime}
+                                    mode={"time"}
+                                    accentColor={"blue"}
+                                    themeVariant={"light"}
+                                    display={"compact"}
+                                    onChange={updateStartTime}
+                                    minuteInterval={5}
+                                    style={{width: "100%", marginLeft: 0,}}
+                                />
+                            </View>
                         </View>
                     </View>
 
@@ -452,26 +407,22 @@ const AddEvent = ({ navigation, route }) => {
                                 }}>
                                 {"Date:"}
                             </Text>
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {showDatePicker(false)}}
-                                style={{
+                            <View style={{
                                     width: "100%", minHeight: 30,
-                                    paddingHorizontal: 10, paddingVertical: 10, marginTop: 5,
-                                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8",
+                                    paddingHorizontal: 0, paddingVertical: 0, marginTop: 5,
+                                    borderWidth: 0, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F800",
                                     justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                 }}>
-                                <Text style={{
-                                    paddingLeft: 0,
-                                    textAlign: 'left',
-                                    fontSize: 15,
-                                    fontWeight: '500',
-                                    color: '#222',
-                                    }}>
-                                    {(endDate != undefined) ? (
-                                        endDate.toLocaleDateString("en-US", {month: "short", day: "2-digit", year: "numeric"})
-                                    ) : ""}
-                                </Text>
-                                <Entypo name="calendar" size={18} color="#333" />
-                            </TouchableOpacity>
+                                <DateTimePicker
+                                    value={endDate}
+                                    mode={"date"}
+                                    accentColor={"blue"}
+                                    themeVariant={"light"}
+                                    display={"compact"}
+                                    onChange={updateEndDate}
+                                    style={{width: "100%", marginLeft: 0,}}
+                                />
+                            </View>
                         </View>
                         {/* Time */}
                         <View style={{
@@ -489,26 +440,23 @@ const AddEvent = ({ navigation, route }) => {
                                 }}>
                                 {"Time:"}
                             </Text>
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {showTimePicker(false)}}
-                                style={{
+                            <View style={{
                                     width: "100%", minHeight: 30,
-                                    paddingHorizontal: 10, paddingVertical: 10, marginTop: 5,
-                                    borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8",
+                                    paddingHorizontal: 0, paddingVertical: 0, marginTop: 5,
+                                    borderWidth: 0, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F800",
                                     justifyContent: "space-between", alignItems: "center", flexDirection: "row",
                                 }}>
-                                <Text style={{
-                                    paddingLeft: 0,
-                                    textAlign: 'left',
-                                    fontSize: 15,
-                                    fontWeight: '500',
-                                    color: '#222',
-                                    }}>
-                                    {(endTime != undefined) ?
-                                    (endTime.toLocaleTimeString("en-US", {hour: "numeric", minute: "2-digit" })
-                                    ) : ("")}
-                                </Text>
-                                <Feather name="clock" size={18} color="#333" />
-                            </TouchableOpacity>
+                                <DateTimePicker
+                                    value={endTime}
+                                    mode={"time"}
+                                    accentColor={"blue"}
+                                    themeVariant={"light"}
+                                    display={"compact"}
+                                    onChange={updateEndTime}
+                                    minuteInterval={5}
+                                    style={{width: "100%", marginLeft: 0,}}
+                                />
+                            </View>
                         </View>
                     </View>
 
