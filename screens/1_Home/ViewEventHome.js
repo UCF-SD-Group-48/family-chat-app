@@ -18,6 +18,7 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
+    Linking,
 } from 'react-native';
 import {
     Alert,
@@ -192,7 +193,7 @@ const ViewEventHome = ({ navigation, route }) => {
         style={{
             borderBottomWidth: (isSpacer) ? 7 : ((!isLast) ? 1.5 : 0),
             borderColor: "#dedede",
-            height: (isSpacer) ? 47 : 40,
+            height: (isSpacer) ? 47 : 43,
             paddingLeft: 15, paddingVertical: 12,
         }}>
           <Text style={{ fontSize: 14, color: (isDestructive) ? "red" : "black" }}>
@@ -486,12 +487,19 @@ const ViewEventHome = ({ navigation, route }) => {
                     <View style={{
                         width: "90%", flexDirection: "row",
                     }}>
+                        
+                        <Menu style={{flex: 1, flexGrow: 1, borderWidth: 0, maxWidth: "100%",
+                            minWidth: "100%", flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                            borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                            }}>
+                            <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
+                                
                         <View style={{
-                            width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                            width: "100%", minHeight: 10, maxHeight: 250, 
                             marginTop: 0, marginHorizontal: 0,
                             paddingTop: 10, paddingBottom: 10, paddingHorizontal: 12,
                             justifyContent: "flex-start", alignItems: "center", flexDirection: "row",
-                            borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
+                            
                         }}>
                             <Ionicons name="location-sharp" size={24} color="#333" />
                             <Text style={{
@@ -499,11 +507,35 @@ const ViewEventHome = ({ navigation, route }) => {
                                 textAlign: 'left',
                                 fontSize: 16,
                                 fontWeight: '500',
-                                color: "#222",
+                                color: "#222", width: "100%", marginRight: -50,
                                 }}>
                                 {eventData.location || ""}
                             </Text>
                         </View>
+
+                        </MenuTrigger>
+                            <MenuOptions style={{
+                                borderRadius: 12, backgroundColor: "#fff",
+                            }}
+                            customStyles={{
+                                optionsContainer: {
+                                    borderRadius: 15, backgroundColor: "#666",
+                                },
+                            }}>
+                                <IconOption value={1} isLast={false} isDestructive={false} iconName='map' text='Open in Google Maps'
+                                    selectFunction={() => {
+                                        let searchText = location.replace(" ", "+");
+                                        Linking.openURL('https://www.google.com/maps/search/?api=1&query='+searchText);
+                                    }}/>
+                                <IconOption value={2} isLast={true} isDestructive={false} iconName='map' text='Open in Apple Maps'
+                                    selectFunction={() => {
+                                        let searchText = location.replace(" ", "+");
+                                        Linking.openURL('http://maps.apple.com/?q='+searchText);
+                                    }}/>
+                            </MenuOptions>
+                        </Menu>
+
+
                     </View>
 
 
