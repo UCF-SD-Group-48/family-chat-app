@@ -468,6 +468,7 @@ const ProfileTab = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
+    <StatusBar style='dark' />
       <ScrollView
         width={'100%'}
         contentContainerStyle={{

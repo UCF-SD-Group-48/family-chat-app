@@ -73,7 +73,7 @@ const FamilyChatScreen = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView behavior='padding' style={styles.container}>
-            <StatusBar style='light' />
+            <StatusBar style='dark' />
             <Image source={{
                 uri: 'https://logowik.com/content/uploads/images/signal-messenger-icon9117.jpg'
             }}

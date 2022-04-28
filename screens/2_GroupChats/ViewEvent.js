@@ -501,7 +501,7 @@ const ViewEvent = ({ navigation, route }) => {
                             minWidth: "100%", flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
                             borderWidth: 1, borderColor: "#333", borderRadius: 3, backgroundColor: "#F8F8F8"
                             }}>
-                            <MenuTrigger text='' triggerOnLongPress={false} customStyles={[triggerStyles, {}]}>
+                            <MenuTrigger text='' triggerOnLongPress={false} customStyles={triggerStyles}>
                                 
                         <View style={{
                             width: "100%", minHeight: 10, maxHeight: 250, 

@@ -309,6 +309,7 @@ const DirectMessagesTab = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ backgroundColor: "#EFEAE2" }}>
+    <StatusBar style='dark' />
       <View style={{
         width: "100%", backgroundColor: "#CFC5BA", // BFBFBF
         borderBottomWidth: 1, borderColor: "#777",
