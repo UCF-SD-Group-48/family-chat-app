@@ -674,8 +674,9 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const openTextMessage = () => {
+        const phoneNumberText = ` , `
         const textMessageText = `Hey, have you ever head of the FamilyChat app? Join in on the conversation by clicking this download link: https://www.familychat.app/`
-        Linking.openURL(`sms://''&body=${textMessageText}`)
+        Linking.openURL(`sms://${phoneNumberText}&body=${textMessageText}`)
     }
 
     const [copiedText, setCopiedText] = useState(false)
@@ -1729,7 +1730,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                     <Image source={imageSelection(getPfp(data.ownerUID))}
                                                         style={{
                                                             width: "100%", height: "100%",
-                                                            borderRadius: 7, borderWidth: 1, borderColor: "#777",
+                                                            // borderRadius: 7, borderWidth: 1, borderColor: "#777",
                                                         }} />
                                                 </View>
                                                 <View style={styles.textContainer}>
