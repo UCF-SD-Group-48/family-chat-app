@@ -158,7 +158,7 @@ const TopicSettings = ({ navigation, route }) => {
                                         <Text style={{ fontWeight: '600', marginLeft: 5, marginRight: 5, }}>Still have questions?</Text>
                                         <Text
                                             style={{ color: 'blue', fontWeight: '600' }}
-                                            onPress={() => Linking.openURL('https://www.familychat.app/')}
+                                            onPress={() => Linking.openURL('https://www.familychat.app/#FAQ')}
                                         >
                                             Visit our FAQs.
                                         </Text>
