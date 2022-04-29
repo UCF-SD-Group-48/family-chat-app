@@ -100,10 +100,10 @@ const PhoneSuccess = ({ navigation, route }) => {
 			return {
 				width: 50,
 				height: 50,
-				borderRadius: 8,
+				borderRadius: 5,
 				margin: 5,
 				opacity: 1,
-				borderWidth: 5,
+				borderWidth: 3,
 				borderColor: '#2C6BED'
 			}
 		}
@@ -114,7 +114,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 				height: 50,
 				borderRadius: 8,
 				margin: 5,
-				opacity: .3
+				opacity: .4
 			}
 		}
 	};
@@ -246,7 +246,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 									}}
 								>
 									<Image
-										source={require('../../assets/pfpOptions/avatar_1.png')}
+										source={require('../../assets/pfpOptions/pfp_face_1.png')}
 										style={checkIfSelected(1)}
 									/>
 								</TouchableOpacity>
@@ -256,7 +256,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 										setPFP(2)
 									}}					>
 									<Image
-										source={require('../../assets/pfpOptions/avatar_2.png')}
+										source={require('../../assets/pfpOptions/pfp_face_2.png')}
 										style={checkIfSelected(2)}
 									/>
 								</TouchableOpacity>
@@ -267,7 +267,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 									}}
 								>
 									<Image
-										source={require('../../assets/pfpOptions/avatar_3.png')}
+										source={require('../../assets/pfpOptions/pfp_face_3.png')}
 										style={checkIfSelected(3)}
 									/>
 								</TouchableOpacity>
@@ -278,8 +278,89 @@ const PhoneSuccess = ({ navigation, route }) => {
 									}}
 								>
 									<Image
-										source={require('../../assets/pfpOptions/avatar_4.png')}
+										source={require('../../assets/pfpOptions/pfp_face_4.png')}
 										style={checkIfSelected(4)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(5)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_5.png')}
+										style={checkIfSelected(5)}
+									/>
+								</TouchableOpacity>
+							</View>
+							<View style={styles.pfpOptions}>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(6)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_6.png')}
+										style={checkIfSelected(6)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(7)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_7.png')}
+										style={checkIfSelected(7)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(8)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_8.png')}
+										style={checkIfSelected(8)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(9)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_9.png')}
+										style={checkIfSelected(9)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(10)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_10.png')}
+										style={checkIfSelected(10)}
+									/>
+								</TouchableOpacity>
+							</View>
+							<View style={styles.pfpOptions}>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(11)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_11.png')}
+										style={checkIfSelected(11)}
 									/>
 								</TouchableOpacity>
 								<TouchableOpacity
@@ -289,43 +370,8 @@ const PhoneSuccess = ({ navigation, route }) => {
 									}}
 								>
 									<Image
-										source={require('../../assets/pfpOptions/avatar_12.png')}
+										source={require('../../assets/pfpOptions/pfp_face_12.png')}
 										style={checkIfSelected(12)}
-									/>
-								</TouchableOpacity>
-							</View>
-							<View style={styles.pfpOptions}>
-								<TouchableOpacity
-									activeOpacity={0.75}
-									onPress={() => {
-										setPFP(8)
-									}}
-								>
-									<Image
-										source={require('../../assets/pfpOptions/avatar_8.png')}
-										style={checkIfSelected(8)}
-									/>
-								</TouchableOpacity>
-								<TouchableOpacity
-									activeOpacity={0.75}
-									onPress={() => {
-										setPFP(14)
-									}}
-								>
-									<Image
-										source={require('../../assets/pfpOptions/avatar_14.png')}
-										style={checkIfSelected(14)}
-									/>
-								</TouchableOpacity>
-								<TouchableOpacity
-									activeOpacity={0.75}
-									onPress={() => {
-										setPFP(6)
-									}}
-								>
-									<Image
-										source={require('../../assets/pfpOptions/avatar_6.png')}
-										style={checkIfSelected(6)}
 									/>
 								</TouchableOpacity>
 								<TouchableOpacity
@@ -335,20 +381,30 @@ const PhoneSuccess = ({ navigation, route }) => {
 									}}
 								>
 									<Image
-										source={require('../../assets/pfpOptions/avatar_13.png')}
+										source={require('../../assets/pfpOptions/pfp_face_13.png')}
 										style={checkIfSelected(13)}
 									/>
 								</TouchableOpacity>
-
 								<TouchableOpacity
 									activeOpacity={0.75}
 									onPress={() => {
-										setPFP(5)
+										setPFP(14)
 									}}
 								>
 									<Image
-										source={require('../../assets/pfpOptions/avatar_5.png')}
-										style={checkIfSelected(5)}
+										source={require('../../assets/pfpOptions/pfp_face_14.png')}
+										style={checkIfSelected(14)}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									activeOpacity={0.75}
+									onPress={() => {
+										setPFP(15)
+									}}
+								>
+									<Image
+										source={require('../../assets/pfpOptions/pfp_face_15.png')}
+										style={checkIfSelected(15)}
 									/>
 								</TouchableOpacity>
 							</View>
