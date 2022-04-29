@@ -317,22 +317,27 @@ const ProfileTab = ({ navigation }) => {
     setStatusEmoji(newText);
   };
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const saveProfileData = async () => {
-
-    await db.collection("users").doc(auth.currentUser.uid).update({
-      firstName: firstName,
-      lastName: lastName,
-      statusEmoji: statusEmoji,
-      statusText: status,
-      email: email,
-      pfp: pfp,
-    });
-
+    try {
+      await db
+        .collection("users")
+        .doc(auth.currentUser.uid)
+        .update({
+          firstName: firstName,
+          lastName: lastName,
+          statusEmoji: statusEmoji,
+          statusText: status,
+          email: email,
+          pfp: pfp,
+        });
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsSaving(false);
+    }
   };
-
-  const togglePFPSelection = () => {
-
-  }
 
   const checkIfSelected = (imageNumber) => {
     if (pfp === imageNumber) {
@@ -340,10 +345,10 @@ const ProfileTab = ({ navigation }) => {
       return {
         width: 50,
         height: 50,
-        borderRadius: 8,
+        borderRadius: 5,
         margin: 5,
         opacity: 1,
-        borderWidth: 5,
+        borderWidth: 3,
         borderColor: '#2C6BED'
       }
     }
@@ -354,7 +359,7 @@ const ProfileTab = ({ navigation }) => {
         height: 50,
         borderRadius: 8,
         margin: 5,
-        opacity: .3
+        opacity: .4
       }
     }
   };
@@ -363,103 +368,97 @@ const ProfileTab = ({ navigation }) => {
     switch (pfp) {
       case 1: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_1.png')}
+          source={require('../../assets/pfpOptions/pfp_face_1.png')}
           style={styles.pfpSelection}
         />
       }
       case 2: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_2.png')}
+          source={require('../../assets/pfpOptions/pfp_face_2.png')}
           style={styles.pfpSelection}
         />
       }
       case 3: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_3.png')}
+          source={require('../../assets/pfpOptions/pfp_face_3.png')}
           style={styles.pfpSelection}
         />
       }
       case 4: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_4.png')}
+          source={require('../../assets/pfpOptions/pfp_face_4.png')}
           style={styles.pfpSelection}
         />
       }
       case 5: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_5.png')}
+          source={require('../../assets/pfpOptions/pfp_face_5.png')}
           style={styles.pfpSelection}
         />
       }
       case 6: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_6.png')}
+          source={require('../../assets/pfpOptions/pfp_face_6.png')}
           style={styles.pfpSelection}
         />
       }
       case 7: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_7.png')}
+          source={require('../../assets/pfpOptions/pfp_face_7.png')}
           style={styles.pfpSelection}
         />
       }
       case 8: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_8.png')}
+          source={require('../../assets/pfpOptions/pfp_face_8.png')}
           style={styles.pfpSelection}
         />
       }
       case 9: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_9.png')}
+          source={require('../../assets/pfpOptions/pfp_face_9.png')}
           style={styles.pfpSelection}
         />
       }
       case 10: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_10.png')}
+          source={require('../../assets/pfpOptions/pfp_face_10.png')}
           style={styles.pfpSelection}
         />
       }
       case 11: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_11.png')}
+          source={require('../../assets/pfpOptions/pfp_face_11.png')}
           style={styles.pfpSelection}
         />
       }
       case 12: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_12.png')}
+          source={require('../../assets/pfpOptions/pfp_face_12.png')}
           style={styles.pfpSelection}
         />
       }
       case 13: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_13.png')}
+          source={require('../../assets/pfpOptions/pfp_face_13.png')}
           style={styles.pfpSelection}
         />
       }
       case 14: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_14.png')}
+          source={require('../../assets/pfpOptions/pfp_face_14.png')}
           style={styles.pfpSelection}
         />
       }
       case 15: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_15.png')}
-          style={styles.pfpSelection}
-        />
-      }
-      case 16: {
-        return <Image
-          source={require('../../assets/pfpOptions/avatar_16.png')}
+          source={require('../../assets/pfpOptions/pfp_face_15.png')}
           style={styles.pfpSelection}
         />
       }
       default: {
         return <Image
-          source={require('../../assets/pfpOptions/avatar_1.png')}
+          source={require('../../assets/pfpOptions/pfp_face_1.png')}
           style={styles.pfpSelection}
         />
       }
@@ -468,7 +467,7 @@ const ProfileTab = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-    <StatusBar style='dark' />
+      <StatusBar style='dark' />
       <ScrollView
         width={'100%'}
         contentContainerStyle={{
@@ -486,7 +485,7 @@ const ProfileTab = ({ navigation }) => {
             justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
           }}>
             {/* Profile Picture */}
-            <TouchableOpacity activeOpacity={0.85} onPress={() => togglePFPSelection(pfp)}
+            <TouchableOpacity activeOpacity={0.85}
               style={{
                 width: "90%", minHeight: 50, backgroundColor: "#abc0",
                 justifyContent: "flex-start", alignItems: "flex-end", flexDirection: "row",
@@ -511,7 +510,7 @@ const ProfileTab = ({ navigation }) => {
                               onPress={() => setPfp(1)}
                             >
                               <Image
-                                source={require('../../assets/pfpOptions/avatar_1.png')}
+                                source={require('../../assets/pfpOptions/pfp_face_1.png')}
                                 style={checkIfSelected(1)}
                               />
                             </TouchableOpacity>
@@ -522,7 +521,7 @@ const ProfileTab = ({ navigation }) => {
                               onPress={() => setPfp(2)}
                             >
                               <Image
-                                source={require('../../assets/pfpOptions/avatar_2.png')}
+                                source={require('../../assets/pfpOptions/pfp_face_2.png')}
                                 style={checkIfSelected(2)}
                               />
                             </TouchableOpacity>
@@ -533,7 +532,7 @@ const ProfileTab = ({ navigation }) => {
                               onPress={() => setPfp(3)}
                             >
                               <Image
-                                source={require('../../assets/pfpOptions/avatar_3.png')}
+                                source={require('../../assets/pfpOptions/pfp_face_3.png')}
                                 style={checkIfSelected(3)}
                               />
                             </TouchableOpacity>
@@ -544,67 +543,8 @@ const ProfileTab = ({ navigation }) => {
                               onPress={() => setPfp(4)}
                             >
                               <Image
-                                source={require('../../assets/pfpOptions/avatar_4.png')}
+                                source={require('../../assets/pfpOptions/pfp_face_4.png')}
                                 style={checkIfSelected(4)}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                          <View style={styles.imageOptions}>
-                            <TouchableOpacity
-                              activeOpacity={0.75}
-                              onPress={() => setPfp(8)}
-                            >
-                              <Image
-                                source={require('../../assets/pfpOptions/avatar_8.png')}
-                                style={checkIfSelected(8)}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                        <View style={styles.imagesGridRow2}>
-
-
-                          <View style={styles.imageOptions}>
-                            <TouchableOpacity
-                              activeOpacity={0.75}
-                              onPress={() => setPfp(12)}
-                            >
-                              <Image
-                                source={require('../../assets/pfpOptions/avatar_12.png')}
-                                style={checkIfSelected(12)}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                          <View style={styles.imageOptions}>
-                            <TouchableOpacity
-                              activeOpacity={0.75}
-                              onPress={() => setPfp(13)}
-                            >
-                              <Image
-                                source={require('../../assets/pfpOptions/avatar_13.png')}
-                                style={checkIfSelected(13)}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                          <View style={styles.imageOptions}>
-                            <TouchableOpacity
-                              activeOpacity={0.75}
-                              onPress={() => setPfp(14)}
-                            >
-                              <Image
-                                source={require('../../assets/pfpOptions/avatar_14.png')}
-                                style={checkIfSelected(14)}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                          <View style={styles.imageOptions}>
-                            <TouchableOpacity
-                              activeOpacity={0.75}
-                              onPress={() => setPfp(15)}
-                            >
-                              <Image
-                                source={require('../../assets/pfpOptions/avatar_15.png')}
-                                style={checkIfSelected(15)}
                               />
                             </TouchableOpacity>
                           </View>
@@ -614,61 +554,118 @@ const ProfileTab = ({ navigation }) => {
                               onPress={() => setPfp(5)}
                             >
                               <Image
-                                source={require('../../assets/pfpOptions/avatar_5.png')}
+                                source={require('../../assets/pfpOptions/pfp_face_5.png')}
                                 style={checkIfSelected(5)}
                               />
                             </TouchableOpacity>
                           </View>
+                        </View>
 
+                        <View style={styles.imagesGridRow2}>
+                          <View style={styles.imageOptions}>
+                            <TouchableOpacity
+                              activeOpacity={0.75}
+                              onPress={() => setPfp(6)}
+                            >
+                              <Image
+                                source={require('../../assets/pfpOptions/pfp_face_6.png')}
+                                style={checkIfSelected(6)}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                          <View style={styles.imageOptions}>
+                            <TouchableOpacity
+                              activeOpacity={0.75}
+                              onPress={() => setPfp(7)}
+                            >
+                              <Image
+                                source={require('../../assets/pfpOptions/pfp_face_7.png')}
+                                style={checkIfSelected(7)}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                          <View style={styles.imageOptions}>
+                            <TouchableOpacity
+                              activeOpacity={0.75}
+                              onPress={() => setPfp(8)}
+                            >
+                              <Image
+                                source={require('../../assets/pfpOptions/pfp_face_8.png')}
+                                style={checkIfSelected(8)}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                          <View style={styles.imageOptions}>
+                            <TouchableOpacity
+                              activeOpacity={0.75}
+                              onPress={() => setPfp(9)}
+                            >
+                              <Image
+                                source={require('../../assets/pfpOptions/pfp_face_9.png')}
+                                style={checkIfSelected(9)}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                          <View style={styles.imageOptions}>
+                            <TouchableOpacity
+                              activeOpacity={0.75}
+                              onPress={() => setPfp(10)}
+                            >
+                              <Image
+                                source={require('../../assets/pfpOptions/pfp_face_10.png')}
+                                style={checkIfSelected(10)}
+                              />
+                            </TouchableOpacity>
+                          </View>
                         </View>
                       </View>
                     </View>
+
                     <View style={styles.imagesGridBottom3}>
-
                       <View style={styles.imagesGridRow3}>
-                        <View style={styles.imageOptions}>
-                          <TouchableOpacity
-                            activeOpacity={0.75}
-                            onPress={() => setPfp(9)}
-                          >
-                            <Image
-                              source={require('../../assets/pfpOptions/avatar_9.png')}
-                              style={checkIfSelected(9)}
-                            />
-                          </TouchableOpacity>
-                        </View>
-                        <View style={styles.imageOptions}>
-                          <TouchableOpacity
-                            activeOpacity={0.75}
-                            onPress={() => setPfp(6)}
-                          >
-                            <Image
-                              source={require('../../assets/pfpOptions/avatar_6.png')}
-                              style={checkIfSelected(6)}
-                            />
-                          </TouchableOpacity>
-                        </View>
-
                         <View style={styles.imageOptions}>
                           <TouchableOpacity
                             activeOpacity={0.75}
                             onPress={() => setPfp(11)}
                           >
                             <Image
-                              source={require('../../assets/pfpOptions/avatar_11.png')}
+                              source={require('../../assets/pfpOptions/pfp_face_11.png')}
                               style={checkIfSelected(11)}
                             />
                           </TouchableOpacity>
                         </View>
+                        <View style={styles.imageOptions}>
+                          <TouchableOpacity
+                            activeOpacity={0.75}
+                            onPress={() => setPfp(12)}
+                          >
+                            <Image
+                              source={require('../../assets/pfpOptions/pfp_face_12.png')}
+                              style={checkIfSelected(12)}
+                            />
+                          </TouchableOpacity>
+                        </View>
 
                         <View style={styles.imageOptions}>
                           <TouchableOpacity
                             activeOpacity={0.75}
-                            onPress={() => setPfp(18)}
+                            onPress={() => setPfp(13)}
                           >
                             <Image
-                              source={require('../../assets/pfpOptions/avatar_18.png')}
-                              style={checkIfSelected(18)}
+                              source={require('../../assets/pfpOptions/pfp_face_13.png')}
+                              style={checkIfSelected(13)}
+                            />
+                          </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.imageOptions}>
+                          <TouchableOpacity
+                            activeOpacity={0.75}
+                            onPress={() => setPfp(14)}
+                          >
+                            <Image
+                              source={require('../../assets/pfpOptions/pfp_face_14.png')}
+                              style={checkIfSelected(14)}
                             />
                           </TouchableOpacity>
                         </View>
@@ -677,17 +674,17 @@ const ProfileTab = ({ navigation }) => {
                         <View style={styles.imageOptions}>
                           <TouchableOpacity
                             activeOpacity={0.75}
-                            onPress={() => setPfp(16)}
+                            onPress={() => setPfp(15)}
                           >
                             <Image
-                              source={require('../../assets/pfpOptions/avatar_16.png')}
-                              style={checkIfSelected(16)}
+                              source={require('../../assets/pfpOptions/pfp_face_15.png')}
+                              style={checkIfSelected(15)}
                             />
                           </TouchableOpacity>
                         </View>
 
                       </View>
-          
+
                     </View>
                   </View>
                 }>
@@ -1042,18 +1039,31 @@ const ProfileTab = ({ navigation }) => {
               marginBottom: 22,
             }}>
 
-              <TouchableOpacity activeOpacity={0.7} onPress={() => { setEditing(false); saveProfileData(); }} style={{
-                paddingVertical: 7, paddingHorizontal: 17,
-                backgroundColor: "#1174EC", borderColor: "#333", borderWidth: 2.5, borderRadius: 50,
-                justifyContent: "center", alignItems: "center", flexDirection: "row",
-              }}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => {
+                  setIsSaving(true);
+                  setEditing(false);
+                  saveProfileData();
+                }}
+                style={{
+                  paddingVertical: 7, paddingHorizontal: 17,
+                  backgroundColor: "#1174EC", borderColor: "#333", borderWidth: 2.5, borderRadius: 50,
+                  justifyContent: "center", alignItems: "center", flexDirection: "row",
+                }}>
                 <Text style={{
                   textAlign: 'center', fontSize: 16, fontWeight: '800',
                   color: '#fff', marginRight: 10,
                 }}>
                   {"SAVE"}
                 </Text>
-                <Octicons name="check" size={24} color="white" />
+                {isSaving
+                  ? <ActivityIndicator
+                    size="small"
+                    color="white"
+                  />
+                  : <Octicons name="check" size={24} color="white" />
+                }
               </TouchableOpacity>
 
             </View>
@@ -1153,12 +1163,19 @@ const ProfileTab = ({ navigation }) => {
                   <Text style={styles.buttonEditText}>
                     EDIT
                   </Text>
-                  <Icon
-                    name="edit"
-                    type="material"
-                    size={20}
-                    color="#363732"
-                  />
+
+                  {editing
+                    ? <ActivityIndicator
+                      size="small"
+                      color="#363732"
+                    />
+                    : <Icon
+                      name="edit"
+                      type="material"
+                      size={20}
+                      color="#363732"
+                    />
+                  }
                 </View>
               </View>
             </TouchableOpacity>
