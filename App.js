@@ -164,6 +164,7 @@ const TabStackScreen = () => (
     <TabStack.Screen
       name='Home'
       component={HomeStackScreen}
+      screenOptions={{gestureEnabled: false}}
     />
     <TabStack.Screen
       name='Groups'
