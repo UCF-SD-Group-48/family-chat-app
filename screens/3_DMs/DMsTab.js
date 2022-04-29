@@ -298,6 +298,7 @@ const DirectMessagesTab = ({ navigation }) => {
 
 
   const [isLoadingDMs, setIsLoadingDMs] = useState(false);
+  const [loadingKey, setLoadingKey] = useState('')
 
   useEffect(async () => {
     setIsLoadingDMs(false);
@@ -483,6 +484,7 @@ const DirectMessagesTab = ({ navigation }) => {
         {chats.map(({ id, data }) => (
           <TouchableOpacity key={id} activeOpacity={0.7} onPress={() => {
             setIsLoadingDMs(true);
+            setLoadingKey(id);
             const otherUserFullName = getSenderName(id)
             setTimeout(() => navigation.push("Chat", { topicId: id, topicName: "DM", isDM: true, otherUserFullName }));
           }}
@@ -529,7 +531,7 @@ const DirectMessagesTab = ({ navigation }) => {
                     color: '#777',
                     textAlign: "left",
                   }}>
-                    {getMessage(id)}
+                    {getMessage(id) || <Text style={{fontStyle: 'italic'}}> ...</Text>}
                   </Text>
                 </View>
               </View>
@@ -537,7 +539,7 @@ const DirectMessagesTab = ({ navigation }) => {
                 width: 50, height: 50, borderWidth: 0,
                 justifyContent: "center", alignItems: 'center', flexDirection: "row",
               }}>
-                {isLoadingDMs
+                {(isLoadingDMs && (loadingKey === id))
                   ? <ActivityIndicator
                     size="small"
                     color="#363732"
