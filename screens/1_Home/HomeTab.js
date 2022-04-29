@@ -60,7 +60,7 @@ import {
 import firebase from 'firebase/compat/app';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 
-import { useIsFocused, useScrollToTop } from '@react-navigation/native';
+import { useIsFocused, useScrollToTop, useFocusEffect } from '@react-navigation/native';
 import { G } from 'react-native-svg';
 
 import { getHexValue, imageSelection } from '../5_Supplementary/GenerateProfileIcon';
@@ -88,96 +88,96 @@ import { set } from 'react-native-reanimated';
 // First tab of the application: HOME.
 const HomeTab = ({ navigation, route }) => {
 
-  const [testData, setTestData] = useState([
-    {
-      groupColor: "red",
-      groupID: "fedcba",
-      groupImageNumber: 2,
-      groupName: "The boiis",
-      topics: [
-        {
-          missedMessages: [
-            {
-              messageText: "Are you okay?",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Jake Truemann",
-              senderPFP: 3,
-            },
-            {
-              messageText: "No I'm not :(",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Triabel Canderberry",
-              senderPFP: 2,
-            },
-            {
-              messageText: "bummer...",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Jake Truemann",
-              senderPFP: 3,
-            },
-            {
-              messageText: "umm, who is getting displayed??",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Triabel Canderberry",
-              senderPFP: 2,
-            },
-          ],
-          topicID: "abcdefg",
-          topicName: "General",
-        },
-        {
-          missedMessages: [
-            {
-              messageText: "Let's have an awesome usmmer",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Jake Truemann",
-              senderPFP: 3,
-            },
-            {
-              messageText: "yayaya",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Jake Truemann",
-              senderPFP: 3,
-            },
-          ],
-          topicID: "hfhfl",
-          topicName: "Summer time",
-        }
-      ],
-    },
-    {
-      groupColor: "blue",
-      groupID: "hfhfhfl",
-      groupImageNumber: 1,
-      groupName: "The gurls",
-      topics: [
-        {
-          missedMessages: [
-            {
-              messageText: "Why not the pink tho??",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Jill Truemann",
-              senderPFP: 4,
-            },
-            {
-              messageText: "Not here for it",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Trinity Canderberry",
-              senderPFP: 5,
-            },
-            {
-              messageText: "whatever",
-              messageTime: firebase.firestore.FieldValue.serverTimestamp(),
-              senderFullName: "Jill Truemann",
-              senderPFP: 4,
-            },
-          ],
-          topicID: "hhhh",
-          topicName: "General",
-        },
-      ],
-    },
-  ]);
+  // const [testData, setTestData] = useState([
+  //   {
+  //     groupColor: "red",
+  //     groupID: "fedcba",
+  //     groupImageNumber: 2,
+  //     groupName: "The boiis",
+  //     topics: [
+  //       {
+  //         missedMessages: [
+  //           {
+  //             messageText: "Are you okay?",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Jake Truemann",
+  //             senderPFP: 3,
+  //           },
+  //           {
+  //             messageText: "No I'm not :(",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Triabel Canderberry",
+  //             senderPFP: 2,
+  //           },
+  //           {
+  //             messageText: "bummer...",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Jake Truemann",
+  //             senderPFP: 3,
+  //           },
+  //           {
+  //             messageText: "umm, who is getting displayed??",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Triabel Canderberry",
+  //             senderPFP: 2,
+  //           },
+  //         ],
+  //         topicID: "abcdefg",
+  //         topicName: "General",
+  //       },
+  //       {
+  //         missedMessages: [
+  //           {
+  //             messageText: "Let's have an awesome usmmer",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Jake Truemann",
+  //             senderPFP: 3,
+  //           },
+  //           {
+  //             messageText: "yayaya",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Jake Truemann",
+  //             senderPFP: 3,
+  //           },
+  //         ],
+  //         topicID: "hfhfl",
+  //         topicName: "Summer time",
+  //       }
+  //     ],
+  //   },
+  //   {
+  //     groupColor: "blue",
+  //     groupID: "hfhfhfl",
+  //     groupImageNumber: 1,
+  //     groupName: "The gurls",
+  //     topics: [
+  //       {
+  //         missedMessages: [
+  //           {
+  //             messageText: "Why not the pink tho??",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Jill Truemann",
+  //             senderPFP: 4,
+  //           },
+  //           {
+  //             messageText: "Not here for it",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Trinity Canderberry",
+  //             senderPFP: 5,
+  //           },
+  //           {
+  //             messageText: "whatever",
+  //             messageTime: firebase.firestore.FieldValue.serverTimestamp(),
+  //             senderFullName: "Jill Truemann",
+  //             senderPFP: 4,
+  //           },
+  //         ],
+  //         topicID: "hhhh",
+  //         topicName: "General",
+  //       },
+  //     ],
+  //   },
+  // ]);
 
   const [groupToData, setGroupToData] = useState([]);
   const [numEvents, setNumEvents] = useState(0);
@@ -227,19 +227,35 @@ const HomeTab = ({ navigation, route }) => {
   const [cArray, setCArray] = useState([])
   const [isContentLoading, setIsContentLoading] = useState(true);
 
-  useLayoutEffect(() => {
-    setIsContentLoading(true);
-    getAllData();
+  // useLayoutEffect(() => {
+  //   setIsContentLoading(true);
+  //   getAllData();
 
-    return () => {
-      setIsContentLoading(false);
-      setNumEvents();
-      setNumPolls();
-      setGroupsWithMissedMessages();
-      setGroupToData([]);
-      setIsContentLoading(false);
-    }
-  }, [isFocused]);
+  //   return () => {
+  //     setIsContentLoading(false);
+  //     setNumEvents();
+  //     setNumPolls();
+  //     setGroupsWithMissedMessages();
+  //     setGroupToData([]);
+  //     setIsContentLoading(false);
+  //   }
+  // }, [isFocused]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsContentLoading(true);
+      getAllData();
+
+      return () => {
+        setIsContentLoading(false);
+        setNumEvents();
+        setNumPolls();
+        setGroupsWithMissedMessages();
+        setGroupToData([]);
+        setIsContentLoading(false);
+      };
+    }, [isFocused])
+  );
 
   const getAllData = async () => {
 
@@ -428,7 +444,7 @@ const HomeTab = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-    <StatusBar style='dark' />
+      <StatusBar style='dark' />
       <ScrollView
         width={'100%'}
         contentContainerStyle={{
@@ -557,13 +573,8 @@ const HomeTab = ({ navigation, route }) => {
                 ? <View
                 // hide={numEvents > 0}
                 >
-                  <TouchableOpacity
-                    activeOpacity={0.75}
-                    onPress={() => {
-                    }}
-                  >
                     <View style={[styles.interactiveFeatureButtonDisabled, { marginRight: 7 }]}>
-                      <View style={[styles.interactiveFeatureLeftHalfDisabled, {height: 40,}]}>
+                      <View style={[styles.interactiveFeatureLeftHalfDisabled, { height: 40, }]}>
                         <View style={styles.interactiveFeatureIconBackgroundDisabled}>
                           <Icon
                             name='calendar'
@@ -579,7 +590,6 @@ const HomeTab = ({ navigation, route }) => {
                         </Text>
                       </View>
                     </View>
-                  </TouchableOpacity>
                 </View>
                 : <View
                 // hide={numEvents <= 0}
@@ -592,7 +602,7 @@ const HomeTab = ({ navigation, route }) => {
                   >
                     <View style={{
                       minWidth: 100, backgroundColor: "#fff",
-                      borderWidth: 1, borderColor: '#333', borderRadius: 5,
+                      borderWidth: 2, borderColor: '#333', borderRadius: 5,
                       justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
                     }}>
                       <View style={{ flexDirection: "row", height: 40, }}>
@@ -628,61 +638,58 @@ const HomeTab = ({ navigation, route }) => {
 
               {/* Polls */}
               {(numPolls <= 0) ? (
-              <TouchableOpacity
-                activeOpacity={0.75}>
-                <View style={[styles.interactiveFeatureButtonDisabled, { marginLeft: 7 }]}>
-                  <View style={[styles.interactiveFeatureLeftHalfDisabled, {height: 40,}]}>
-                    <View style={styles.interactiveFeatureIconBackgroundDisabled}>
-                      <Icon
-                        name='bar-graph'
-                        type='entypo'
-                        color='#9D9D9D'
-                        size={25}
-                      />
+                  <View style={[styles.interactiveFeatureButtonDisabled, { marginLeft: 7 }]}>
+                    <View style={[styles.interactiveFeatureLeftHalfDisabled, { height: 40, }]}>
+                      <View style={styles.interactiveFeatureIconBackgroundDisabled}>
+                        <Icon
+                          name='bar-graph'
+                          type='entypo'
+                          color='#9D9D9D'
+                          size={25}
+                        />
+                      </View>
+                    </View>
+                    <View style={styles.interactiveFeatureRightHalfDisabled}>
+                      <Text style={styles.interactiveFeatureTextDisabled}>
+                        No Active Polls
+                      </Text>
                     </View>
                   </View>
-                  <View style={styles.interactiveFeatureRightHalfDisabled}>
-                    <Text style={styles.interactiveFeatureTextDisabled}>
-                      No Active Polls
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                    activeOpacity={0.75}
-                    onPress={() => {
-                      navigation.push("ActivePolls", { groupToData, numPolls });
-                    }}
-                  >
-                    <View style={{
-                      minWidth: 100, backgroundColor: "#fff",
-                      borderWidth: 1, borderColor: '#333', borderRadius: 5,
-                      justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
-                    }}>
-                      <View style={{ flexDirection: "row", height: 40, }}>
-                        <View style={{
-                          backgroundColor: '#ED984F', paddingHorizontal: 10, paddingVertical: 5,
-                          borderTopLeftRadius: 5, borderBottomLeftRadius: 5,
-                          justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
-                        }}>
-                          <Entypo name="bar-graph" size={20} color="#000" />
-                        </View>
-                      </View>
-                      <Text style={{
-                        fontSize: 12,
-                        fontWeight: '800',
-                        textAlign: "left",
-                        marginLeft: 10,
-                        color: "#333",
+                  activeOpacity={0.75}
+                  onPress={() => {
+                    navigation.push("ActivePolls", { groupToData, numPolls });
+                  }}
+                >
+                  <View style={{
+                    minWidth: 100, backgroundColor: "#fff",
+                    borderWidth: 1, borderColor: '#333', borderRadius: 5,
+                    justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
+                  }}>
+                    <View style={{ flexDirection: "row", height: 40, }}>
+                      <View style={{
+                        backgroundColor: '#ED984F', paddingHorizontal: 10, paddingVertical: 5,
+                        borderTopLeftRadius: 5, borderBottomLeftRadius: 5,
+                        justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
                       }}>
-                        Open Polls
-                      </Text>
-                      <Entypo name="chevron-right" size={20} color="#333" style={{
-                        paddingHorizontal: 7,
-                      }} />
+                        <Entypo name="bar-graph" size={20} color="#000" />
+                      </View>
                     </View>
-                  </TouchableOpacity>
+                    <Text style={{
+                      fontSize: 12,
+                      fontWeight: '800',
+                      textAlign: "left",
+                      marginLeft: 10,
+                      color: "#333",
+                    }}>
+                      Open Polls
+                    </Text>
+                    <Entypo name="chevron-right" size={20} color="#333" style={{
+                      paddingHorizontal: 7,
+                    }} />
+                  </View>
+                </TouchableOpacity>
               )}
             </View>
           }
@@ -985,7 +992,7 @@ const HomeTab = ({ navigation, route }) => {
                     </View>
                   </TouchableOpacity> */}
                 </View>
-                :<View style={{width: 0, height: 0,}} />
+                : <View style={{ width: 0, height: 0, }} />
               }
             </View>
           }
