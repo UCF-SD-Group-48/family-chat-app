@@ -87,14 +87,13 @@ const ChatScreen = ({ navigation, route }) => {
     const coverImageNumber = route.params.coverImageNumber;
     const isDM = route.params.isDM;
     const otherUserFullName = route.params.otherUserFullName;
+    const lastReadTime = route.params.lastReadTime;
     const [generalId, setgeneralId] = useState('');
 
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([])
     const [topicSelectionEnabled, setTopicSelection] = useState(true);
     const [topics, setTopics] = useState([]);
-    const [messageMap, setMessageMap] = useState({});
-    const [messageSenderUIDs, setMessageSenderUIDs] = useState([])
     const [messageSenders, setMessageSenders] = useState({})
     const [overlayIsVisible, setOverlay] = useState(false);
     const [alertExists, setAlertExists] = useState(false);
@@ -153,12 +152,13 @@ const ChatScreen = ({ navigation, route }) => {
         statusEmoji: "",
         statusText: "",
         topicMap: [],
-    });
+    }); //TODO only used for topic map read time that will be fixed
 
-    const [lastMessageTime, setLastMessageTime] = useState(null);
+    const [lastMessageTime, setLastMessageTime] = useState(null); //TODO delete this
 
     const isFocused = useIsFocused();
     const flatList = useRef();
+    const [isRefreshingMessages, setIsRefreshingMessages] = useState(false);
 
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
@@ -235,50 +235,17 @@ const ChatScreen = ({ navigation, route }) => {
         // }
     }, [messages, isFocused]);
 
-    const messageMapFunction = () => {
+    const messageMapFunction = async () => {
+        
         let messageSenders = [];
-        if (messages.length > 1) {
-            messages.map((message, i, array) => {
-                if (i > 0) {
-                    setMessageMap(state => ({
-                        ...state,
-                        [message.id]: ({
-                            currentMessage: {
-                                id: message.id,
-                                data: message.data,
-                            },
-                            previousMessage: {
-                                id: array[i - 1].id,
-                                data: array[i - 1].data,
-                            },
-                        })
-                    })
-                    );
-                }
-                if (messageSenders.indexOf(message.data.ownerUID) === -1) {
-                    messageSenders.push(message.data.ownerUID);
-                }
-            });
-        }
-        else if (messages.length == 1) { messageSenders.push(messages[0].data.ownerUID) }
-        setMessageSenderUIDs([...messageSenders]);
-        // console.log("messageSenderUIDs = "+JSON.stringify(messageSenderUIDs));
-    }
-    useEffect(() => {
-        messageMapFunction();
+        messages.map((message) => {
+            (messageSenders.indexOf(message.data.ownerUID) === -1)
+                ? (messageSenders.push(message.data.ownerUID))
+                : ({})
+        });
 
-        if (messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
-            setLastMessageTime(messages[messages.length - 1].data.timestamp);
-        }
-
-        return () => {
-            setMessageMap({});
-        }
-    }, [messages]);
-
-    const messageSendersHelper = async () => {
         let senders = {};
-        for (const uid of messageSenderUIDs) {
+        for (const uid of messageSenders) {
             await db.collection('users').doc(uid).get()
                 .then((result) => {
 
@@ -287,13 +254,17 @@ const ChatScreen = ({ navigation, route }) => {
                 });
         }
         setMessageSenders(senders);
-
-        flatList.current.scrollToEnd({ animated: true });
-    };
-
+        
+        // setMessageSenderUIDs([...messageSenders]);
+    }
     useEffect(() => {
-        messageSendersHelper();
-    }, [messageSenderUIDs]);
+        messageMapFunction();
+
+        // if (messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
+        //     setLastMessageTime(messages[messages.length - 1].data.timestamp);
+        // }
+
+    }, [messages]);
 
     useEffect(() => {
         setOverlay(false);
@@ -342,7 +313,7 @@ const ChatScreen = ({ navigation, route }) => {
     }, []);
 
     const goBackward = async () => {
-
+        //remove these lines
         const topicMapString = "topicMap." + topicId;
 
         await db.collection("users").doc(auth.currentUser.uid).update({
@@ -428,7 +399,7 @@ const ChatScreen = ({ navigation, route }) => {
             ),
         });
 
-        resetCurrentUser();
+        resetCurrentUser(); //TODO remove
 
     }, [navigation, messages]);
 
@@ -501,7 +472,8 @@ const ChatScreen = ({ navigation, route }) => {
             .collection('chats')
             .doc(topicId)
             .collection('messages')
-            .orderBy('timestamp', 'asc')
+            .orderBy('timestamp', 'desc')
+            .limit(25)
             .onSnapshot((snapshot) =>
                 setMessages(
                     snapshot.docs.map(doc => ({
@@ -536,10 +508,35 @@ const ChatScreen = ({ navigation, route }) => {
         setInput(''); // clears messaging box
     };
 
+    const refreshMessages = async () => {
+        
+        setIsRefreshingMessages(true);
+
+        const lastMessageTime = messages[messages.length-1].data.timestamp;
+        let newMessageArray = [];
+        try{
+            const newMessages = await db.collection('chats').doc(topicId).collection('messages')
+            .where('timestamp', '<', lastMessageTime).orderBy('timestamp', 'desc').limit(25).get();
+            newMessages.docs.map((doc) => {
+                newMessageArray.push({
+                    id: doc.id,
+                    data: doc.data(),
+                })
+            });
+        }
+        catch(error) {
+            console.log(error);
+        }
+
+        setMessages([...messages, ...newMessageArray]);
+        setIsRefreshingMessages(false);
+    }
+
     const toggleTopicSelection = () => {
         setTopicSelection(!topicSelectionEnabled);
     };
 
+    //TODO make sure this works as intended -sets the new readTime
     const [mapUpdate, setMapUpdate] = useState({});
 
     const enterTopic = async (id, name) => {
@@ -681,13 +678,20 @@ const ChatScreen = ({ navigation, route }) => {
 
     const [copiedText, setCopiedText] = useState(false)
 
-    const reachEnd = async () => {
-        // const topicMapString = "topicMap."+topicId;
+    const hideProfilePicture = (data, index) => {
 
-        // await db.collection("users").doc(auth.currentUser.uid).update({
-        //     [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
-        // });
-    }
+        //messages[index+1] is the previous message
+        //messages the array is indexed from the most recent (at 0) to the farthest ago sent (at messages.length-1)
+
+        return index >= 0 && index < messages.length - 1 //index is in range
+            && messages[index+1] != undefined && messages[index+1].data != undefined //the messages exist
+            && data.phoneNumber == messages[index+1].data.phoneNumber //they are from the same sender
+            && data.timestamp != null && messages[index+1].data.timestamp != null //the messages were sent near each other (time)
+            && (data.timestamp.seconds - messages[index+1].data.timestamp.seconds) < 300 //300 seconds = 5 minutes
+            && (currentUser.topicMap[topicId] == null ||
+                (currentUser.topicMap[topicId].seconds < messages[index+1].data.timestamp.seconds
+                || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)) //separate for "New Messages"
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -1551,22 +1555,18 @@ const ChatScreen = ({ navigation, route }) => {
 
                         {/* Messages */}
                         <FlatList ref={flatList}
-                            data={messages} keyExtractor={item => item.id}
+                            data={messages} keyExtractor={(item) => item.id}
                             initialNumToRender={20}
+                            inverted={true}
+                            refreshing={isRefreshingMessages}
                             // onContentSizeChange= {()=> {}} flatList.current.scrollToEnd()
-                            onEndReachedThreshold={0.5} onEndReached={reachEnd}
-                            renderItem={({ item: { id, data } }) => {
+                            onEndReachedThreshold={0.5} onEndReached={refreshMessages}
+                            ListHeaderComponent={<View style={{height: 40,}}/>}
+                            renderItem={({ item: { id, data }, index }) => {
                                 return (
 
-                                    (messageMap[id] != undefined && messageMap[id].previousMessage != undefined
-                                        && messageMap[id].previousMessage.data != undefined
-                                        && data.phoneNumber == messageMap[id].previousMessage.data.phoneNumber
-                                        && data.timestamp != null && messageMap[id].previousMessage.data.timestamp != null
-                                        && (data.timestamp.seconds - messageMap[id].previousMessage.data.timestamp.seconds) < 300
-                                        && (currentUser.topicMap[topicId] == null ||
-                                            (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
-                                            || currentUser.topicMap[topicId].seconds > data.timestamp.seconds))
-                                    ) ? (
+                                    ( hideProfilePicture(data, index) )
+                                    ? (
                                         //message without profile picture
                                         <View key={id} style={{
                                             width: "100%",
@@ -1693,15 +1693,19 @@ const ChatScreen = ({ navigation, route }) => {
                                             paddingHorizontal: 10,
                                             backgroundColor: "#6660",
                                         }}>
-                                            <MyView hide={messageMap[id] == undefined || messageMap[id].previousMessage == undefined
-                                                || messageMap[id].previousMessage.data == undefined
-                                                || currentUser.topicMap.length <= 0
-                                                || currentUser.topicMap[topicId] == null
-                                                || data.timestamp == null || messageMap[id].previousMessage.data.timestamp == null
-                                                || (currentUser.topicMap[topicId] != null &&
-                                                    (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
-                                                    || currentUser.topicMap[topicId].seconds > data.timestamp.seconds))
-                                                || (lastMessageTime != null && data.timestamp.seconds > lastMessageTime.seconds)}
+                                            {/* //TODO */}
+                                            <MyView hide={
+                                                // messageMap[id] == undefined || messageMap[id].previousMessage == undefined
+                                                // || messageMap[id].previousMessage.data == undefined
+                                                // || currentUser.topicMap.length <= 0
+                                                // || currentUser.topicMap[topicId] == null
+                                                // || data.timestamp == null || messageMap[id].previousMessage.data.timestamp == null
+                                                // || (currentUser.topicMap[topicId] != null &&
+                                                //     (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
+                                                //     || currentUser.topicMap[topicId].seconds > data.timestamp.seconds))
+                                                // || (lastMessageTime != null && data.timestamp.seconds > lastMessageTime.seconds)
+                                                true
+                                            }
                                                 style={{
                                                     height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
                                                     justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
