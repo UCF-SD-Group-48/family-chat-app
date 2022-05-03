@@ -321,7 +321,8 @@ const HomeTab = ({ navigation, route }) => {
 
           //getting all the messages per topic
           let missedMessages = [];
-          if (memberUIDToData[auth.currentUser.uid].topicMap.hasOwnProperty(topicUID)) {
+          //does the topic's member list include the current user
+          if(topicUIDtoData[topicUID].members.includes(auth.currentUser.uid)) {
             const snapshot = await db.collection('chats').doc(topicUID).collection("messages")
               .where('timestamp', ">", memberUIDToData[auth.currentUser.uid].topicMap[topicUID])
               // .where('ownerUID', "==", !auth.currentUser.uid)
@@ -441,6 +442,40 @@ const HomeTab = ({ navigation, route }) => {
     setGroupToData(result);
     setGroupsWithMissedMessages(groupsWithMissedMessages - 1);
   };
+
+  const goToChatScreen = async (group, topic) => {
+    // Navigating on a message or on "See all messages"
+    try {
+      db.collection("users").doc(auth.currentUser.uid).get()
+				.then((userDoc) => {
+					const lastReadTime = userDoc.data().topicMap[topic.topicID]; //getting lastReadTime
+
+					const topicMapString = "topicMap."+topic.topicID; //overwriting lastReadTime
+					db.collection("users").doc(auth.currentUser.uid).update({
+						[topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+					});
+
+					//passing lastReadTime
+          navigation.push('TabStack', {
+              screen: 'Groups', params: {
+                screen: 'Chat', params: {
+                  topicId: topic.topicID,
+                  topicName: topic.topicName,
+                  groupId: group.groupID,
+                  groupName: group.groupName,
+                  groupOwner: group.groupOwner,
+                  color: group.groupColor,
+                  coverImageNumber: group.groupImageNumber,
+                  lastReadTime: lastReadTime,
+                },
+                initial: false,
+              }
+          });
+
+				})
+    } catch (error) { console.log(error) }
+
+  }
 
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -832,27 +867,7 @@ const HomeTab = ({ navigation, route }) => {
 
                         (topic.missedMessages.length < 3 || index >= (topic.missedMessages.length - 3)) ? (
                           <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => {
-                            try {
-                              navigation.push('TabStack',
-                                {
-                                  screen: 'Groups', params: {
-                                    screen: 'Chat', params: {
-                                      topicId: topic.topicID,
-                                      topicName: topic.topicName,
-                                      groupId: group.groupID,
-                                      groupName: group.groupName,
-                                      groupOwner: group.groupOwner,
-                                      color: group.groupColor,
-                                      coverImageNumber: group.groupImageNumber
-                                    },
-                                    initial: false,
-
-                                  }
-                                }).then(() => {
-                                  console.log('[Home Tab] Navigation → DISMISSED')
-                                  dismissButtonPressed(group);
-                                })
-                            } catch (error) { console.log(error) }
+                            goToChatScreen(group, topic)
                           }}
                             style={{
                               maxWidth: "100%", minHeight: 10, backgroundColor: "#F8F8F8",
@@ -904,14 +919,7 @@ const HomeTab = ({ navigation, route }) => {
                         marginHorizontal: 15, marginTop: -1,
                       }}>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => {
-                          navigation.navigate('Groups',
-                            {
-                              screen: 'Chat', params: {
-                                topicId: topic.topicID, topicName: topic.topicName,
-                                groupId: group.groupID, groupName: group.groupName, groupOwner: null,
-                                color: group.groupColor, coverImageNumber: group.groupImageNumber
-                              }
-                            });
+                          goToChatScreen(group, topic)
                         }}
                           style={{
                             flex: 1, flexGrow: 1,

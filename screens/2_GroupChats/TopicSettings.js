@@ -242,7 +242,7 @@ const TopicSettings = ({ navigation, route }) => {
 
                 const generalTopicSnapshotData = generalTopicSnapshot.docs[0].data();
 
-                navigation.navigate('Chat',
+                navigation.navigate("Chat",
                     {
                         color: groupSnapshotData.color,
                         coverImageNumber: groupSnapshotData.coverImageNumber,
@@ -382,7 +382,7 @@ const TopicSettings = ({ navigation, route }) => {
 
         console.log('[User Leaves Topic] Alert sent + Navigating to General')
 
-        navigation.navigate('Chat',
+        navigation.navigate("Chat",
             {
                 color: groupSnapshotData.color,
                 coverImageNumber: groupSnapshotData.coverImageNumber,
@@ -463,7 +463,7 @@ const TopicSettings = ({ navigation, route }) => {
 
                 console.log('[Owner Deletes Topic] Alert sent + Navigating to General')
 
-                navigation.navigate('Chat',
+                navigation.navigate("Chat",
                     {
                         color: groupSnapshotData.color,
                         coverImageNumber: groupSnapshotData.coverImageNumber,

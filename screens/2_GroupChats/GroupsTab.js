@@ -127,7 +127,19 @@ const GroupsTab = ({ navigation }) => {
 			.then(() => {
 				const topicId = topic.id;
 				const topicName = topic.data().topicName;
-				navigation.push('Chat', { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
+
+				db.collection("users").doc(auth.currentUser.uid).get()
+				.then((userDoc) => {
+					const lastReadTime = userDoc.data().topicMap[topicId]; //getting lastReadTime
+
+					const topicMapString = "topicMap."+topicId; //overwriting lastReadTime
+					db.collection("users").doc(auth.currentUser.uid).update({
+						[topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+					});
+
+					//passing lastReadTime
+					navigation.push('Chat', { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, lastReadTime });
+				})
 			})
 			.catch((error) => {
 				console.log(error);

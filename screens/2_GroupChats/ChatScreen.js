@@ -88,6 +88,7 @@ const ChatScreen = ({ navigation, route }) => {
     const isDM = route.params.isDM;
     const otherUserFullName = route.params.otherUserFullName;
     const lastReadTime = route.params.lastReadTime;
+    const [lastReadTimeState, setLastReadTimeState] = useState(lastReadTime);
     const [generalId, setgeneralId] = useState('');
 
     const [input, setInput] = useState('');
@@ -137,24 +138,6 @@ const ChatScreen = ({ navigation, route }) => {
     });
     const [pinMap, setPinMap] = useState({});
     const [topicMap, setTopicMap] = useState({});
-
-    const [currentUser, setCurrentUser] = useState({
-        color: "",
-        discoverableEnabled: false,
-        email: "",
-        firstName: "",
-        groups: [],
-        lastName: "",
-        lastOn: firebase.firestore.FieldValue.serverTimestamp(),
-        pfp: 0,
-        phoneNumber: "",
-        pushNotificationsEnabled: false,
-        statusEmoji: "",
-        statusText: "",
-        topicMap: [],
-    }); //TODO only used for topic map read time that will be fixed
-
-    const [lastMessageTime, setLastMessageTime] = useState(null); //TODO delete this
 
     const isFocused = useIsFocused();
     const flatList = useRef();
@@ -225,6 +208,21 @@ const ChatScreen = ({ navigation, route }) => {
             })
         }
         setPinMap(pins);
+    }
+
+    //isFocused -only updates on false, can also do if true if need be later
+    useEffect(() => {
+        if(isFocused == false) {
+            onLeave();
+        }
+    }, [isFocused]);
+
+    const onLeave = async () => {
+        const topicMapString = "topicMap." + topicId;
+
+        await db.collection("users").doc(auth.currentUser.uid).update({
+            [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+        });
     }
 
     useEffect(() => {
@@ -313,12 +311,12 @@ const ChatScreen = ({ navigation, route }) => {
     }, []);
 
     const goBackward = async () => {
-        //remove these lines
-        const topicMapString = "topicMap." + topicId;
 
-        await db.collection("users").doc(auth.currentUser.uid).update({
-            [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
-        });
+        // const topicMapString = "topicMap." + topicId;
+
+        // await db.collection("users").doc(auth.currentUser.uid).update({
+        //     [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+        // });
 
         navigation.navigate('GroupsTab')
     };
@@ -399,16 +397,7 @@ const ChatScreen = ({ navigation, route }) => {
             ),
         });
 
-        resetCurrentUser(); //TODO remove
-
     }, [navigation, messages]);
-
-    const resetCurrentUser = async () => {
-        const snapshot = await db.collection("users").doc(auth.currentUser.uid).get();
-        if (!snapshot.empty) {
-            setCurrentUser(snapshot.data());
-        }
-    };
 
     useLayoutEffect(() => {
         const unsubscribe = db
@@ -482,7 +471,7 @@ const ChatScreen = ({ navigation, route }) => {
                     }))
                 ));
         return unsubscribe;
-    }, [route]);
+    }, [route, topicId]);
 
 
     const sendMessage = () => {
@@ -503,6 +492,10 @@ const ChatScreen = ({ navigation, route }) => {
                 phoneNumber: auth.currentUser.phoneNumber,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
             }); // id passed in when we entered the chatroom
+        }
+
+        if(lastReadTimeState != null && lastReadTimeState != undefined) {
+            setLastReadTimeState(undefined);
         }
 
         setInput(''); // clears messaging box
@@ -536,25 +529,61 @@ const ChatScreen = ({ navigation, route }) => {
         setTopicSelection(!topicSelectionEnabled);
     };
 
-    //TODO make sure this works as intended -sets the new readTime
-    const [mapUpdate, setMapUpdate] = useState({});
+    //TODO search CMD+F navigation.navigate("Chat"
 
+    //TODO push or not push
     const enterTopic = async (id, name) => {
-        // if (name != "General") {
-        navigation.navigate("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber });
-        // update the topicMap of the current user here
-        mapUpdate[`topicMap.${id}`] = firebase.firestore.FieldValue.serverTimestamp()
-        await db.collection('users').doc(auth.currentUser.uid).update(mapUpdate)
-        // find the topic in the topic map
 
-        // }
+        onLeave();
+
+        let userDoc = await db.collection("users").doc(auth.currentUser.uid).get();
+        if(!userDoc.empty) {
+            const lastReadTime = userDoc.data().topicMap[id]; //getting lastReadTime
+
+            const topicMapString = "topicMap."+id; //overwriting lastReadTime
+            await db.collection("users").doc(auth.currentUser.uid).update({
+                [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+
+            //passing lastReadTime
+            // navigation.navigate("Chat", { topicId: id, topicName: name, groupId, groupName, groupOwner, color, coverImageNumber, lastReadTime });
+            setMessages([]);
+            navigation.setParams({
+                topicId: id,
+                topicName: name,
+                lastReadTime: lastReadTime,
+            });
+            setLastReadTimeState(lastReadTime);
+        }
+        
         toggleTopicSelection();
     };
 
-    const enterTopicFromMessage = (id) => {
+    const enterTopicFromMessage = async (id) => {
+        
+        onLeave();
+
         const topic = getTopicData(id);
         if (topic != null) {
-            navigation.navigate("Chat", { topicId: topic.id, topicName: topic.data.topicName, groupId, groupName, groupOwner, color, coverImageNumber });
+            let userDoc = await db.collection("users").doc(auth.currentUser.uid).get();
+            if(!userDoc.empty) {
+                const lastReadTime = userDoc.data().topicMap[topic.id]; //getting lastReadTime
+
+                const topicMapString = "topicMap."+topic.id; //overwriting lastReadTime
+                db.collection("users").doc(auth.currentUser.uid).update({
+                    [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+
+                //passing lastReadTime
+                //navigation.navigate("Chat", { topicId: topic.id, topicName: topic.data.topicName, groupId, groupName, groupOwner, color, coverImageNumber, lastReadTime });
+                setMessages([]);
+                navigation.setParams({
+                    topicId: topic.id,
+                    topicName: topic.data.topicName,
+                    lastReadTime: lastReadTime,
+                });
+                setLastReadTimeState(lastReadTime);
+            }
         }
     };
 
@@ -684,13 +713,13 @@ const ChatScreen = ({ navigation, route }) => {
         //messages the array is indexed from the most recent (at 0) to the farthest ago sent (at messages.length-1)
 
         return index >= 0 && index < messages.length - 1 //index is in range
-            && messages[index+1] != undefined && messages[index+1].data != undefined //the messages exist
+            && messages[index+1] != undefined && messages[index+1].data != undefined //the previous message exists
             && data.phoneNumber == messages[index+1].data.phoneNumber //they are from the same sender
             && data.timestamp != null && messages[index+1].data.timestamp != null //the messages were sent near each other (time)
             && (data.timestamp.seconds - messages[index+1].data.timestamp.seconds) < 300 //300 seconds = 5 minutes
-            && (currentUser.topicMap[topicId] == null ||
-                (currentUser.topicMap[topicId].seconds < messages[index+1].data.timestamp.seconds
-                || currentUser.topicMap[topicId].seconds > data.timestamp.seconds)) //separate for "New Messages"
+            && (lastReadTimeState == null ||
+                (lastReadTimeState.seconds < messages[index+1].data.timestamp.seconds
+                || lastReadTimeState.seconds > data.timestamp.seconds)) //separate for "New Messages"
     };
 
     return (
@@ -1693,18 +1722,25 @@ const ChatScreen = ({ navigation, route }) => {
                                             paddingHorizontal: 10,
                                             backgroundColor: "#6660",
                                         }}>
-                                            {/* //TODO */}
+                                            {/* 
+
+                                            hide if lastReadTime == undefined or null
+                                            
+                                            hide if the message is the very last message (oldest)
+                                            && (the lastReadTime is after the message was sent)
+                                            
+                                            hide if the message is a valid message && time stuff is false
+                                            
+                                            */}
                                             <MyView hide={
-                                                // messageMap[id] == undefined || messageMap[id].previousMessage == undefined
-                                                // || messageMap[id].previousMessage.data == undefined
-                                                // || currentUser.topicMap.length <= 0
-                                                // || currentUser.topicMap[topicId] == null
-                                                // || data.timestamp == null || messageMap[id].previousMessage.data.timestamp == null
-                                                // || (currentUser.topicMap[topicId] != null &&
-                                                //     (currentUser.topicMap[topicId].seconds < messageMap[id].previousMessage.data.timestamp.seconds
-                                                //     || currentUser.topicMap[topicId].seconds > data.timestamp.seconds))
-                                                // || (lastMessageTime != null && data.timestamp.seconds > lastMessageTime.seconds)
-                                                true
+                                                index > messages.length - 1 || lastReadTimeState == undefined || lastReadTimeState == null
+                                                || data.timestamp == null
+                                                || (index == messages.length-1 //last message
+                                                    && lastReadTimeState.seconds > data.timestamp.seconds)
+                                                || (index < messages.length - 1
+                                                    && messages[index+1] != undefined && messages[index+1].data != undefined
+                                                    && (lastReadTimeState.seconds < messages[index+1].data.timestamp.seconds
+                                                        || lastReadTimeState.seconds > data.timestamp.seconds))
                                             }
                                                 style={{
                                                     height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
