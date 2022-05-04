@@ -529,9 +529,7 @@ const ChatScreen = ({ navigation, route }) => {
         setTopicSelection(!topicSelectionEnabled);
     };
 
-    //TODO search CMD+F navigation.navigate("Chat"
-
-    //TODO push or not push
+    //TODO push or not push (currently not push and refresh params)
     const enterTopic = async (id, name) => {
 
         onLeave();
