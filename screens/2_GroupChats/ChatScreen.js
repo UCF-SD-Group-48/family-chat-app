@@ -40,7 +40,7 @@ import { HoldItem } from 'react-native-hold-menu';
 // Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
-import ImagePicker, { getPendingResultAsync } from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import {
     Menu,
@@ -142,6 +142,9 @@ const ChatScreen = ({ navigation, route }) => {
     const isFocused = useIsFocused();
     const flatList = useRef();
     const [isRefreshingMessages, setIsRefreshingMessages] = useState(false);
+
+    const [selectingImage, setSelectingImage] = useState(false);
+    const [imageData, setImageData] = useState(null);
 
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
@@ -719,6 +722,33 @@ const ChatScreen = ({ navigation, route }) => {
                 (lastReadTimeState.seconds < messages[index+1].data.timestamp.seconds
                 || lastReadTimeState.seconds > data.timestamp.seconds)) //separate for "New Messages"
     };
+
+    const pickImage = async () => {
+        
+        setSelectingImage(true);
+        
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: false,
+          // aspect: [4, 3],
+          quality: 0,
+          allowsMultipleSelection: true,
+        });
+    
+        console.log(result);
+        setSelectingImage(false);
+    
+        if (!result.cancelled) {
+          setImageData({
+            uri: result.uri,
+            width: result.width,
+            height: result.height,
+          });
+          console.log("result = ("+result.width+", "+result.height+")");
+        }
+        
+      };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -1893,50 +1923,122 @@ const ChatScreen = ({ navigation, route }) => {
                             }} />
 
                         {/* Footer */}
-                        <View style={styles.footer}>
-
-                            <View style={{
-                                width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
-                                paddingLeft: 15,
-                                justifyContent: "flex-start", alignItems: "flex-end",
-                                borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
-                                borderBottomRightRadius: 21, borderTopRightRadius: 21,
-                            }}>
+                        {(imageData || selectingImage) ? (
+                            <View style={styles.footer}>
                                 <View style={{
-                                    width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end",
+                                    minWidth: 125, maxWidth: "100%", height: 115, flexDirection: "column",
+                                    flex: 1, flexGrow: 1,
+                                    marginLeft: 2, paddingLeft: 10,
+                                    justifyContent: "center", alignItems: "flex-start",
+                                    borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
                                 }}>
-                                    <TextInput placeholder={"Type a message..."} onChangeText={(text) => setInput(text)} value={input}
-                                        multiline={true} maxLength={200} //onSubmitEditing={sendMessage}
+                                    <View style={{
+                                        flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
+                                        borderWidth: 0,
+                                    }}>
+                                        {/* <Entypo name="images" size={90} color="#777" /> */}
+                                        {imageData && <Image source={{ uri: imageData.uri }} style={{
+                                            width: 97, height: 97, borderRadius: 5, borderWidth: 2, borderColor: "#777",
+                                        }} />}
+                                    </View>
+                                </View>
+                                <View style={{
+                                        borderWidth: 0, marginLeft: 15, marginRight: 8,
+                                        flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
+                                    }}>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
                                         style={{
-                                            minHeight: 20, maxWidth: "70%",
-                                            marginBottom: 12, marginTop: 5,
-                                            backgroundColor: "#fff",
-                                            textAlign: 'left',
-                                            fontSize: 16,
-                                            fontWeight: '500',
-                                            color: '#222',
-                                        }}
-                                    />
-                                    <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
-                                        style={{
-                                            height: 42, width: "25%",
-                                            backgroundColor: (input.length > 0) ? ("#1174EC") : ("#98B0D4"),
-                                            borderRadius: 21,
+                                            flex: 1, flexGrow: 1,
+                                            paddingHorizontal: 12,
+                                            backgroundColor: "#1174EC",
+                                            borderRadius: 15,
                                             justifyContent: "center", alignItems: "center",
                                         }}>
                                         <Text style={{
-                                            fontSize: 16,
+                                            fontSize: 18,
                                             fontWeight: '700',
                                             textAlign: "center",
                                             color: "white",
                                         }}>
-                                            {"SEND"}
+                                            {"Send Image in Chat"}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {setImageData(null)}}
+                                        style={{
+                                            width: "100%",
+                                            marginTop: 7,
+                                            borderColor: "#333", borderRadius: 21, borderWidth: 3,
+                                            justifyContent: "center", alignItems: "center",
+                                        }}>
+                                        <Text style={{
+                                            paddingVertical: 5,
+                                            fontSize: 18,
+                                            fontWeight: '700',
+                                            textAlign: "center",
+                                            color: "#333",
+                                        }}>
+                                            {"Cancel"}
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
+                        ) : (
+                            <View style={styles.footer}>
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                                    pickImage();
+                                }}
+                                style={{
+                                    width: 40, height: 40,
+                                    marginLeft: 5, marginRight: 10,
+                                    backgroundColor: "#fff",
+                                    borderRadius: 10, borderWidth: 2, borderColor: "#777",
+                                    justifyContent: "center", alignItems: "center",
+                                }}>
+                                    <Entypo name="images" size={25} color="#777" />
+                                </TouchableOpacity>
+                                <View style={{
+                                    width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
+                                    paddingLeft: 15,
+                                    justifyContent: "flex-start", alignItems: "flex-end",
+                                    borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
+                                    borderBottomRightRadius: 21, borderTopRightRadius: 21,
+                                }}>
+                                    <View style={{
+                                        width: "100%", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end",
+                                    }}>
+                                        <TextInput placeholder={"Type a message..."} onChangeText={(text) => setInput(text)} value={input}
+                                            multiline={true} maxLength={200} //onSubmitEditing={sendMessage}
+                                            style={{
+                                                minHeight: 20, maxWidth: "70%",
+                                                marginBottom: 12, marginTop: 5,
+                                                backgroundColor: "#fff",
+                                                textAlign: 'left',
+                                                fontSize: 16,
+                                                fontWeight: '500',
+                                                color: '#222',
+                                            }}
+                                        />
+                                        <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
+                                            style={{
+                                                height: 42, width: "25%",
+                                                backgroundColor: (input.length > 0) ? ("#1174EC") : ("#98B0D4"),
+                                                borderRadius: 21,
+                                                justifyContent: "center", alignItems: "center",
+                                            }}>
+                                            <Text style={{
+                                                fontSize: 16,
+                                                fontWeight: '700',
+                                                textAlign: "center",
+                                                color: "white",
+                                            }}>
+                                                {"SEND"}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
 
-                        </View>
+                            </View>
+                        )}
                     </>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
