@@ -56,8 +56,10 @@ import {
     apps,
     auth,
     db,
-    firebaseConfig
+    firebaseConfig,
+    storage,
 } from '../../firebase';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import firebase from 'firebase/compat/app';
 import { doc, updateDoc, arrayUnion, arrayRemove, FieldValue } from "firebase/firestore";
 
@@ -69,6 +71,7 @@ import helpers from '../../helperFunctions/helpers';
 import CreateChatObj from '../../helperFunctions/CreateChatObj';
 
 import SkeletonContent from 'react-native-skeleton-content';
+import uuid from 'react-native-uuid';
 
 // *************************************************************
 
@@ -96,6 +99,8 @@ const ChatScreen = ({ navigation, route }) => {
     const [topicSelectionEnabled, setTopicSelection] = useState(true);
     const [topics, setTopics] = useState([]);
     const [messageSenders, setMessageSenders] = useState({})
+    const [messageImages, setMessageImages] = useState({})
+    const [imageFinishedUploading, setImageFinishedUploading] = useState(true)
     const [overlayIsVisible, setOverlay] = useState(false);
     const [alertExists, setAlertExists] = useState(false);
     const [alert, setAlert] = useState({
@@ -145,6 +150,8 @@ const ChatScreen = ({ navigation, route }) => {
 
     const [selectingImage, setSelectingImage] = useState(false);
     const [imageData, setImageData] = useState(null);
+
+    const [colorBlack, setColorBlack] = useState("#000");
 
     const toggleOverlay = () => {
         setOverlay(!overlayIsVisible);
@@ -239,9 +246,13 @@ const ChatScreen = ({ navigation, route }) => {
     const messageMapFunction = async () => {
         
         let messageSenders = [];
+        let imageMessages = [];
         messages.map((message) => {
             (messageSenders.indexOf(message.data.ownerUID) === -1)
                 ? (messageSenders.push(message.data.ownerUID))
+                : ({}),
+            (message.data.imageUID != undefined)
+                ? (imageMessages.push(message.data.imageUID))
                 : ({})
         });
 
@@ -255,8 +266,24 @@ const ChatScreen = ({ navigation, route }) => {
                 });
         }
         setMessageSenders(senders);
-        
-        // setMessageSenderUIDs([...messageSenders]);
+
+        for (const uid of imageMessages) {
+            //download image
+            const imagePathUrl = topicId+"/"+uid+".jpg";
+            const imageRef = ref(storage, imagePathUrl);
+            if(imageRef) {
+                getDownloadURL(imageRef)
+                .then((url) => {
+                    const messageImagesTemp = messageImages;
+                    messageImagesTemp[uid] = url;
+                    // console.log("messageImagesTemp = "+JSON.stringify(messageImagesTemp));
+                    setMessageImages(messageImagesTemp);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            }
+        }
     }
     useEffect(() => {
         messageMapFunction();
@@ -266,6 +293,40 @@ const ChatScreen = ({ navigation, route }) => {
         // }
 
     }, [messages]);
+
+    const reloadImages = async () => {
+        let imageMessages = [];
+        messages.map((message) => {
+            (message.data.imageUID != undefined)
+                ? (imageMessages.push(message.data.imageUID))
+                : ({})
+        });
+
+        for (const uid of imageMessages) {
+            //download image
+            const imagePathUrl = topicId+"/"+uid+".jpg";
+            const imageRef = ref(storage, imagePathUrl);
+            if(imageRef) {
+                getDownloadURL(imageRef)
+                .then((url) => {
+                    const messageImagesTemp = messageImages;
+                    messageImagesTemp[uid] = url;
+                    setMessageImages(messageImagesTemp);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            }
+        }
+    }
+    useEffect(() => {
+        if(imageFinishedUploading == true) {
+            reloadImages();
+        }
+
+    }, [imageFinishedUploading]);
+
+    setImageFinishedUploading
 
     useEffect(() => {
         setOverlay(false);
@@ -532,6 +593,16 @@ const ChatScreen = ({ navigation, route }) => {
         setTopicSelection(!topicSelectionEnabled);
     };
 
+    const rerender = () => {
+        // console.log("here");
+        if(colorBlack == "#000") {
+            setColorBlack("#111");
+        }
+        else {
+            setColorBlack("#000");
+        }
+    }
+
     //TODO push or not push (currently not push and refresh params)
     const enterTopic = async (id, name) => {
 
@@ -671,11 +742,22 @@ const ChatScreen = ({ navigation, route }) => {
         else return null;
     };
 
-    const deleteMessage = (id) => {
+    const deleteMessage = (id, data) => {
         //delete pin(if applicable), then message
         const pinData = getPinData(id);
         if (pinData != null) { //then delete pin before deleting message
             db.collection("chats").doc(topicId).collection("pins").doc(pinData.id).delete();
+        }
+
+        //delete image here
+        if(data.imageUID != undefined && data.imageUID != "") {
+            const topicFolder = topicId+"/"+data.imageUID+".jpg";
+            const imageRef = ref(storage, topicFolder);
+            deleteObject(imageRef).then(() => {
+                console.log("File deleted successfully");
+            }).catch((error) => {
+                console.log("Uh-oh, an error occurred!");
+            });
         }
 
         db.collection("chats").doc(topicId).collection("messages").doc(id).delete();
@@ -735,8 +817,7 @@ const ChatScreen = ({ navigation, route }) => {
           quality: 0,
           allowsMultipleSelection: true,
         });
-    
-        console.log(result);
+        
         setSelectingImage(false);
     
         if (!result.cancelled) {
@@ -745,10 +826,56 @@ const ChatScreen = ({ navigation, route }) => {
             width: result.width,
             height: result.height,
           });
-          console.log("result = ("+result.width+", "+result.height+")");
         }
         
-      };
+    };
+
+    const uploadImageAsync = async (uri) => {
+        
+        setImageFinishedUploading(false);
+
+        //create blob
+        const blob = await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.onload = function () {
+            resolve(xhr.response);
+          };
+          xhr.onerror = function (e) {
+            console.log(e);
+            reject(new TypeError("Network request failed"));
+          };
+          xhr.responseType = "blob";
+          xhr.open("GET", uri, true);
+          xhr.send(null);
+        });
+
+        //upload blob
+        const imageUID = uuid.v4();
+        const topicFolder = topicId+"/"+imageUID+".jpg";
+        const imageRef = ref(storage, topicFolder);
+        uploadBytes(imageRef, blob).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+        });
+
+        blob.close();
+
+        //send message
+        db.collection('chats').doc(topicId).collection('messages').add({
+            editedTime: null,
+            membersWhoReacted: [],
+            message: "",
+            ownerUID: auth.currentUser.uid,
+            phoneNumber: auth.currentUser.phoneNumber,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            imageUID: imageUID,
+            imageDimensions: {
+                width: imageData.width,
+                height: imageData.height,
+            },
+        });
+        setImageData(null);
+        setImageFinishedUploading(true);
+     }
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -1060,7 +1187,7 @@ const ChatScreen = ({ navigation, route }) => {
                                 <Text numberOfLines={1} style={{
                                     fontSize: 16,
                                     fontWeight: '700',
-                                    color: 'black',
+                                    color: colorBlack,
                                     textAlign: "left",
                                     paddingLeft: 15, paddingRight: 15,
                                     marginVertical: 7,
@@ -1683,7 +1810,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                             <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
                                                             <IconOption value={5} iconName='edit' text='Edit' hide={true} />
                                                             <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
-                                                                selectFunction={() => { deleteMessage(id) }} />
+                                                                selectFunction={() => { deleteMessage(id, data) }} />
                                                         </MenuOptions>
                                                     </Menu>
                                                 </View>
@@ -1828,15 +1955,36 @@ const ChatScreen = ({ navigation, route }) => {
                                                     }}>
                                                         <Menu style={{ flex: 1, }}>
                                                             <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
-                                                                <View style={{
+                                                                <View activeOpacity={0.7} //onPress={rerender}
+                                                                style={{
                                                                     minHeight: 30, marginLeft: 5,
                                                                     flex: 1, flexGrow: 1, justifyContent: "center",
+                                                                    alignItems: ((data.imageUID != undefined && data.imageUID != "")) ? ("center") : ("justify-start"),
                                                                     backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
                                                                     borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
                                                                 }}>
-                                                                    <Text style={styles.text}>
-                                                                        {data.message}
-                                                                    </Text>
+                                                                    {/* {messageImages != undefined && messageImages[data.imageUID] != undefined && */}
+                                                                    {(data.imageUID != undefined && data.imageUID != "") &&
+                                                                        <TouchableOpacity activeOpacity={0.7} onPress={() => {console.log("Pressed image"); rerender();}}
+                                                                        style={{
+                                                                            width: (data.imageDimensions.width < data.imageDimensions.height)
+                                                                                ? ((data.imageDimensions.width/data.imageDimensions.height) * 150)
+                                                                                : ("70%"), maxWidth: "70%",
+                                                                            height: (data.imageDimensions.width > data.imageDimensions.height)
+                                                                                ? ((data.imageDimensions.height/data.imageDimensions.width) * ((screenWidth*.9 - 50)*.70))
+                                                                                : (150),
+                                                                            marginHorizontal: 5, marginVertical: 5,
+                                                                        }}>
+                                                                            <Image source={{
+                                                                                uri: messageImages[data.imageUID],
+                                                                            }} style={{width: "100%", height: "100%",
+                                                                                borderRadius: 5, borderWidth: 2, borderColor: "#777",}}/>
+                                                                        </TouchableOpacity>
+                                                                    }
+                                                                    {(messageImages == undefined || messageImages[data.imageUID] == undefined) &&
+                                                                        <Text style={styles.text}>
+                                                                            {data.message}
+                                                                        </Text>}
                                                                 </View>
                                                             </MenuTrigger>
                                                             <MenuOptions style={{
@@ -1850,15 +1998,17 @@ const ChatScreen = ({ navigation, route }) => {
                                                                 <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
                                                                     isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
                                                                     selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                                <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM || (getPinData(id) != null)}
+                                                                <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM
+                                                                        || (getPinData(id) != null) || (data.imageUID != undefined && data.imageUID != "")}
                                                                     selectFunction={() => { addPinFromMessage(data, id) }} />
                                                                 <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
-                                                                    hide={data.ownerUID != auth.currentUser.uid || topicName != "General" || (getTopicData(id) != null)}
+                                                                    hide={data.ownerUID != auth.currentUser.uid || topicName != "General"
+                                                                        || (getTopicData(id) != null) || (data.imageUID != undefined && data.imageUID != "")}
                                                                     selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, originalMessageUID: id }) }} />
                                                                 <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
                                                                 <IconOption value={5} iconName='edit' text='Edit' hide={true} />
                                                                 <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
-                                                                    selectFunction={() => { deleteMessage(id) }} />
+                                                                    selectFunction={() => { deleteMessage(id, data) }} />
                                                             </MenuOptions>
                                                         </Menu>
 
@@ -1930,7 +2080,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     flex: 1, flexGrow: 1,
                                     marginLeft: 2, paddingLeft: 10,
                                     justifyContent: "center", alignItems: "flex-start",
-                                    borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
+                                    borderWidth: 2, borderColor: "#777", borderRadius: 5, backgroundColor: "#fff",
                                 }}>
                                     <View style={{
                                         flexDirection: "row", justifyContent: "flex-start", alignItems: "center",
@@ -1946,7 +2096,9 @@ const ChatScreen = ({ navigation, route }) => {
                                         borderWidth: 0, marginLeft: 15, marginRight: 8,
                                         flexDirection: "column", justifyContent: "flex-start", alignItems: "center",
                                     }}>
-                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {}}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                                        uploadImageAsync(imageData.uri)
+                                    }}
                                         style={{
                                             flex: 1, flexGrow: 1,
                                             paddingHorizontal: 12,
@@ -1991,7 +2143,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     width: 40, height: 40,
                                     marginLeft: 5, marginRight: 10,
                                     backgroundColor: "#fff",
-                                    borderRadius: 10, borderWidth: 2, borderColor: "#777",
+                                    borderRadius: 10, borderWidth: 2.5, borderColor: "#777",
                                     justifyContent: "center", alignItems: "center",
                                 }}>
                                     <Entypo name="images" size={25} color="#777" />
@@ -2000,7 +2152,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
                                     paddingLeft: 15,
                                     justifyContent: "flex-start", alignItems: "flex-end",
-                                    borderWidth: 0, borderColor: "#333", borderRadius: 5, backgroundColor: "#fff",
+                                    borderWidth: 2, borderColor: "#777", borderRadius: 5, backgroundColor: "#fff",
                                     borderBottomRightRadius: 21, borderTopRightRadius: 21,
                                 }}>
                                     <View style={{
@@ -2020,9 +2172,9 @@ const ChatScreen = ({ navigation, route }) => {
                                         />
                                         <TouchableOpacity activeOpacity={0.7} onPress={sendMessage}
                                             style={{
-                                                height: 42, width: "25%",
+                                                height: 44, width: "25%",
                                                 backgroundColor: (input.length > 0) ? ("#1174EC") : ("#98B0D4"),
-                                                borderRadius: 21,
+                                                borderRadius: 18,
                                                 justifyContent: "center", alignItems: "center",
                                             }}>
                                             <Text style={{
