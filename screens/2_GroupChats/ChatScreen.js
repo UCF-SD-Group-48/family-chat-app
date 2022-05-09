@@ -603,6 +603,14 @@ const ChatScreen = ({ navigation, route }) => {
         }
     }
 
+    useLayoutEffect(() => {
+        setTimeout(() => {
+            rerender();
+            console.log("logggg");
+          }, 1750)
+        return () => {setColorBlack("#000")};
+    }, [route, messages]);
+
     //TODO push or not push (currently not push and refresh params)
     const enterTopic = async (id, name) => {
 
@@ -2106,7 +2114,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     }}
                                         style={{
                                             flex: 1, flexGrow: 1,
-                                            paddingHorizontal: 12,
+                                            paddingHorizontal: 30,
                                             backgroundColor: "#1174EC",
                                             borderRadius: 15,
                                             justifyContent: "center", alignItems: "center",
@@ -2117,7 +2125,7 @@ const ChatScreen = ({ navigation, route }) => {
                                             textAlign: "center",
                                             color: "white",
                                         }}>
-                                            {"Send Image in Chat"}
+                                            {"Send Image"}
                                         </Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => {setImageData(null)}}
