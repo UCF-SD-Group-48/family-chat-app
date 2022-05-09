@@ -876,6 +876,11 @@ const ChatScreen = ({ navigation, route }) => {
         setImageData(null);
         setImageFinishedUploading(true);
      }
+     const viewImage = (id, data) => {
+        if (data.imageUID != undefined && data.imageUID != "") {
+            navigation.push("ViewImage", { topicId, topicName, groupId, groupName, imageUID: data.imageUID, messageId: id, messageData: data, pinMap });
+        }
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -1965,7 +1970,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                                 }}>
                                                                     {/* {messageImages != undefined && messageImages[data.imageUID] != undefined && */}
                                                                     {(data.imageUID != undefined && data.imageUID != "") &&
-                                                                        <TouchableOpacity activeOpacity={0.7} onPress={() => {console.log("Pressed image"); rerender();}}
+                                                                        <TouchableOpacity activeOpacity={0.7} onPress={() => {console.log("Pressed image"); rerender(); viewImage(id, data)}}
                                                                         style={{
                                                                             width: (data.imageDimensions.width < data.imageDimensions.height)
                                                                                 ? ((data.imageDimensions.width/data.imageDimensions.height) * 150)
