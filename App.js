@@ -71,6 +71,7 @@ import ViewEvent from './screens/2_GroupChats/ViewEvent';
 import Polls from './screens/2_GroupChats/Polls';
 import AddPoll from './screens/2_GroupChats/AddPoll';
 import ViewPoll from './screens/2_GroupChats/ViewPoll';
+import Images from './screens/2_GroupChats/Images';
 import ViewImage from './screens/2_GroupChats/ViewImage';
 import GroupInvite from './screens/2_GroupChats/GroupInvite';
 import GroupMembers from './screens/2_GroupChats/GroupMembers';
@@ -225,6 +226,7 @@ const GroupChatsStackScreen = () => (
     <Stack.Screen name='Polls' component={Polls} />
     <Stack.Screen name='AddPoll' component={AddPoll} />
     <Stack.Screen name='ViewPoll' component={ViewPoll} />
+    <Stack.Screen name='Images' component={Images} />
     <Stack.Screen name='ViewImage' component={ViewImage} />
     <Stack.Screen name='GroupInvite' component={GroupInvite} />
     <Stack.Screen name='GroupMembers' component={GroupMembers} />

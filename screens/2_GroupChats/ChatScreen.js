@@ -677,7 +677,7 @@ const ChatScreen = ({ navigation, route }) => {
             }
         }
         else {
-            navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
+            navigation.push(place, { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, pinMap });
         }
         setOverlay(false);
         setCopiedText(false)
@@ -1070,14 +1070,14 @@ const ChatScreen = ({ navigation, route }) => {
                                 <View style={{
                                     width: "100%", marginBottom: 20,
                                     backgroundColor: "#DFD7CE0",
-                                    justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                    justifyContent: "space-evenly", alignItems: "center", flexDirection: "row",
                                 }}>
                                     {/* Pins */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => { navigateTo("Pins") }}
                                         style={[styles.featuresOuterView,
                                         {
                                             shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
-                                            shadowRadius: 3, shadowOpacity: 0.25, marginRight: 20,
+                                            shadowRadius: 3, shadowOpacity: 0.25, marginRight: 0,
                                         }]}>
                                         <Entypo name="pin" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
@@ -1090,7 +1090,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         style={[styles.featuresOuterView,
                                         {
                                             shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
-                                            shadowRadius: 3, shadowOpacity: 0.25,
+                                            shadowRadius: 3, shadowOpacity: 0.25, marginRight: 0,
                                         }]}>
                                         <Entypo name="megaphone" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
@@ -1098,6 +1098,18 @@ const ChatScreen = ({ navigation, route }) => {
                                         </Text>
                                     </TouchableOpacity>
 
+                                    {/* Images */}
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Images")}
+                                        style={[styles.featuresOuterView,
+                                    {
+                                        shadowColor: "#000", shadowOffset: {width: 0, height: 5},
+                                        shadowRadius: 3, shadowOpacity: 0.25,
+                                    }]}>
+                                        <Entypo name="images" size={30} color="#333" />
+                                        <Text style={styles.featuresText}>
+                                            Images
+                                        </Text>
+                                    </TouchableOpacity>
 
                                 </View>
 
@@ -1120,14 +1132,14 @@ const ChatScreen = ({ navigation, route }) => {
                                 {/* Feature Icons 2 */}
                                 <View style={{
                                     width: "100%", backgroundColor: "#0cf0",
-                                    justifyContent: "center", alignItems: "center", flexDirection: "row",
+                                    justifyContent: "space-evenly", alignItems: "center", flexDirection: "row",
                                 }}>
                                     {/* Events */}
                                     <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("Events")}
                                         style={[styles.featuresOuterView,
                                         {
                                             shadowColor: "#000", shadowOffset: { width: 0, height: 5 },
-                                            shadowRadius: 3, shadowOpacity: 0.25, marginRight: 20,
+                                            shadowRadius: 3, shadowOpacity: 0.25, marginRight: 0,
                                         }]}>
                                         <Entypo name="calendar" size={30} color="#333" />
                                         <Text style={styles.featuresText}>
@@ -1153,18 +1165,13 @@ const ChatScreen = ({ navigation, route }) => {
                                         </Text>
                                     </TouchableOpacity>
                                     {/* </View> */}
-
-                                    {/* Images */}
-                                    {/* <View style={[styles.featuresOuterViewDisabled,
-                                    {
-                                        // shadowColor: "#000", shadowOffset: {width: 0, height: 5},
-                                        // shadowRadius: 3, shadowOpacity: 0.25,
-                                    }]}>
-                                        <Entypo name="images" size={30} color="#777" />
-                                        <Text style={styles.featuresTextDisabled}>
-                                            Images
+                                    
+                                    <View style={[styles.featuresOuterView, {backgroundColor: "#0000", borderColor: "#0000"}]}>
+                                    <Entypo name="bar-graph" size={30} color="#3330" />
+                                        <Text style={[styles.featuresText, {color: "#0000"}]}>
+                                            text
                                         </Text>
-                                    </View> */}
+                                    </View>
 
                                     {/* Lists */}
                                     {/* <View style={[styles.featuresOuterViewDisabled,
@@ -1791,41 +1798,64 @@ const ChatScreen = ({ navigation, route }) => {
                                                 }} />
                                                 <View style={styles.textContainer}>
 
-                                                    <Menu>
-                                                        <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
-                                                            <View style={{
-                                                                minHeight: 30, marginLeft: 5,
-                                                                flex: 1, flexGrow: 1, justifyContent: "center",
-                                                                backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
-                                                                borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
-                                                            }}>
+                                                <Menu style={{ flex: 1, }}>
+                                                    <MenuTrigger text='' triggerOnLongPress={true} customStyles={triggerStyles}>
+                                                        <View activeOpacity={0.7} //onPress={rerender}
+                                                        style={{
+                                                            minHeight: 30, marginLeft: 5,
+                                                            flex: 1, flexGrow: 1, justifyContent: "center",
+                                                            alignItems: ((data.imageUID != undefined && data.imageUID != "")) ? ("center") : ("justify-start"),
+                                                            backgroundColor: ((data.ownerUID == auth.currentUser.uid) ? '#EFEAE2' : '#F8F8F8'),
+                                                            borderWidth: 1.3, borderColor: '#9D9D9D', borderRadius: 5,
+                                                        }}>
+                                                            {/* {messageImages != undefined && messageImages[data.imageUID] != undefined && */}
+                                                            {(data.imageUID != undefined && data.imageUID != "") &&
+                                                                <TouchableOpacity activeOpacity={0.7} onPress={() => {console.log("Pressed image"); rerender(); viewImage(id, data)}}
+                                                                style={{
+                                                                    width: (data.imageDimensions.width < data.imageDimensions.height)
+                                                                        ? ((data.imageDimensions.width/data.imageDimensions.height) * 150)
+                                                                        : ("70%"), maxWidth: "70%",
+                                                                    height: (data.imageDimensions.width > data.imageDimensions.height)
+                                                                        ? ((data.imageDimensions.height/data.imageDimensions.width) * ((screenWidth*.9 - 50)*.70))
+                                                                        : (150),
+                                                                    marginHorizontal: 5, marginVertical: 5,
+                                                                }}>
+                                                                    <Image source={{
+                                                                        uri: messageImages[data.imageUID],
+                                                                    }} style={{width: "100%", height: "100%",
+                                                                        borderRadius: 5, borderWidth: 2, borderColor: "#777",}}/>
+                                                                </TouchableOpacity>
+                                                            }
+                                                            {(messageImages == undefined || messageImages[data.imageUID] == undefined) &&
                                                                 <Text style={styles.text}>
                                                                     {data.message}
-                                                                </Text>
-                                                            </View>
-                                                        </MenuTrigger>
-                                                        <MenuOptions style={{
-                                                            borderRadius: 12, backgroundColor: "#fff",
-                                                        }}
-                                                            customStyles={{
-                                                                optionsContainer: {
-                                                                    borderRadius: 15, backgroundColor: "#666",
-                                                                },
-                                                            }}>
-                                                            <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
-                                                                isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
-                                                                selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
-                                                            <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM || (getPinData(id) != null)}
-                                                                selectFunction={() => { addPinFromMessage(data, id) }} />
-                                                            <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic'
-                                                                hide={data.ownerUID != auth.currentUser.uid || topicName != "General" || (getTopicData(id) != null)}
-                                                                selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, originalMessageUID: id }) }} />
-                                                            <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
-                                                            <IconOption value={5} iconName='edit' text='Edit' hide={true} />
-                                                            <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
-                                                                selectFunction={() => { deleteMessage(id, data) }} />
-                                                        </MenuOptions>
-                                                    </Menu>
+                                                                </Text>}
+                                                        </View>
+                                                    </MenuTrigger>
+                                                    <MenuOptions style={{
+                                                        borderRadius: 12, backgroundColor: "#fff",
+                                                    }}
+                                                        customStyles={{
+                                                            optionsContainer: {
+                                                                borderRadius: 15, backgroundColor: "#666",
+                                                            },
+                                                        }}>
+                                                        <IconOption value={1} iconName='heart' text={(data.membersWhoReacted.some(u => (u == auth.currentUser.uid))) ? 'Unlike' : "Like"}
+                                                            isSpacer={data.ownerUID == auth.currentUser.uid} isLast={data.ownerUID != auth.currentUser.uid}
+                                                            selectFunction={() => { likeMessage(id, data.membersWhoReacted) }} />
+                                                        <IconOption value={2} iconName='bookmark' text='Pin Message' hide={data.ownerUID != auth.currentUser.uid || isDM
+                                                                || (getPinData(id) != null) || (data.imageUID != undefined && data.imageUID != "")}
+                                                            selectFunction={() => { addPinFromMessage(data, id) }} />
+                                                        <IconOption value={3} isSpacer={true} iconName='message-circle' text='Make into Topic' //arrow-right
+                                                            hide={data.ownerUID != auth.currentUser.uid || topicName != "General"
+                                                                || (getTopicData(id) != null) || (data.imageUID != undefined && data.imageUID != "")}
+                                                            selectFunction={() => { navigation.push("CreateTopic", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber, originalMessageUID: id }) }} />
+                                                        <IconOption value={4} isSpacer={true} iconName='alert-triangle' text='Make into Alert' hide={true} />
+                                                        <IconOption value={5} iconName='edit' text='Edit' hide={true} />
+                                                        <IconOption value={6} isLast={true} isDestructive={true} iconName='trash' text='Delete' hide={data.ownerUID != auth.currentUser.uid}
+                                                            selectFunction={() => { deleteMessage(id, data) }} />
+                                                    </MenuOptions>
+                                                </Menu>
                                                 </View>
 
                                                 {/* PIN */}
@@ -2149,7 +2179,7 @@ const ChatScreen = ({ navigation, route }) => {
                             </View>
                         ) : (
                             <View style={styles.footer}>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                                {!isDM && <TouchableOpacity activeOpacity={0.7} onPress={() => {
                                     pickImage();
                                 }}
                                 style={{
@@ -2160,7 +2190,7 @@ const ChatScreen = ({ navigation, route }) => {
                                     justifyContent: "center", alignItems: "center",
                                 }}>
                                     <Entypo name="images" size={25} color="#777" />
-                                </TouchableOpacity>
+                                </TouchableOpacity>}
                                 <View style={{
                                     width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
                                     paddingLeft: 15,
@@ -2217,7 +2247,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     featuresOuterView: {
-        width: 120,
+        width: 100,
         paddingHorizontal: 5, paddingVertical: 15,
         borderRadius: 10, borderWidth: 1, borderColor: "#777",
         backgroundColor: "#fff",
