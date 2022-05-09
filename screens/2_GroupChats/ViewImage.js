@@ -184,36 +184,43 @@ const ViewImage = ({ navigation, route }) => {
 
     const saveImage = async () => {
 
-        FileSystem.downloadAsync(
-            url,
-            FileSystem.cacheDirectory+""+topicId+"/"+imageUID+".jpg"
-        )
-        .then(({ uri }) => {
-            console.log('Finished downloading to ', uri);
-
-            MediaLibrary.saveToLibraryAsync(uri)
-            .then(() => {
-                console.log("Image Saved successfully");
-                Alert.alert(
-                    "Image Saved",
-                    "Image Downloaded Successfully",
-                )
+        await FileSystem.makeDirectoryAsync(FileSystem.cacheDirectory+""+topicId);
+        const dir = await FileSystem.getInfoAsync(FileSystem.cacheDirectory+""+topicId);
+        if(dir.exists) {
+            FileSystem.downloadAsync(
+                url,
+                FileSystem.cacheDirectory+""+topicId+"/"+imageUID+".jpg"
+            )
+            .then(({ uri }) => {
+                MediaLibrary.saveToLibraryAsync(uri)
+                .then(() => {
+                    Alert.alert(
+                        "Image Saved",
+                        "Image Downloaded Successfully",
+                    )
+                })
+                .catch(error => {
+                    console.log("error 1");
+                    console.error(error);
+                    Alert.alert(
+                        "Error",
+                        "There was a problem downloading the image",
+                    )
+                })
             })
             .catch(error => {
+                console.log("error 2");
                 console.error(error);
                 Alert.alert(
                     "Error",
                     "There was a problem downloading the image",
                 )
-            })
-        })
-        .catch(error => {
-            console.error(error);
-            Alert.alert(
-                "Error",
-                "There was a problem downloading the image",
-            )
-        });
+            });
+        }
+        else {
+            console.log("dir does not exist");
+            console.log("dir = "+JSON.stringify(dir));
+        }
         
     }
 
