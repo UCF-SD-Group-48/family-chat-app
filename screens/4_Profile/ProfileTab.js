@@ -23,6 +23,7 @@ import {
   Dimensions,
   Linking,
 } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import {
   Avatar,
   Button,
@@ -80,6 +81,7 @@ import LoginText from '../../components/LoginText';
 import UserPrompt from '../../components/UserPrompt';
 import { set } from 'react-native-reanimated';
 import MyView from '../../components/MyView';
+import generatePushNotificationsToken from '../../helperFunctions/generatePushNotificationsToken';
 
 // *************************************************************
 
@@ -230,17 +232,67 @@ const ProfileTab = ({ navigation }) => {
 
   const [pushNotifications, setPushNotifications] = useState();
 
-  const togglePushNotifications = () => {
+  const togglePushNotifications = async () => {
     const newBooleanValue = !pushNotifications;
-    setPushNotifications(newBooleanValue);
 
-    const pushNotificationsQuery = db
-      .collection('users')
+    if(newBooleanValue == true) {
+      //ask user to enable push notifications here
+      const token = await generatePushNotificationsToken();
+      if(!token) {
+        return;
+      }
+
+      // update profile
+      db.collection('users')
       .doc(auth.currentUser.uid)
       .update({
-        pushNotificationEnabled: newBooleanValue
+        expoPushToken: token,
+        pushNotificationEnabled: newBooleanValue,
+      })
+      .then(() => {
+        //then set push notifications to true if it was a success
+        setPushNotifications(newBooleanValue);
       })
       .catch((error) => console.log(error));
+
+    }
+    else { //delete expo push token, then set to false
+      // update profile
+      db.collection('users')
+      .doc(auth.currentUser.uid)
+      .update({
+        expoPushToken: "",
+        pushNotificationEnabled: newBooleanValue,
+      })
+      .then(() => {
+        //then set push notifications to false if it was a success
+        setPushNotifications(newBooleanValue);
+      })
+      .catch((error) => console.log(error));
+    }
+  }
+
+  const sendNotification = async () => {
+    
+    db.collection("users").doc(auth.currentUser.uid).get()
+			.then((userDoc) => {
+      const lastReadTime = userDoc.data().topicMap["P7o2KPs5LLzv4YGf1LwA"]; //getting lastReadTime
+
+      const topicMapString = "topicMap.P7o2KPs5LLzv4YGf1LwA"; //overwriting lastReadTime
+      db.collection("users").doc(auth.currentUser.uid).update({
+        [topicMapString]: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Message from JJ",
+          body: "Hey, let's all go to the beach this saturday so we can hangout!",
+          data: { url: "exp://10.186.150.80:19000/--/" // "familychat://"
+          +"chat/P7o2KPs5LLzv4YGf1LwA/General/2g68B8ueZ8BK4UByDywd/Jackson Household/ij0T9Wp64ThYxOXvRi9Hr240KWJ3/green/3/"+lastReadTime.seconds, },
+        },
+        trigger: { seconds: 3 },
+      });
+    })
   }
 
   const [userSnapshotData, setUserSnapshotData] = useState({});
@@ -291,8 +343,9 @@ const ProfileTab = ({ navigation }) => {
     navigate.replace('AppTutorial');
   }
 
-  const visitFAQ = () => {
-    Linking.openURL('https://www.familychat.app/#FAQ');
+  const visitFAQ = async () => {
+    // Linking.openURL('https://www.familychat.app/#FAQ');
+    sendNotification();
   }
 
   const contactDeveloper = () => {
@@ -1193,8 +1246,8 @@ const ProfileTab = ({ navigation }) => {
           />
 
           <Text style={styles.applicationSettingsText}>
-            {/* Application Settings: */}
-            Informational Help:
+            Application Settings:
+            {/* Informational Help: */}
           </Text>
 
           <Divider
@@ -1204,7 +1257,7 @@ const ProfileTab = ({ navigation }) => {
           />
         </View>
 
-        {/* <View style={[styles.toggleBox, { borderBottomWidth: 1, borderColor: '#C4C4C4' }]}>
+        <View style={[styles.toggleBox, { borderBottomWidth: 1, borderColor: '#C4C4C4' }]}>
           <Text style={pushNotifications ? styles.toggleBoxTextEnabled : styles.toggleBoxTextDisabled}>
             Push Notifications
           </Text>
@@ -1213,7 +1266,7 @@ const ProfileTab = ({ navigation }) => {
             onValueChange={() => togglePushNotifications()}
           />
         </View>
-        <View style={styles.toggleBox}>
+        {/* <View style={styles.toggleBox}>
           <View style={styles.toggleBoxLeftHalf}>
             <Text style={pushNotifications ? styles.toggleBoxTextEnabled : styles.toggleBoxTextDisabled}>
               Discoverable
@@ -1232,7 +1285,7 @@ const ProfileTab = ({ navigation }) => {
           />
         </View> */}
 
-        <View style={styles.buttonExternalsContainer}>
+        <View style={[styles.buttonExternalsContainer, {marginTop: 20,}]}>
           {/* 
           <TouchableOpacity
             activeOpacity={0.75}

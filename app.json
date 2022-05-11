@@ -5,6 +5,7 @@
     "version": "1.1.1",
     "slug": "family-chat-app",
     "orientation": "portrait",
+    "scheme": "familychat",
     "splash": {
       "image": "./assets/speechBubble.png",
       "resizeMode": "cover",
@@ -40,7 +41,7 @@
         {
           "photosPermission": "Allow $(FamilyChat) to access your photos.",
           "savePhotosPermission": "Allow $(FamilyChat) to save photos.",
-          "isAccessMediaLocationEnabled": true
+          "isAccessMediaLocationEnabled": "true"
         }
       ]
     ]

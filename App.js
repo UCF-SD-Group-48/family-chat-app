@@ -11,7 +11,11 @@ import {
   Text,
   View,
   SafeAreaView,
+  // Linking,
 } from 'react-native';
+import * as Linking from 'expo-linking';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 import {
   Alert,
   Avatar,
@@ -111,6 +115,7 @@ import {
 } from './firebase';
 import firebase from 'firebase/compat/app';
 import { Tab } from 'react-native-elements/dist/tab/Tab';
+import { Timestamp } from 'firebase/firestore';
 
 const Stack = createStackNavigator();
 const TabStack = createBottomTabNavigator();
@@ -260,9 +265,76 @@ const ProfileStackScreen = () => (
   </Stack.Navigator>
 )
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+const prefix = Linking.createURL('/');
+// familychat://
+// exp://10.186.150.80:19000/--/
+// chat/topicId/topicName/groupId/groupName/groupOwner/color/coverImageNumber/lastReadTimeSeconds
+
+const config = {
+  screens: {
+    TabStack: {
+      initialRouteName: "HomeTab",
+      screens: {
+        Home: {
+          initialRouteName: "HomeTab",
+          screens: {
+            HomeTab: {path: 'home', exact: true},
+          },
+        },
+        Groups: {
+          initialRouteName: "GroupsTab",
+          screens: {
+            GroupsTab: "GroupsTab",
+            Chat: {exact: true,
+              path: 'chat/:topicId/:topicName/:groupId/:groupName/:groupOwner/:color/:coverImageNumber/:lastReadTimeSeconds',
+              parse: {
+                lastReadTimeSeconds: seconds => {new Timestamp(seconds, 0)}
+              }
+            },
+            Banners: 'banners',
+            Events: 'events',
+            Polls: 'polls',
+          },
+        },
+        Messages: {
+          screens: {
+            DMsTab: 'dms',
+          },
+        },
+        Profile: {
+          screens: {
+            ProfileTab: 'profile',
+          },
+        },
+      },
+    },
+  },
+};
+const linking = {
+  prefixes: [prefix],
+  config: config,
+};
 
 // Screen definitions for the application.
 export default function App() {
+
+  React.useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log("data = "+JSON.stringify(response.notification.request.content.data))
+      const url = response.notification.request.content.data.url;
+      Linking.openURL(url);
+    });
+    return () => subscription.remove();
+  }, []);
+
   return (
     <MenuProvider customStyles={{
       backdrop: {
@@ -270,7 +342,7 @@ export default function App() {
       },
     }}>
       <SafeAreaView style={styles.safeAreaContainer}>
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
           {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
           <Stack.Navigator>
 
