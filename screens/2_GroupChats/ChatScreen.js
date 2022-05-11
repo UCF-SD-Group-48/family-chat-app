@@ -98,7 +98,7 @@ const ChatScreen = ({ navigation, route }) => {
     const [messages, setMessages] = useState([])
     const [topicSelectionEnabled, setTopicSelection] = useState(true);
     const [topics, setTopics] = useState([]);
-    const [messageSenders, setMessageSenders] = useState({})
+    const [members, setMembers] = useState({})
     const [messageImages, setMessageImages] = useState({})
     const [imageFinishedUploading, setImageFinishedUploading] = useState(true)
     const [overlayIsVisible, setOverlay] = useState(false);
@@ -243,55 +243,41 @@ const ChatScreen = ({ navigation, route }) => {
         // }
     }, [messages, isFocused]);
 
-    const messageMapFunction = async () => {
-        
-        let messageSenders = [];
-        let imageMessages = [];
-        messages.map((message) => {
-            (messageSenders.indexOf(message.data.ownerUID) === -1)
-                ? (messageSenders.push(message.data.ownerUID))
-                : ({}),
-            (message.data.imageUID != undefined)
-                ? (imageMessages.push(message.data.imageUID))
-                : ({})
-        });
+    const populateMembers = async () => {
 
-        let senders = {};
-        for (const uid of messageSenders) {
+        //get all members -store in array
+        let memberList = [];
+        if(isDM) {
+            const chat = await db.collection('chats').doc(topicId).get();
+            memberList = chat.data().members;
+        }
+        else {
+            const topic = await db.collection('groups').doc(groupId).collection("topics").doc(topicId).get();
+            memberList = topic.data().members;
+        }
+
+        //get all member's data -store in map
+        let membersMap = {};
+        for (const uid of memberList) {
             await db.collection('users').doc(uid).get()
-                .then((result) => {
+            .then((result) => {
 
-                    senders[uid] = result.data();
+                membersMap[uid] = result.data();
 
-                });
+            });
         }
-        setMessageSenders(senders);
 
-        for (const uid of imageMessages) {
-            //download image
-            const imagePathUrl = topicId+"/"+uid+".jpg";
-            const imageRef = ref(storage, imagePathUrl);
-            if(imageRef) {
-                getDownloadURL(imageRef)
-                .then((url) => {
-                    const messageImagesTemp = messageImages;
-                    messageImagesTemp[uid] = url;
-                    // console.log("messageImagesTemp = "+JSON.stringify(messageImagesTemp));
-                    setMessageImages(messageImagesTemp);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-            }
-        }
+        //setMembers to created map
+        setMembers(membersMap);
     }
     useEffect(() => {
-        messageMapFunction();
-
-        // if (messages != null && messages.length != undefined && messages.length > 0 && lastMessageTime == null) {
-        //     setLastMessageTime(messages[messages.length - 1].data.timestamp);
-        // }
-
+        populateMembers();
+        return () => {setMembers({})}
+    }, [topicId]);
+    
+    useEffect(() => {
+        reloadImages();
+        return () => {setMessageImages({})}
     }, [messages]);
 
     const reloadImages = async () => {
@@ -323,7 +309,7 @@ const ChatScreen = ({ navigation, route }) => {
         if(imageFinishedUploading == true) {
             reloadImages();
         }
-
+        return () => {setMessageImages({})}
     }, [imageFinishedUploading]);
 
     setImageFinishedUploading
@@ -591,6 +577,10 @@ const ChatScreen = ({ navigation, route }) => {
 
     const toggleTopicSelection = () => {
         setTopicSelection(!topicSelectionEnabled);
+
+        // if(members) {
+        //     console.log("members = "+JSON.stringify(members));
+        // }
     };
 
     const rerender = () => {
@@ -712,14 +702,14 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     const getString = (uid) => {
-        if (messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
-            return (messageSenders[uid.toString()].firstName + " " + messageSenders[uid.toString()].lastName);
+        if (members != undefined && uid != undefined && members[uid.toString()] != undefined) {
+            return (members[uid.toString()].firstName + " " + members[uid.toString()].lastName);
         }
         else return "";
     }
     const getPfp = (uid) => {
-        if (messageSenders != undefined && uid != undefined && messageSenders[uid.toString()] != undefined) {
-            return (messageSenders[uid.toString()].pfp);
+        if (members != undefined && uid != undefined && members[uid.toString()] != undefined) {
+            return (members[uid.toString()].pfp);
         }
         else return "";
     }
