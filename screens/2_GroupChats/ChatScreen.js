@@ -37,7 +37,6 @@ import {
 import { useIsFocused } from "@react-navigation/native";
 import { HoldItem } from 'react-native-hold-menu';
 
-// Imports for: Expo
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
@@ -75,6 +74,11 @@ import uuid from 'react-native-uuid';
 
 // *************************************************************
 
+// Imports for: Expo
+// import { Expo } from 'expo-server-sdk';
+import { getFunctions, httpsCallable } from "firebase/functions";
+
+
 const screenHeight = Dimensions.get('screen').height;
 const screenWidth = Dimensions.get('screen').width;
 const overlayOffset = -screenHeight + 350 + Constants.statusBarHeight * 2 + 44 * 2 + 55 * 2 - 2;
@@ -99,6 +103,7 @@ const ChatScreen = ({ navigation, route }) => {
     const [topicSelectionEnabled, setTopicSelection] = useState(true);
     const [topics, setTopics] = useState([]);
     const [members, setMembers] = useState({})
+    const [memberUIDs, setMemberUIDs] = useState({})
     const [messageImages, setMessageImages] = useState({})
     const [imageFinishedUploading, setImageFinishedUploading] = useState(true)
     const [overlayIsVisible, setOverlay] = useState(false);
@@ -269,6 +274,7 @@ const ChatScreen = ({ navigation, route }) => {
 
         //setMembers to created map
         setMembers(membersMap);
+        setMemberUIDs(memberList);
     }
     useEffect(() => {
         populateMembers();
@@ -542,6 +548,44 @@ const ChatScreen = ({ navigation, route }) => {
                 phoneNumber: auth.currentUser.phoneNumber,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(), // adapts to server's timestamp and adapts to regions
             }); // id passed in when we entered the chatroom
+
+            // Make the messages
+            let messages = [];
+            let users = [];
+            for (let uid of memberUIDs) {
+                console.log("uid = "+uid);
+                if(uid != auth.currentUser.uid
+                    && members[uid] != undefined && members[uid].expoPushToken != undefined && members[uid].expoPushToken != "") {
+                    
+                    messages.push({
+                        to: members[uid].expoPushToken,
+                        sound: "default",
+                        title: members[auth.currentUser.uid].firstName+" sent a message in \""+topicName+"\"",
+                        body: trimmedInput,
+                        data: { url: "familychat://"+"chat/"
+                        +topicId+"/"+topicName
+                        +"/"+groupId+"/"+groupName+"/"
+                        +groupOwner+"/"+color+"/"+coverImageNumber+"/"
+                        +members[uid].topicMap[topicId].seconds, },
+                    })
+
+                    users.push({
+                        [members[uid].expoPushToken]: uid,
+                    })
+                }
+            }
+            // console.log("(within CS.js) messages = "+JSON.stringify(messages));
+            // console.log("(within CS.js) users = "+JSON.stringify(users));
+
+            // const functions = getFunctions();
+            // const sendPushNotification = httpsCallable(functions, 'sendPushNotification');
+            // // send to cloud function
+            // // http://localhost:5001/family-chat-app-48/us-central1/sendPushNotification?messages=[{"to":"ExponentPushToken[rEhLFwBuiwPQ7PFfeOH0HT]","sound":"default","title":"Freddy%20sent%20a%20message%20in%20\"General\"","body":"Test2","data":{"url":"familychat://chat/P7o2KPs5LLzv4YGf1LwA/General/2g68B8ueZ8BK4UByDywd/Jackson%20Household/ij0T9Wp64ThYxOXvRi9Hr240KWJ3/green/3/1652311167"}}]
+            // sendPushNotification({messages: messages})
+            // .then((result) => {
+
+            // });
+
         }
 
         if(lastReadTimeState != null && lastReadTimeState != undefined) {
