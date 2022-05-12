@@ -77,6 +77,7 @@ import uuid from 'react-native-uuid';
 // Imports for: Expo
 // import { Expo } from 'expo-server-sdk';
 import { getFunctions, httpsCallable } from "firebase/functions";
+// import { firebase } from '@react-native-firebase/functions';
 
 
 const screenHeight = Dimensions.get('screen').height;
@@ -576,6 +577,23 @@ const ChatScreen = ({ navigation, route }) => {
             }
             // console.log("(within CS.js) messages = "+JSON.stringify(messages));
             // console.log("(within CS.js) users = "+JSON.stringify(users));
+
+            //double check the link
+            // https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification
+            const requestUrl = "https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification?messages="
+                +JSON.stringify(messages)+"&users="+JSON.stringify(users)
+
+            // call cloud function
+            fetch(requestUrl, {
+                method: 'POST',
+            })
+            .then((response) => {
+                console.log("Success, response = "+JSON.stringify(response));
+            })
+            .catch((error) => {
+                console.log("error");
+                console.error(error);
+            });
 
             // const functions = getFunctions();
             // const sendPushNotification = httpsCallable(functions, 'sendPushNotification');
