@@ -578,12 +578,12 @@ const ChatScreen = ({ navigation, route }) => {
             // console.log("(within CS.js) messages = "+JSON.stringify(messages));
             // console.log("(within CS.js) users = "+JSON.stringify(users));
 
-            //double check the link
+            //sending the messages through the cloud function
             // https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification
             const requestUrl = "https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification?messages="
                 +JSON.stringify(messages)+"&users="+JSON.stringify(users)
 
-            // call cloud function
+            // calling cloud function
             fetch(requestUrl, {
                 method: 'POST',
             })
@@ -594,16 +594,6 @@ const ChatScreen = ({ navigation, route }) => {
                 console.log("error");
                 console.error(error);
             });
-
-            // const functions = getFunctions();
-            // const sendPushNotification = httpsCallable(functions, 'sendPushNotification');
-            // // send to cloud function
-            // // http://localhost:5001/family-chat-app-48/us-central1/sendPushNotification?messages=[{"to":"ExponentPushToken[rEhLFwBuiwPQ7PFfeOH0HT]","sound":"default","title":"Freddy%20sent%20a%20message%20in%20\"General\"","body":"Test2","data":{"url":"familychat://chat/P7o2KPs5LLzv4YGf1LwA/General/2g68B8ueZ8BK4UByDywd/Jackson%20Household/ij0T9Wp64ThYxOXvRi9Hr240KWJ3/green/3/1652311167"}}]
-            // sendPushNotification({messages: messages})
-            // .then((result) => {
-
-            // });
-
         }
 
         if(lastReadTimeState != null && lastReadTimeState != undefined) {
@@ -1972,6 +1962,46 @@ const ChatScreen = ({ navigation, route }) => {
                                             paddingHorizontal: 10,
                                             backgroundColor: "#6660",
                                         }}>
+                                            {/* date separator */}
+                                            <MyView hide={
+                                                index > messages.length - 1
+                                                || data.timestamp == null
+                                                || (index < messages.length - 1
+                                                    && messages[index+1] != undefined && messages[index+1].data != undefined
+                                                    && (messages[index+1].data.timestamp.seconds - data.timestamp.seconds < 24 * 60 * 60)
+                                                    && (messages[index+1].data.timestamp.toDate().getDay()
+                                                        == data.timestamp.toDate().getDay()))
+                                            }
+                                            //show if difference is greater than a day
+                                            //  or if the seconds converted to dates and then the day is different
+                                            //hide if the difference is less than a day
+                                            //  and the day is the same //TODO change something to day
+                                                style={{
+                                                    height: 50, width: "100%", backgroundColor: "#aef0", marginBottom: 15,
+                                                    justifyContent: "flex-start", alignItems: 'center', flexDirection: "row",
+                                                }}>
+                                                <Divider width={1} color={"#555"}
+                                                    style={{
+                                                        minWidth: "10%",
+                                                        flexGrow: 1, flex: 1,
+                                                    }} />
+                                                <Text style={{
+                                                    textAlign: "center",
+                                                    fontSize: 18,
+                                                    fontWeight: '500',
+                                                    color: '#555', marginHorizontal: 10
+                                                }}>
+                                                    {/* {"April 20th"} */}
+                                                    {data.timestamp.toDate().toLocaleDateString("en-US", {
+                                                        month: "short", day: "numeric",})}
+                                                </Text>
+                                                <Divider width={1} color={"#555"}
+                                                    style={{
+                                                        minWidth: "10%",
+                                                        flexGrow: 1, flex: 1,
+                                                    }} />
+                                            </MyView>
+
                                             {/* 
 
                                             hide if lastReadTime == undefined or null

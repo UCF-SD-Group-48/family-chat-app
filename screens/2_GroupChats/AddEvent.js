@@ -84,6 +84,9 @@ const AddEvent = ({ navigation, route }) => {
     const [endDate, setEndDate] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
 
+    const [members, setMembers] = useState({})
+    const [memberUIDs, setMemberUIDs] = useState({})
+
     // Start
     const updateStartDate = (event, date) => {
         setStartDate(date);
@@ -159,6 +162,48 @@ const AddEvent = ({ navigation, route }) => {
             viewedBy: [],
         });
 
+        // Make the notification messages
+        let messages = [];
+        let users = [];
+        for (let uid of memberUIDs) {
+            if(uid != auth.currentUser.uid
+                && members[uid] != undefined && members[uid].expoPushToken != undefined && members[uid].expoPushToken != "") {
+                
+                messages.push({
+                    to: members[uid].expoPushToken,
+                    sound: "default",
+                    title: members[auth.currentUser.uid].firstName+" created an event in \""+topicName+"\"",
+                    body: title,
+                    data: { url: "familychat://"+"chat/"
+                    +topicId+"/"+topicName
+                    +"/"+groupId+"/"+groupName+"/"
+                    +groupOwner+"/"+color+"/"+coverImageNumber+"/"
+                    +members[uid].topicMap[topicId].seconds, },
+                })
+
+                users.push({
+                    [members[uid].expoPushToken]: uid,
+                })
+            }
+        }
+
+        //sending the messages through the cloud function
+        // https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification
+        const requestUrl = "https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification?messages="
+            +JSON.stringify(messages)+"&users="+JSON.stringify(users)
+
+        // calling cloud function
+        fetch(requestUrl, {
+            method: 'POST',
+        })
+        .then((response) => {
+            console.log("Success, response = "+JSON.stringify(response));
+        })
+        .catch((error) => {
+            console.log("error");
+            console.error(error);
+        });
+
         // clears input
         setTitle("");
         setLocation("");
@@ -166,6 +211,32 @@ const AddEvent = ({ navigation, route }) => {
 
         navigation.navigate("Chat", { topicId, topicName, groupId, groupName, groupOwner, color, coverImageNumber });
     };
+
+    const populateMembers = async () => {
+
+        //get all members -store in array
+        const topic = await db.collection('groups').doc(groupId).collection("topics").doc(topicId).get();
+        let memberList = topic.data().members;
+
+        //get all member's data -store in map
+        let membersMap = {};
+        for (const uid of memberList) {
+            await db.collection('users').doc(uid).get()
+            .then((result) => {
+
+                membersMap[uid] = result.data();
+
+            });
+        }
+
+        //setMembers to created map
+        setMembers(membersMap);
+        setMemberUIDs(memberList);
+    }
+    useEffect(() => {
+        populateMembers();
+        return () => {setMembers({})}
+    }, []); //route?
 
     return (
         <SafeAreaView style={styles.container}>

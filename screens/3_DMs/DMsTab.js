@@ -245,7 +245,7 @@ const DirectMessagesTab = ({ navigation }) => {
     if (!snapshot.empty) {
       for (const doc of snapshot.docs) {
         if (doc.data().members.some(u => (u == auth.currentUser.uid))) {
-          navigation.push("Chat", { topicId: doc.id, topicName: "DM", isDM: true, otherUserFullName: searchedUser.name });
+          navigation.push("Chat", { topicId: doc.id, topicName: "DMs", isDM: true, otherUserFullName: searchedUser.name });
           return;
         }
       }
@@ -486,7 +486,7 @@ const DirectMessagesTab = ({ navigation }) => {
             setIsLoadingDMs(true);
             setLoadingKey(id);
             const otherUserFullName = getSenderName(id)
-            setTimeout(() => navigation.push("Chat", { topicId: id, topicName: "DM", isDM: true, otherUserFullName }));
+            setTimeout(() => navigation.push("Chat", { topicId: id, topicName: "DMs", isDM: true, otherUserFullName }));
           }}
             style={[{
               width: "95%", height: 70,
