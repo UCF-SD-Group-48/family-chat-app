@@ -621,7 +621,7 @@ const AddPoll = ({ navigation, route }) => {
                                 fontWeight: '700',
                                 color: 'black',
                                 }}>
-                                {"Date:"}
+                                {"End Date:"}
                             </Text>
                             <View style={{
                                     width: "100%", minHeight: 30,
@@ -654,7 +654,7 @@ const AddPoll = ({ navigation, route }) => {
                                 fontWeight: '700',
                                 color: 'black',
                                 }}>
-                                {"Time:"}
+                                {"End Time:"}
                             </Text>
                             <View style={{
                                     width: "100%", minHeight: 30,

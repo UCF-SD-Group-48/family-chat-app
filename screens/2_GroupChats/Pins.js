@@ -149,10 +149,11 @@ const Pins = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View
-                style={{
+            <ScrollView
+                contentContainerStyle={{
+                    width: "100%",
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-                    flex: 1, flexGrow: 1,
+                    flex: 0, flexGrow: 1, borderWidth: 0, paddingBottom: 75,
                 }}>
 
                 {/* History Text */}
@@ -216,7 +217,7 @@ const Pins = ({ navigation, route }) => {
                         </Text>
                         <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
                     </MyView>
-                    <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
+                    <View style={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
                         {pins.map(({ id, data }) => (
                             <TouchableOpacity activeOpacity={0.7} onPress={() => {viewPin(id, data, getMessage(data.originalMessageUID))}} key={id}
                                 style={[
@@ -296,9 +297,9 @@ const Pins = ({ navigation, route }) => {
                                 </View>
                             </TouchableOpacity>
                         ))}
-                    </ScrollView>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     )
 }

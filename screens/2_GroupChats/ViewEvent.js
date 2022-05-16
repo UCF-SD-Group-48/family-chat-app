@@ -267,18 +267,20 @@ const ViewEvent = ({ navigation, route }) => {
                     }]}>
                     <View style={{
                         justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                        borderWidth: 0, borderRadius: 10, marginLeft: 15, marginVertical: 15,
+                        backgroundColor: "#FDF4D4",
                     }}>
                         <Entypo name="calendar" size={25} color="#333" style={{
-                            paddingVertical: 15, paddingHorizontal: 15,
+                            paddingVertical: 7, paddingLeft: 15, paddingRight: 12,
                         }}/>
                         <Text style={{
-                            paddingLeft: 5,
+                            paddingRight: 20,
                             textAlign: 'left',
                             fontSize: 16,
                             fontWeight: '700',
                             color: "#222",
                             }}>
-                            {"Event Details:"}
+                            {"Event Details"}
                         </Text>
                     </View>
                     {(eventData.ownerUID === auth.currentUser.uid) ? (

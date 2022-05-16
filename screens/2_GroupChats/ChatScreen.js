@@ -563,11 +563,13 @@ const ChatScreen = ({ navigation, route }) => {
                         sound: "default",
                         title: members[auth.currentUser.uid].firstName+" sent a message in \""+topicName+"\"",
                         body: trimmedInput,
-                        data: { url: "familychat://"+"chat/"
-                        +topicId+"/"+topicName
-                        +"/"+groupId+"/"+groupName+"/"
-                        +groupOwner+"/"+color+"/"+coverImageNumber+"/"
-                        +members[uid].topicMap[topicId].seconds, },
+                        data: (isDM)
+                            ? ({ url: "familychat://"+"dms" })
+                            : ({ url: "familychat://"+"chat/"
+                                +topicId+"/"+topicName
+                                +"/"+groupId+"/"+groupName+"/"
+                                +groupOwner+"/"+color+"/"+coverImageNumber+"/"
+                                +members[uid].topicMap[topicId].seconds }),
                     })
 
                     users.push({
@@ -1966,7 +1968,8 @@ const ChatScreen = ({ navigation, route }) => {
                                             <MyView hide={
                                                 index > messages.length - 1
                                                 || data.timestamp == null
-                                                || (index < messages.length - 1
+                                                || (data.timestamp != null
+                                                    && index < messages.length - 1
                                                     && messages[index+1] != undefined && messages[index+1].data != undefined
                                                     && (messages[index+1].data.timestamp.seconds - data.timestamp.seconds < 24 * 60 * 60)
                                                     && (messages[index+1].data.timestamp.toDate().getDay()
@@ -1992,7 +1995,7 @@ const ChatScreen = ({ navigation, route }) => {
                                                     color: '#555', marginHorizontal: 10
                                                 }}>
                                                     {/* {"April 20th"} */}
-                                                    {data.timestamp.toDate().toLocaleDateString("en-US", {
+                                                    {data.timestamp && data.timestamp.toDate().toLocaleDateString("en-US", {
                                                         month: "short", day: "numeric",})}
                                                 </Text>
                                                 <Divider width={1} color={"#555"}
@@ -2329,7 +2332,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     featuresOuterView: {
-        width: 100,
+        width: 90,
         paddingHorizontal: 5, paddingVertical: 15,
         borderRadius: 10, borderWidth: 1, borderColor: "#777",
         backgroundColor: "#fff",

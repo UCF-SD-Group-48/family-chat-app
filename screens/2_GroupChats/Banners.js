@@ -168,11 +168,11 @@ const Banners = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View
-                style={{
+            <ScrollView
+                contentContainerStyle={{
                     width: "100%",
                     justifyContent: "flex-start", alignItems: "center", flexDirection: "column",
-                    flex: 1, flexGrow: 1,
+                    flex: 0, flexGrow: 1, borderWidth: 0, paddingBottom: 75,
                 }}>
                 {/* Add Banner Button */}
                 <TouchableOpacity onPress={addBanner} activeOpacity={0.7}
@@ -261,7 +261,7 @@ const Banners = ({ navigation, route }) => {
                         </Text>
                         <MaterialCommunityIcons name="dots-horizontal" size={65} color="#999" />
                     </MyView>
-                    <ScrollView contentContainerStyle={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
+                    <View style={{ paddingTop: 0, width: "100%", paddingLeft: 20, }}>
                         {banners.map(({ id, data }) => (
                             <TouchableOpacity activeOpacity={0.7} onPress={() => {viewBanner(id, data)}} key={id}
                                 style={[
@@ -341,9 +341,9 @@ const Banners = ({ navigation, route }) => {
                                 </View>
                             </TouchableOpacity>
                         ))}
-                    </ScrollView>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
             {/* <View style={{
                 width: "100%", minHeight: 100,
                 borderTopWidth: 2, backgroundColor: "#ffc0",

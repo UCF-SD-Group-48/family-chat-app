@@ -272,7 +272,7 @@ const Events = ({ navigation, route }) => {
                                     <View style={{
                                         minWidth: 26, minHeight: 26,
                                         borderColor: "#000", borderWidth: 0, backgroundColor: "#afc0",
-                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 2,
+                                        paddingVertical: 0, paddingHorizontal: 0, marginRight: 15, borderRadius: 15, borderWidth: 0,
                                         flex: 1, flexGrow: 0, justifyContent: "center", alignItems: "center",
                                     }}>
                                         {/* <MaterialCommunityIcons name="crown" size={16} color="#333" style={{paddingLeft: 1}} /> */}

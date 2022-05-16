@@ -200,18 +200,20 @@ const ViewPin = ({ navigation, route }) => {
                         }]}>
                         <View style={{
                             justifyContent: "space-between", alignItems: "center", flexDirection: "row",
+                            borderWidth: 0, borderRadius: 10, marginLeft: 15, marginVertical: 15,
+                            backgroundColor: "#F7F5F3",
                         }}>
                             <Entypo name="pin" size={25} color="#333" style={{
-                                paddingVertical: 15, paddingHorizontal: 15,
+                                paddingVertical: 7, paddingLeft: 15, paddingRight: 10,
                             }}/>
                             <Text style={{
-                                paddingLeft: 5,
+                                paddingRight: 15,
                                 textAlign: 'left',
                                 fontSize: 16,
                                 fontWeight: '700',
                                 color: "#222",
                                 }}>
-                                {"Pin Details:"}
+                                {"Pin Details"}
                             </Text>
                         </View>
                         {(pinData.ownerUID === auth.currentUser.uid) ? (

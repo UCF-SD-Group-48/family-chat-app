@@ -306,7 +306,10 @@ const config = {
         },
         Messages: {
           screens: {
-            DMsTab: 'dms',
+            DMsTab: {
+              exact: true,
+              path: 'dms'
+            },
           },
         },
         Profile: {
