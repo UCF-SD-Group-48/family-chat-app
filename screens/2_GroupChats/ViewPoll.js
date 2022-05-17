@@ -154,7 +154,7 @@ const ViewPoll = ({ navigation, route }) => {
 
         setMax(getMax(pollData));
         
-
+        return () => {setMax(0)}
     }, [navigation]);
 
     // const getBannerOwner = async () => {

@@ -142,7 +142,7 @@ const CreateTopic = ({ navigation, route }) => {
         }
 
         return () => {
-            getGroupMembers();
+            setGroupMembers([]);
         }
     }, [])
 
@@ -245,7 +245,7 @@ const CreateTopic = ({ navigation, route }) => {
         setIsLoading(false);
 
         return () => {
-            setIsLoading();
+            setIsLoading(false);
         };
     }, [isFocused]);
 

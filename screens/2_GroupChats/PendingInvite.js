@@ -67,7 +67,7 @@ const PendingInvite = ({navigation}) => {
         } else {
             alert("Not a valid user")
         }
-
+        return () => {setInvite([])}
     }, []);
 
   return (

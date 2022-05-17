@@ -113,6 +113,7 @@ const ViewImage = ({ navigation, route }) => {
 
     useEffect(() => {
         setContent(route.params.message || "");
+        return () => {setContent("")}
     }, [route]);
 
     useEffect(() => {
@@ -127,6 +128,7 @@ const ViewImage = ({ navigation, route }) => {
                 console.error(error);
             });
         }
+        return () => {setUrl(undefined)}
     }, [route]);
 
     useLayoutEffect(() => {
@@ -172,6 +174,7 @@ const ViewImage = ({ navigation, route }) => {
 
         getImageOwner();
 
+        return () => {setImageOwner([])}
     }, [navigation]);
 
     const getImageOwner = async () => {

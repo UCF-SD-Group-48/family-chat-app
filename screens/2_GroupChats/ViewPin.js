@@ -152,6 +152,7 @@ const ViewPin = ({ navigation, route }) => {
 
         getPinOwner();
 
+        return () => {setPinOwner([])}
     }, [navigation]);
 
     const getPinOwner = async () => {

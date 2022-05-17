@@ -123,6 +123,7 @@ const DirectMessagesTab = ({ navigation }) => {
 
   useEffect(() => {
     messageSendersHelper();
+    return () => {setMessageSenders({}); setMessageContents({})}
   }, [chats, isFocused]);
 
   const getSenderName = (id) => {
@@ -159,6 +160,7 @@ const DirectMessagesTab = ({ navigation }) => {
         searchForUser();
       }
     }
+    return () => {setSearchResults(""); setSearchedUser({})}
   }, [searchedUserPhoneNumber]);
 
   const searchForUser = async () => {

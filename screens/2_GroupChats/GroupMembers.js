@@ -117,6 +117,7 @@ const GroupMembers = ({ navigation, route }) => {
         const value = fetchData();
         if(value != null) {
         }
+        return () => {setMembers([])}
     }, [memberIDs]);
 
 

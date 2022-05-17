@@ -89,6 +89,7 @@ const RegisterPhone = ({ navigation, route }) => {
 
     useEffect(() => {
         setSubmitButtonDisabled((phoneNumber.length === 10) ? false : true);
+        return () => {setSubmitButtonDisabled(true)}
     }, [phoneNumber]);
 
     const [shownPhoneText, setShownPhoneText] = useState('');

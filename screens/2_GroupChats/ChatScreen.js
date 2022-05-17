@@ -231,6 +231,7 @@ const ChatScreen = ({ navigation, route }) => {
         if(isFocused == false) {
             onLeave();
         }
+        return () => {}
     }, [isFocused]);
 
     const onLeave = async () => {
@@ -244,9 +245,9 @@ const ChatScreen = ({ navigation, route }) => {
     useEffect(() => {
 
         pinMapFunction();
-        // return () => {
-        //     setPinMap();
-        // }
+        return () => {
+            setPinMap({});
+        }
     }, [messages, isFocused]);
 
     const populateMembers = async () => {
@@ -279,7 +280,7 @@ const ChatScreen = ({ navigation, route }) => {
     }
     useEffect(() => {
         populateMembers();
-        return () => {setMembers({})}
+        return () => {setMembers({}); setMemberUIDs({})}
     }, [topicId]);
     
     useEffect(() => {
@@ -323,6 +324,7 @@ const ChatScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         setOverlay(false);
+        return () => {setOverlay(false)}
     }, [route]);
 
     useEffect(() => {
@@ -335,6 +337,7 @@ const ChatScreen = ({ navigation, route }) => {
 
         resetTopicMap();
 
+        return () => {setTopicMap({})}
     }, [topics, isFocused]);
 
     const resetTopicMap = () => {

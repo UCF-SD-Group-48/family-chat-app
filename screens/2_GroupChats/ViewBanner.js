@@ -148,7 +148,7 @@ const ViewBanner = ({ navigation, route }) => {
 
         getBannerOwner();
         
-
+        return () => {setBannerOwner([])}
     }, [navigation]);
 
     const getBannerOwner = async () => {

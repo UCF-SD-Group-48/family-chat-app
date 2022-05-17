@@ -66,6 +66,7 @@ const PhoneSuccess = ({ navigation, route }) => {
 
     useEffect(() => {
         setCreateButtonDisabled(lastName.length > 0 ? false : true);
+		return () => {setCreateButtonDisabled(true)}
     }, email);
 
 	const goBackToPreviousScreen = () => {

@@ -115,10 +115,10 @@ const CreateGroup_2_Members = ({ navigation, route }) => {
 		//  setSearchResults();
 		//  setSearchedUser({});
 		// }
-		// return () => {
-		// 	setSearchResults();
-		// 	setSearchedUser({});
-		// }
+		return () => {
+			setSearchResults("");
+			setSearchedUser({});
+		}
 	}, searchedUserPhoneNumber);
 
 	const checkTheMembersList = (searchedUserPhoneNumber) => {

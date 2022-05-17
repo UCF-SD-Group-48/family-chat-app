@@ -113,6 +113,7 @@ const VerifyPhone = ({ navigation, route }) => {
 
     useEffect(() => {
         setConfirmButtonDisabled((verificationCode.length === 6) ? false : true);
+        return () => {setConfirmButtonDisabled(true)}
     }, [verificationCode]);
 
     const [shownPhoneText, setShownPhoneText] = useState('');

@@ -96,6 +96,7 @@ const AddPin = ({ navigation, route }) => {
 
         getPinOwner();
 
+        return () => {setPinOwner([])}
     }, [navigation]);
 
     const getPinOwner = async () => {

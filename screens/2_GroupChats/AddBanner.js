@@ -78,6 +78,7 @@ const AddBanner = ({ navigation, route }) => {
 
     useEffect(() => {
         setContent(route.params.message || "");
+        return () => {setContent("")}
     }, [route]);
 
     useLayoutEffect(() => {
@@ -192,7 +193,7 @@ const AddBanner = ({ navigation, route }) => {
     }
     useEffect(() => {
         populateMembers();
-        return () => {setMembers({})}
+        return () => {setMembers({}); setMemberUIDs({})}
     }, []); //route?
 
     return (

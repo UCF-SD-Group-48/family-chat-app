@@ -300,7 +300,8 @@ const TopicSettings = ({ navigation, route }) => {
             setNewTopicName();
             setNewTopicOwner();
             setIsLoadingEditContent();
-            setGroupMembers([])
+            setGroupMembers([]);
+            setTopicObjectForPassing({});
         };
     }, [isFocused, toggleOverlay])
 
@@ -327,6 +328,7 @@ const TopicSettings = ({ navigation, route }) => {
             setIsLoadingEditContent();
             setIsLoadingEditButton();
             setIsLoadingSaveButton();
+            setGroupColor('');
         };
     }, [isFocused]);
 

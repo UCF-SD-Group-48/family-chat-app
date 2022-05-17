@@ -94,6 +94,7 @@ const ActiveEvents = ({ navigation, route }) => {
 
         setCurrentTime(new Date());
 
+        return () => {setCurrentTime()}
     }, [navigation]);
 
     const getCurrentTime = () => {

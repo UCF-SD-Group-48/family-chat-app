@@ -59,6 +59,7 @@ const UserAuth = ({ navigation }) => {
 
     useEffect(() => {
         setLoginButtonDisabled((phoneNumber.length === 10) ? false : ((phoneNumber.length === 3) ? ((phoneNumber === '000') ? false : true) : true));
+        return () => {setLoginButtonDisabled(true)}
     }, [phoneNumber]);
 
     const [shownPhoneText, setShownPhoneText] = useState('');

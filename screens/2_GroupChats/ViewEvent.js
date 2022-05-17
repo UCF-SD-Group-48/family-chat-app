@@ -234,7 +234,7 @@ const ViewEvent = ({ navigation, route }) => {
 
         getEventOwner();
         
-
+        return () => {setEventOwner([])}
     }, [navigation]);
 
     const getEventOwner = async () => {

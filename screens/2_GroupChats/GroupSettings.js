@@ -225,6 +225,7 @@ const GroupSettings = ({ navigation, route }) => {
             setTopicCount(0);
             unsubscribe;
             setGroupOwnerName('');
+            setNewGroupName('');
             setGroupMembers([]);
             setNewGroupOwner('');
             setSearchResults('')
@@ -242,6 +243,7 @@ const GroupSettings = ({ navigation, route }) => {
                 searchForUser();
             }
         }
+        return () => {setSearchResults(""); setSearchedUser({})}
     }, searchedUserPhoneNumber);
 
     const [searchedUserPhoneNumber, setSearchedUserPhoneNumber] = useState('');

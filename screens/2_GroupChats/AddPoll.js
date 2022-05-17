@@ -239,7 +239,7 @@ const AddPoll = ({ navigation, route }) => {
     }
     useEffect(() => {
         populateMembers();
-        return () => {setMembers({})}
+        return () => {setMembers({}); setMemberUIDs({})}
     }, []); //route?
 
     const addChoice = () => {

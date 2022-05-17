@@ -116,6 +116,7 @@ const Pins = ({ navigation, route }) => {
     
     useEffect(() => {
         getMessages();
+        return () => {setMessages({})}
     }, [pins]);
 
     const getMessages = async () => {
