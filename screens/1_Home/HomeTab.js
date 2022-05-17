@@ -20,6 +20,7 @@ import {
   TouchableWithoutFeedback,
   View,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import {
   Alert,
@@ -183,6 +184,19 @@ const HomeTab = ({ navigation, route }) => {
   const [numEvents, setNumEvents] = useState(0);
   const [numPolls, setNumPolls] = useState(0);
   const [groupsWithMissedMessages, setGroupsWithMissedMessages] = useState(0);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setIsContentLoading(true);
+    getAllData()
+    .then(() => {
+      setRefreshing(false);
+      setIsContentLoading(false);
+    });
+  }, []);
+
 
   // const [toggleWindowWidth, setToggleWindowWidth] = useState(() => {
   //   const windowWidth = Dimensions.get('window').width;
@@ -486,6 +500,12 @@ const HomeTab = ({ navigation, route }) => {
           justifyContent: "flex-start",
           flexDirection: "column",
         }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <View style={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
@@ -728,7 +748,7 @@ const HomeTab = ({ navigation, route }) => {
               )}
             </View>
           }
-          {((groupToData.length > 0) && (groupsWithMissedMessages > 0))
+          {((groupToData.length > 0) && (groupsWithMissedMessages > 0) && !isContentLoading)
             ? <View>
               {groupToData.map((group, index) => (
                 <MyView hide={group.topics.length <= 0} key={group.groupID} style={[{
@@ -741,6 +761,7 @@ const HomeTab = ({ navigation, route }) => {
                   shadowColor: "#000", shadowOffset: { width: 0, height: 3 },
                   shadowRadius: 3, shadowOpacity: 0.4,
                 }]}>
+                <View>
                   {/* Top Border */}
                   <View style={{
                     width: "100%", minHeight: 10, backgroundColor: "#CFC5BA",
@@ -946,7 +967,7 @@ const HomeTab = ({ navigation, route }) => {
 
                     </View>
                   ))}
-
+                </View>
                 </MyView>
               ))}
             </View>
