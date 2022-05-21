@@ -199,7 +199,7 @@ const PhoneSuccess = ({ navigation, route }) => {
     };
 
 	return (
-		<SafeAreaView>
+		<SafeAreaView style={{backgroundColor: "#FCF3EA"}}>
 			<KeyboardAwareScrollView style={styles.container}>
 				<View style={styles.title}>
 					<Text style={{ fontSize: 30, textAlign: 'center', fontWeight: 'bold' }}>

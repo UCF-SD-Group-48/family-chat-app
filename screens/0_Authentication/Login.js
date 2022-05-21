@@ -124,7 +124,7 @@ const Login = ({ navigation }) => {
     }
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{backgroundColor: "#FCF3EA"}}>
             <ScrollView>
                 <View style={styles.container}>
 

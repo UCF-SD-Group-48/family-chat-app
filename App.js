@@ -34,6 +34,8 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 // ----------------- Temporary visual space for Front-End component testing.
 // import FrontEndTestSpace from './screens/deprecated/FrontEndTestSpace';
 
@@ -119,6 +121,9 @@ import { Timestamp } from 'firebase/firestore';
 
 const Stack = createStackNavigator();
 const TabStack = createBottomTabNavigator();
+const getInsets = () => {
+  return useSafeAreaInsets();
+}
 
 const TabStackScreen = () => (
   <TabStack.Navigator
@@ -126,7 +131,7 @@ const TabStackScreen = () => (
     screenOptions={({ route }) => ({
       initialRouteName: "Home",
       headerShown: false,
-      tabBarStyle: { height: 80 },
+      tabBarStyle: { height: (80 + getInsets().bottom) },
       backgroundColor: 'red',
       tabBarLabelStyle: {
         fontSize: 15,
@@ -339,12 +344,13 @@ export default function App() {
   }, []);
 
   return (
+    <SafeAreaProvider>
     <MenuProvider customStyles={{
       backdrop: {
         opacity: 0.35, backgroundColor: "#000"
       },
     }}>
-      <SafeAreaView style={styles.safeAreaContainer}>
+      {/* <SafeAreaView style={styles.safeAreaContainer}> */}
         <NavigationContainer linking={linking}>
           {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
           <Stack.Navigator>
@@ -362,8 +368,9 @@ export default function App() {
 
           </Stack.Navigator>
         </NavigationContainer>
-      </SafeAreaView>
+      {/* </SafeAreaView> */}
     </MenuProvider>
+    </SafeAreaProvider>
   );
 }
 

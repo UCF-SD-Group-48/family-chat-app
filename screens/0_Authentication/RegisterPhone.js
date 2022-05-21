@@ -136,7 +136,7 @@ const RegisterPhone = ({ navigation, route }) => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{backgroundColor: "#FCF3EA"}}>
             <ScrollView style={styles.container}>
 
                 <FirebaseRecaptchaVerifierModal

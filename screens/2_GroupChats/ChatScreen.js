@@ -79,6 +79,7 @@ import uuid from 'react-native-uuid';
 import { getFunctions, httpsCallable } from "firebase/functions";
 // import { firebase } from '@react-native-firebase/functions';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const screenHeight = Dimensions.get('screen').height;
 const screenWidth = Dimensions.get('screen').width;
@@ -98,6 +99,10 @@ const ChatScreen = ({ navigation, route }) => {
     const lastReadTime = route.params.lastReadTime;
     const [lastReadTimeState, setLastReadTimeState] = useState(lastReadTime);
     const [generalId, setgeneralId] = useState('');
+
+    const [inputHeight, setInputHeight] = useState(-1);
+    const [initialInputHeight, setInitialInputHeight] = useState(0);
+    const insets = useSafeAreaInsets();
 
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([])
@@ -211,6 +216,22 @@ const ChatScreen = ({ navigation, route }) => {
     const triggerStyles = {
         triggerTouchable: { underlayColor: "#0000" },
     }
+
+
+    //if groupName has "%20", change it to space char
+    useLayoutEffect(() => {
+        if(RegExp("%20").test(groupName) && isDM != true) {
+            let newGroupName = groupName.replace("%20", " ");
+            navigation.setParams({
+                groupName: newGroupName,
+            })
+            navigation.setOptions({
+                title: newGroupName,
+            })
+        }
+        return () => {}
+    }, []);
+
 
     const pinMapFunction = async () => {
         let pins = {};
@@ -634,10 +655,6 @@ const ChatScreen = ({ navigation, route }) => {
 
     const toggleTopicSelection = () => {
         setTopicSelection(!topicSelectionEnabled);
-
-        // if(members) {
-        //     console.log("members = "+JSON.stringify(members));
-        // }
     };
 
     const rerender = () => {
@@ -938,14 +955,17 @@ const ChatScreen = ({ navigation, route }) => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={(inputHeight + 14) + (initialInputHeight - inputHeight) + insets.bottom - 4}
+            contentContainerStyle={{flex: 1}}
+            style={{ flex: 1, backgroundColor: 'white' }}>
             <StatusBar style='dark' />
-            <KeyboardAvoidingView
+            {/* <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}
-                keyboardVerticalOffset={90}
-            >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                // keyboardVerticalOffset={90}
+            > */}
+                {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
                     <>
                         {/* Overlay */}
                         <Overlay isVisible={overlayIsVisible} onBackdropPress={toggleOverlay}
@@ -2279,7 +2299,15 @@ const ChatScreen = ({ navigation, route }) => {
                                 }}>
                                     <Entypo name="images" size={25} color="#777" />
                                 </TouchableOpacity>}
-                                <View style={{
+                                <View 
+                                onLayout={(event)=> {
+                                    const {x, y, height, width} = event.nativeEvent.layout;
+                                    if(inputHeight == -1) {
+                                        setInitialInputHeight(height);
+                                    }
+                                    setInputHeight(height);
+                                }}
+                                style={{
                                     width: 50, minHeight: 10, maxHeight: 250, flex: 1, flexGrow: 1, flexDirection: "column",
                                     paddingLeft: 15,
                                     justifyContent: "flex-start", alignItems: "flex-end",
@@ -2323,9 +2351,9 @@ const ChatScreen = ({ navigation, route }) => {
                             </View>
                         )}
                     </>
-                </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                {/* </TouchableWithoutFeedback> */}
+            {/* </KeyboardAvoidingView> */}
+        </KeyboardAvoidingView>
     );
 };
 
@@ -2518,7 +2546,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        paddingHorizontal: 5, paddingVertical: 7, marginTop: 3,
+        paddingHorizontal: 5, paddingVertical: 8, marginTop: 3,
         backgroundColor: "#bbb",
     },
     textInput: {

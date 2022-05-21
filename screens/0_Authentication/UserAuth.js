@@ -115,7 +115,7 @@ const UserAuth = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{backgroundColor: "#FCF3EA"}}>
             <ScrollView
             contentContainerStyle={{alignItems: "center",}}
             style={styles.container}

@@ -170,7 +170,7 @@ const GroupsTab = ({ navigation }) => {
 	}, [isFocused]);
 
 	return (
-		<SafeAreaView style={styles.mainContainer}>
+		<View style={styles.mainContainer}>
 		<StatusBar style='dark' />
 			<ScrollView
 				width={'100%'}
@@ -337,7 +337,7 @@ const GroupsTab = ({ navigation }) => {
 				</View>
 
 			</ScrollView>
-		</SafeAreaView >
+		</View>
 	)
 }
 
