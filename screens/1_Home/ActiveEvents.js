@@ -124,6 +124,7 @@ const ActiveEvents = ({ navigation, route }) => {
                         borderRadius: 25, borderWidth: 0, borderColor: "#777",
                         paddingBottom: 0, marginBottom: 5, flex: 0, flexGrow: 0,
                         },]}>
+                        <View>
 
                         {/* Group Image & Title */}
                         <View style={{
@@ -222,6 +223,7 @@ const ActiveEvents = ({ navigation, route }) => {
                             style={{
                                 flexDirection: "row", justifyContent: "center", alignItems: "flex-start",
                             }}>
+                                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "flex-start", }}>
                                 <Feather name="clock" size={18} color="#3D8D04" />
                                 <Text numberOfLines={1} style={{
                                 fontSize: 16,
@@ -239,11 +241,13 @@ const ActiveEvents = ({ navigation, route }) => {
                                     {hour: "numeric", minute: "2-digit", })) : ("")}
                                 
                                 </Text>
+                                </View>
                             </MyView>
                             <MyView hide={currentTime === undefined || event.data.startTime.seconds > (currentTime.valueOf()/1000)}
                             style={{
                                 flexDirection: "row", justifyContent: "center", alignItems: "flex-start",
                             }}>
+                                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "flex-start", }}>
                                 <Feather name="clock" size={18} color="#DF3D23" />
                                 <Text numberOfLines={1} style={{
                                 fontSize: 16,
@@ -261,6 +265,7 @@ const ActiveEvents = ({ navigation, route }) => {
                                     {hour: "numeric", minute: "2-digit", })) : ("")}
                                 
                                 </Text>
+                                </View>
                             </MyView>
                         </View>
                         <Icon
@@ -276,7 +281,7 @@ const ActiveEvents = ({ navigation, route }) => {
                         {(index != groupToData.length-1) ? (
                         <Divider width={1} color={"#999"} style={{minWidth: "100%", marginTop: 5,}}/>
                         ) : (null)}
-
+                    </View>
                     </MyView>
                     ))}
                 </View>

@@ -300,8 +300,8 @@ const TopicSettings = ({ navigation, route }) => {
             setNewTopicName();
             setNewTopicOwner();
             setIsLoadingEditContent();
-            setGroupMembers([]);
-            setTopicObjectForPassing({});
+            // setGroupMembers([]);
+            // setTopicObjectForPassing({});
         };
     }, [isFocused, toggleOverlay])
 

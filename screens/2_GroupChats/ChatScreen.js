@@ -267,7 +267,7 @@ const ChatScreen = ({ navigation, route }) => {
 
         pinMapFunction();
         return () => {
-            setPinMap({});
+            // setPinMap();
         }
     }, [messages, isFocused]);
 
@@ -306,7 +306,9 @@ const ChatScreen = ({ navigation, route }) => {
     
     useEffect(() => {
         reloadImages();
-        return () => {setMessageImages({})}
+        return () => {
+            // setMessageImages({})
+        }
     }, [messages]);
 
     const reloadImages = async () => {
@@ -320,17 +322,22 @@ const ChatScreen = ({ navigation, route }) => {
         for (const uid of imageMessages) {
             //download image
             const imagePathUrl = topicId+"/"+uid+".jpg";
-            const imageRef = ref(storage, imagePathUrl);
-            if(imageRef) {
-                getDownloadURL(imageRef)
-                .then((url) => {
-                    const messageImagesTemp = messageImages;
-                    messageImagesTemp[uid] = url;
-                    setMessageImages(messageImagesTemp);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
+            try {
+                const imageRef = ref(storage, imagePathUrl);
+                if(imageRef) {
+                    getDownloadURL(imageRef)
+                    .then((url) => {
+                        const messageImagesTemp = messageImages;
+                        messageImagesTemp[uid] = url;
+                        setMessageImages(messageImagesTemp);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+                }
+            }
+            catch(error){
+                console.log(error);
             }
         }
     }
@@ -670,7 +677,6 @@ const ChatScreen = ({ navigation, route }) => {
     useLayoutEffect(() => {
         setTimeout(() => {
             rerender();
-            console.log("logggg");
           }, 1750)
         return () => {setColorBlack("#000")};
     }, [route, messages]);
@@ -927,26 +933,75 @@ const ChatScreen = ({ navigation, route }) => {
         const imageRef = ref(storage, topicFolder);
         uploadBytes(imageRef, blob).then((snapshot) => {
             console.log('Uploaded a blob or file!');
+
+            //send message
+            db.collection('chats').doc(topicId).collection('messages').add({
+                editedTime: null,
+                membersWhoReacted: [],
+                message: "",
+                ownerUID: auth.currentUser.uid,
+                phoneNumber: auth.currentUser.phoneNumber,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                imageUID: imageUID,
+                imageDimensions: {
+                    width: imageData.width,
+                    height: imageData.height,
+                },
+            });
+            setImageData(null);
+            setImageFinishedUploading(true);
+
+            // Make the messages
+            let messages = [];
+            let users = [];
+            for (let uid of memberUIDs) {
+                console.log("uid = "+uid);
+                if(uid != auth.currentUser.uid
+                    && members[uid] != undefined && members[uid].expoPushToken != undefined && members[uid].expoPushToken != "") {
+                    
+                    messages.push({
+                        to: members[uid].expoPushToken,
+                        sound: "default",
+                        title: members[auth.currentUser.uid].firstName+" sent an image in \""+topicName+"\"",
+                        body: "",
+                        data: (isDM)
+                            ? ({ url: "familychat://"+"dms" })
+                            : ({ url: "familychat://"+"chat/"
+                                +topicId+"/"+topicName
+                                +"/"+groupId+"/"+groupName+"/"
+                                +groupOwner+"/"+color+"/"+coverImageNumber+"/"
+                                +members[uid].topicMap[topicId].seconds }),
+                    })
+
+                    users.push({
+                        [members[uid].expoPushToken]: uid,
+                    })
+                }
+            }
+
+            //sending the messages through the cloud function
+            // https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification
+            const requestUrl = "https://us-central1-family-chat-app-48.cloudfunctions.net/sendPushNotification?messages="
+                +JSON.stringify(messages)+"&users="+JSON.stringify(users)
+
+            // calling cloud function
+            fetch(requestUrl, {
+                method: 'POST',
+            })
+            .then((response) => {
+                console.log("Success, response = "+JSON.stringify(response));
+            })
+            .catch((error) => {
+                console.log("error");
+                console.error(error);
+            });
+
+            if(lastReadTimeState != null && lastReadTimeState != undefined) {
+                setLastReadTimeState(undefined);
+            }
         });
 
         blob.close();
-
-        //send message
-        db.collection('chats').doc(topicId).collection('messages').add({
-            editedTime: null,
-            membersWhoReacted: [],
-            message: "",
-            ownerUID: auth.currentUser.uid,
-            phoneNumber: auth.currentUser.phoneNumber,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            imageUID: imageUID,
-            imageDimensions: {
-                width: imageData.width,
-                height: imageData.height,
-            },
-        });
-        setImageData(null);
-        setImageFinishedUploading(true);
      }
      const viewImage = (id, data) => {
         if (data.imageUID != undefined && data.imageUID != "") {
@@ -2320,7 +2375,7 @@ const ChatScreen = ({ navigation, route }) => {
                                         <TextInput placeholder={"Type a message..."} onChangeText={(text) => setInput(text)} value={input}
                                             multiline={true} maxLength={200} //onSubmitEditing={sendMessage}
                                             style={{
-                                                minHeight: 20, maxWidth: "70%",
+                                                minHeight: 20, width: "70%",
                                                 marginBottom: 12, marginTop: 5,
                                                 backgroundColor: "#fff",
                                                 textAlign: 'left',
