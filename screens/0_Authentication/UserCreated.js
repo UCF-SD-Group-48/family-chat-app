@@ -88,6 +88,7 @@ const UserCreated = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={{backgroundColor: "#FCF3EA"}}>
+      <StatusBar style='dark' />
       <ScrollView style={styles.container}>
         <View style={styles.title}>
           <Text style={{ fontSize: 25, textAlign: 'center', fontWeight: 'bold' }}>

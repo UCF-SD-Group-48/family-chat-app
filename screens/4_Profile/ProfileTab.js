@@ -209,7 +209,17 @@ const ProfileTab = ({ navigation }) => {
 
   }
 
-  const signOutUser = () => {
+  const signOutUser = async () => {
+    
+    await db.collection('users')
+    .doc(auth.currentUser.uid)
+    .update({
+      expoPushToken: "",
+      pushNotificationEnabled: false,
+      shouldPromptForPushNotifications: true,
+    })
+    .catch((error) => console.log(error));
+
     auth.signOut().then(() => {
       navigation.navigate('UserAuth')
     })

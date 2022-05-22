@@ -84,6 +84,7 @@ import { Timestamp } from 'firebase/firestore';
 
 // *************************************************************
 import helpers from '../../helperFunctions/helpers';
+import generatePushNotificationsToken from '../../helperFunctions/generatePushNotificationsToken';
 import { set } from 'react-native-reanimated';
 
 // First tab of the application: HOME.
@@ -270,6 +271,53 @@ const HomeTab = ({ navigation, route }) => {
       };
     }, [isFocused])
   );
+
+  useEffect(() => {
+    checkUserForNotifications();
+    return () => {}
+  }, []);
+  const checkUserForNotifications = async () => {
+    //if shouldPromptForPushNotifications does not exist, prompt user for notifications
+    //if shouldPromptForPushNotifications == true, prompt user for notifications
+    let userDoc = await db.collection("users").doc(auth.currentUser.uid).get();
+    if(!userDoc.empty) {
+      const userData = userDoc.data();
+      
+      if(userData.shouldPromptForPushNotifications == undefined
+        || userData.shouldPromptForPushNotifications == true) {
+          //prompt user for notifications
+          const token = await generatePushNotificationsToken();
+          
+          if(!token) {
+            
+            // update profile
+            db.collection('users')
+            .doc(auth.currentUser.uid)
+            .update({
+              shouldPromptForPushNotifications: false,
+            })
+            .catch((error) => console.log(error));
+            return;
+          }
+          else {
+            
+            // update profile
+            db.collection('users')
+            .doc(auth.currentUser.uid)
+            .update({
+              expoPushToken: token,
+              pushNotificationEnabled: true,
+              shouldPromptForPushNotifications: false,
+            })
+            .catch((error) => console.log(error));
+          }
+
+      }
+      else {
+        // do nothing
+      }
+    };
+  };
 
   const getAllData = async () => {
 

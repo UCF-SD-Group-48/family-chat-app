@@ -157,6 +157,7 @@ const VerifyPhone = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={{backgroundColor: "#FCF3EA"}}>
+            <StatusBar style='dark' />
             <ScrollView style={styles.container}>
                 <View style={styles.subtext}>
                     <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 10, fontWeight: 'bold' }}>
