@@ -125,7 +125,7 @@ const AddBanner = ({ navigation, route }) => {
                     messages.push({
                         to: members[uid].expoPushToken,
                         sound: "default",
-                        title: members[auth.currentUser.uid].firstName+" created an alert in \""+topicName+"\"",
+                        title: members[auth.currentUser.uid].firstName+" "+members[auth.currentUser.uid].lastName+" created an alert in \""+topicName+"\"",
                         body: trimmedInput,
                         data: { url: "familychat://"+"chat/"
                         +topicId+"/"+topicName

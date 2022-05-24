@@ -271,11 +271,37 @@ const ProfileStackScreen = () => (
 )
 
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
+  handleNotification: async (notification) => {
+    const currentRouteName = navRef.current.getCurrentRoute().name;
+      // console.log("navRef.current.getCurrentRoute() = "+JSON.stringify(navRef.current.getCurrentRoute()))
+      // console.log("notification = "+JSON.stringify(notification))
+    const notificationTitle = notification.request.content.title;
+    const topic = notificationTitle.substring(notificationTitle.indexOf("\"")+1, notificationTitle.length-1);
+    const name = notificationTitle.substring(0, notificationTitle.indexOf("sent")-1);
+      // console.log("topic = ."+topic+".")
+      // console.log("name = ."+name+".")
+    //show if outside of chat, or topic param doesn't exist or if in a different topic
+    //show if  it's a DM message and first/last name in notification is different than name in dm
+    if(currentRouteName != "Chat"
+      || navRef.current.getCurrentRoute().params == undefined
+      || navRef.current.getCurrentRoute().params.topicName == undefined
+      || navRef.current.getCurrentRoute().params.topicName != topic
+      || (
+        topic == "DMs"
+        && navRef.current.getCurrentRoute().params != undefined
+        && navRef.current.getCurrentRoute().params.topicName != undefined
+        && name != navRef.current.getCurrentRoute().params.otherUserFullName
+      )){
+      return {
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      }
+    }
+    else {
+      return null;
+    }
+  },
 });
 
 const prefix = Linking.createURL('/');
@@ -331,6 +357,8 @@ const linking = {
   config: config,
 };
 
+export const navRef = React.createRef();
+
 // Screen definitions for the application.
 export default function App() {
 
@@ -351,7 +379,7 @@ export default function App() {
       },
     }}>
       {/* <SafeAreaView style={styles.safeAreaContainer}> */}
-        <NavigationContainer linking={linking}>
+        <NavigationContainer linking={linking} ref={navRef}>
           {/* <Stack.Navigator screenOptions={globalScreenOptions} > */}
           <Stack.Navigator>
 

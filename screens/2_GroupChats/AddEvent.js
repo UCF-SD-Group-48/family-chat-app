@@ -172,7 +172,7 @@ const AddEvent = ({ navigation, route }) => {
                 messages.push({
                     to: members[uid].expoPushToken,
                     sound: "default",
-                    title: members[auth.currentUser.uid].firstName+" created an event in \""+topicName+"\"",
+                    title: members[auth.currentUser.uid].firstName+" "+members[auth.currentUser.uid].lastName+" created an event in \""+topicName+"\"",
                     body: title,
                     data: { url: "familychat://"+"chat/"
                     +topicId+"/"+topicName

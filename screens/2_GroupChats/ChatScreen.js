@@ -592,7 +592,7 @@ const ChatScreen = ({ navigation, route }) => {
                     messages.push({
                         to: members[uid].expoPushToken,
                         sound: "default",
-                        title: members[auth.currentUser.uid].firstName+" sent a message in \""+topicName+"\"",
+                        title: members[auth.currentUser.uid].firstName+" "+members[auth.currentUser.uid].lastName+" sent a message in \""+topicName+"\"",
                         body: trimmedInput,
                         data: (isDM)
                             ? ({ url: "familychat://"+"dms" })
@@ -962,7 +962,7 @@ const ChatScreen = ({ navigation, route }) => {
                     messages.push({
                         to: members[uid].expoPushToken,
                         sound: "default",
-                        title: members[auth.currentUser.uid].firstName+" sent an image in \""+topicName+"\"",
+                        title: members[auth.currentUser.uid].firstName+" "+members[auth.currentUser.uid].lastName+" sent an image in \""+topicName+"\"",
                         body: "",
                         data: (isDM)
                             ? ({ url: "familychat://"+"dms" })
