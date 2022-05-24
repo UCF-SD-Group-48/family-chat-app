@@ -25,8 +25,8 @@ const generatePushNotificationsToken = async () => {
 
   if (finalStatus !== 'granted') {
     Alert.alert(
-      'Enable Notifications',
-      'We need permission to enable Push Notifications.\nGo to Settings and Allow Notifications.',
+      'Enable Push Notifications',
+      'To display notifications, go to Settings and Allow Notifications.\nThen enable push notifications within profile.',
       [
         {
           text: 'Cancel',

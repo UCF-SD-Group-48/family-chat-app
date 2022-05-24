@@ -395,7 +395,7 @@ const HomeTab = ({ navigation, route }) => {
               for (const message of snapshot.docs) {
                 //TODO only push the last three?
                 missedMessages.push({
-                  messageText: message.data().message,
+                  messageText: (message.data().imageUID != undefined) ? ("-Sent an Image-") : message.data().message,
                   messageTime: message.data().timestamp,
                   senderFullName: memberUIDToData[message.data().ownerUID].firstName + " " + memberUIDToData[message.data().ownerUID].lastName,
                   senderPFP: memberUIDToData[message.data().ownerUID].pfp,
@@ -425,7 +425,7 @@ const HomeTab = ({ navigation, route }) => {
             });
           }
 
-          //saving all events
+          //saving all polls
           const pollSnapshot = await db.collection('chats').doc(topicUID).collection("polls")
             .where("endTime", ">", new Date()).orderBy('endTime', 'desc').get();
           for (const poll of pollSnapshot.docs) {
